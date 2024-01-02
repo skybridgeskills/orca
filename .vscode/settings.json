@@ -1,0 +1,8 @@
+{
+	"workbench.tree.indent": 12,
+	"editor.formatOnSave": true,
+	"[prisma]": { "editor.defaultFormatter": "Prisma.prisma" },
+	"[svelte]": { "editor.defaultFormatter": "svelte.svelte-vscode" },
+	"[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+	"vitest.include": ["**/tests/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"]
+}

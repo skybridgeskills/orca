@@ -1,0 +1,43 @@
+# This is based on a sample GitLab CI/CD configuration file.
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
+#
+stages:          # List of stages for jobs, and their order of execution
+  #- build
+  - test
+  #- deploy
+
+playwritght-tests-job:   # This job runs in the test stage. 
+  stage: test    # It only starts when the job in the build stage completes successfully.
+  image: mcr.microsoft.com/playwright:v1.40.0-focal
+  # parallel: # maybe use this later
+  #   matrix:
+  #     - PROJECT: ['chromium', 'webkit']
+  #       SHARD_INDEX: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  #       SHARD_TOTAL: 10
+  variables:
+    POSTGRES_VERSION: "15.2"
+    POSTGRES_USER: orcaadmin
+    POSTGRES_PASSWORD: password
+  services:
+    - name: "postgres:${POSTGRES_VERSION}"
+  tags:
+    - linux
+    - docker
+  before_script:
+    - apt update
+    - apt install -y postgresql
+  script:
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h "postgres" -U "$POSTGRES_USER" -f docker-support/postgres/docker-entrypoint-initdb.d/init-db-and-schemas.sql
+    - npm ci
+    - npx dotenv -e .env.test.ci -- npx playwright test #--project=$PROJECT --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      when: always
+    - if: $CI_COMMIT_TAG
+      when: always
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always

@@ -1,0 +1,7 @@
+{
+    "functions": {
+        "**/*": {
+            "includeFiles": "**/node_modules/security-context/contexts/*"
+        }
+    }
+}

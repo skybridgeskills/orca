@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"workbench.tree.indent": 12,
+		"window.title": "ORCA - Open Recognition Community App",
+		"debug.allowBreakpointsEverywhere": true,
+		"explorer.sortOrder": "filesFirst",
+		"explorer.compactFolders": false,
+		"breadcrumbs.symbolPath": "off"
+	}
+}

@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: orcaadmin
+      PGUSER: orcaadmin
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+      - ./docker-support/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+  
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    image: localstack/localstack:1.4.0
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      # - PERSISTENCE=1  # only pro users can use persistence like this.
+      # - LOCALSTACK_API_KEY=<your_key>
+    volumes:
+      - localstackvolume:/var/lib/localstack  # isn't that useful except for pro users, but keeps unnamed volume from being created
+      - /var/run/docker.sock:/var/run/docker.sock
+    profiles:
+      - localstack
+volumes:
+  postgresdata:
+  localstackvolume:

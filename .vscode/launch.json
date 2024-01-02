@@ -1,0 +1,44 @@
+{
+	"configurations": [
+		{
+			"name": "Debug via NPM",
+			"cwd": "${workspaceFolder}",
+			"request": "launch",
+			"runtimeArgs": ["run-script", "debug-dev"],
+			"runtimeExecutable": "npm",
+			"runtimeVersion": "18",
+			"skipFiles": ["<node_internals>/**"],
+			"type": "node",
+			"sourceMaps": true,
+			// "trace": true,
+			"outFiles": [
+				"${workspaceFolder}/**/*",
+				"${workspaceFolder}/.svelte-kit/output/**/*.js",
+				"!**/node_modules/**"
+			],
+			"sourceMapPathOverrides": {
+				"/src/*": "${workspaceFolder}/src/*"
+			}
+		},
+		{
+			"name": "Launch via NPM",
+			"cwd": "${workspaceFolder}",
+			"request": "launch",
+			"runtimeArgs": ["run-script", "dev"],
+			"runtimeExecutable": "npm",
+			"runtimeVersion": "18",
+			"skipFiles": ["<node_internals>/**"],
+			"type": "node",
+			"sourceMaps": true,
+			// "trace": true,
+			"outFiles": [
+				"${workspaceFolder}/**/*",
+				"${workspaceFolder}/.svelte-kit/**/*.js",
+				"!**/node_modules/**"
+			],
+			"sourceMapPathOverrides": {
+				"/src/*": "${workspaceFolder}/src/*"
+			}
+		}
+	]
+}

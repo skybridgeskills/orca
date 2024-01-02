@@ -1,0 +1,243 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["clientExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id                    String                  @id @default(uuid())
+  createdAt             DateTime                @default(now())
+  name                  String
+  description           String
+  email                 String
+  url                   String?
+  domain                String                  @unique @default(uuid())
+  logo                  String?
+  primaryColor          String?
+  achievements          Achievement[]
+  achievementCategories AchievementCategory[]
+  claims                AchievementClaim[]
+  achievementConfigs    AchievementConfig[]
+  credentials           AchievementCredential[]
+  claimInvitations      ClaimEndorsement[]
+  identifiers           Identifier[]
+  profiles              Profile[]
+  userSessions          Session[]
+  signingKeys           SigningKey[]
+  users                 User[]
+}
+
+model User {
+  id                        String                  @id @default(uuid())
+  givenName                 String?
+  familyName                String?
+  organizationId            String
+  orgRole                   RoleType?
+  defaultVisibility         Visibility              @default(COMMUNITY)
+  createdAchievementClaims  AchievementClaim[]      @relation("CreatedAchievementClaims")
+  receivedAchievementClaims AchievementClaim[]      @relation("AchievementClaims")
+  createdCredentials        AchievementCredential[]
+  createdEndorsements       ClaimEndorsement[]      @relation("CreatedEndorsements")
+  identifiers               Identifier[]
+  sessions                  Session[]
+  organization              Organization            @relation(fields: [organizationId], references: [id])
+}
+
+model Identifier {
+  id             String         @id @default(uuid())
+  type           IdentifierType @default(EMAIL)
+  identifier     String
+  verifiedAt     DateTime?
+  organizationId String
+  userId         String
+  visibility     Visibility     @default(COMMUNITY)
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, identifier])
+}
+
+model Achievement {
+  id                String                  @id @default(uuid())
+  organizationId    String
+  achievementType   String?
+  name              String
+  description       String
+  criteriaId        String?
+  criteriaNarrative String?
+  creatorProfileId  String?
+  json              Json
+  identifier        String
+  image             String?
+  achievementStatus AchievementStatus       @default(ACTIVE)
+  categoryId        String?
+  category          AchievementCategory?    @relation(fields: [categoryId], references: [id])
+  creator           Profile?                @relation(fields: [creatorProfileId], references: [id])
+  organization      Organization            @relation(fields: [organizationId], references: [id])
+  achievementClaims AchievementClaim[]
+  achievementConfig AchievementConfig?      @relation("AchievementConfig")
+  claimRequiredBy   AchievementConfig[]     @relation("EnablesClaimOf")
+  reviewEnabledBy   AchievementConfig[]     @relation("EnablesReviewOf")
+  credentials       AchievementCredential[]
+  claimEndorsements ClaimEndorsement[]
+
+  @@unique([organizationId, identifier])
+}
+
+model AchievementConfig {
+  id               String       @id @default(uuid())
+  organizationId   String
+  achievementId    String       @unique
+  claimable        Boolean      @default(false)
+  claimRequiresId  String?
+  reviewRequiresId String?
+  reviewsRequired  Int          @default(0)
+  achievement      Achievement  @relation("AchievementConfig", fields: [achievementId], references: [id])
+  claimRequires    Achievement? @relation("EnablesClaimOf", fields: [claimRequiresId], references: [id])
+  organization     Organization @relation(fields: [organizationId], references: [id])
+  reviewRequires   Achievement? @relation("EnablesReviewOf", fields: [reviewRequiresId], references: [id])
+}
+
+model AchievementCategory {
+  id             String        @id @default(uuid())
+  organizationId String
+  name           String
+  weight         Int           @default(1000)
+  achievements   Achievement[]
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model AchievementCredential {
+  id             String            @id @default(uuid())
+  identifier     String
+  organizationId String
+  achievementId  String
+  json           Json
+  subjectId      String
+  creatorUserId  String
+  profileId      String?
+  claim          AchievementClaim?
+  achievement    Achievement       @relation(fields: [achievementId], references: [id])
+  creatorUser    User              @relation(fields: [creatorUserId], references: [id])
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  Profile        Profile?          @relation(fields: [profileId], references: [id])
+
+  @@index([subjectId])
+}
+
+model AchievementClaim {
+  id             String                 @id @default(uuid())
+  organizationId String
+  credentialId   String?                @unique
+  userId         String
+  achievementId  String
+  json           Json                   @default("{}")
+  claimStatus    ClaimStatus            @default(UNACCEPTED)
+  createdOn      DateTime               @default(now())
+  creatorId      String?
+  validFrom      DateTime?
+  validUntil     DateTime?
+  visibility     Visibility             @default(COMMUNITY)
+  achievement    Achievement            @relation(fields: [achievementId], references: [id])
+  creator        User?                  @relation("CreatedAchievementClaims", fields: [creatorId], references: [id])
+  credential     AchievementCredential? @relation(fields: [credentialId], references: [id])
+  organization   Organization           @relation(fields: [organizationId], references: [id])
+  user           User                   @relation("AchievementClaims", fields: [userId], references: [id])
+  endorsements   ClaimEndorsement[]     @relation("Endorsements")
+  reviewsGiven   ClaimEndorsement[]     @relation("Prerequisite")
+
+  @@unique([userId, achievementId])
+}
+
+model ClaimEndorsement {
+  id             String            @id @default(uuid())
+  organizationId String
+  creatorId      String?
+  claimId        String?
+  inviteeEmail   String
+  json           Json              @default("{}")
+  achievementId  String
+  createdAt      DateTime          @default(now())
+  claimStatus    ClaimStatus       @default(UNACCEPTED)
+  prereqId       String?
+  achievement    Achievement       @relation(fields: [achievementId], references: [id])
+  claim          AchievementClaim? @relation("Endorsements", fields: [claimId], references: [id])
+  creator        User?             @relation("CreatedEndorsements", fields: [creatorId], references: [id])
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  prereq         AchievementClaim? @relation("Prerequisite", fields: [prereqId], references: [id])
+  Session        Session[]
+
+  @@unique([creatorId, achievementId, inviteeEmail])
+}
+
+model Profile {
+  id                  String                  @id @default(uuid())
+  name                String
+  organizationId      String
+  email               String?
+  identifier          String
+  url                 String?
+  json                Json                    @default("{}")
+  createdAchievements Achievement[]
+  issuedCredentials   AchievementCredential[]
+  organization        Organization            @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, identifier])
+}
+
+model Session {
+  id             String            @id @default(uuid())
+  code           String
+  createdAt      DateTime          @default(now())
+  expiresAt      DateTime
+  userId         String?
+  organizationId String
+  valid          Boolean           @default(false)
+  inviteId       String?
+  invite         ClaimEndorsement? @relation(fields: [inviteId], references: [id])
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  user           User?             @relation(fields: [userId], references: [id])
+}
+
+model SigningKey {
+  id                  String       @id @default(uuid())
+  revoked             Boolean      @default(false)
+  publicKeyMultibase  String
+  privateKeyMultibase String
+  organizationId      String
+  organization        Organization @relation(fields: [organizationId], references: [id])
+}
+
+enum Visibility {
+  PUBLIC
+  COMMUNITY
+  ACHIEVEMENT
+  PRIVATE
+}
+
+enum RoleType {
+  GENERAL_ADMIN
+  BILLING_ADMIN
+  CONTENT_ADMIN
+}
+
+enum IdentifierType {
+  EMAIL
+  DID
+  URL
+}
+
+enum AchievementStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum ClaimStatus {
+  ACCEPTED
+  REJECTED
+  UNACCEPTED
+}
