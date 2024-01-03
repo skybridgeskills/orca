@@ -10,6 +10,6 @@
 		"https://cdn.jsdelivr.net/npm/@inlang/plugin-m-function-matcher@latest/dist/index.js"
 	],
 	"plugin.inlang.messageFormat": {
-		"pathPattern": "../src/messages/{languageTag}/orca.json"
+		"pathPattern": "./src/messages/{languageTag}/orca.json"
 	}
 }
