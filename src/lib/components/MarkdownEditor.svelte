@@ -40,10 +40,14 @@
 		},
 		disableIcons: ['taskList']
 	});
+	const labels = {
+		writeTab: m.writeCTA(),
+		previewTab: m.previewCTA()
+	};
 </script>
 
 <div on:click|stopPropagation|preventDefault on:keypress|stopPropagation role="none">
-	<CartaEditor {carta} bind:value theme="default" mode="tabs" />
+	<CartaEditor {carta} {labels} bind:value theme="default" mode="tabs" />
 	<input type="hidden" bind:value name={inputName} />
 </div>
 
