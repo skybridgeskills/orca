@@ -53,11 +53,7 @@ const getSession = async function (sessionId: string, orgId: string) {
 };
 
 export const handle: Handle = async function ({ event, resolve }) {
-	try {
-		event.locals.org = await getOrganizationFromRequest(event);
-	} catch (error) {
-		console.log(error.message);
-	}
+	event.locals.org = await getOrganizationFromRequest(event);
 
 	const cookies = cookie.parse(event.request.headers.get('cookie') || '');
 	if (cookies.sessionId) {
