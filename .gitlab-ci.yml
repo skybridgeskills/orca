@@ -5,13 +5,13 @@
 #
 # For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
 #
-stages:          # List of stages for jobs, and their order of execution
+stages: # List of stages for jobs, and their order of execution
   #- build
   - test
   #- deploy
 
-playwritght-tests-job:   # This job runs in the test stage. 
-  stage: test    # It only starts when the job in the build stage completes successfully.
+playwright-tests-job: # This job runs in the test stage.
+  stage: test # It only starts when the job in the build stage completes successfully.
   image: mcr.microsoft.com/playwright:v1.40.0-focal
   # parallel: # maybe use this later
   #   matrix:
@@ -19,11 +19,11 @@ playwritght-tests-job:   # This job runs in the test stage.
   #       SHARD_INDEX: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   #       SHARD_TOTAL: 10
   variables:
-    POSTGRES_VERSION: "15.2"
+    POSTGRES_VERSION: '15.2'
     POSTGRES_USER: orcaadmin
     POSTGRES_PASSWORD: password
   services:
-    - name: "postgres:${POSTGRES_VERSION}"
+    - name: 'postgres:${POSTGRES_VERSION}'
   tags:
     - linux
     - docker
