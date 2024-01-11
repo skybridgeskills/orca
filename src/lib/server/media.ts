@@ -1,6 +1,13 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client, type S3ClientConfig } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { S3_BUCKET_NAME, S3_REGION, S3_URL, S3_USE_LOCALSTACK } from '$env/static/private';
+import {
+	AWS_ACCESS_KEY_ID,
+	AWS_SECRET_ACCESS_KEY,
+	S3_BUCKET_NAME,
+	S3_REGION,
+	S3_URL,
+	S3_USE_LOCALSTACK
+} from '$env/static/private';
 import { PUBLIC_MEDIA_DOMAIN } from '$env/static/public';
 import { imageUrl } from '$lib/utils/imageUrl';
 
@@ -15,8 +22,12 @@ export const getUploadUrl = async (key: string): Promise<string> => {
 	}
 
 	//do the S3 stuff
-	const aws_client_params: any = {
-		region: S3_REGION
+	const aws_client_params: S3ClientConfig = {
+		region: S3_REGION,
+		credentials: {
+			accessKeyId: AWS_ACCESS_KEY_ID,
+			secretAccessKey: AWS_SECRET_ACCESS_KEY
+		}
 	};
 
 	if ('true' === S3_USE_LOCALSTACK) {
