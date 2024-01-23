@@ -6,7 +6,7 @@ dotenv.config();
 
 export async function GET({ url, locals }) {
 	const requestUrl = new URL(new String(url).toString());
-	const did = `did:web:${requestUrl.hostname}:${requestUrl.port}`;
+	const did = `did:web:${locals.org.domain}`;
 
 	const signingKeys = await prisma.signingKey.findMany({
 		where: {
