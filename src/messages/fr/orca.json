@@ -220,7 +220,7 @@
 	"setting_other": "Paramètres",
 	"share": "Partager",
 	"share_copyUrl": "Copy URL",
-	"share_description": "Vous pouvez copier l'URL publique de votre badge pour la partager via les réseaux sociaux, l'importer dans d'autres sacs à badges, envoyer des e-mails ou l'inclure sur votre CV.",
+	"share_description": "Vous pouvez copier l'URL publique de votre badge pour le partager via les réseaux sociaux, l'importer dans d'autres sacs à badges, envoyer des e-mails ou l'inclure sur votre CV.",
 	"share_qrCode_description": "Affichez ce code QR ou enregistrez-le sur votre appareil pour partager votre badge avec d'autres personnes, par exemple en invitant quelqu'un à vous soutenir.",
 	"share_qrCode_heading": "Partager par QR code",
 	"share_qrCodeImageAltText": "Une image QR Code qui peut être numérisée avec un téléphone ou un scanner",
