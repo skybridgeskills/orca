@@ -235,7 +235,7 @@
 	"status_notYetReviewed_description": "Pas encore examiné. Ce badge est valide une fois qu'il accumule {count} endossements par les détenteurs du badge :",
 	"status_prerequisiteRequired": "Prérequis",
 	"status_rejected": "Rejeté",
-	"status_rejected_description": "Vous avez été invité à revendiquer ce badge, mais vous avez rejeté cette demande. Aucun autre membre de la communauté ne verra que vous avez été invité à revendiquer ce badge.",
+	"status_rejected_description": "Vous avez été invité à revendiquer ce badge, mais vous avez rejeté cette invitation. Aucun autre membre de la communauté ne verra que vous avez été invité à revendiquer ce badge.",
 	"status_underReview": "En cours d'examen",
 	"status_valid": "Valide",
 	"status_verified": "vérifié",
