@@ -34,6 +34,7 @@
 	"award_createUserIfNotExistsOption": "Advanced: Force-create account for this user if they are not yet a member",
 	"award_narrative_description": "You may submit a description of why the member qualifies for this achievement. It will be included in the badge award. If there is a URL that points to evidence of this achievement on the web, you may include that.",
 	"award_narrative_placeholder": "They completed a project...",
+	"award_noneYet": "None awarded yet",
 	"award_recipientEmail": "Recipient email",
 	"awardedBadge": "Awarded badge",
 	"awardedBadge_email_description": "Congratulations, you have been awarded a badge for the achievement {achievementName} in the {communityName} community.\n\nYou can see your badge here and login to update it:\n{badgeUrl}",

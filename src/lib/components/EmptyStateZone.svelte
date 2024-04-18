@@ -11,7 +11,7 @@
 	Use a link in the 
 -->
 
-<div class="bg-white p-6 mt-10 max-w-3xl rounded shadow">
+<div class="bg-white dark:bg-gray-800 p-6 mt-10 max-w-3xl rounded shadow">
 	<div class="flex flex-col sm:flex-row gap-4">
 		<div class="text-gray-500 w-40 dark:text-white">
 			<slot name="image" />
