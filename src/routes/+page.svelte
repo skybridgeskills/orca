@@ -59,7 +59,7 @@
 		<a href="/achievements" class="underline hover:no-underline">{m.achievements_all()}</a>.
 	</p>
 {:else}
-	<EmptyStateZone title="No awards yet">
+	<EmptyStateZone title={m.award_noneYet()}>
 		<Ribbon slot="image" />
 		<p slot="description">
 			{m.seeCTA()}
