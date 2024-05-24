@@ -4,6 +4,11 @@
 
 	import { page } from '$app/stores';
 	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
+	import {
+		achievements,
+		achievementsLoading,
+		fetchAchievements
+	} from '$lib/stores/achievementStore';
 	import { onMount } from 'svelte';
 	import { session } from '$lib/stores/sessionStore';
 	import { notifications } from '$lib/stores/notificationStore';
@@ -38,7 +43,7 @@
 				<Alert
 					message={n.message}
 					dismissable={true}
-					onClose={() => {
+					on:close={() => {
 						notifications.dismissNotification(n.id);
 					}}
 				>

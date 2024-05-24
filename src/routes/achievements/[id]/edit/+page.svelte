@@ -38,4 +38,4 @@
 	{m.achievement_edit_description()}
 </p>
 
-<AchievementForm initialData={formData} {categories} />
+<AchievementForm achievementId={data.achievement.id} initialData={formData} {categories} />

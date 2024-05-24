@@ -34,7 +34,7 @@
 		<span>
 			{#if page > 1 && maxPage > 1}
 				<span class="inline-block text-blue-500">
-					<Button onClick={() => action(page - 1)} submodule="secondary"
+					<Button on:click={() => action(page - 1)} submodule="secondary"
 						><Icon src={FiChevronLeft} size="16" /></Button
 					>
 				</span>
@@ -53,7 +53,7 @@
 			{/each}
 			{#if page < maxPage && maxPage > 1}
 				<span class="inline-block text-blue-500">
-					<Button onClick={() => action(page + 1)} submodule="secondary"
+					<Button on:click={() => action(page + 1)} submodule="secondary"
 						><Icon src={FiChevronRight} size="16" /></Button
 					>
 				</span>

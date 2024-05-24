@@ -78,7 +78,7 @@
 		<AchievementSummary
 			{claim}
 			achievement={claim.achievement}
-			hoverEffect={true}
+			isClickable={true}
 			href={`/claims/${claim.id}`}
 			linkAchievement={false}
 		>

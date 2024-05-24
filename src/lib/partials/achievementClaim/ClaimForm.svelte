@@ -196,6 +196,11 @@
 			text={m.submitCTA()}
 			id="claimFormSubmitButton"
 		/>
-		<Button submodule="secondary" buttonType="button" text={m.cancelCTA()} onClick={handleCancel} />
+		<Button
+			submodule="secondary"
+			buttonType="button"
+			text={m.cancelCTA()}
+			on:click={handleCancel}
+		/>
 	</div>
 </form>

@@ -102,7 +102,7 @@
 			<Button
 				text={m.achievement_awardAnotherCTA()}
 				submodule="secondary"
-				onClick={() => {
+				on:click={() => {
 					form = null;
 				}}
 			/>

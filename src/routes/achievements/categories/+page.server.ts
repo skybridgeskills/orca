@@ -9,24 +9,6 @@ export const load: PageServerLoad = ({ params, locals }) => {
 	// Don't include edit controls if not an admin
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
 		throw redirect(302, `/achievements`);
-
-	let categories = prisma.achievementCategory.findMany({
-		where: {
-			organizationId: locals.org.id
-		},
-		include: {
-			_count: {
-				select: { achievements: true }
-			}
-		},
-		orderBy: {
-			weight: 'desc'
-		}
-	});
-
-	return {
-		categories
-	};
 };
 
 export const actions: Actions = {
@@ -53,7 +35,7 @@ export const actions: Actions = {
 			data: formData
 		});
 
-		return category;
+		return { ...category, _count: { achievements: 0 } };
 	},
 
 	update: async ({ locals, cookies, request, params }) => {

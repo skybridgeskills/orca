@@ -9,7 +9,7 @@
 	x="0px"
 	y="0px"
 	width="100%"
-	height="auto"
+	height="100%"
 	viewBox="0 0 930.3 930.301"
 	style="enable-background:new 0 0 930.3 930.301;"
 	xml:space="preserve"

@@ -94,7 +94,7 @@
 
 					<Button
 						text={m.claim_sendToWalletCTA()}
-						onClick={() => {
+						on:click={() => {
 							sendToWalletModalVisible = true;
 						}}
 						submodule="secondary"
@@ -103,7 +103,7 @@
 
 				<Button
 					text={m.claim_editCTA()}
-					onClick={() => {
+					on:click={() => {
 						claimIntent = 'ACCEPTED';
 						showClaimForm = true;
 					}}
@@ -112,7 +112,7 @@
 				<Button
 					submodule="danger"
 					text={m.claim_rejectCTA()}
-					onClick={() => {
+					on:click={() => {
 						claimIntent = 'REJECTED';
 						showClaimForm = true;
 					}}
@@ -138,7 +138,7 @@
 				class="text-xs"
 				submodule="secondary"
 				text={m.share_copyUrl()}
-				onClick={(e) => {
+				on:click={(e) => {
 					if (!existingBadgeClaim || !achievement || !navigator.clipboard) {
 						return;
 					}
@@ -153,7 +153,7 @@
 				class="text-xs"
 				submodule="secondary"
 				text={m.qrCode()}
-				onClick={() => {
+				on:click={() => {
 					showQRShareModal = true;
 				}}
 			/>

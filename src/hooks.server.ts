@@ -7,7 +7,6 @@ import {
 	availableLanguageTags,
 	type AvailableLanguageTag
 } from '$lib/i18n/runtime';
-import type { Organization } from '@prisma/client';
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 
 const getOrganizationFromRequest = async function (event: RequestEvent) {
