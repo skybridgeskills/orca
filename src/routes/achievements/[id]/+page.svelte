@@ -19,17 +19,24 @@
 	import QRCode from '$lib/components/QRCode.svelte';
 	import type {
 		Achievement,
+		AchievementCategory,
 		AchievementClaim,
 		AchievementConfig,
 		ClaimEndorsement,
 		User
 	} from '@prisma/client';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
-	import { getCategoryById } from '$lib/stores/achievementStore';
+	import {
+		acLoading,
+		achievementCategories,
+		fetchAchievementCategories,
+		getCategoryById
+	} from '$lib/stores/achievementStore';
 	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
+	import { ensureLoaded } from '$lib/stores/common';
 
 	dayjs.extend(relativeTime);
 
@@ -45,6 +52,7 @@
 
 	let config: AchievementConfig | null = null;
 	let claim: AchievementClaim | undefined;
+	let category: AchievementCategory | undefined;
 	let userHoldsRequiredAchievement = false;
 	let reviewRequires: Achievement | undefined;
 	let invite: (ClaimEndorsement & { creator: User | null }) | undefined;
@@ -63,6 +71,13 @@
 
 	setContext('achievementId', data.achievement.id);
 	setContext('session', data.session);
+
+	onMount(async () => {
+		if (!data.achievement.categoryId) return;
+
+		await ensureLoaded($achievementCategories, fetchAchievementCategories, $acLoading);
+		category = getCategoryById(data.achievement.categoryId ?? 'Uncategorized');
+	});
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
@@ -112,10 +127,10 @@
 	</div>
 </div>
 
-{#if data.achievement.categoryId}
+{#if category !== undefined}
 	<span
 		class="bg-gray-100 text-gray-800 text-md font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
-		>{m.category()}: {getCategoryById(data.achievement.categoryId)?.name}</span
+		>{m.category()}: {category.name}</span
 	>
 {/if}
 
