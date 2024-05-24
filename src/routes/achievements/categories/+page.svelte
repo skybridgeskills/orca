@@ -5,7 +5,7 @@
 	import ButtonGroup from '$lib/components/ButtonGroup.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import {
-		achievementCagegories,
+		achievementCategories,
 		upsertAchievementCategory,
 		deleteAchievementCategory,
 		fetchAchievementCategories,
@@ -95,7 +95,7 @@
 			</thead>
 
 			<tbody>
-				{#each $achievementCagegories as category (category.id)}
+				{#each $achievementCategories as category (category.id)}
 					{#if category.id == currentlyEditingCategory.id}
 						<!-- Editing Category in table row -->
 						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
