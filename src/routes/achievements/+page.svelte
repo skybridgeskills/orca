@@ -2,35 +2,57 @@
 	import * as m from '$lib/i18n/messages';
 	import type { PageData } from './$types';
 	import Button from '$lib/components/Button.svelte';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
-	import RightArrow from '$lib/illustrations/RightArrow.svelte';
 	import Card from '$lib/components/Card.svelte';
-	import type { AchievementCategory, Achievement } from '@prisma/client';
+	import {
+		achievements,
+		achievementsLoading,
+		fetchAchievements,
+		achievementCategories,
+		acLoading,
+		fetchAchievementCategories
+	} from '$lib/stores/achievementStore';
+	import type { AchievementCategory, Achievement, AchievementConfig } from '@prisma/client';
 	import { session } from '$lib/stores/sessionStore';
 	import Heading from '$lib/components/Heading.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
+	import { onMount, tick } from 'svelte';
+	import { ensureLoaded, LoadingStatus } from '$lib/stores/common';
+	import Alert from '$lib/components/Alert.svelte';
+	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 
 	export let data: PageData;
-	const achievements = data.achievements;
 	const categories = [
 		...data.categories,
 		{
 			id: 'uncategorized',
 			organizationId: data.org.id,
-			name: 'Uncategorized',
+			name: m.uncategorized(),
 			weight: -1
 		}
 	];
 
-	const categoryAchievements: { [key: string]: Array<Achievement> } = {};
+	const categoryAchievements: {
+		[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;
+	} = {};
+	const mapCategories = () => {
+		$achievementCategories.map(
+			(c: AchievementCategory) =>
+				(categoryAchievements[c.id] = $achievements.filter(
+					(a: Achievement) => a.categoryId == c.id || (!a.categoryId && c.id == 'uncategorized')
+				))
+		);
+	};
 
-	categories.map(
-		(category: AchievementCategory) =>
-			(categoryAchievements[category.id] = achievements.filter(
-				(a: Achievement) =>
-					a.categoryId == category.id || (!a.categoryId && category.id == 'uncategorized')
-			))
-	);
+	onMount(async () => {
+		await Promise.all([
+			ensureLoaded($achievements, fetchAchievements, $achievementsLoading),
+			ensureLoaded($achievementCategories, fetchAchievementCategories, $acLoading)
+		]);
+		await tick();
+		mapCategories();
+	});
 </script>
 
 <Heading title={m.achievement_other()} description={m.achievements_description()} />
@@ -42,8 +64,20 @@
 	</div>
 {/if}
 
+{#if [LoadingStatus.NotStarted, LoadingStatus.Loading].includes($achievementsLoading)}
+	<LoadingSpinner />
+{/if}
+{#if $achievementsLoading == LoadingStatus.Error}
+	<Alert level="warning" message={m.achievements_errorLoading()} />
+{/if}
+{#if $achievementsLoading == LoadingStatus.Complete && !$achievements?.length}
+	<EmptyStateZone
+		title={m.achievements_noneFound()}
+		description={m.achievements_noneFound_description()}
+	/>
+{/if}
 {#each categories as category}
-	{#if categoryAchievements[category.id].length}
+	{#if categoryAchievements[category.id]?.length}
 		<h2 class="text-l sm:text-xl font-bold mt-6 mb-4 dark:text-white">{category.name}</h2>
 		<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
 			{#each categoryAchievements[category.id] as achievement}

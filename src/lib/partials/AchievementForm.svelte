@@ -7,12 +7,22 @@
 	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
 	import type * as yup from 'yup';
 	import type { AchievementCategory } from '@prisma/client';
+	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
-	import type { Action, ActionResult } from './$types';
+	import type { ActionResult } from '@sveltejs/kit';
+	import {
+		achievements,
+		achievementsLoading,
+		fetchAchievements,
+		upsertAchievement
+	} from '$lib/stores/achievementStore';
+	import { onMount } from 'svelte';
+	import { ensureLoaded } from '$lib/stores/common';
 
 	export let categories: Array<AchievementCategory>;
 	export let initialData;
+	export let achievementId = '';
 	let formData = { ...initialData };
 
 	let noErrors = {
@@ -69,27 +79,25 @@
 		const result: ActionResult = deserialize(responseText);
 		switch (result.type) {
 			case 'failure':
-			// fall through to success block
+				if (result.data?.code == 'config_claimRequires')
+					errors['claimRequires'] = m.requirement_statusInvalid();
+				break;
 			case 'success':
-				if (response.status == 400) {
-					if (result.code == 'config_achievementRequires')
-						errors['claimRequires'] = m.requirement_statusInvalid();
-				} else {
-					//read the upload url and put the image data to it.
-					if (formData['image'] && result.data?.imageUploadUrl) {
-						const imageAsBlob = await (await fetch(formData['image'])).blob();
-						const contentType = `image/${formData['imageExtension'] === 'png' ? 'png' : 'svg+xml'}`;
-						await fetch(result.data.imageUploadUrl, {
-							method: 'PUT',
-							body: imageAsBlob,
-							headers: {
-								'Content-Type': contentType
-							}
-						});
-					}
-
-					goto(`/achievements/${result.data?.achievement.id}`);
+				//read the upload url and put the image data to it.
+				if (formData['image'] && result.data?.imageUploadUrl) {
+					const imageAsBlob = await (await fetch(formData['image'])).blob();
+					const contentType = `image/${formData['imageExtension'] === 'png' ? 'png' : 'svg+xml'}`;
+					await fetch(result.data.imageUploadUrl, {
+						method: 'PUT',
+						body: imageAsBlob,
+						headers: {
+							'Content-Type': contentType
+						}
+					});
 				}
+
+				upsertAchievement(result.data?.achievement);
+				goto(`/achievements/${result.data?.achievement.id}`);
 				break;
 			case 'redirect':
 				goto(result.location);
@@ -98,6 +106,10 @@
 				console.error(result.error);
 		}
 	};
+
+	onMount(async () => {
+		await ensureLoaded($achievements, fetchAchievements, $achievementsLoading);
+	});
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>
@@ -186,7 +198,7 @@
 		</div>
 	</div>
 
-	<div class="max-w-2xl">
+	<div class="max-w-2xl space-y-6">
 		<!-- Criteria -->
 
 		<Heading title={m.criteria()} description={m.criteria_description()} level="h2" />
@@ -200,7 +212,7 @@
 			{/if}
 		</div>
 
-		<div class="mb-6" class:isError={errors.criteriaId}>
+		<div class:isError={errors.criteriaId}>
 			<label
 				for="achievementEdit_url"
 				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -222,7 +234,7 @@
 
 		<Heading title={m.claimConfiguration_heading()} level="h2" />
 
-		<div class="mb-6" class:isError={errors.claimable}>
+		<div class:isError={errors.claimable}>
 			<div class="flex items-center">
 				<input
 					bind:checked={formData.claimable}
@@ -243,31 +255,18 @@
 			{/if}
 		</div>
 
-		<div class="mb-6" class:isError={errors.claimRequires}>
-			<label
-				for="achievementEdit_claimRequires"
-				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.claimConfiguration_requiredAchievement()}</label
-			>
-			<input
-				type="text"
-				id="achievementEdit_claimRequires"
-				name="config_achievementRequires"
-				class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-				placeholder=""
-				bind:value={formData.claimRequires}
-				on:blur={validate}
-			/>
-			{#if errors.claimRequires}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
-					{errors.claimRequires}
-				</p>{/if}
-			<!-- TODO: make this a light gray like the other label descriptions, another chance for a forminput component -->
-			<p class="mt-4 text-sm text-gray-900 dark:text-gray-300">
-				{m.claimConfiguration_requiredAchievement_description()}
-			</p>
-		</div>
+		<AchievementSelect
+			bind:badgeId={formData.claimRequires}
+			on:validate={validate}
+			label={m.claimConfiguration_requiredAchievement()}
+			description={m.claimConfiguration_requiredAchievement_description()}
+			achievementFilter={(a) => a.id != achievementId}
+			inputId="achievementEdit_claimRequires"
+			inputName="config_achievementRequires"
+			errorMessage={errors.claimRequires}
+		/>
 
-		<div class="mb-6" class:isError={errors.reviewsRequired}>
+		<div class:isError={errors.reviewsRequired}>
 			<label
 				for="achievementEdit_reviewsRequired"
 				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -293,31 +292,16 @@
 			</p>
 		</div>
 
-		<div class="mb-6" class:isError={errors.reviewRequires}>
-			<label
-				for="achievementEdit_reviewRequires"
-				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.claimConfiguration_reviewRequires()}</label
-			>
-			<input
-				type="text"
-				id="achievementEdit_reviewRequires"
-				name="config_reviewRequires"
-				class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-				placeholder=""
-				bind:value={formData.reviewRequires}
-				on:blur={validate}
-			/>
-			{#if errors.reviewRequires}
-				<p class="mt-2 text-sm text-red-600 dark:text-red-500">
-					{errors.reviewRequires}
-				</p>
-			{/if}
-
-			<p class="mt-4 text-sm text-gray-900 dark:text-gray-300">
-				{m.claimConfiguration_reviewRequires_description()}
-			</p>
-		</div>
+		<AchievementSelect
+			bind:badgeId={formData.reviewRequires}
+			on:validate={validate}
+			label={m.claimConfiguration_reviewRequires()}
+			description={m.claimConfiguration_reviewRequires_description()}
+			achievementFilter={(a) => a.id != achievementId}
+			inputId="achievementEdit_reviewRequires"
+			inputName="config_reviewRequires"
+			errorMessage={errors.reviewRequires}
+		/>
 
 		<div class="flex items-center lg:order-2">
 			<button

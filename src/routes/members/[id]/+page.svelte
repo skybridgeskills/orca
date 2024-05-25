@@ -28,7 +28,7 @@
 			<Button
 				text={m.share()}
 				submodule="secondary"
-				onClick={() => {
+				on:click={() => {
 					showShareModal = true;
 				}}
 			/>

@@ -65,7 +65,9 @@
 		<ActionHeading
 			text={`${data.claim.user.givenName} ${data.claim.user.familyName} claimed this badge`}
 		>
-			<span slot="actions">{data.claim.createdOn.toDateString()}</span>
+			<span slot="actions" class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400"
+				>{data.claim.createdOn.toDateString()}</span
+			>
 		</ActionHeading>
 
 		<EvidenceItem item={evidenceItem(data.claim)} />

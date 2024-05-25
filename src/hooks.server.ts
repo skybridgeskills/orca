@@ -7,24 +7,21 @@ import {
 	availableLanguageTags,
 	type AvailableLanguageTag
 } from '$lib/i18n/runtime';
-import type { Organization } from '@prisma/client';
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 
 const getOrganizationFromRequest = async function (event: RequestEvent) {
 	const domain = event.url.host || '';
 
-	let org = await prisma.organization.findUnique({
-		where: { domain }
+	let orgs = await prisma.organization.findMany({
+		where: {
+			domain: DEFAULT_ORG_ENABLED === 'true' ? { in: [domain, DEFAULT_ORG_DOMAIN ?? ''] } : domain
+		}
 	});
-	if (!org && DEFAULT_ORG_ENABLED === 'true') {
-		org = await prisma.organization.findUniqueOrThrow({
-			where: { domain: DEFAULT_ORG_DOMAIN || '' }
-		});
-	} else if (!org) {
+	if (orgs.length == 0) {
 		throw error(404, m.organization_notFoundError());
 	}
 
-	return org;
+	return orgs.find((org) => org.domain === domain) || orgs[0];
 };
 
 const getSession = async function (sessionId: string, orgId: string) {

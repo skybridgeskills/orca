@@ -1,15 +1,16 @@
 <script lang="ts">
 	import RightArrow from '$lib/illustrations/RightArrow.svelte';
+	import { createEventDispatcher } from 'svelte';
 	let klass = '';
 	export { klass as class };
 	export let text: string = '';
 	export let href: string = '';
 	export let id: string = '';
 	export let buttonType: 'button' | 'submit' = 'button';
-	export let onClick: (e: Event) => void | Promise<void> = (e: Event) => {};
 	export let moreProps: Object = {};
 	export let submodule: App.ButtonRole = 'primary';
-	// hasIcon
+
+	const dispatch = createEventDispatcher();
 
 	let defaultClasses = `flex items-center mr-3 focus:outline-none focus:ring-4 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${klass}`;
 	const submoduleClassList = {
@@ -28,9 +29,9 @@
 		{id}
 		type={buttonType}
 		{...moreProps}
-		on:click={(e) => onClick(e)}
+		on:click
 		on:keypress={(e) => {
-			if (e.key == 'Enter' || e.key == ' ') onClick(e);
+			if (e.key == 'Enter' || e.key == ' ') dispatch('click');
 		}}
 		class={submoduleClassList[submodule]}
 	>

@@ -46,6 +46,7 @@
 
 <AchievementSummary
 	{claim}
+	achievementHref={`/achievements/${achievement.id}/claim`}
 	achievement={{
 		...achievement,
 		name: claim.claimStatus == 'ACCEPTED' ? m.claim_statusAccepted() : m.status_rejected(),

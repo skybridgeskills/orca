@@ -39,7 +39,9 @@ test('achievement claim to credential', async () => {
 
 	expect(credentialResult).toBeDefined();
 	expect(credentialResult.id).toEqual(`urn:uuid:${achievementClaimForTest.id}`);
-	expect(credentialResult.name).toEqual(achievementClaimForTest.achievement.name);
+	expect(credentialResult.credentialSubject.achievement.name).toEqual(
+		achievementClaimForTest.achievement.name
+	);
 	expect(credentialResult.type).toEqual(['VerifiableCredential', 'OpenBadgeCredential']);
 	expect(credentialResult.proof).toBeDefined();
 	expect(credentialResult.proof?.type).toEqual('Ed25519Signature2020');

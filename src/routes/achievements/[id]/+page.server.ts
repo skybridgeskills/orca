@@ -1,16 +1,9 @@
 import * as m from '$lib/i18n/messages';
 import { prisma } from '$lib/../prisma/client';
-import type {
-	Achievement,
-	AchievementCategory,
-	AchievementConfig,
-	ClaimEndorsement,
-	User
-} from '@prisma/client';
+import type { ClaimEndorsement, User } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { Prisma } from '@prisma/client';
 
 export const load: PageServerLoad = async ({ url, params, locals }) => {
 	const achievementId = params.id;
@@ -26,7 +19,6 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 			_count: {
 				select: { achievementClaims: true }
 			},
-			category: true,
 			achievementConfig: true
 		}
 	});
@@ -41,7 +33,6 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 			}
 		},
 		include: {
-			category: true,
 			achievementConfig: true
 		}
 	});

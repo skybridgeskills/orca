@@ -19,16 +19,24 @@
 	import QRCode from '$lib/components/QRCode.svelte';
 	import type {
 		Achievement,
+		AchievementCategory,
 		AchievementClaim,
 		AchievementConfig,
 		ClaimEndorsement,
 		User
 	} from '@prisma/client';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import {
+		acLoading,
+		achievementCategories,
+		fetchAchievementCategories,
+		getCategoryById
+	} from '$lib/stores/achievementStore';
 	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
+	import { ensureLoaded } from '$lib/stores/common';
 
 	dayjs.extend(relativeTime);
 
@@ -44,6 +52,7 @@
 
 	let config: AchievementConfig | null = null;
 	let claim: AchievementClaim | undefined;
+	let category: AchievementCategory | undefined;
 	let userHoldsRequiredAchievement = false;
 	let reviewRequires: Achievement | undefined;
 	let invite: (ClaimEndorsement & { creator: User | null }) | undefined;
@@ -62,6 +71,13 @@
 
 	setContext('achievementId', data.achievement.id);
 	setContext('session', data.session);
+
+	onMount(async () => {
+		if (!data.achievement.categoryId) return;
+
+		await ensureLoaded($achievementCategories, fetchAchievementCategories, $acLoading);
+		category = getCategoryById(data.achievement.categoryId ?? 'Uncategorized');
+	});
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
@@ -80,12 +96,12 @@
 			/>
 			<Button
 				submodule="danger"
-				onClick={() => {
+				on:click={() => {
 					showDeleteModal = true;
 				}}
 			>
 				<span class="sr-only">{m.deleteCTA()}</span>
-				<div class="icon">
+				<div class="h-4 w-4">
 					<Icon src={FaTrashAlt} size="16" color="currentColor" />
 				</div>
 			</Button>
@@ -93,7 +109,7 @@
 		<Button
 			text={m.share()}
 			submodule="secondary"
-			onClick={() => {
+			on:click={() => {
 				showShareModal = true;
 			}}
 		/>
@@ -111,10 +127,10 @@
 	</div>
 </div>
 
-{#if data.achievement.category}
+{#if category !== undefined}
 	<span
 		class="bg-gray-100 text-gray-800 text-md font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
-		>{m.category()}: {data.achievement.category.name}</span
+		>{m.category()}: {category.name}</span
 	>
 {/if}
 
@@ -164,7 +180,7 @@
 			<div slot="actions">
 				<div class="p-2 flex flex-row space-x-3">
 					<a
-						class="icon text-gray-600 w-4 h-4 cursor-pointer"
+						class="text-gray-600 w-4 h-4 cursor-pointer"
 						href={invite
 							? `/achievements/${data.achievement.id}/claim?i=${invite?.id}&e=${encodeURIComponent(
 									invite?.inviteeEmail
@@ -327,10 +343,3 @@
 		alt={m.share_qrCodeImageAltText()}
 	/>
 </Modal>
-
-<style>
-	.icon {
-		width: 16px;
-		height: 16px;
-	}
-</style>

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { createEventDispatcher } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
 	export let level: 'info' | 'warning' | 'success' | 'error' = 'info';
 	export let message: string = '';
 	export let heading: string = '';
 	export let dismissable: boolean = false;
 	export let elementId: string = uuidv4();
-	export let onClose: () => void = () => {};
+	const dispatch = createEventDispatcher();
 </script>
 
 {#if dismissable}
@@ -20,7 +21,9 @@
 			class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 inline-flex items-center justify-center h-8 w-8 dark:hover:bg-gray-700 {level}"
 			data-dismiss-target={elementId}
 			aria-label={m.close()}
-			on:click={onClose}
+			on:click={() => {
+				dispatch('close');
+			}}
 		>
 			<span class="sr-only">{m.close()}</span>
 			<svg

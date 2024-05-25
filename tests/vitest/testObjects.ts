@@ -27,7 +27,8 @@ export const testUser: User = {
 	givenName: 'Test',
 	familyName: 'User',
 	orgRole: null,
-	organizationId: testOrganization.id
+	organizationId: testOrganization.id,
+	defaultVisibility: 'PRIVATE'
 };
 
 export const testUserIdentifier: Identifier = {
@@ -36,7 +37,8 @@ export const testUserIdentifier: Identifier = {
 	identifier: 'testuser@example.com',
 	verifiedAt: testDate,
 	userId: testUser.id,
-	organizationId: testOrganization.id
+	organizationId: testOrganization.id,
+	visibility: 'PRIVATE'
 };
 
 export const testAchievement: Achievement = {
@@ -66,6 +68,7 @@ export const testAchievementClaim: AchievementClaim = {
 	claimStatus: 'ACCEPTED',
 	validFrom: testDate,
 	validUntil: null,
+	visibility: 'PRIVATE',
 	json: null
 };
 

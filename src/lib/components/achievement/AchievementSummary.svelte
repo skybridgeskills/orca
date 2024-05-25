@@ -5,19 +5,30 @@
 	import StatusTag from '$lib/components/StatusTag.svelte';
 	import type { Achievement, AchievementClaim } from '@prisma/client';
 	import { imageUrl } from '$lib/utils/imageUrl';
+	import { createEventDispatcher } from 'svelte';
 
 	export let achievement: Achievement;
 	export let linkAchievement = true;
+	export let achievementHref = '';
 	export let claim: AchievementClaim | null = null;
-	export let hoverEffect = false;
 	export let href = '';
+	export let imageSize: '16' | '32' = '32'; // Tailwind width https://tailwindcss.com/docs/width
+	export let isClickable = false;
+
+	const dispatcher = createEventDispatcher();
 </script>
 
 <svelte:element
 	this={!!href ? 'a' : 'section'}
 	href={href || undefined}
-	class="relative max-w-2xl shadow-lg bg-white p-6 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex flex-col {hoverEffect
-		? 'hover:shadow-xl hover:border-gray-300'
+	on:click={() => {
+		if (isClickable) dispatcher('click');
+	}}
+	role={isClickable ? 'button' : 'listitem'}
+	tabindex="-1"
+	aria-roledescription={m.achievement_selectThisCTA()}
+	class="relative max-w-2xl bg-white p-6 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex flex-col {isClickable
+		? 'hover:shadow-lg hover:dark:shadow-gray-800 hover:border-gray-300 hover:dark:border-gray-500 cursor-pointer'
 		: ''}"
 >
 	{#if claim?.claimStatus}
@@ -35,11 +46,17 @@
 			{#if achievement.image}
 				<img
 					src={imageUrl(achievement.image)}
-					class="w-32 object-scale-down"
+					class="object-scale-down"
+					class:w-32={imageSize === '32'}
+					class:w-16={imageSize === '16'}
 					alt={m.achievementImageAltText({ name: achievement.name })}
 				/>
 			{:else}
-				<div class="w-32 text-gray-400 dark:text-gray-700">
+				<div
+					class={`text-gray-400 dark:text-gray-700`}
+					class:w-32={imageSize === '32'}
+					class:w-16={imageSize === '16'}
+				>
 					<Ribbon />
 				</div>
 			{/if}
@@ -50,8 +67,10 @@
 			<h3
 				class="max-w-2xl mb-4 text-xl font-extrabold tracking-tight leading-none lg:text-2xl xl:text-3xl dark:text-white"
 			>
-				{#if linkAchievement}
-					<a href="/achievements/{achievement.id}/claim">{achievement.name}</a>
+				{#if achievementHref}
+					<a href={achievementHref}>{achievement.name}</a>
+				{:else if linkAchievement}
+					<a href="/achievements/{achievement.id}">{achievement.name}</a>
 				{:else}
 					{achievement.name}
 				{/if}

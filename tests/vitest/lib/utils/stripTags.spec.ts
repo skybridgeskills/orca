@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 
 import stripTags from '$lib/utils/stripTags';
 
-test('undefined returned if nothing passed', () => {
+test('Empty string returned if nothing passed', () => {
 	expect(stripTags()).toEqual('');
 });
 

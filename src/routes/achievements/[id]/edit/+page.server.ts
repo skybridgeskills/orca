@@ -1,6 +1,6 @@
 import * as m from '$lib/i18n/messages';
 import type { PageServerLoad, Actions } from './$types';
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { prisma } from '../../../../prisma/client';
 import { Prisma } from '@prisma/client';
 import stripTags from '../../../../lib/utils/stripTags';
@@ -96,7 +96,7 @@ export const actions: Actions = {
 		try {
 			await achievementFormSchema.validate(formData);
 		} catch (err) {
-			if (err instanceof ValidationError) throw error(400, err.message);
+			if (err instanceof ValidationError) return fail(400, { message: err.message });
 		}
 
 		// If achievement is not claimable, don't allow claimRequires to be set to anything.
@@ -123,7 +123,7 @@ export const actions: Actions = {
 		} catch (e) {
 			if (e instanceof Prisma.PrismaClientKnownRequestError) {
 				if (e.code == 'P2025') {
-					throw error(400, {
+					return fail(400, {
 						code: 'claimRequires',
 						message: m.claimConfiguration_relatedAchievementNotFoundError()
 					});
@@ -134,8 +134,8 @@ export const actions: Actions = {
 
 		const updated = await prisma.achievement.update({
 			where: {
-				id: params.id
-				// TODO: this doesn't explicitly check the org relationship, so might be cross-org security gap. It errored when I tried.
+				id: params.id,
+				organizationId: locals.org.id
 			},
 			include: {
 				category: true,

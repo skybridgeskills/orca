@@ -7,6 +7,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const achievements = await prisma.achievement.findMany({
 		where: {
 			organizationId: locals.org.id
+		},
+		include: {
+			achievementConfig: true
 		}
 	});
 	const categories = await prisma.achievementCategory.findMany({

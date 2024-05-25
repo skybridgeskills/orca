@@ -36,7 +36,7 @@
 		<div>
 			<Button
 				text="Change acceptance"
-				onClick={() => {
+				on:click={() => {
 					showClaimForm = true;
 				}}
 			/>

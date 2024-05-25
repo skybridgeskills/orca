@@ -71,9 +71,9 @@
 	"claimConfiguration_openClaimableCTA": "Claim to join the community",
 	"claimConfiguration_relatedAchievementNotFoundError": "Could not save Achievement settings. The requested related Achievement was not found.",
 	"claimConfiguration_requiredAchievement": "Achievement required to claim",
-	"claimConfiguration_requiredAchievement_description": "Enter the ID of an achievement that a member must already hold in order to be able to claim this badge. You can find the ID of the badge in your browser's location bar when viewing its details after you select it from the list of achievements. This manual entry will be replaced with a search interface as soon as possible.",
+	"claimConfiguration_requiredAchievement_description": "Select an achievement that a member must already hold in order to be able to claim this badge.",
 	"claimConfiguration_reviewRequires": "Achievement required to review claims",
-	"claimConfiguration_reviewRequires_description": "Enter the ID of an achievement that qualifies a member to be a reviewer for claims for this achievement. If you don't enter anything, and you have required a review, any single admin review will be sufficient to validate claims.",
+	"claimConfiguration_reviewRequires_description": "Select an achievement that qualifies a member to be a reviewer for claims for this achievement.",
 	"claimConfiguration_reviewsRequired": "Number of reviews required (0-5)",
 	"claimConfiguration_reviewsRequiredSummary": "Claims require review by {reviewsRequired} members who hold the achievement:",
 	"claimConfiguration_reviewsRequired_description": "Enter the number of reviews required before claims become valid. If 0 reviews are required, claims are immediately valid.",
@@ -251,5 +251,12 @@
 	"verificationCode": "Verification code",
 	"view": "View",
 	"writeCTA": "Write",
-	"yourEmail": "Your email address"
+	"yourEmail": "Your email address",
+	"removeCTA": "Remove",
+	"changeCta": "Change",
+	"achievement_selectThisCTA": "Select this achievement",
+	"achievement_searchByName": "Search Achievements by name",
+	"achievements_noneFound": "No achievements found.",
+	"achievements_noneFound_description": "This community does not have any visible achievements.",
+	"achievements_errorLoading": "Error loading achievements"
 }
