@@ -23,21 +23,18 @@
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 
 	export let data: PageData;
-	const categories = [
-		...data.categories,
-		{
-			id: 'uncategorized',
-			organizationId: data.org.id,
-			name: m.uncategorized(),
-			weight: -1
-		}
-	];
+	const U = {
+		id: 'uncategorized',
+		organizationId: data.org.id,
+		name: m.uncategorized(),
+		weight: -1
+	};
 
 	const categoryAchievements: {
 		[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;
 	} = {};
 	const mapCategories = () => {
-		$achievementCategories.map(
+		[...$achievementCategories, U].map(
 			(c: AchievementCategory) =>
 				(categoryAchievements[c.id] = $achievements.filter(
 					(a: Achievement) => a.categoryId == c.id || (!a.categoryId && c.id == 'uncategorized')
@@ -76,7 +73,7 @@
 		description={m.achievements_noneFound_description()}
 	/>
 {/if}
-{#each categories as category}
+{#each [...$achievementCategories, U] as category}
 	{#if categoryAchievements[category.id]?.length}
 		<h2 class="text-l sm:text-xl font-bold mt-6 mb-4 dark:text-white">{category.name}</h2>
 		<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
