@@ -20,7 +20,9 @@
 		</slot>
 	</div>
 
-	<div class="w-full inline-flex items-center pt-3">
-		<slot name="actions" />
-	</div>
+	{#if $$slots.actions}
+		<div class="w-full inline-flex items-center pt-3">
+			<slot name="actions" />
+		</div>
+	{/if}
 </svelte:element>

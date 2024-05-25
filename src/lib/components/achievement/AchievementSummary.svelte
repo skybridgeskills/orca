@@ -9,6 +9,7 @@
 
 	export let achievement: Achievement;
 	export let linkAchievement = true;
+	export let achievementHref = '';
 	export let claim: AchievementClaim | null = null;
 	export let href = '';
 	export let imageSize: '16' | '32' = '32'; // Tailwind width https://tailwindcss.com/docs/width
@@ -66,8 +67,10 @@
 			<h3
 				class="max-w-2xl mb-4 text-xl font-extrabold tracking-tight leading-none lg:text-2xl xl:text-3xl dark:text-white"
 			>
-				{#if linkAchievement}
-					<a href="/achievements/{achievement.id}/claim">{achievement.name}</a>
+				{#if achievementHref}
+					<a href={achievementHref}>{achievement.name}</a>
+				{:else if linkAchievement}
+					<a href="/achievements/{achievement.id}">{achievement.name}</a>
 				{:else}
 					{achievement.name}
 				{/if}
