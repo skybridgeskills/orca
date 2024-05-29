@@ -5,11 +5,14 @@
 	import Icon from 'svelte-icons-pack';
 	import FiSearch from 'svelte-icons-pack/fi/FiSearch.js';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import type { Achievement } from '@prisma/client';
+	import FormFieldHelperText from './FormFieldHelperText.svelte';
 
 	export let badgeId = '';
+	export let disabled = false;
 	export let errorMessage: string;
 	export let label = 'Select achievement';
 	export let description = '';
@@ -18,6 +21,9 @@
 	export let achievementFilter: (a: Achievement) => boolean = (a) => true;
 	let searchModalOpen = false;
 	let searchQuery = '';
+
+	const tColor = 'text-gray-900 dark:text-gray-300'; // default text color
+	const dtColor = 'text-gray-400 dark:text-gray-600'; // Disabled text color
 
 	const dispatch = createEventDispatcher();
 
@@ -33,9 +39,7 @@
 </script>
 
 <div class:isError={errorMessage}>
-	<label for={inputId} class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-		{label}
-	</label>
+	<FormFieldLabel for={inputId} {disabled} text={label} />
 	<input
 		type="hidden"
 		id={inputId}
@@ -51,9 +55,9 @@
 		</p>
 	{/if}
 	<!-- TODO: make this a light gray like the other label descriptions, another chance for a forminput component -->
-	<p class="my-4 text-sm text-gray-900 dark:text-gray-300">
+	<FormFieldHelperText {disabled}>
 		{description}
-	</p>
+	</FormFieldHelperText>
 
 	{#if !badgeId}
 		<Button
@@ -61,25 +65,28 @@
 			on:click={() => {
 				searchModalOpen = true;
 			}}
+			{disabled}
 		>
-			Choose achievement
+			{m.achievement_chooseCTA()}
 		</Button>
 	{:else if achievement != null}
-		<AchievementSummary {achievement} imageSize="16" linkAchievement={false}>
+		<AchievementSummary {achievement} imageSize="16" linkAchievement={false} {disabled}>
 			<div slot="actions">
 				<button
 					type="button"
-					class="text-sm pb-2 pr-2 text-gray-900 dark:text-white underline hover:no-underline"
+					class="text-sm pb-2 pr-2 ${disabled ? dtColor : tColor} underline hover:no-underline"
 					on:click={() => {
 						searchModalOpen = true;
 					}}
+					{disabled}
 				>
 					{m.changeCta()}
 				</button>
 				<button
 					type="button"
-					class="text-sm pb-2 pr-2 text-gray-900 dark:text-white underline hover:no-underline"
+					class="text-sm pb-2 pr-2 ${disabled ? dtColor : tColor} underline hover:no-underline"
 					on:click={() => (badgeId = '')}
+					{disabled}
 				>
 					{m.removeCTA()}
 				</button>
@@ -97,12 +104,7 @@
 	}}
 	actions={[]}
 >
-	<label
-		for="achievementSelect_searchInput"
-		class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-	>
-		{description}
-	</label>
+	<FormFieldLabel for="achievementSelect_searchInput" text={description} />
 	<div class="relative text-gray-900 dark:text-white">
 		<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
 			<Icon src={FiSearch} size="16" color="currentColor" />

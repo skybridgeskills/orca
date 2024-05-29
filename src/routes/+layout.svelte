@@ -43,6 +43,7 @@
 				<Alert
 					message={n.message}
 					dismissable={true}
+					level={n.level}
 					on:close={() => {
 						notifications.dismissNotification(n.id);
 					}}

@@ -8,11 +8,13 @@
 	import {
 		achievements,
 		achievementsLoading,
-		fetchAchievements,
+		fetchAchievements
+	} from '$lib/stores/achievementStore';
+	import {
 		achievementCategories,
 		acLoading,
 		fetchAchievementCategories
-	} from '$lib/stores/achievementStore';
+	} from '$lib/stores/achievementCategoryStore';
 	import type { AchievementCategory, Achievement, AchievementConfig } from '@prisma/client';
 	import { session } from '$lib/stores/sessionStore';
 	import Heading from '$lib/components/Heading.svelte';

@@ -15,6 +15,7 @@ model Organization {
   name                  String
   description           String
   email                 String
+  json                  Json                    @default("{}")
   url                   String?
   domain                String                  @unique @default(uuid())
   logo                  String?
@@ -95,6 +96,7 @@ model AchievementConfig {
   achievementId    String       @unique
   claimable        Boolean      @default(false)
   claimRequiresId  String?
+  json             Json         @default("{}")
   reviewRequiresId String?
   reviewsRequired  Int          @default(0)
   achievement      Achievement  @relation("AchievementConfig", fields: [achievementId], references: [id])

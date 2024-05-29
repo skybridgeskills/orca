@@ -24,6 +24,7 @@
 	export let initialData;
 	export let achievementId = '';
 	let formData = { ...initialData };
+	let claimableSelectedOption = '';
 
 	let noErrors = {
 		name: '',
@@ -39,6 +40,7 @@
 		reviewRequires: ''
 	};
 	let errors = { ...noErrors };
+	let reviewRequired = formData.reviewsRequired > 0;
 
 	const validate = () => {
 		achievementFormSchema
@@ -135,7 +137,7 @@
 
 		<div class="w-full">
 			<!-- Name -->
-			<div class="mb-6" class:isError={errors.name}>
+			<div class="mb-6 max-w-2xl" class:isError={errors.name}>
 				<label
 					for="achievementEdit_name"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
@@ -155,7 +157,7 @@
 					</p>{/if}
 			</div>
 			<!-- Description -->
-			<div class="mb-6" class:isError={errors.description}>
+			<div class="mb-6 max-w-2xl" class:isError={errors.description}>
 				<label
 					for="achievementEdit_description"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
@@ -174,7 +176,7 @@
 					</p>{/if}
 			</div>
 			<!-- Category -->
-			<div class="mb-6" class:isError={errors.category}>
+			<div class="mb-6 max-w-2xl" class:isError={errors.category}>
 				<label
 					for="achievementEdit_category"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
@@ -232,8 +234,9 @@
 				</p>{/if}
 		</div>
 
-		<Heading title={m.claimConfiguration_heading()} level="h2" />
+		<Heading title={m.setting_other()} level="h2" />
 
+		<!-- Claim Settings -->
 		<div class:isError={errors.claimable}>
 			<div class="flex items-center">
 				<input
@@ -258,6 +261,7 @@
 		<AchievementSelect
 			bind:badgeId={formData.claimRequires}
 			on:validate={validate}
+			disabled={!formData.claimable}
 			label={m.claimConfiguration_requiredAchievement()}
 			description={m.claimConfiguration_requiredAchievement_description()}
 			achievementFilter={(a) => a.id != achievementId}
@@ -266,11 +270,31 @@
 			errorMessage={errors.claimRequires}
 		/>
 
+		<!-- Review Settings -->
+		<div>
+			<div class="flex items-center">
+				<input
+					bind:checked={reviewRequired}
+					id="achievementEdit_reviewIsRequired"
+					type="checkbox"
+					name="config_reviewIsRequired"
+					class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+				/>
+				<label
+					for="achievementEdit_reviewIsRequired"
+					class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+				>
+					{m.achievementConfig_requireAReview()}
+				</label>
+			</div>
+		</div>
+
 		<div class:isError={errors.reviewsRequired}>
 			<label
 				for="achievementEdit_reviewsRequired"
-				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.claimConfiguration_reviewsRequired()}</label
+				class={`block mb-2 text-sm font-medium ${
+					reviewRequired ? 'text-gray-900 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600'
+				}`}>{m.claimConfiguration_reviewsRequired()}</label
 			>
 			<input
 				type="number"
@@ -278,16 +302,25 @@
 				max="5"
 				id="achievementEdit_reviewsRequired"
 				name="config_reviewsRequired"
-				class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+				class={`bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 ${
+					reviewRequired
+						? 'text-gray-900 dark:text-white'
+						: 'text-gray-700 dark:text-gray-500 cursor-not-allowed'
+				} dark:focus:ring-blue-500 dark:focus:border-blue-500`}
 				placeholder=""
 				bind:value={formData.reviewsRequired}
 				on:blur={validate}
+				disabled={!reviewRequired}
 			/>
 			{#if errors.reviewsRequired}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 					{errors.reviewsRequired}
 				</p>{/if}
 
-			<p class="mt-4 text-sm text-gray-900 dark:text-gray-300">
+			<p
+				class={`mt-4 text-sm ${
+					reviewRequired ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-500'
+				}`}
+			>
 				{m.claimConfiguration_reviewsRequired_description()}
 			</p>
 		</div>
@@ -295,6 +328,7 @@
 		<AchievementSelect
 			bind:badgeId={formData.reviewRequires}
 			on:validate={validate}
+			disabled={!reviewRequired}
 			label={m.claimConfiguration_reviewRequires()}
 			description={m.claimConfiguration_reviewRequires_description()}
 			achievementFilter={(a) => a.id != achievementId}
@@ -302,6 +336,8 @@
 			inputName="config_reviewRequires"
 			errorMessage={errors.reviewRequires}
 		/>
+
+		<!-- Invite Settings -->
 
 		<div class="flex items-center lg:order-2">
 			<button

@@ -31,7 +31,7 @@
 		achievementCategories,
 		fetchAchievementCategories,
 		getCategoryById
-	} from '$lib/stores/achievementStore';
+	} from '$lib/stores/achievementCategoryStore';
 	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
 	import { onMount, setContext } from 'svelte';
 	import { calculatePageAndSize } from '$lib/utils/pagination';

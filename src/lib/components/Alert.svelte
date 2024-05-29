@@ -2,23 +2,42 @@
 	import * as m from '$lib/i18n/messages';
 	import { createEventDispatcher } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
-	export let level: 'info' | 'warning' | 'success' | 'error' = 'info';
+	export let level: App.NotificationLevel = 'info';
 	export let message: string = '';
 	export let heading: string = '';
 	export let dismissable: boolean = false;
 	export let elementId: string = uuidv4();
 	const dispatch = createEventDispatcher();
+
+	const levelClasses = {
+		info: 'text-blue-700 bg-blue-100 dark:bg-blue-200 dark:text-blue:800',
+		warning: 'text-amber-700 bg-amber-100 dark:bg-amber-200 dark:text-amber-800',
+		success: 'text-green-700 bg-green-100 dark:bg-green-200 dark:text-green-800',
+		error: 'text-red-700 bg-red-100 dark:bg-red-200 dark:text-red-800'
+	};
+	const buttonClasses = {
+		info: 'hover:bg-blue-300',
+		warning: 'hover:bg-amber-300',
+		success: 'hover:bg-emerald-300',
+		error: 'hover:bg-red-300'
+	};
 </script>
 
 {#if dismissable}
-	<div class="max-w-2xl flex items-center p-4 mb-4 rounded-lg {level}" role="alert" id={elementId}>
+	<div
+		class="max-w-2xl flex items-center p-4 mb-4 rounded-lg {levelClasses[level]}"
+		role="alert"
+		id={elementId}
+	>
 		<div class="ml-3 text-sm font-medium">
 			{message}
 			<slot />
 		</div>
 		<button
 			type="button"
-			class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 inline-flex items-center justify-center h-8 w-8 dark:hover:bg-gray-700 {level}"
+			class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 inline-flex items-center justify-center h-8 w-8 {buttonClasses[
+				level
+			]}"
 			data-dismiss-target={elementId}
 			aria-label={m.close()}
 			on:click={() => {
@@ -50,33 +69,3 @@
 		<slot />
 	</div>
 {/if}
-
-<style lang="postcss">
-	.info {
-		@apply text-blue-700 bg-blue-100;
-	}
-	.dark .info {
-		@apply bg-blue-200 text-blue-800;
-	}
-
-	.warning {
-		@apply text-yellow-700 bg-yellow-100;
-	}
-	.dark .warning {
-		@apply bg-yellow-200 text-yellow-800;
-	}
-
-	.success {
-		@apply text-green-700 bg-green-100;
-	}
-	.dark .success {
-		@apply bg-green-200 text-green-800;
-	}
-
-	.error {
-		@apply text-red-700 bg-red-100;
-	}
-	.dark .error {
-		@apply bg-red-200 text-red-800;
-	}
-</style>

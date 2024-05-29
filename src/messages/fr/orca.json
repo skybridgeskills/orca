@@ -258,5 +258,7 @@
 	"achievement_searchByName": "Rechercher des réalisations par nom",
 	"achievements_noneFound": "Aucune réalisation trouvée.",
 	"achievements_noneFound_description": "Cette communauté n'a aucune réalisation visible.",
-	"achievements_errorLoading": "Erreur lors du chargement des succès"
+	"achievements_errorLoading": "Erreur lors du chargement des succès",
+	"achievementConfig_requireAReview": "Exiger un examen avant que les récompenses ne soient valides",
+	"achievement_chooseCTA": "Choisissez la réalisation"
 }

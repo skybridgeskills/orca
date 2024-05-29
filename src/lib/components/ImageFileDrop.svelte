@@ -37,7 +37,7 @@
 <FileDrop {handleFiles} max={1}>
 	<div class="flex justify-center items-center w-full mb-6">
 		<div
-			class="flex flex-col justify-center items-center w-full h-64 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+			class="flex flex-col justify-center items-center w-full h-72 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
 		>
 			{#if !currentValue}
 				<div class="flex flex-col justify-center items-center pt-5 pb-6">

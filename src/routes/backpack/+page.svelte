@@ -20,9 +20,32 @@
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
+	import {
+		backpackClaims,
+		backpackClaimsLoading,
+		fetchBackpackClaims,
+		outstandingInvites,
+		outstandingInvitesLoading,
+		fetchOutstandingInvites
+	} from '$lib/stores/backpackStore';
+	import { LoadingStatus, ensureLoaded } from '$lib/stores/common';
+	import { onMount } from 'svelte';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+	import {
+		achievements,
+		achievementsLoading,
+		fetchAchievements,
+		getAchievementById
+	} from '$lib/stores/achievementStore';
 
 	dayjs.extend(relativeTime);
 	export let data: PageData;
+	let { page: currentPageNum, pageSize } = calculatePageAndSize($page.url);
+	$: currentPageData = $backpackClaims.slice(
+		(currentPageNum - 1) * pageSize,
+		currentPageNum * pageSize
+	);
+
 	let currentShareIntent: (AchievementClaim & { achievement: Achievement }) | null = null;
 
 	const breadcrumbItems = [{ text: m.home(), href: '/' }, { text: m.backpack() }];
@@ -47,6 +70,14 @@
 		if (!claim || !navigator.clipboard) return;
 		navigator.clipboard.writeText(`${PUBLIC_HTTP_PROTOCOL}://${data.org.domain}/ob2/a/${claim.id}`);
 	};
+
+	onMount(async () => {
+		await Promise.all([
+			ensureLoaded($backpackClaims, fetchBackpackClaims, $backpackClaimsLoading),
+			ensureLoaded($outstandingInvites, fetchOutstandingInvites, $outstandingInvitesLoading),
+			ensureLoaded($achievements, fetchAchievements, $achievementsLoading)
+		]);
+	});
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
@@ -57,6 +88,9 @@
 	description={m.backpack_yourBadges_description()}
 />
 
+{#if [LoadingStatus.NotStarted, LoadingStatus.Loading].includes($backpackClaimsLoading)}
+	<LoadingSpinner />
+{/if}
 {#each data.outstandingInvites as invite}
 	<div class="my-2">
 		<Alert>
@@ -72,55 +106,67 @@
 	</div>
 {/each}
 
-<Pagination paging={{ ...calculatePageAndSize($page.url), count: data.achievementCount }} />
-{#each data.achievementClaims as claim (claim.id)}
-	<div class="mb-4">
-		<AchievementSummary
-			{claim}
-			achievement={claim.achievement}
-			isClickable={true}
-			href={`/claims/${claim.id}`}
-			linkAchievement={false}
-		>
-			<div slot="moredescription">
-				<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
-					{m.claimed()}
-					{dayjs(claim.createdOn).fromNow()}
-				</p>
-			</div>
-			<div slot="actions">
-				{#if claim.claimStatus === 'ACCEPTED' && claim.validFrom}
-					<div class="p-2 flex flex-row space-x-3">
-						<a
-							class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
-							tabindex="0"
-							href={`/claims/${claim.id}`}
-						>
-							<span class="sr-only">View details</span>
-							<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
-						</a>
-						<button
-							class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
-							tabindex="0"
-							on:click={(e) => {
-								handleShare(claim);
-								e.preventDefault();
-								e.stopPropagation();
-							}}
-							on:keypress={(e) => {
-								handleShare(claim);
-								e.preventDefault();
-								e.stopPropagation();
-							}}
-						>
-							<span class="sr-only">{m.share()}</span>
-							<Icon src={FaShareSquare} size="20" color="currentColor" />
-						</button>
-					</div>
-				{/if}
-			</div>
-		</AchievementSummary>
-	</div>
+<Pagination
+	paging={{
+		page: currentPageNum,
+		pageSize,
+		count: $backpackClaims.length,
+		action: (p) => {
+			currentPageNum = p;
+		}
+	}}
+/>
+{#each currentPageData as claim (claim.id)}
+	{@const achievement = getAchievementById(claim.achievementId)}
+	{#if achievement}
+		<div class="mb-4">
+			<AchievementSummary
+				{claim}
+				{achievement}
+				isClickable={true}
+				href={`/claims/${claim.id}`}
+				linkAchievement={false}
+			>
+				<div slot="moredescription">
+					<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
+						{m.claimed()}
+						{dayjs(claim.createdOn).fromNow()}
+					</p>
+				</div>
+				<div slot="actions">
+					{#if claim.claimStatus === 'ACCEPTED' && claim.validFrom}
+						<div class="p-2 flex flex-row space-x-3">
+							<a
+								class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
+								tabindex="0"
+								href={`/claims/${claim.id}`}
+							>
+								<span class="sr-only">View details</span>
+								<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
+							</a>
+							<button
+								class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
+								tabindex="0"
+								on:click={(e) => {
+									handleShare({ ...claim, achievement });
+									e.preventDefault();
+									e.stopPropagation();
+								}}
+								on:keypress={(e) => {
+									handleShare({ ...claim, achievement });
+									e.preventDefault();
+									e.stopPropagation();
+								}}
+							>
+								<span class="sr-only">{m.share()}</span>
+								<Icon src={FaShareSquare} size="20" color="currentColor" />
+							</button>
+						</div>
+					{/if}
+				</div>
+			</AchievementSummary>
+		</div>
+	{/if}
 {:else}
 	<EmptyStateZone title="You haven't claimed any badges yet.">
 		<Backpack slot="image" />

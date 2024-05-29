@@ -258,5 +258,7 @@
 	"achievement_searchByName": "Search Achievements by name",
 	"achievements_noneFound": "No achievements found.",
 	"achievements_noneFound_description": "This community does not have any visible achievements.",
-	"achievements_errorLoading": "Error loading achievements"
+	"achievements_errorLoading": "Error loading achievements",
+	"achievementConfig_requireAReview": "Require a review before awards are valid",
+	"achievement_chooseCTA": "Choose achievement"
 }

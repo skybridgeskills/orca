@@ -54,6 +54,7 @@ declare namespace App {
 
 	// Design System
 	type ButtonRole = 'primary' | 'secondary' | 'danger';
+	type NotificationLevel = 'info' | 'success' | 'warning' | 'error';
 
 	interface Evidence {
 		id?: string;
