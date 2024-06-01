@@ -1,7 +1,9 @@
+import * as m from '$lib/i18n/messages';
 import type { AchievementClaim, ClaimEndorsement } from '@prisma/client';
 import { get, writable } from 'svelte/store';
 import { LoadingStatus } from './common';
 import { notifications, Notification } from './notificationStore';
+import { session } from './sessionStore';
 
 /*
 // AchievementClaims in the current User's backpack
@@ -11,14 +13,15 @@ export const backpackClaims = writable<AchievementClaim[]>([]);
 
 export const backpackClaimsLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
 
-export const fetchBackpackClaims = async () => {
+export const fetchBackpackClaims = async (): Promise<LoadingStatus> => {
+	if (!get(session)?.user) return LoadingStatus.NotStarted;
+
 	let a: AchievementClaim[] = [];
 	backpackClaimsLoading.set(LoadingStatus.Loading);
 	const page1 = await fetch('/api/v1/backpack/claims?includeCount=true');
 	if (page1.status !== 200) {
-		backpackClaimsLoading.set(LoadingStatus.Error);
-		notifications.addNotification(new Notification('Error fetching achievements!', true, 'error'));
-		return;
+		notifications.addNotification(new Notification(m.backpack_errorFetchingData(), true, 'error'));
+		return LoadingStatus.Error;
 	}
 	const { data, meta } = await page1.json();
 	a = [...data];
@@ -27,11 +30,10 @@ export const fetchBackpackClaims = async () => {
 		for (let i = 2; i <= meta.totalPages; i++) {
 			const page = await fetch(`/api/v1/achievements?page=${i}`);
 			if (page.status !== 200) {
-				backpackClaimsLoading.set(LoadingStatus.Error);
 				notifications.addNotification(
-					new Notification('Error fetching achievements!', true, 'error')
+					new Notification(m.backpack_errorFetchingData(), true, 'error')
 				);
-				return;
+				return LoadingStatus.Error;
 			}
 			const { data: pageData } = await page.json();
 			a = [...a, ...pageData.data];
@@ -39,7 +41,7 @@ export const fetchBackpackClaims = async () => {
 	}
 
 	backpackClaims.set(a);
-	backpackClaimsLoading.set(LoadingStatus.Complete);
+	return LoadingStatus.Complete;
 };
 
 export const upsertBackpackClaim = async (claim: AchievementClaim) => {
@@ -59,17 +61,15 @@ export const getClaimById = (id: string) => {
 export const outstandingInvites = writable<ClaimEndorsement[]>([]);
 export const outstandingInvitesLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
 
-export const fetchOutstandingInvites = async () => {
-	outstandingInvitesLoading.set(LoadingStatus.Loading);
+export const fetchOutstandingInvites = async (): Promise<LoadingStatus> => {
 	const res = await fetch('/api/v1/backpack/invites');
 	if (res.status !== 200) {
-		outstandingInvitesLoading.set(LoadingStatus.Error);
 		notifications.addNotification(
 			new Notification('Error fetching outstanding invites!', true, 'error')
 		);
-		return;
+		return LoadingStatus.Error;
 	}
 	const { data }: { data: ClaimEndorsement[] } = await res.json();
 	outstandingInvites.set(data);
-	outstandingInvitesLoading.set(LoadingStatus.Complete);
+	return LoadingStatus.Complete;
 };

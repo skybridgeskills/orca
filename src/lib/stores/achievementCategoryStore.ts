@@ -13,18 +13,16 @@ export const achievementCategories = writable<AchievementCategoryWithCount[]>([]
 
 export const acLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
 
-export const fetchAchievementCategories = async () => {
-	acLoading.set(LoadingStatus.Loading);
+export const fetchAchievementCategories = async (): Promise<LoadingStatus> => {
 	const res = await fetch('/api/v1/achievementCategories');
 	if (res.status !== 200) {
-		acLoading.set(LoadingStatus.Error);
 		notifications.addNotification(new Notification('Error fetching categories!', true, 'error'));
-		return;
+		return LoadingStatus.Error;
 	}
 	const { data }: { data: AchievementCategoryWithCount[] } = await res.json();
 	achievementCategories.set(data.sort((a, b) => b.weight - a.weight));
 
-	acLoading.set(LoadingStatus.Complete);
+	return LoadingStatus.Complete;
 };
 
 export const upsertAchievementCategory = async (category: AchievementCategoryWithCount) => {

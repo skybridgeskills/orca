@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let text: string;
+	export let text = '';
 	let inputId: string;
 	export { inputId as for };
 	export let disabled = false;

@@ -1,15 +1,15 @@
 <script lang="ts">
 	export let value = '';
-	export let selected = '';
+	export let selectedOption = '';
 	export let name = '';
 	export let label = '';
 	export let id = '';
 	export let disabled = false;
 </script>
 
-<div class="flex items-center">
+<div class="flex">
 	<input
-		bind:group={selected}
+		bind:group={selectedOption}
 		{value}
 		{name}
 		{id}
@@ -19,7 +19,7 @@
 	/>
 	<label
 		for={id}
-		class={`ms-2 text-sm font-medium ${
+		class={`flex-grow ms-2 text-sm font-medium ${
 			disabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-gray-300'
 		}`}
 	>

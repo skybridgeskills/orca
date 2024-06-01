@@ -1,6 +1,6 @@
 import * as m from '$lib/i18n/messages';
 import type { PageServerLoad, Actions } from './$types';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail, json, redirect } from '@sveltejs/kit';
 import { prisma } from '../../../../prisma/client';
 import { Prisma } from '@prisma/client';
 import stripTags from '../../../../lib/utils/stripTags';
@@ -16,6 +16,11 @@ interface AchievementConfigForm {
 	organization: { connect: { id: string } };
 	reviewsRequired: number;
 	reviewRequires?: { connect: { id: string } } | undefined;
+	json?: {
+		capabilities: {
+			inviteRequires: string | null;
+		};
+	};
 }
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -56,10 +61,7 @@ export const actions: Actions = {
 			throw error(403, m.error_unauthorized());
 
 		const requestData = await request.formData();
-		const categoryId = stripTags(requestData.get('category')?.toString());
-
 		const imageUpdated = requestData.get('imageEdited') === 'true';
-
 		const imageKey = requestData.get('imageExtension')
 			? `achievement-${params.id}/${uuidv4().slice(-8)}-raw-image.${requestData.get(
 					'imageExtension'
@@ -67,31 +69,62 @@ export const actions: Actions = {
 			: null;
 
 		const formData = {
+			// Properties for Achievement
 			name: stripTags(requestData.get('name')?.toString()) || '',
 			description: stripTags(requestData.get('description')?.toString()) || '',
 			criteriaId: requestData.get('url')?.toString(),
 			criteriaNarrative: stripTags(requestData.get('criteriaNarrative')?.toString()),
+
+			category: stripTags(requestData.get('category')?.toString()),
+
+			// Properties for AchievmentConfig
+			capabilities_inviteRequires:
+				requestData.get('capabilities_inviteRequires')?.toString() || null,
+			claimable: requestData.get('claimable')?.toString(), // 'on' or 'off'
+			claimRequires: requestData.get('claimRequires')?.toString(),
+			reviewRequires: requestData.get('reviewRequires')?.toString(),
+			reviewsRequired: parseInt(requestData.get('reviewsRequired')?.toString() || '') || 0,
+			reviewableSelectedOption: requestData.get('reviewableSelectedOption')?.toString() || 'none'
+		};
+		const achievementData = {
+			name: formData.name,
+			description: formData.description,
+			criteriaId: formData.criteriaId,
+			criteriaNarrative: formData.criteriaNarrative,
 			...(imageUpdated ? { image: imageKey } : null), // Only include the image field value if image is changed.
 			category:
-				categoryId != 'uncategorized' ? { connect: { id: categoryId } } : { disconnect: true }
+				formData.category != 'uncategorized'
+					? { connect: { id: formData.category } }
+					: { disconnect: true }
 		};
 
 		let configData: AchievementConfigForm = {
-			claimable: requestData.get('config_claimable')?.toString() == 'on',
+			claimable: formData.claimable == 'on',
 			organization: { connect: { id: locals.org.id } },
 			achievement: { connect: { id: params.id } },
-			reviewsRequired: parseInt(requestData.get('config_reviewsRequired')?.toString() || '') || 0
+			reviewsRequired: formData.reviewsRequired
 		};
 
-		if (configData['claimable'] && !!requestData.get('config_achievementRequires')?.toString())
+		if (configData['claimable'] && !!formData.claimRequires)
 			configData['claimRequires'] = {
-				connect: { id: requestData.get('config_achievementRequires')?.toString() || '' }
+				connect: { id: formData.claimRequires }
 			};
+		else if (formData.claimable) configData['claimRequires'] = undefined;
 
-		if (configData['claimable'] && !!requestData.get('config_reviewRequires')?.toString())
+		if (configData['reviewsRequired'] > 0 && !!formData.reviewRequires)
 			configData['reviewRequires'] = {
-				connect: { id: requestData.get('config_reviewRequires')?.toString() || '' }
+				connect: { id: formData.reviewRequires || '' }
 			};
+		else if (configData['reviewsRequired'] == 0) configData['reviewRequires'] = undefined;
+
+		configData['json'] = {
+			capabilities: {
+				inviteRequires: formData.capabilities_inviteRequires
+			}
+		};
+
+		// "Reviewed by an admin requires only one review, no matter what."
+		if (formData.reviewableSelectedOption == 'admin') configData['reviewsRequired'] = 1;
 
 		try {
 			await achievementFormSchema.validate(formData);
@@ -113,7 +146,8 @@ export const actions: Actions = {
 				reviewRequires: !!configData.reviewRequires
 					? configData.reviewRequires
 					: { disconnect: true },
-				reviewsRequired: configData.reviewsRequired
+				reviewsRequired: configData.reviewsRequired,
+				json: configData.json
 			},
 			create: configData
 		};
@@ -141,7 +175,7 @@ export const actions: Actions = {
 				category: true,
 				achievementConfig: true
 			},
-			data: formData
+			data: achievementData
 		});
 
 		const imageUploadUrl = imageUpdated && imageKey ? await getUploadUrl(imageKey) : null;

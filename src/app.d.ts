@@ -5,6 +5,7 @@
 // and what to do when importing types
 
 declare namespace App {
+	// Models
 	interface UserData {
 		id: string;
 		givenName: string?;
@@ -50,6 +51,14 @@ declare namespace App {
 	interface EvidenceItem {
 		id?: string;
 		narrative?: string;
+	}
+
+	interface AchievementConfigWithJson {
+		json?: {
+			capabilities: {
+				inviteRequires: string | null;
+			};
+		}?;
 	}
 
 	// Design System

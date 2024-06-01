@@ -73,9 +73,9 @@
 
 	onMount(async () => {
 		await Promise.all([
-			ensureLoaded($backpackClaims, fetchBackpackClaims, $backpackClaimsLoading),
-			ensureLoaded($outstandingInvites, fetchOutstandingInvites, $outstandingInvitesLoading),
-			ensureLoaded($achievements, fetchAchievements, $achievementsLoading)
+			ensureLoaded($backpackClaims, fetchBackpackClaims, backpackClaimsLoading),
+			ensureLoaded($outstandingInvites, fetchOutstandingInvites, outstandingInvitesLoading),
+			ensureLoaded($achievements, fetchAchievements, achievementsLoading)
 		]);
 	});
 </script>

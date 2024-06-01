@@ -46,8 +46,8 @@
 
 	onMount(async () => {
 		await Promise.all([
-			ensureLoaded($achievements, fetchAchievements, $achievementsLoading),
-			ensureLoaded($achievementCategories, fetchAchievementCategories, $acLoading)
+			ensureLoaded($achievements, fetchAchievements, achievementsLoading),
+			ensureLoaded($achievementCategories, fetchAchievementCategories, acLoading)
 		]);
 		await tick();
 		mapCategories();
@@ -63,7 +63,7 @@
 	</div>
 {/if}
 
-{#if [LoadingStatus.NotStarted, LoadingStatus.Loading].includes($achievementsLoading)}
+{#if $achievementsLoading == LoadingStatus.NotStarted || $achievementsLoading == LoadingStatus.Loading}
 	<LoadingSpinner />
 {/if}
 {#if $achievementsLoading == LoadingStatus.Error}

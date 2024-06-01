@@ -37,6 +37,16 @@
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 	import { ensureLoaded } from '$lib/stores/common';
+	import {
+		achievements,
+		achievementsLoading,
+		fetchAchievements
+	} from '$lib/stores/achievementStore';
+	import {
+		backpackClaims,
+		backpackClaimsLoading,
+		fetchBackpackClaims
+	} from '$lib/stores/backpackStore';
 
 	dayjs.extend(relativeTime);
 
@@ -50,17 +60,26 @@
 		{ text: data.achievement.name }
 	];
 
-	let config: AchievementConfig | null = null;
+	let config: (AchievementConfig & App.AchievementConfigWithJson) | null = null;
 	let claim: AchievementClaim | undefined;
 	let category: AchievementCategory | undefined;
 	let userHoldsRequiredAchievement = false;
+	let inviteCapability = false;
 	let reviewRequires: Achievement | undefined;
 	let invite: (ClaimEndorsement & { creator: User | null }) | undefined;
 	$: {
-		config = data.achievement.achievementConfig;
+		config = data.achievement.achievementConfig as
+			| (AchievementConfig & App.AchievementConfigWithJson)
+			| null;
 		claim = data.relatedClaims.find((c) => data.achievement.id == c.achievementId);
 		userHoldsRequiredAchievement =
 			data.relatedClaims.filter((c) => c.achievementId == config?.claimRequiresId).length > 0;
+		inviteCapability =
+			data.editAchievementCapability ||
+			(!!config?.json?.capabilities?.inviteRequires &&
+				!!$backpackClaims.find(
+					(c) => c.achievementId == config?.json?.capabilities?.inviteRequires
+				));
 
 		reviewRequires = data.relatedAchievements
 			.filter((c) => data.achievement.achievementConfig?.reviewRequiresId == c.id)
@@ -74,8 +93,9 @@
 
 	onMount(async () => {
 		if (!data.achievement.categoryId) return;
-
-		await ensureLoaded($achievementCategories, fetchAchievementCategories, $acLoading);
+		await ensureLoaded($achievements, fetchAchievements, achievementsLoading);
+		await ensureLoaded($achievementCategories, fetchAchievementCategories, acLoading);
+		await ensureLoaded($backpackClaims, fetchBackpackClaims, backpackClaimsLoading);
 		category = getCategoryById(data.achievement.categoryId ?? 'Uncategorized');
 	});
 </script>
@@ -87,8 +107,11 @@
 		{data.achievement.name}
 	</h1>
 	<div class="inline-flex items-center">
-		{#if data.editAchievementCapability}
+		{#if inviteCapability}
 			<Button href={`/achievements/${data.achievement.id}/award`} text={m.awardCTA()} />
+		{/if}
+
+		{#if data.editAchievementCapability}
 			<Button
 				href={`/achievements/${data.achievement.id}/edit`}
 				submodule="secondary"
@@ -201,22 +224,33 @@
 	<Heading title={m.claimConfiguration_heading()} level="h3">
 		{#if !config?.claimable}
 			<!-- A1: Achievement is not claimable -->
-			{m.claimConfiguration_claimDisabled()}
+			{m.claimConfiguration_claimDisabled()}.
+		{/if}
+		{@const inviteRequires = $achievements.find(
+			(a) => config?.json?.capabilities?.inviteRequires == a.id
+		)}
+		{#if inviteRequires}
+			Invitations to claim may be made by holders of:
+			<a href={`/achievements/${inviteRequires?.id}`} class="font-bold underline hover:no-underline"
+				>{inviteRequires?.name}</a
+			>
+		{:else}
 			{m.claimConfiguration_adminOnly_description()}
-		{:else if config?.claimRequiresId}
+		{/if}
+
+		{#if config?.claimRequiresId}
 			<!-- A2: Achievement is claimable, and requires a prerequisite -->
-			{#each data.relatedAchievements.filter((a) => config?.claimRequiresId == a.id) as claimRequires}
+			{@const claimRequires = $achievements.find((a) => config?.claimRequiresId == a.id)}
+			{#if claimRequires}
 				{m.claimConfiguration_claimRequiresSummary()}
-				<a
-					href={`/achievements/${claimRequires.id}`}
-					class="font-bold underline hover:no-underline"
-				>
-					{claimRequires.name}</a
-				>{#if userHoldsRequiredAchievement}. {m.claimConfiguration_userMeetsRequirement()}
+				<a href={`/achievements/${claimRequires.id}`} class="font-bold underline hover:no-underline"
+					>{claimRequires.name}</a
+				>. {#if userHoldsRequiredAchievement}
+					{m.claimConfiguration_userMeetsRequirement()}
 				{:else}
 					{m.claimConfiguration_userNotMeetsRequirement()}
 				{/if}
-			{/each}
+			{/if}
 		{:else}
 			<span class="text-gray-500 dark:text-gray-400">
 				{m.achievement_openClaimable_description()}
@@ -233,6 +267,8 @@
 			>
 				{reviewRequires.name}</a
 			>.
+		{:else if !config?.reviewRequiresId && config?.reviewsRequired}
+			{m.claimConfiguration_anAdminReviewRequired()}
 		{:else}
 			{m.claimConfiguration_noReviewsRequired_description()}
 		{/if}

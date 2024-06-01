@@ -9,9 +9,15 @@ export enum LoadingStatus {
 
 export const ensureLoaded = async <T>(
 	collection: Array<T>,
-	fetcher: () => Promise<void>,
-	status: LoadingStatus
+	fetcher: () => Promise<LoadingStatus>,
+	status: Writable<LoadingStatus | Promise<LoadingStatus>>
 ) => {
-	console.log('ensureLoaded', collection.length, status);
-	if (collection.length == 0 && status == LoadingStatus.NotStarted) await fetcher();
+	const currentStatus = get(status);
+	if (collection.length == 0 && currentStatus == LoadingStatus.NotStarted) {
+		const promise = fetcher();
+		status.set(promise); // Sets the promise so other components can wait for it too
+		status.set(await promise); // Upon resolution will set status to the result
+	} else if (currentStatus instanceof Promise) {
+		await currentStatus; // If we're already waiting, wait.
+	}
 };

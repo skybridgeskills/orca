@@ -1,3 +1,4 @@
+import * as m from '$lib/i18n/messages';
 import type { Achievement, AchievementConfig, AchievementCategory } from '@prisma/client';
 import { get, writable } from 'svelte/store';
 import { LoadingStatus } from './common';
@@ -11,16 +12,18 @@ export const achievements = writable<
 >([]);
 
 // Initially unset to indicate uninitialized store, periodically needs to update.
-export const achievementsLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
+export const achievementsLoading = writable<LoadingStatus | Promise<LoadingStatus>>(
+	LoadingStatus.NotStarted
+);
 
-export const fetchAchievements = async () => {
+export const fetchAchievements = async (): Promise<LoadingStatus> => {
 	let a: (Achievement & { achievementConfig: AchievementConfig | null })[] = [];
-	achievementsLoading.set(LoadingStatus.Loading);
 	const page1 = await fetch('/api/v1/achievements?includeCount=true');
 	if (page1.status !== 200) {
-		achievementsLoading.set(LoadingStatus.Error);
-		notifications.addNotification(new Notification('Error fetching achievements!', true, 'error'));
-		return;
+		notifications.addNotification(
+			new Notification(m.achievements_errorFetchingData(), true, 'error')
+		);
+		return LoadingStatus.Error;
 	}
 	const { data, meta } = await page1.json();
 	a = [...data];
@@ -29,11 +32,10 @@ export const fetchAchievements = async () => {
 		for (let i = 2; i <= meta.totalPages; i++) {
 			const page = await fetch(`/api/v1/achievements?page=${i}`);
 			if (page.status !== 200) {
-				achievementsLoading.set(LoadingStatus.Error);
 				notifications.addNotification(
-					new Notification('Error fetching achievements!', true, 'error')
+					new Notification(m.achievements_errorFetchingData(), true, 'error')
 				);
-				return;
+				return LoadingStatus.Error;
 			}
 			const { data: pageData } = await page.json();
 			a = [...a, ...pageData.data];
@@ -41,7 +43,7 @@ export const fetchAchievements = async () => {
 	}
 
 	achievements.set(a);
-	achievementsLoading.set(LoadingStatus.Complete);
+	return LoadingStatus.Complete;
 };
 
 export const upsertAchievement = async (
