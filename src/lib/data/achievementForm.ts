@@ -16,9 +16,15 @@ export const achievementFormSchema = yup
 		reviewRequires: yup.string().nullable(),
 		reviewsReqired: yup.number().integer().min(0).max(5),
 		reviewableSelectedOption: yup.string().oneOf(['none', 'admin', 'badge']),
+		inviteSelectedOption: yup.string().oneOf(['none', 'badge']),
+
 		capabilities_inviteRequires: yup.string().nullable().transform(emptyNulled).uuid()
 	})
 	.test('reviewRequires', m.achievementConfig_reviewRequiredCrossValidationMessage(), (value) => {
 		if (value.reviewableSelectedOption == 'badge' && !value.reviewRequires) return false;
+		return true;
+	})
+	.test('inviteRequires', 'A badge must be selected if review by invite is required.', (value) => {
+		if (value.inviteSelectedOption == 'badge' && !value.capabilities_inviteRequires) return false;
 		return true;
 	});

@@ -8,6 +8,7 @@ import { ValidationError } from 'yup';
 import { achievementFormSchema } from '$lib/data/achievementForm';
 import { getUploadUrl } from '$lib/server/media';
 import { v4 as uuidv4 } from 'uuid';
+import { getAchievement } from '$lib/data/achievement';
 
 interface AchievementConfigForm {
 	claimable: boolean;
@@ -117,6 +118,19 @@ export const actions: Actions = {
 			};
 		else if (configData['reviewsRequired'] == 0) configData['reviewRequires'] = undefined;
 
+		if (formData.capabilities_inviteRequires) {
+			try {
+				const relatedInviteRequiresAchievement = await getAchievement(
+					formData.capabilities_inviteRequires,
+					locals.org.id
+				);
+			} catch (e) {
+				return fail(400, {
+					code: 'inviteRequires',
+					message: m.claimConfiguration_relatedAchievementNotFoundError()
+				});
+			}
+		}
 		configData['json'] = {
 			capabilities: {
 				inviteRequires: formData.capabilities_inviteRequires

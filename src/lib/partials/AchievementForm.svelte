@@ -32,11 +32,9 @@
 			? initialData.reviewRequires
 				? 'badge'
 				: 'admin'
-			: 'none'
+			: 'none',
+		inviteSelectedOption: initialData.capabilities_inviteRequires ? 'badge' : 'none'
 	};
-	let inviteSelectedOption: 'none' | 'badge' = initialData.capabilities_inviteRequires
-		? 'badge'
-		: 'none';
 
 	let noErrors = {
 		name: '',
@@ -50,7 +48,7 @@
 		claimRequires: '',
 		reviewsRequired: '',
 		reviewRequires: '',
-		capabilities_inviteRequires: ''
+		inviteRequires: ''
 	};
 	let errors = { ...noErrors };
 
@@ -62,10 +60,17 @@
 			})
 			.catch((err: yup.ValidationError) => {
 				errors = { ...noErrors };
-				console.log(errors);
 				err.inner.map((err) => {
-					errors[err.path] = err.message;
+					const errPath = err.path || err.type;
+					if (errPath) errors[errPath as keyof typeof errors] = err.message;
+
+					// assign it to itself to trigger a reactivity update
 					errors = errors;
+
+					const firstErrorEl = document?.querySelector(
+						'.isError input, .isError select, .isError textarea'
+					) as HTMLInputElement;
+					if (firstErrorEl?.focus) firstErrorEl.focus();
 				});
 			});
 	};
@@ -78,6 +83,7 @@
 			const validationResults = await achievementFormSchema.validate(formData);
 		} catch (err) {
 			validate();
+			return;
 		}
 		const formsData = new FormData(e.target as HTMLFormElement);
 
@@ -95,8 +101,12 @@
 		const result: ActionResult = deserialize(responseText);
 		switch (result.type) {
 			case 'failure':
-				if (result.data?.code == 'claimRequires')
-					errors['claimRequires'] = m.requirement_statusInvalid();
+				if (
+					['claimRequires', 'inviteRequires', 'reviewRequires'].includes(
+						result.data?.code ?? 'none'
+					)
+				)
+					errors[result.data?.code as keyof typeof errors] = m.requirement_statusInvalid();
 				break;
 			case 'success':
 				//read the upload url and put the image data to it.
@@ -177,9 +187,11 @@
 					bind:value={formData.name}
 					required
 				/>
-				{#if errors.name}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+				{#if errors.name}
+					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 						{errors.name}
-					</p>{/if}
+					</p>
+				{/if}
 			</div>
 			<!-- Description -->
 			<div class="mb-6 max-w-2xl" class:isError={errors.description}>
@@ -196,9 +208,11 @@
 					placeholder="A learning process that is created and molded by the learner..."
 					bind:value={formData.description}
 				/>
-				{#if errors.description}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+				{#if errors.description}
+					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 						{errors.description}
-					</p>{/if}
+					</p>
+				{/if}
 			</div>
 			<!-- Category -->
 			<div class="mb-6 max-w-2xl" class:isError={errors.category}>
@@ -218,9 +232,11 @@
 						<option value={category.id}>{category.name}</option>
 					{/each}
 				</select>
-				{#if errors.description}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
-						{errors.description}
-					</p>{/if}
+				{#if errors.category}
+					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+						{errors.category}
+					</p>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -262,7 +278,7 @@
 		<Heading title={m.setting_other()} level="h3" />
 
 		<!-- Claim Settings -->
-		<div class:isError={errors.claimable}>
+		<div class:isError={errors.claimRequires}>
 			<FormFieldLabel for="claimable">{m.claimConfiguration_allow()}</FormFieldLabel>
 			<div class="space-y-2">
 				<RadioOption
@@ -391,6 +407,11 @@
 						</span>
 					</AchievementSelect>
 				</RadioOption>
+				{#if errors.reviewRequires}
+					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+						{errors.reviewRequires}
+					</p>
+				{/if}
 			</div>
 
 			<div class:isError={errors.reviewsRequired} class="mt-2">
@@ -425,20 +446,20 @@
 		</div>
 
 		<!-- Invite Settings -->
-		<div class:isError={errors.capabilities_inviteRequires}>
+		<div class:isError={errors.inviteRequires}>
 			<FormFieldLabel for="capabilities_inviteRequires"
 				>{m.achievementConfig_inviteRequiresLabel()}</FormFieldLabel
 			>
 			<div class="space-y-2">
 				<RadioOption
-					bind:selectedOption={inviteSelectedOption}
+					bind:selectedOption={formData.inviteSelectedOption}
 					value="none"
 					name="config_inviteable"
 					label="Only admins"
 					id="achievementEdit_inviteOption_none"
 				/>
 				<RadioOption
-					bind:selectedOption={inviteSelectedOption}
+					bind:selectedOption={formData.inviteSelectedOption}
 					value="badge"
 					name="config_invitable"
 					id="achievementEdit_inviteOption_badge"
@@ -447,24 +468,26 @@
 					<AchievementSelect
 						badgeId={formData.capabilities_inviteRequires}
 						on:unselected={() => {
-							inviteSelectedOption = 'none';
+							formData.inviteSelectedOption = 'none';
 							formData.capabilities_inviteRequires = null;
+							errors.inviteRequires = '';
 						}}
 						on:selected={(e) => {
 							formData.capabilities_inviteRequires = e.detail;
+							errors.inviteRequires = '';
 						}}
-						disabled={inviteSelectedOption != 'badge'}
+						disabled={formData.inviteSelectedOption != 'badge'}
 						label=""
 						description=""
 						inputId="capabilities_inviteRequires_input"
 						inputName="capabilities_inviteRequires"
-						errorMessage={errors.capabilities_inviteRequires}
+						errorMessage={errors.inviteRequires}
 					>
 						<span slot="invoker" class="inline" let:handler>
 							{#if !formData.capabilities_inviteRequires}
 								<button
 									on:click|preventDefault={() => {
-										inviteSelectedOption = 'badge';
+										formData.inviteSelectedOption = 'badge';
 										handler();
 									}}
 									class={`font-medium${
@@ -480,6 +503,12 @@
 						</span>
 					</AchievementSelect>
 				</RadioOption>
+
+				{#if errors.inviteRequires}
+					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+						{errors.inviteRequires}
+					</p>
+				{/if}
 			</div>
 
 			<!-- Submit/Cancel -->

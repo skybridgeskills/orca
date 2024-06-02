@@ -1,5 +1,5 @@
 import * as m from '$lib/i18n/messages';
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
 import * as dotenv from 'dotenv';
 import { ValidationError } from 'yup';
@@ -12,6 +12,7 @@ import stripTags from '$lib/utils/stripTags';
 import { v4 as uuidv4 } from 'uuid';
 import { connect } from 'http2';
 import { getUploadUrl } from '$lib/server/media';
+import { getAchievement } from '$lib/data/achievement';
 
 dotenv.config();
 
@@ -65,6 +66,20 @@ export const actions: Actions = {
 			await achievementFormSchema.validate(formData);
 		} catch (err) {
 			if (err instanceof ValidationError) throw error(400, err.message);
+		}
+
+		if (formData.capabilities_inviteRequires) {
+			try {
+				const relatedInviteRequiresAchievement = await getAchievement(
+					formData.capabilities_inviteRequires,
+					locals.org.id
+				);
+			} catch (e) {
+				return fail(400, {
+					code: 'inviteRequires',
+					message: m.claimConfiguration_relatedAchievementNotFoundError()
+				});
+			}
 		}
 
 		const achievementData = {

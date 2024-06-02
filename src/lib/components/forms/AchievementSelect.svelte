@@ -52,6 +52,7 @@
 		if (badgeId) {
 			achievement = $achievements.find((a) => a.id === badgeId);
 		}
+		if (!achievement) dispatch('unselected');
 	});
 </script>
 
