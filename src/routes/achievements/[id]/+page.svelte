@@ -92,7 +92,6 @@
 	setContext('session', data.session);
 
 	onMount(async () => {
-		if (!data.achievement.categoryId) return;
 		await ensureLoaded(achievementsLoading, fetchAchievements);
 		await ensureLoaded(acLoading, fetchAchievementCategories);
 		await ensureLoaded(backpackClaimsLoading, fetchBackpackClaims);
