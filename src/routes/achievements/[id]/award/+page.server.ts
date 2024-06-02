@@ -114,7 +114,11 @@ export const actions: Actions = {
 			throw error(403, m.invite_unauthorizedNonAdminError());
 		}
 
-		if (authenticatedUserId && achievementConfig?.json?.capabilities?.inviteRequires) {
+		if (
+			!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none') &&
+			authenticatedUserId &&
+			achievementConfig?.json?.capabilities?.inviteRequires
+		) {
 			const inviteQualificationClaim = await prisma.achievementClaim.findFirst({
 				where: {
 					achievementId: params.id,
