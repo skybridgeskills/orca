@@ -100,5 +100,8 @@
 		"nodemailer-mailgun-transport": "^2.1.5",
 		"qrcode": "^1.5.3",
 		"ws": "^8.16.0"
+	},
+	"prisma": {
+		"schema": "src/prisma/schema.prisma"
 	}
 }

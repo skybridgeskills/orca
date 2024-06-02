@@ -38,14 +38,14 @@
 		{#if !showClaimForm}
 			<Button
 				text="Reject"
-				onClick={() => {
+				on:click={() => {
 					claimIntent = 'REJECTED';
 					showClaimForm = true;
 				}}
 			/>
 			<Button
 				text="Accept"
-				onClick={() => {
+				on:click={() => {
 					claimIntent = 'ACCEPTED';
 					showClaimForm = true;
 				}}

@@ -8,11 +8,13 @@
 	import {
 		achievements,
 		achievementsLoading,
-		fetchAchievements,
+		fetchAchievements
+	} from '$lib/stores/achievementStore';
+	import {
 		achievementCategories,
 		acLoading,
 		fetchAchievementCategories
-	} from '$lib/stores/achievementStore';
+	} from '$lib/stores/achievementCategoryStore';
 	import type { AchievementCategory, Achievement, AchievementConfig } from '@prisma/client';
 	import { session } from '$lib/stores/sessionStore';
 	import Heading from '$lib/components/Heading.svelte';
@@ -44,10 +46,9 @@
 
 	onMount(async () => {
 		await Promise.all([
-			ensureLoaded($achievements, fetchAchievements, $achievementsLoading),
-			ensureLoaded($achievementCategories, fetchAchievementCategories, $acLoading)
+			ensureLoaded(achievementsLoading, fetchAchievements),
+			ensureLoaded(acLoading, fetchAchievementCategories)
 		]);
-		await tick();
 		mapCategories();
 	});
 </script>
@@ -61,7 +62,7 @@
 	</div>
 {/if}
 
-{#if [LoadingStatus.NotStarted, LoadingStatus.Loading].includes($achievementsLoading)}
+{#if $achievementsLoading == LoadingStatus.NotStarted || $achievementsLoading == LoadingStatus.Loading}
 	<LoadingSpinner />
 {/if}
 {#if $achievementsLoading == LoadingStatus.Error}

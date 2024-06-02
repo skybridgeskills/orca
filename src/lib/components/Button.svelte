@@ -6,6 +6,7 @@
 	export let text: string = '';
 	export let href: string = '';
 	export let id: string = '';
+	export let disabled = false;
 	export let buttonType: 'button' | 'submit' = 'button';
 	export let moreProps: Object = {};
 	export let submodule: App.ButtonRole = 'primary';
@@ -18,10 +19,26 @@
 		secondary: `${defaultClasses} bg-white text-gray-600 border dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 focus:ring-blue-300 dark:focus:ring-blue-800`,
 		danger: `${defaultClasses} text-white bg-red-600 border-red-900 focus:ring-red-300 dark:focus:ring-red-700`
 	};
+	const disabledClassList = {
+		primary: `${defaultClasses} bg-blue-400 dark:bg-blue-500 cursor-not-allowed`,
+		secondary: `${defaultClasses} text-gray-400 dark:text-gray-600 bg-gray-200 dark:bg-gray-700 cursor-not-allowed`,
+		danger: `${defaultClasses} bg-red-400 cursor-not-allowed`
+	};
+
+	const handleClick = () => {
+		if (!disabled) {
+			dispatch('click');
+		}
+	};
 </script>
 
 {#if href}
-	<a {id} {href} {...moreProps} class={submoduleClassList[submodule]}>
+	<a
+		{id}
+		{href}
+		{...moreProps}
+		class={disabled ? disabledClassList[submodule] : submoduleClassList[submodule]}
+	>
 		<slot>{text}</slot>
 	</a>
 {:else}
@@ -29,11 +46,12 @@
 		{id}
 		type={buttonType}
 		{...moreProps}
-		on:click
+		on:click={handleClick}
 		on:keypress={(e) => {
-			if (e.key == 'Enter' || e.key == ' ') dispatch('click');
+			if (e.key == 'Enter' || e.key == ' ') handleClick();
 		}}
-		class={submoduleClassList[submodule]}
+		class={disabled ? disabledClassList[submodule] : submoduleClassList[submodule]}
+		{disabled}
 	>
 		<slot>{text}</slot>
 	</button>

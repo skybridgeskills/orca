@@ -10,7 +10,7 @@
 		deleteAchievementCategory,
 		fetchAchievementCategories,
 		acLoading
-	} from '$lib/stores/achievementStore';
+	} from '$lib/stores/achievementCategoryStore';
 	import { deleteCTA } from '$lib/i18n/messages';
 	import { enhance } from '$app/forms';
 	import type { PageData } from './$types';

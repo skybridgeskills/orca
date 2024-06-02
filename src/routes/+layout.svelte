@@ -10,13 +10,14 @@
 		fetchAchievements
 	} from '$lib/stores/achievementStore';
 	import { onMount } from 'svelte';
-	import { session } from '$lib/stores/sessionStore';
+	import { session, sessionStatus } from '$lib/stores/sessionStore';
 	import { notifications } from '$lib/stores/notificationStore';
 	import '../app.css';
 	import Nav from '$lib/components/Nav.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import type { PageData } from './$types';
 	import { languageTag, setLanguageTag } from '$lib/i18n/runtime';
+	import { LoadingStatus } from '$lib/stores/common';
 
 	export let data: PageData;
 	preferredTheme.initialize(data.cookieTheme || 'light');
@@ -25,6 +26,7 @@
 	onMount(() => {
 		preferredTheme.initialize(data.cookieTheme || 'light'); // reinitialize but with the ability to set document.cookie
 		if (data.session) $session = data.session;
+		$sessionStatus = LoadingStatus.Complete;
 	});
 </script>
 
@@ -43,6 +45,7 @@
 				<Alert
 					message={n.message}
 					dismissable={true}
+					level={n.level}
 					on:close={() => {
 						notifications.dismissNotification(n.id);
 					}}
