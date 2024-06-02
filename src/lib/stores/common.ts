@@ -7,17 +7,25 @@ export enum LoadingStatus {
 	Error
 }
 
-export const ensureLoaded = async <T>(
-	collection: Array<T>,
-	fetcher: () => Promise<LoadingStatus>,
-	status: Writable<LoadingStatus | Promise<LoadingStatus>>
+export const ensureLoaded = async (
+	statusStore: Writable<LoadingStatus>,
+	fetcher?: () => Promise<LoadingStatus>
 ) => {
-	const currentStatus = get(status);
-	if (collection.length == 0 && currentStatus == LoadingStatus.NotStarted) {
-		const promise = fetcher();
-		status.set(promise); // Sets the promise so other components can wait for it too
-		status.set(await promise); // Upon resolution will set status to the result
-	} else if (currentStatus instanceof Promise) {
-		await currentStatus; // If we're already waiting, wait.
+	const currentStatus = get(statusStore);
+	if (currentStatus == LoadingStatus.Complete) return;
+
+	if (currentStatus == LoadingStatus.NotStarted && fetcher !== undefined) {
+		// Sets the promise so other components can wait for it too
+		statusStore.set(LoadingStatus.Loading);
+		statusStore.set(await fetcher()); // Upon resolution will set status to the result
+	} else if (fetcher == undefined && currentStatus == LoadingStatus.Loading) {
+		await new Promise<LoadingStatus>((resolve) => {
+			const unsubscribe = statusStore.subscribe((status) => {
+				if (status !== LoadingStatus.Loading) {
+					unsubscribe();
+					resolve(status);
+				}
+			});
+		});
 	}
 };

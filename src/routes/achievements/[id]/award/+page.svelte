@@ -4,11 +4,11 @@
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import type { PageData } from './$types';
-	import Backpack from '$lib/illustrations/Backpack.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+	import type { Achievement, AchievementConfig } from '@prisma/client';
 
 	export let data: PageData;
 	export let form;
@@ -27,7 +27,7 @@
 	const breadcrumbItems = [
 		{ text: 'Home', href: '/' },
 		{ text: 'Achievements', href: '/achievements' },
-		{ text: data.achievement.name }
+		{ text: data.achievement?.name }
 	];
 </script>
 

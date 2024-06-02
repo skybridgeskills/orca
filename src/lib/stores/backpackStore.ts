@@ -1,9 +1,9 @@
 import * as m from '$lib/i18n/messages';
 import type { AchievementClaim, ClaimEndorsement } from '@prisma/client';
 import { get, writable } from 'svelte/store';
-import { LoadingStatus } from './common';
+import { ensureLoaded, LoadingStatus } from './common';
 import { notifications, Notification } from './notificationStore';
-import { session } from './sessionStore';
+import { session, sessionStatus } from './sessionStore';
 
 /*
 // AchievementClaims in the current User's backpack
@@ -14,6 +14,8 @@ export const backpackClaims = writable<AchievementClaim[]>([]);
 export const backpackClaimsLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
 
 export const fetchBackpackClaims = async (): Promise<LoadingStatus> => {
+	await ensureLoaded(sessionStatus);
+
 	if (!get(session)?.user) return LoadingStatus.NotStarted;
 
 	let a: AchievementClaim[] = [];

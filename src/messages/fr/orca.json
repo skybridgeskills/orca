@@ -164,7 +164,7 @@
 	"invite_achievementUnauthorizedError": "Vous ne pouvez pas attribuer ce badge.",
 	"invite_notFoundError": "Invitation inconnue. Cette invitation n'existe pas ou n'est peut-être plus valide.",
 	"invite_recipientIdentifierRequiredError": "L'identifiant du destinataire est requis.",
-	"invite_unauthorizedNonAdminError": "Vous ne pouvez pas inviter d'autres personnes à revendiquer ce badge. Utilisez la fonction de demande de badge pour les auto-attributions.",
+	"invite_unauthorizedNonAdminError": "Vous ne pouvez pas inviter d'autres personnes à revendiquer ce badge.",
 	"linkedin_addToProfileButton_label": "Bouton Ajouter au profil LinkedIn",
 	"logInCTA": "Se connecter",
 	"logOutCTA": "Se déconnecter",

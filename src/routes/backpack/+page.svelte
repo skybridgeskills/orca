@@ -24,7 +24,6 @@
 		backpackClaims,
 		backpackClaimsLoading,
 		fetchBackpackClaims,
-		outstandingInvites,
 		outstandingInvitesLoading,
 		fetchOutstandingInvites
 	} from '$lib/stores/backpackStore';
@@ -32,7 +31,6 @@
 	import { onMount } from 'svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import {
-		achievements,
 		achievementsLoading,
 		fetchAchievements,
 		getAchievementById
@@ -71,12 +69,10 @@
 		navigator.clipboard.writeText(`${PUBLIC_HTTP_PROTOCOL}://${data.org.domain}/ob2/a/${claim.id}`);
 	};
 
-	onMount(async () => {
-		await Promise.all([
-			ensureLoaded($backpackClaims, fetchBackpackClaims, backpackClaimsLoading),
-			ensureLoaded($outstandingInvites, fetchOutstandingInvites, outstandingInvitesLoading),
-			ensureLoaded($achievements, fetchAchievements, achievementsLoading)
-		]);
+	onMount(() => {
+		ensureLoaded(backpackClaimsLoading, fetchBackpackClaims);
+		ensureLoaded(outstandingInvitesLoading, fetchOutstandingInvites);
+		ensureLoaded(achievementsLoading, fetchAchievements);
 	});
 </script>
 

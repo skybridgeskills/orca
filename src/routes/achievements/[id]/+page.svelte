@@ -93,9 +93,9 @@
 
 	onMount(async () => {
 		if (!data.achievement.categoryId) return;
-		await ensureLoaded($achievements, fetchAchievements, achievementsLoading);
-		await ensureLoaded($achievementCategories, fetchAchievementCategories, acLoading);
-		await ensureLoaded($backpackClaims, fetchBackpackClaims, backpackClaimsLoading);
+		await ensureLoaded(achievementsLoading, fetchAchievements);
+		await ensureLoaded(acLoading, fetchAchievementCategories);
+		await ensureLoaded(backpackClaimsLoading, fetchBackpackClaims);
 		category = getCategoryById(data.achievement.categoryId ?? 'Uncategorized');
 	});
 </script>
@@ -238,7 +238,7 @@
 			{m.claimConfiguration_adminOnly_description()}
 		{/if}
 
-		{#if config?.claimRequiresId}
+		{#if config?.claimable && config?.claimRequiresId}
 			<!-- A2: Achievement is claimable, and requires a prerequisite -->
 			{@const claimRequires = $achievements.find((a) => config?.claimRequiresId == a.id)}
 			{#if claimRequires}
@@ -251,7 +251,8 @@
 					{m.claimConfiguration_userNotMeetsRequirement()}
 				{/if}
 			{/if}
-		{:else}
+		{:else if config?.claimable && !config?.claimRequiresId}
+			<!-- A3: Achievement is claimable by anybody, even members of the public -->
 			<span class="text-gray-500 dark:text-gray-400">
 				{m.achievement_openClaimable_description()}
 			</span>

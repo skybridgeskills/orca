@@ -12,9 +12,7 @@ export const achievements = writable<
 >([]);
 
 // Initially unset to indicate uninitialized store, periodically needs to update.
-export const achievementsLoading = writable<LoadingStatus | Promise<LoadingStatus>>(
-	LoadingStatus.NotStarted
-);
+export const achievementsLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
 
 export const fetchAchievements = async (): Promise<LoadingStatus> => {
 	let a: (Achievement & { achievementConfig: AchievementConfig | null })[] = [];

@@ -164,7 +164,7 @@
 	"invite_achievementUnauthorizedError": "You may not award this achievement.",
 	"invite_notFoundError": "Unknown invitation. This invitation not exist or may no longer be valid.",
 	"invite_recipientIdentifierRequiredError": "Recipient identifier is required.",
-	"invite_unauthorizedNonAdminError": "You may not invite others to claim this achievement. Use the claim feature for self-awards.",
+	"invite_unauthorizedNonAdminError": "You may not invite others to claim this achievement.",
 	"linkedin_addToProfileButton_label": "LinkedIn Add to Profile button",
 	"logInCTA": "Log in",
 	"logOutCTA": "Log out",

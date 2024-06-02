@@ -48,7 +48,7 @@
 	};
 
 	onMount(async () => {
-		await ensureLoaded($achievements, fetchAchievements, achievementsLoading);
+		await ensureLoaded(achievementsLoading, fetchAchievements);
 		if (badgeId) {
 			achievement = $achievements.find((a) => a.id === badgeId);
 		}

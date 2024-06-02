@@ -15,9 +15,8 @@ import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 dotenv.config();
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	// redirect user if logged out or doesn't hold org admin role
-	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		throw redirect(302, `/achievements/${params.id}`);
+	// redirect user if logged out
+	if (!locals.session?.user) throw redirect(302, `/achievements/${params.id}`);
 
 	const achievement = await prisma.achievement.findFirstOrThrow({
 		where: {
@@ -25,6 +24,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			organizationId: locals.org.id
 		},
 		include: {
+			achievementConfig: true,
 			_count: {
 				select: { achievementClaims: true, claimEndorsements: true }
 			}
@@ -32,7 +32,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	});
 
 	return {
-		organization: locals.org,
 		achievement: achievement
 	};
 };
@@ -65,16 +64,17 @@ export const actions: Actions = {
 				message: m.invite_recipientIdentifierRequiredError()
 			});
 
-		if (!authenticatedUserId) {
-			// UNAUTHENTICATD USERS: can create an invite for open-claim achievements only.
-			const achievement = await getAchievement(params.id, locals.org.id);
+		const achievement = await getAchievement(params.id, locals.org.id);
+		const achievementConfig = achievement.achievementConfig as
+			| App.AchievementConfigWithJson
+			| undefined;
 
-			if (
-				!achievement.achievementConfig?.claimable ||
-				achievement.achievementConfig.claimRequiresId
-			)
-				throw error(403, m.invite_achievementUnauthorizedError());
-
+		// UNAUTHENTICATD USERS: can create an invite for open-claim achievements only.
+		if (
+			!authenticatedUserId &&
+			achievement.achievementConfig?.claimable &&
+			!achievement?.achievementConfig?.claimRequiresId
+		) {
 			// achievement is claimable without any prerequisite. Unauthenticated
 			// user will create a self-endorsement (with null creator) and then use it as an invite-code.
 			const endorsement = await prisma.claimEndorsement.upsert({
@@ -101,15 +101,32 @@ export const actions: Actions = {
 				identifier: null,
 				claim: null
 			};
-		} else if (
-			!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none')
+		} else if (!authenticatedUserId) {
+			// Not an open claim achievement, and not authenticated.
+			throw error(403, m.invite_achievementUnauthorizedError());
+		}
+
+		if (
+			!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none') &&
+			!achievementConfig?.json?.capabilities?.inviteRequires
 		) {
-			// NON ADMIN USERS: Cannot use this endpoint to endorse
+			// NON ADMIN USERS for a badge that is only inviteable by admins
 			throw error(403, m.invite_unauthorizedNonAdminError());
 		}
 
-		// ADMIN USERS: May create claims for other users in unaccepted state. May not use this feature to self-award.
+		if (authenticatedUserId && achievementConfig?.json?.capabilities?.inviteRequires) {
+			const inviteQualificationClaim = await prisma.achievementClaim.findFirst({
+				where: {
+					achievementId: params.id,
+					userId: authenticatedUserId
+				}
+			});
+			if (!inviteQualificationClaim || inviteQualificationClaim.validFrom === null) {
+				throw error(403, m.invite_unauthorizedNonAdminError());
+			}
+		}
 
+		// ADMIN USERS and QUALIFIED INVITERS: May create claims for other users in unaccepted state.
 		data.creator = { connect: { id: authenticatedUserId } };
 
 		let identifier: Identifier | null = await prisma.identifier.findFirst({
@@ -119,8 +136,13 @@ export const actions: Actions = {
 			}
 		});
 
-		// Force award option
-		if (forceCreateUser != 'no' && !identifier?.verifiedAt) {
+		// Force create account option for admins only
+		if (
+			['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none') &&
+			forceCreateUser != 'no' &&
+			!identifier?.verifiedAt
+		) {
+			// TODO remove this feature now that qualified invitation is improving.
 			const givenName = stripTags(requestData.get('givenName')?.toString()) || '';
 			const familyName = stripTags(requestData.get('familyName')?.toString()) || '';
 

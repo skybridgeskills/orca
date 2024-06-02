@@ -46,10 +46,9 @@
 
 	onMount(async () => {
 		await Promise.all([
-			ensureLoaded($achievements, fetchAchievements, achievementsLoading),
-			ensureLoaded($achievementCategories, fetchAchievementCategories, acLoading)
+			ensureLoaded(achievementsLoading, fetchAchievements),
+			ensureLoaded(acLoading, fetchAchievementCategories)
 		]);
-		await tick();
 		mapCategories();
 	});
 </script>
