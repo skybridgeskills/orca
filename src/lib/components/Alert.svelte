@@ -63,7 +63,7 @@
 		</button>
 	</div>
 {:else}
-	<div class="max-w-2xl p-4 my-4 text-sm rounded-lg {level}" role="alert">
+	<div class="max-w-2xl p-4 my-4 text-sm rounded-lg {levelClasses[level]}" role="alert">
 		{#if heading}<span class="font-medium">{heading}</span>{/if}
 		{message}
 		<slot />
