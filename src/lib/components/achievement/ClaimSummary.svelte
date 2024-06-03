@@ -85,7 +85,7 @@
 		</div>
 	</div>
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
-		{#each relatedAchievements.filter((rc) => achievement.achievementConfig?.claimRequiresId == rc.id) as claimRequires}
+		{#each relatedAchievements.filter((rc) => achievement.achievementConfig?.claimRequiresId == rc.id) as claimRequires (claimRequires.id)}
 			<span>
 				{m.claimConfiguration_claimRequiresSummary()}
 				<a

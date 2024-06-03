@@ -74,7 +74,7 @@
 		description={m.achievements_noneFound_description()}
 	/>
 {/if}
-{#each [...$achievementCategories, U] as category}
+{#each [...$achievementCategories, U] as category (category.id)}
 	{#if categoryAchievements[category.id]?.length}
 		<h2 class="text-l sm:text-xl font-bold mt-6 mb-4 dark:text-white">{category.name}</h2>
 		<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">

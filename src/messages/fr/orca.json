@@ -271,5 +271,9 @@
 	"achievementConfig_requirementHoldersOf": "Titulaires d'un badge spécifique : ",
 	"chooseCTA": "Choisir...",
 	"backpack_errorFetchingData": "Erreur lors de la récupération des données du sac à dos !",
-	"achievements_errorFetchingData": "Erreur lors de la récupération des succès !"
+	"achievements_errorFetchingData": "Erreur lors de la récupération des succès !",
+	"achievementConfig_claimRequiresCrossValidationMessage": "Un badge doit être sélectionné si la réclamation nécessite un badge.",
+	"achievementConfig_inviteREquiresCrossValidationMessage": "Un badge doit être sélectionné si un examen sur invitation est requis.",
+	"achievementConfig_inviteRequiredGeneric": "Cette réalisation n'est décernée que sur invitation.",
+	"claimConfiguration_inviteRequiresDescription": "Les invitations à réclamation peuvent être formulées par les titulaires de :"
 }
