@@ -225,17 +225,6 @@
 			<!-- A1: Achievement is not claimable -->
 			{m.claimConfiguration_claimDisabled()}.
 		{/if}
-		{@const inviteRequires = $achievements.find(
-			(a) => config?.json?.capabilities?.inviteRequires == a.id
-		)}
-		{#if inviteRequires}
-			Invitations to claim may be made by holders of:
-			<a href={`/achievements/${inviteRequires?.id}`} class="font-bold underline hover:no-underline"
-				>{inviteRequires?.name}</a
-			>
-		{:else}
-			{m.claimConfiguration_adminOnly_description()}
-		{/if}
 
 		{#if config?.claimable && config?.claimRequiresId}
 			<!-- A2: Achievement is claimable, and requires a prerequisite -->
@@ -255,6 +244,18 @@
 			<span class="text-gray-500 dark:text-gray-400">
 				{m.achievement_openClaimable_description()}
 			</span>
+		{/if}
+
+		{@const inviteRequires = config?.json?.capabilities?.inviteRequires
+			? $achievements.find((a) => config?.json?.capabilities?.inviteRequires == a.id)
+			: undefined}
+		{#if inviteRequires}
+			{m.claimConfiguration_inviteRequiresDescription()}
+			<a href={`/achievements/${inviteRequires?.id}`} class="font-bold underline hover:no-underline"
+				>{inviteRequires?.name}</a
+			>.
+		{:else if !config?.claimable}
+			{m.claimConfiguration_adminOnly_description()}
 		{/if}
 
 		{#if reviewRequires && !!config?.reviewsRequired}

@@ -141,7 +141,7 @@
 
 	{#if searchResults.length > 0}
 		<ul class="mt-4 space-y-2">
-			{#each searchResults as a}
+			{#each searchResults as a (a.id)}
 				<li>
 					<AchievementSummary
 						achievement={a}
@@ -164,6 +164,7 @@
 										dispatch('selected', a.id);
 										searchModalOpen = false;
 										searchQuery = '';
+										achievement = a;
 									}}
 								>
 									Select

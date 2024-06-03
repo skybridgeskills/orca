@@ -54,6 +54,7 @@ export const actions: Actions = {
 			category: stripTags(requestData.get('category')?.toString()),
 
 			claimable: requestData.get('claimable')?.toString(), // 'on' or 'off'
+			claimableSelectedOption: requestData.get('claimableSelectedOption')?.toString(), // 'off', 'badge', or 'public'
 			claimRequires: requestData.get('claimRequires')?.toString(),
 			reviewRequires: requestData.get('reviewRequires')?.toString(),
 			reviewsRequired: parseInt(requestData.get('reviewsRequired')?.toString() || '') || 0,
@@ -98,9 +99,10 @@ export const actions: Actions = {
 				create: {
 					organization: { connect: { id: locals.org.id } },
 					claimable: formData.claimable == 'on',
-					claimRequires: formData.claimRequires
-						? { connect: { id: formData.claimRequires } }
-						: undefined,
+					claimRequires:
+						formData.claimable == 'on' && formData.claimRequires
+							? { connect: { id: formData.claimRequires } }
+							: undefined,
 					reviewRequires: formData.reviewRequires
 						? { connect: { id: formData.reviewRequires } }
 						: undefined,

@@ -28,6 +28,11 @@
 	let formData = {
 		...initialData,
 		claimable: initialData.claimable ? 'on' : 'off',
+		claimableSelectedOption: initialData.claimable
+			? initialData.claimRequires
+				? 'badge'
+				: 'public'
+			: 'off',
 		reviewableSelectedOption: initialData.reviewsRequired
 			? initialData.reviewRequires
 				? 'badge'
@@ -146,6 +151,12 @@
 		} else if (formData.reviewableSelectedOption == 'admin' && formData.reviewsRequired != 1) {
 			formData.reviewsRequired = 1;
 		}
+
+		if (formData.claimableSelectedOption == 'off') {
+			formData.claimable = 'off';
+		} else {
+			formData.claimable = 'on';
+		}
 	}
 </script>
 
@@ -228,7 +239,7 @@
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 				>
 					<option value="uncategorized">- {m.uncategorized()} -</option>
-					{#each categories as category}
+					{#each categories as category (category.id)}
 						<option value={category.id}>{category.name}</option>
 					{/each}
 				</select>
@@ -280,19 +291,27 @@
 		<!-- Claim Settings -->
 		<div class:isError={errors.claimRequires}>
 			<FormFieldLabel for="claimable">{m.claimConfiguration_allow()}</FormFieldLabel>
+			<input type="hidden" name="claimable" bind:value={formData.claimable} />
 			<div class="space-y-2">
 				<RadioOption
-					bind:selectedOption={formData.claimable}
+					bind:selectedOption={formData.claimableSelectedOption}
 					value="off"
-					name="claimable"
+					name="claimableSelectedOption"
 					label={m.achievement_awardByInvitation()}
 					id="achievementEdit_claimable_off"
 				/>
 				<RadioOption
-					bind:selectedOption={formData.claimable}
-					value="on"
-					name="claimable"
-					id="achievementEdit_claimable_on"
+					bind:selectedOption={formData.claimableSelectedOption}
+					value="public"
+					name="claimableSelectedOption"
+					label={m.achievement_openClaimable_description()}
+					id="achievementEdit_claimableSelectedOption_public"
+				/>
+				<RadioOption
+					bind:selectedOption={formData.claimableSelectedOption}
+					value="badge"
+					name="claimableSelectedOption"
+					id="achievementEdit_claimableSelectedOption_badge"
 				>
 					<span class="inline">Claimable by holders of a specific badge: </span>
 					<AchievementSelect
@@ -304,7 +323,7 @@
 						on:selected={(e) => {
 							formData.claimRequires = e.detail;
 						}}
-						disabled={formData.claimable != 'on'}
+						disabled={formData.claimableSelectedOption != 'badge'}
 						label={m.claimConfiguration_requiredAchievement()}
 						description={m.claimConfiguration_requiredAchievement_description()}
 						achievementFilter={(a) => a.id != achievementId}
@@ -382,7 +401,6 @@
 						disabled={formData.reviewableSelectedOption != 'badge'}
 						label={m.claimConfiguration_requiredAchievement()}
 						description={m.claimConfiguration_requiredAchievement_description()}
-						achievementFilter={(a) => a.id != achievementId}
 						inputId="achievementEdit_reviewRequires"
 						inputName="reviewRequires"
 						errorMessage={errors.reviewRequires}

@@ -12,6 +12,7 @@ export const achievementFormSchema = yup
 		criteriaNarrative: yup.string().nullable(),
 
 		claimable: yup.string().oneOf(['on', 'off']),
+		claimableSelectedOption: yup.string().oneOf(['off', 'badge', 'public']),
 		claimRequires: yup.string().nullable(),
 		reviewRequires: yup.string().nullable(),
 		reviewsReqired: yup.number().integer().min(0).max(5),
@@ -20,11 +21,18 @@ export const achievementFormSchema = yup
 
 		capabilities_inviteRequires: yup.string().nullable().transform(emptyNulled).uuid()
 	})
-	.test('reviewRequires', m.achievementConfig_reviewRequiredCrossValidationMessage(), (value) => {
-		if (value.reviewableSelectedOption == 'badge' && !value.reviewRequires) return false;
-		return true;
-	})
-	.test('inviteRequires', 'A badge must be selected if review by invite is required.', (value) => {
-		if (value.inviteSelectedOption == 'badge' && !value.capabilities_inviteRequires) return false;
-		return true;
-	});
+	.test(
+		'claimRequires',
+		m.achievementConfig_claimRequiresCrossValidationMessage(),
+		(value) => !(value.claimableSelectedOption == 'badge' && !value.claimRequires)
+	)
+	.test(
+		'reviewRequires',
+		m.achievementConfig_reviewRequiredCrossValidationMessage(),
+		(value) => !(value.reviewableSelectedOption == 'badge' && !value.reviewRequires)
+	)
+	.test(
+		'inviteRequires',
+		m.achievementConfig_inviteREquiresCrossValidationMessage(),
+		(value) => !(value.inviteSelectedOption == 'badge' && !value.capabilities_inviteRequires)
+	);

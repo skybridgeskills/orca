@@ -271,5 +271,9 @@
 	"achievementConfig_requirementHoldersOf": "Holders of a specific badge: ",
 	"chooseCTA": "Choose...",
 	"backpack_errorFetchingData": "Error fetching backpack data!",
-	"achievements_errorFetchingData": "Error fetching achievements!"
+	"achievements_errorFetchingData": "Error fetching achievements!",
+	"achievementConfig_claimRequiresCrossValidationMessage": "An achievement must be selected if claim requires it.",
+	"achievementConfig_inviteREquiresCrossValidationMessage": "A badge must be selected if review by invite is required.",
+	"achievementConfig_inviteRequiredGeneric": "This achievement is only awardable by invitation.",
+	"claimConfiguration_inviteRequiresDescription": "Invitations to claim may be made by holders of:"
 }

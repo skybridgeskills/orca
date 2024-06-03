@@ -82,6 +82,7 @@ export const actions: Actions = {
 			capabilities_inviteRequires:
 				requestData.get('capabilities_inviteRequires')?.toString() || null,
 			claimable: requestData.get('claimable')?.toString(), // 'on' or 'off'
+			claimableSelectedOption: requestData.get('claimableSelectedOption')?.toString(), // 'off', 'badge', or 'public'
 			claimRequires: requestData.get('claimRequires')?.toString(),
 			reviewRequires: requestData.get('reviewRequires')?.toString(),
 			reviewsRequired: parseInt(requestData.get('reviewsRequired')?.toString() || '') || 0,
@@ -106,11 +107,15 @@ export const actions: Actions = {
 			reviewsRequired: formData.reviewsRequired
 		};
 
-		if (configData['claimable'] && !!formData.claimRequires)
+		if (
+			configData['claimable'] &&
+			formData.claimableSelectedOption == 'badge' &&
+			!!formData.claimRequires
+		)
 			configData['claimRequires'] = {
 				connect: { id: formData.claimRequires }
 			};
-		else if (formData.claimable) configData['claimRequires'] = undefined;
+		else configData['claimRequires'] = undefined;
 
 		if (configData['reviewsRequired'] > 0 && !!formData.reviewRequires)
 			configData['reviewRequires'] = {
