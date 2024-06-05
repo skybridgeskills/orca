@@ -91,7 +91,7 @@ To ensure you get image continuity when switching between localstack and the fil
 
 ### Media saved to the local filesystem (preferred)
 
-Set the `PUBLIC_MEDIA_URL` in your `.env` file to the value `"/media"` e.g. `PUBLIC_MEDIA_DOMAIN="/media"`
+Set the `PUBLIC_MEDIA_DOMAIN` in your `.env` file to the value `"/media"` e.g. `PUBLIC_MEDIA_DOMAIN="/media"`
 
 That is it, all media files will be saved to your local file system in the `dev-uploads` folder and served via the vite dev server.
 
