@@ -1,14 +1,16 @@
 <script lang="ts">
 	export let heat: number = 0.0;
 	export let text: string = '';
-	export let link: boolean = false;
+	export let link: string = '';
+	let state: 'div' | 'a' = 'div';
 	let r_heat = 0;
 
 	let klass =
-		'rounded-full py-0.5 px-2 text-xs font-semibold inline-flex items-center me-2 leading-6 bg-slate-700 text-slate-100';
+		'rounded-full py-0.5 px-2 text-xs font-semibold inline-flex items-center me-2 leading-6 bg-slate-500 dark:bg-slate-700 text-white dark:text-slate-100';
 	// This will add the hover highlight if you pass the link attribute
-	if (link == true) {
-		klass += ' hover:bg-blue-500';
+	if (link != '') {
+		klass += ' hover:bg-blue-500 dark:hover:bg-blue-500';
+		state = 'a';
 	}
 	// just makes sure that the r_heat value will work no matter what is passed to it
 	if (heat >= 0 && heat <= 4) {
@@ -19,7 +21,7 @@
 </script>
 
 <!-- this is the whole tag-->
-<span class={klass}>
+<svelte:element this={state} class={klass} href={link} tabindex="0">
 	<!-- this is so the text in the button truncates only itself, and not the image-->
 	<span class="truncate text-xs tagwidth">
 		{text}
@@ -62,9 +64,9 @@
 			/>
 			<rect
 				x="70"
-				y="20"
+				y="10"
 				width="15"
-				height="70"
+				height="80"
 				rx="5"
 				ry="5"
 				fill="black"
@@ -99,9 +101,9 @@
 			/>
 			<rect
 				x="70"
-				y="20"
+				y="10"
 				width="15"
-				height="70"
+				height="80"
 				rx="5"
 				ry="5"
 				fill="black"
@@ -111,8 +113,8 @@
 		</svg>
 	{:else if r_heat == 2}
 		<svg width="25" height="25" viewBox="-15 0 100 110" xmlns="http://www.w3.org/2000/svg">
-			<rect x="10" y="70" width="15" height="20" rx="5" ry="5" fill="green" stroke="green" />
-			<rect x="30" y="50" width="15" height="40" rx="5" ry="5" fill="green" stroke="green" />
+			<rect x="10" y="70" width="15" height="20" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
+			<rect x="30" y="50" width="15" height="40" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
 			<rect
 				x="50"
 				y="30"
@@ -121,35 +123,35 @@
 				rx="5"
 				ry="5"
 				fill="black"
-				stroke="green"
+				stroke="#0E9F6E"
 				stroke-width="3"
 			/>
 			<rect
 				x="70"
-				y="20"
+				y="10"
 				width="15"
-				height="70"
+				height="80"
 				rx="5"
 				ry="5"
 				fill="black"
-				stroke="green"
+				stroke="#0E9F6E"
 				stroke-width="3"
 			/>
 		</svg>
 	{:else if r_heat == 3}
 		<svg width="25" height="25" viewBox="-15 0 100 110" xmlns="http://www.w3.org/2000/svg">
-			<rect x="10" y="70" width="15" height="20" rx="5" ry="5" fill="green" stroke="green" />
-			<rect x="30" y="50" width="15" height="40" rx="5" ry="5" fill="green" stroke="green" />
-			<rect x="50" y="30" width="15" height="60" rx="5" ry="5" fill="green" stroke="green" />
+			<rect x="10" y="70" width="15" height="20" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
+			<rect x="30" y="50" width="15" height="40" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
+			<rect x="50" y="30" width="15" height="60" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
 			<rect
 				x="70"
-				y="20"
+				y="10"
 				width="15"
-				height="70"
+				height="80"
 				rx="5"
 				ry="5"
 				fill="black"
-				stroke="green"
+				stroke="#0E9F6E"
 				stroke-width="3"
 			/>
 		</svg>
@@ -165,10 +167,10 @@
 			<rect x="10" y="70" width="15" height="20" rx="5" ry="5" fill="url(#Gradient)" />
 			<rect x="30" y="50" width="15" height="40" rx="5" ry="5" fill="url(#Gradient)" />
 			<rect x="50" y="30" width="15" height="60" rx="5" ry="5" fill="url(#Gradient)" />
-			<rect x="70" y="20" width="15" height="70" rx="5" ry="5" fill="url(#Gradient)" />
+			<rect x="70" y="10" width="15" height="80" rx="5" ry="5" fill="url(#Gradient)" />
 		</svg>
 	{/if}
-</span>
+</svelte:element>
 
 <style>
 	.tagwidth {
