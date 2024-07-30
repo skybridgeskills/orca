@@ -15,8 +15,10 @@
 	}
 </script>
 
-<button on:click={handleClick} tabindex="0" >
-	<span class="inline-flex items-center px-2.5 py-0.5 rounded me-2 text-slate-600 dark:text-slate-500">
+<button on:click={handleClick} tabindex="0">
+	<span
+		class="inline-flex items-center px-2.5 py-0.5 rounded me-2 text-slate-600 dark:text-slate-500"
+	>
 		<svg
 			version="1.1"
 			id="Layer_1"
@@ -27,11 +29,9 @@
 			width="35"
 			viewBox="0 0 1024 1024"
 			transform={rotation}
-            fill="currentColor"
+			fill="currentColor"
 		>
-       
 			<path
-				
 				opacity="1.000000"
 				stroke="none"
 				d="
@@ -55,8 +55,7 @@
                 C498.290527,675.641907 503.678955,679.853210 508.766449,684.403015 
                 C511.863129,687.172485 514.200500,686.989136 517.347412,684.273987 
                 C544.589355,660.768982 572.002014,637.461792 599.273438,613.990723 
-                C649.651855,570.632568 699.969055,527.203430 750.578369,483.571228 
-z"
+                C649.651855,570.632568 699.969055,527.203430 750.578369,483.571228 z"
 			/>
 		</svg>
 		<span class="whitespace-pre-line text-xl font-semibold text-black dark:text-white">{title}</span
@@ -64,7 +63,7 @@ z"
 	</span>
 </button>
 
-<hr class="h-px mb-2 mx-2 bg-gray-300 border-0 dark:bg-gray-700">
+<hr class="h-px mb-2 mx-2 bg-gray-300 border-0 dark:bg-gray-700" />
 {#if open}
 	<div
 		transition:slide={{ delay: 250, duration: 300, easing: quintOut, axis: 'y' }}
