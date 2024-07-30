@@ -1,33 +1,41 @@
 <script lang="ts">
-	export let heat: number = 0.0;
-	export let text: string = '';
-	export let link: string = '';
-	let state: 'div' | 'a' = 'div';
-	let r_heat = 0;
+	export let heat = 0.0;
+	export let text = '';
+	export let href = '';
+	let elem = href ? 'a' : 'span';
+
+	type BarCount = 0 | 1 | 2 | 3 | 4;
+	// Clamp and round heat to min 0 and max 4
+	const filledBars = Math.min(4, Math.max(0, Math.round(heat))) as BarCount;
+
+	const strokes: { [K in BarCount]: string } = {
+		0: '#999',
+		1: 'orange',
+		2: '#0E9F6E',
+		3: '#0E9F6E',
+		4: 'url(#Gradient)'
+	};
+	const fills = {
+		0: 'black',
+		1: 'orange',
+		2: '#0E9F6E',
+		3: '#0E9F6E',
+		4: 'url(#Gradient)'
+	};
 
 	let klass =
 		'rounded-full py-0.5 px-2 text-xs font-semibold inline-flex items-center me-2 leading-6 bg-slate-500 dark:bg-slate-700 text-white dark:text-slate-100';
-	// This will add the hover highlight if you pass the link attribute
-	if (link != '') {
+	// Link hover color
+	if (href) {
 		klass += ' hover:bg-blue-500 dark:hover:bg-blue-500';
-		state = 'a';
-	}
-	// just makes sure that the r_heat value will work no matter what is passed to it
-	if (heat >= 0 && heat <= 4) {
-		r_heat = Math.round(heat);
-	} else if (heat > 4) {
-		r_heat = 4;
 	}
 </script>
 
-<!-- this is the whole tag-->
-<svelte:element this={state} class={klass} href={link} tabindex="0">
-	<!-- this is so the text in the button truncates only itself, and not the image-->
+<svelte:element this={elem} class={klass} {href} tabindex="0">
 	<span class="truncate text-xs tagwidth">
 		{text}
 	</span>
-	<!-- if logic that selects the correct coloring of the image for the heat-->
-	{#if r_heat === 0}
+	{#if filledBars <= 3}
 		<svg width="25" height="25" viewBox="-15 0 100 110" xmlns="http://www.w3.org/2000/svg">
 			<rect
 				x="10"
@@ -36,9 +44,9 @@
 				height="20"
 				rx="5"
 				ry="5"
-				fill="black"
-				stroke="red"
 				stroke-width="3"
+				fill={filledBars >= 1 ? fills[filledBars] : 'black'}
+				stroke={strokes[filledBars]}
 			/>
 			<rect
 				x="30"
@@ -47,9 +55,9 @@
 				height="40"
 				rx="5"
 				ry="5"
-				fill="black"
-				stroke="red"
 				stroke-width="3"
+				fill={filledBars >= 2 ? fills[filledBars] : 'black'}
+				stroke={strokes[filledBars]}
 			/>
 			<rect
 				x="50"
@@ -58,9 +66,9 @@
 				height="60"
 				rx="5"
 				ry="5"
-				fill="black"
-				stroke="red"
 				stroke-width="3"
+				fill={filledBars >= 3 ? fills[filledBars] : 'black'}
+				stroke={strokes[filledBars]}
 			/>
 			<rect
 				x="70"
@@ -69,93 +77,12 @@
 				height="80"
 				rx="5"
 				ry="5"
-				fill="black"
-				stroke="red"
 				stroke-width="3"
+				fill="black"
+				stroke={strokes[filledBars]}
 			/>
 		</svg>
-	{:else if r_heat == 1}
-		<svg width="25" height="25" viewBox="-15 0 100 110" xmlns="http://www.w3.org/2000/svg">
-			<rect x="10" y="70" width="15" height="20" rx="5" ry="5" fill="orange" stroke="orange" />
-			<rect
-				x="30"
-				y="50"
-				width="15"
-				height="40"
-				rx="5"
-				ry="5"
-				fill="black"
-				stroke="orange"
-				stroke-width="3"
-			/>
-			<rect
-				x="50"
-				y="30"
-				width="15"
-				height="60"
-				rx="5"
-				ry="5"
-				fill="black"
-				stroke="orange"
-				stroke-width="3"
-			/>
-			<rect
-				x="70"
-				y="10"
-				width="15"
-				height="80"
-				rx="5"
-				ry="5"
-				fill="black"
-				stroke="orange"
-				stroke-width="3"
-			/>
-		</svg>
-	{:else if r_heat == 2}
-		<svg width="25" height="25" viewBox="-15 0 100 110" xmlns="http://www.w3.org/2000/svg">
-			<rect x="10" y="70" width="15" height="20" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
-			<rect x="30" y="50" width="15" height="40" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
-			<rect
-				x="50"
-				y="30"
-				width="15"
-				height="60"
-				rx="5"
-				ry="5"
-				fill="black"
-				stroke="#0E9F6E"
-				stroke-width="3"
-			/>
-			<rect
-				x="70"
-				y="10"
-				width="15"
-				height="80"
-				rx="5"
-				ry="5"
-				fill="black"
-				stroke="#0E9F6E"
-				stroke-width="3"
-			/>
-		</svg>
-	{:else if r_heat == 3}
-		<svg width="25" height="25" viewBox="-15 0 100 110" xmlns="http://www.w3.org/2000/svg">
-			<rect x="10" y="70" width="15" height="20" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
-			<rect x="30" y="50" width="15" height="40" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
-			<rect x="50" y="30" width="15" height="60" rx="5" ry="5" fill="#0E9F6E" stroke="#0E9F6E" />
-			<rect
-				x="70"
-				y="10"
-				width="15"
-				height="80"
-				rx="5"
-				ry="5"
-				fill="black"
-				stroke="#0E9F6E"
-				stroke-width="3"
-			/>
-		</svg>
-	{:else if r_heat == 4}
+	{:else}
 		<svg width="25" height="25" viewBox="-15 0 100 110" xmlns="http://www.w3.org/2000/svg">
 			<defs>
 				<linearGradient id="Gradient" x1="0" x2="0" y1="0" y2="1">
