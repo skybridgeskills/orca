@@ -7,3 +7,4 @@ export const claimEmail = writable('');
 export const claimNarrative = writable('');
 export const claimUrl = writable('');
 export const claimPending = writable(false);
+export const inviteCreatedAt = writable<Date>(undefined);

@@ -7,7 +7,7 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
-	import { claimEmail, claimId, inviteId } from '$lib/stores/activeClaimStore';
+	import { claimEmail, claimId, inviteId, inviteCreatedAt } from '$lib/stores/activeClaimStore';
 	import type { Achievement, AchievementConfig } from '@prisma/client';
 
 	export let data: PageData;
@@ -22,6 +22,7 @@
 	onMount(() => {
 		if (data.inviteId) $inviteId = data.inviteId;
 		if (data.inviteeEmail) $claimEmail = data.inviteeEmail;
+		if (data.inviteCreatedAt) $inviteCreatedAt = data.inviteCreatedAt;
 	});
 
 	// initially show claim form if user is eligible to self-claim a fresh claim now.

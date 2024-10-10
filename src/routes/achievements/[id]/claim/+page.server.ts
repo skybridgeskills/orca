@@ -30,6 +30,7 @@ export const load = async ({ locals, params, url }) => {
 		invite = await prisma.claimEndorsement.findUnique({ where: { id: inviteId } });
 		if (invite && invite?.inviteeEmail != inviteeEmail)
 			throw error(403, m.claim_invitationInvalidError());
+		if (invite?.organizationId != locals.org.id) throw error(404, 'Invitation not found');
 	}
 
 	// If this badge requires a member to hold another badge, get the relevant claim for that badge.
@@ -46,7 +47,8 @@ export const load = async ({ locals, params, url }) => {
 		existingBadgeClaim,
 		requiredBadgeClaim,
 		inviteId,
-		inviteeEmail
+		inviteeEmail,
+		inviteCreatedAt: invite?.createdAt
 	};
 };
 

@@ -4,7 +4,13 @@
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import type { ActionData, PageData, SubmitFunction } from './$types';
-	import { claimPending, claimEmail, claimId, inviteId } from '$lib/stores/activeClaimStore';
+	import {
+		claimPending,
+		claimEmail,
+		claimId,
+		inviteId,
+		inviteCreatedAt
+	} from '$lib/stores/activeClaimStore';
 	import { onMount } from 'svelte';
 	import { nextPath, session } from '$lib/stores/sessionStore';
 	import Heading from '$lib/components/Heading.svelte';
@@ -31,9 +37,29 @@
 	});
 
 	const registerHandler: SubmitFunction = () => {
-		return ({ result }: { result: ActionResult }) => {
-			if (result.type === 'error') errorMessage = result.error?.message;
-			else if (result.type === 'success' && result.data?.session) {
+		return async ({ result }: { result: ActionResult }) => {
+			if (result.type === 'error') {
+				errorMessage = result.error.message;
+				// TODO: specifically handle the case where the invite was stale
+				if (result.error.code === 'invite_expired') {
+					const formData = new URLSearchParams();
+					formData.append('inviteId', $inviteId);
+					formData.append('email', email);
+					const loginResult = await fetch('/login', {
+						method: 'POST',
+						body: formData.toString(),
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					});
+					if (loginResult.status == 200) {
+						const loginData = await loginResult.json();
+						sessionId = loginData.sessionId;
+					} else {
+						errorMessage = 'Could not log in.'; // TODO i18n, make more specific?
+					}
+				}
+			} else if (result.type === 'success' && result.data?.session) {
 				const data = result.data;
 				$session = data.session as App.SessionData;
 				goto(data.location ?? $nextPath ?? '/');
@@ -71,8 +97,9 @@
 <div
 	class="mt-8 shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 p-8 rounded-xl mx-auto max-w-2xl"
 >
-	{#if register}
+	{#if register || (!sessionId && Date.now() < $inviteCreatedAt?.getTime() + 86400000)}
 		<!-- Step 3: User needs to fill out the rest of the registration form. -->
+		<!-- Or a user goes directly here if they have a fresh (less than 1 day old) invite -->
 		<Heading title={m.logInCTA()} description={m.loginInviteCTA_description()} />
 		<form
 			id="registerForm"
@@ -84,7 +111,7 @@
 			use:enhance={registerHandler}
 		>
 			{#if $inviteId}
-				<input type="hidden" id="inviteId" name="inviteId" value={$inviteId} />
+				<input type="hidden" id="registerInviteId" name="inviteId" value={$inviteId} />
 			{/if}
 			<input
 				type="hidden"

@@ -181,30 +181,56 @@ export const actions: Actions = {
 		const requestData = await request.formData();
 		const vcode = requestData.get('verificationCode')?.toString();
 		const sessionId = cookies.get('sessionId');
+		const inviteId = requestData.get('inviteId')?.toString();
 		const givenName = stripTags(requestData.get('givenName')?.toString()) || '';
 		const familyName = stripTags(requestData.get('familyName')?.toString()) || '';
 		const agreeTerms = stripTags(requestData.get('agreeTerms')?.toString()) || 'no';
 
-		if (!vcode) throw error(400, m.login_incorrectCodeError());
+		if (!vcode && !inviteId) throw error(400, m.login_incorrectCodeError());
 		if (agreeTerms == 'no') throw error(400, m.login_agreeTermsError());
 
-		// Validate sessionid and ensure code matches
-		// TODO: use unique indexed query for session somehow
-		// TODO: prevent brute force guessing
-		const session = await prisma.session.findFirst({
-			where: {
-				code: vcode,
-				id: sessionId,
-				organizationId: locals.org.id
-			},
-			include: {
-				invite: true
+		let session;
+		let currentInvite;
+		// TODO there's more to this conditional
+		if (inviteId && !sessionId) {
+			currentInvite = await prisma.claimEndorsement.findFirst({
+				where: {
+					id: inviteId
+				}
+			});
+			// If the invite is no longer fresh, it is valid to confirm control of the email it was sent to.
+			if (
+				currentInvite?.createdAt &&
+				Date.now() > currentInvite.createdAt.getTime() + 86400000 + 3600000
+			) {
+				// User will be required to login by email if their invite is stale.
+				throw error(401, { message: m.unauthenticatedError(), code: 'invite_expired' });
 			}
-		});
-		if (!session) throw error(401, m.login_incorrectCodeError());
+		}
 
-		if (session.userId || !session.invite?.inviteeEmail)
-			throw error(401, m.register_genericError());
+		if (!currentInvite) {
+			// Validate sessionid and ensure code matches
+			// TODO: use unique indexed query for session somehow
+			// TODO: prevent brute force guessing
+			session = await prisma.session.findFirst({
+				where: {
+					code: vcode,
+					id: sessionId,
+					organizationId: locals.org.id
+				},
+				include: {
+					invite: true
+				}
+			});
+
+			if (!session) throw error(401, m.login_incorrectCodeError());
+
+			if (session.userId || !session.invite?.inviteeEmail)
+				throw error(401, m.register_genericError());
+		}
+
+		const userEmail = currentInvite?.inviteeEmail ?? session?.invite?.inviteeEmail;
+		if (!userEmail) throw error(400, m.register_genericError());
 
 		const user = await prisma.user.create({
 			data: {
@@ -215,45 +241,81 @@ export const actions: Actions = {
 					create: [
 						{
 							type: 'EMAIL',
-							identifier: session.invite?.inviteeEmail,
+							identifier: userEmail,
 							organization: { connect: { id: locals.org.id } },
 							verifiedAt: new Date()
 						}
 					]
+				},
+				...(sessionId
+					? {}
+					: {
+							sessions: {
+								create: [
+									{
+										code: '',
+										expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+										organization: { connect: { id: locals.org.id } },
+										valid: true
+									}
+								]
+							}
+					  })
+			},
+			include: {
+				sessions: true
+			}
+		});
+
+		if (sessionId) {
+			const activatedSession = await prisma.session.update({
+				where: {
+					id: sessionId
+				},
+				data: {
+					valid: true,
+					user: { connect: { id: user.id } }
+				},
+				select: {
+					user: true,
+					id: true,
+					createdAt: false,
+					expiresAt: true,
+					code: false,
+					invite: true,
+					inviteId: true,
+					organizationId: true,
+					valid: true
 				}
-			}
+			});
+
+			const invite = activatedSession.invite;
+
+			if (invite?.achievementId && invite) {
+				return {
+					session: activatedSession,
+					location: `/achievements/${invite.achievementId}/claim?i=${
+						invite.id
+					}&e=${encodeURIComponent(invite.inviteeEmail ?? '')}`
+				};
+			} else return { session: activatedSession, location: '/' };
+		}
+
+		const currentSession = user.sessions[0];
+		cookies.set('sessionId', currentSession.id, {
+			secure: process.env.USE_SECURE_COOKIES == 'true',
+			path: '/',
+			expires: currentSession.expiresAt,
+			httpOnly: true
 		});
 
-		const activatedSession = await prisma.session.update({
-			where: {
-				id: sessionId
-			},
-			data: {
-				valid: true,
-				user: { connect: { id: user.id } }
-			},
-			select: {
-				user: true,
-				id: true,
-				createdAt: false,
-				expiresAt: true,
-				code: false,
-				invite: true,
-				inviteId: true,
-				organizationId: true,
-				valid: true
-			}
-		});
-
-		const invite = activatedSession.invite;
-
-		if (invite?.achievementId && invite) {
-			return {
-				session: activatedSession,
-				location: `/achievements/${invite.achievementId}/claim?i=${
-					invite.id
-				}&e=${encodeURIComponent(invite.inviteeEmail ?? '')}`
-			};
-		} else return { session: activatedSession, location: '/' };
+		return {
+			session: { ...currentSession, user },
+			location: currentInvite
+				? `/achievements/${currentInvite.achievementId}/claim?i=${
+						currentInvite.id
+				  }&e=${encodeURIComponent(currentInvite.inviteeEmail ?? '')}`
+				: '/'
+		};
 	}
 };
