@@ -34,7 +34,7 @@
 	"award_createUserIfNotExistsOption": "Avancé : forcer la création d'un compte utilisateur pour cet utilisateur s'il n'est pas encore membre",
 	"award_narrative_description": "Vous pouvez soumettre une description des raisons pour lesquelles un membre peut revendiquer ce badge. Elle sera incluse dans le formulaire de demande du badge. S'il existe une URL pointant vers de la documentation ou une preuve qui appuie cette demande, vous pouvez l'inclure.",
 	"award_narrative_placeholder": "Ils ont réalisé un projet...",
-	"award_noneYet": "Pas encore de récompenses",
+	"award_noneYet": "Pas encore de badges",
 	"award_recipientEmail": "E-mail du destinataire",
 	"awardedBadge": "Badge décerné",
 	"awardedBadge_email_description": "Félicitations, vous avez reçu un badge {achievementName} dans la communauté {communityName}.\n\nVous pouvez voir votre badge ici et vous connecter pour le mettre à jour :\n{badgeUrl}",
