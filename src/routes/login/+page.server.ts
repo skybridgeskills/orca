@@ -8,6 +8,7 @@ import type { Session, User } from '@prisma/client';
 import stripTags from '$lib/utils/stripTags';
 import type { ClaimEndorsement } from '@prisma/client';
 import type { PageServerLoad } from './$types';
+import { INVITE_SESSION_VALIDITY_MS } from '$lib/utils/session';
 
 dotenv.config();
 
@@ -201,7 +202,7 @@ export const actions: Actions = {
 			// If the invite is no longer fresh, it is valid to confirm control of the email it was sent to.
 			if (
 				currentInvite?.createdAt &&
-				Date.now() > currentInvite.createdAt.getTime() + 86400000 + 3600000
+				Date.now() > currentInvite.createdAt.getTime() + INVITE_SESSION_VALIDITY_MS
 			) {
 				// User will be required to login by email if their invite is stale.
 				throw error(401, { message: m.unauthenticatedError(), code: 'invite_expired' });

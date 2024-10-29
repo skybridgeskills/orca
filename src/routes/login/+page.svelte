@@ -56,7 +56,7 @@
 						const loginData = await loginResult.json();
 						sessionId = loginData.sessionId;
 					} else {
-						errorMessage = 'Could not log in.'; // TODO i18n, make more specific?
+						errorMessage = m.authentication_couldNotLogIn();
 					}
 				}
 			} else if (result.type === 'success' && result.data?.session) {
@@ -97,7 +97,7 @@
 <div
 	class="mt-8 shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 p-8 rounded-xl mx-auto max-w-2xl"
 >
-	{#if register || (!sessionId && Date.now() < $inviteCreatedAt?.getTime() + 86400000)}
+	{#if register || (!sessionId && Date.now() < ($inviteCreatedAt?.getTime() ?? 0) + 86400000)}
 		<!-- Step 3: User needs to fill out the rest of the registration form. -->
 		<!-- Or a user goes directly here if they have a fresh (less than 1 day old) invite -->
 		<Heading title={m.logInCTA()} description={m.loginInviteCTA_description()} />
