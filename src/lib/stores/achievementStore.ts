@@ -36,7 +36,7 @@ export const fetchAchievements = async (): Promise<LoadingStatus> => {
 				return LoadingStatus.Error;
 			}
 			const { data: pageData } = await page.json();
-			a = [...a, ...pageData.data];
+			a = [...a, ...pageData];
 		}
 	}
 
