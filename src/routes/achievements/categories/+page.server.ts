@@ -8,13 +8,13 @@ import parseIntData from '../../../lib/utils/parseIntData';
 export const load: PageServerLoad = ({ params, locals }) => {
 	// Don't include edit controls if not an admin
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		throw redirect(302, `/achievements`);
+		redirect(302, `/achievements`);
 };
 
 export const actions: Actions = {
 	create: async ({ locals, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, 'Unauthorized');
+			error(403, 'Unauthorized');
 
 		const requestData = await request.formData();
 		const formData = {
@@ -40,7 +40,7 @@ export const actions: Actions = {
 
 	update: async ({ locals, cookies, request, params }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			error(403, m.error_unauthorized());
 
 		const requestData = await request.formData();
 		const categoryId = stripTags(requestData.get('update_categoryId')?.toString()) || '';
@@ -68,7 +68,7 @@ export const actions: Actions = {
 
 	delete: async ({ locals, cookies, request, params }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			error(403, m.error_unauthorized());
 
 		const requestData = await request.formData();
 		const categoryId = stripTags(requestData.get('delete_categoryId')?.toString()) || '';

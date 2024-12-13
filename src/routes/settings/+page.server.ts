@@ -6,12 +6,12 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't hold org admin role
-	if (!locals.session?.user?.id) throw redirect(302, `/`);
+	if (!locals.session?.user?.id) redirect(302, `/`);
 };
 
 export const actions: Actions = {
 	default: async ({ locals, cookies, request, params }) => {
-		if (!locals.session?.user?.id) throw error(403, m.member_settingsChangeUnauthenticedError());
+		if (!locals.session?.user?.id) error(403, m.member_settingsChangeUnauthenticedError());
 
 		const requestData = await request.formData();
 		const givenName: string = requestData.get('givenName')?.toString() ?? '';

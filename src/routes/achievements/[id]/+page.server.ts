@@ -88,7 +88,7 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 export const actions: Actions = {
 	delete: async ({ locals, cookies, params, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			error(403, m.error_unauthorized());
 
 		// TODO: require confirmation for delete
 		// TODO: ensure can't delete non-org achievement
@@ -138,6 +138,6 @@ export const actions: Actions = {
 			achievementDelete
 		]);
 
-		throw redirect(303, '/achievements');
+		redirect(303, '/achievements');
 	}
 };

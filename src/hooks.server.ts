@@ -18,7 +18,7 @@ const getOrganizationFromRequest = async function (event: RequestEvent) {
 		}
 	});
 	if (orgs.length == 0) {
-		throw error(404, m.organization_notFoundError());
+		error(404, m.organization_notFoundError());
 	}
 
 	return orgs.find((org) => org.domain === domain) || orgs[0];

@@ -16,7 +16,7 @@ dotenv.config();
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	// redirect user if logged out
-	if (!locals.session?.user) throw redirect(302, `/achievements/${params.id}`);
+	if (!locals.session?.user) redirect(302, `/achievements/${params.id}`);
 
 	const achievement = await prisma.achievement.findFirstOrThrow({
 		where: {

@@ -41,7 +41,6 @@ Optional, but helpful enhancements:
 - [map \*.test wildcard domains to localhost with dnsmasq](https://khanhicetea.com/til/2018-04-24-setup-wildcard-domains-test-for-development-in-macos/)
 - VS Code with plugins:
   - [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode)
-  - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
   - [Playwright Test](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright)
   - [Prisma](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
   - [Vitest](https://marketplace.visualstudio.com/items?itemName=ZixuanChen.vitest-explorer)

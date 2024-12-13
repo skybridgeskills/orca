@@ -7,8 +7,8 @@ import { calculatePageAndSize } from '$lib/utils/pagination';
 import { apiResponse } from '$lib/utils/api';
 
 export const GET: RequestHandler = async ({ url, request, params, locals }) => {
-	if (!locals.session?.user) throw error(401);
-	if (prefersHtml(request)) throw redirect(302, '/backpack');
+	if (!locals.session?.user) error(401);
+	if (prefersHtml(request)) redirect(302, '/backpack');
 
 	const { includeCount } = calculatePageAndSize(url);
 	const outstandingInvites = await prisma.claimEndorsement.findMany({

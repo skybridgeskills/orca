@@ -7,7 +7,7 @@ import { badgeAssertionFromAchievementClaim } from '$lib/ob2/badgeAssertion';
 import { prefersHtml } from '$lib/utils/contentNegotiation';
 
 export const GET = async ({ request, params, locals }: RequestEvent) => {
-	if (prefersHtml(request)) throw redirect(302, `/claims/${params.claimId}/public`);
+	if (prefersHtml(request)) redirect(302, `/claims/${params.claimId}/public`);
 	else {
 		const claim = await prisma.achievementClaim.findUniqueOrThrow({
 			where: {
@@ -27,10 +27,10 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 			}
 		});
 		if (!claim?.validFrom || claim?.claimStatus !== 'ACCEPTED')
-			throw error(404, m.claim_notFoundOrNotShareableError());
+			error(404, m.claim_notFoundOrNotShareableError());
 		if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
 		// TODO return the OB3 version, once access control is properly implemented
-		else throw error(404, m.notFound());
+		else error(404, m.notFound());
 	}
 };

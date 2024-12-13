@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		}
 	});
 	if (!claim || claim?.organizationId != locals.org.id || claim.claimStatus != 'ACCEPTED')
-		throw error(404, m.claim_notFoundError());
+		error(404, m.claim_notFoundError());
 
 	return {
 		claim

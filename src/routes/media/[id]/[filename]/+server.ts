@@ -8,12 +8,12 @@ import { isLocalDevFileMedia } from '$lib/server/media.js';
 
 export const GET = async ({ params }: RequestEvent) => {
 	if (!isLocalDevFileMedia())
-		throw error(500, { message: m.media_localMediaOnlyAvailableInDevError() });
+		error(500, { message: m.media_localMediaOnlyAvailableInDevError() });
 	const filePath = path.join(process.cwd(), 'dev-uploads', params.id, params.filename);
 
 	try {
 		const mimeType = mime.lookup(filePath);
-		if (!mimeType) throw error(404);
+		if (!mimeType) error(404);
 
 		const data = await fs.readFile(filePath);
 		return new Response(data, {
@@ -22,7 +22,7 @@ export const GET = async ({ params }: RequestEvent) => {
 	} catch (err) {
 		if (err instanceof Error) {
 			console.error(err);
-			throw error(500, { message: err.message });
+			error(500, { message: err.message });
 		}
 		throw err;
 	}
@@ -30,7 +30,7 @@ export const GET = async ({ params }: RequestEvent) => {
 
 export const PUT = async ({ params, request }: RequestEvent) => {
 	if (!isLocalDevFileMedia())
-		throw error(500, { message: m.media_localMediaOnlyAvailableInDevError() });
+		error(500, { message: m.media_localMediaOnlyAvailableInDevError() });
 	try {
 		const dirPath = path.join(process.cwd(), 'dev-uploads', params.id);
 		const filePath = path.join(dirPath, params.filename);
@@ -46,7 +46,7 @@ export const PUT = async ({ params, request }: RequestEvent) => {
 	} catch (err) {
 		if (err instanceof Error) {
 			console.error(err);
-			throw error(500, { message: err.message });
+			error(500, { message: err.message });
 		}
 		throw err;
 	}

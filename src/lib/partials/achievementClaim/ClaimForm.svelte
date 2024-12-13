@@ -50,7 +50,7 @@
 					body: formData
 				});
 				if (response.status != 200) {
-					throw error(400, m.claim_couldNotObtainInvitationError());
+					error(400, m.claim_couldNotObtainInvitationError());
 				} else {
 					const responseData = deserialize(await response.text());
 					$inviteId = responseData.data?.endorsement?.id;

@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	// redirect user if logged in
 	if (locals.session) {
-		throw redirect(302, '/');
+		redirect(302, '/');
 	}
 
 	const inviteId = url.searchParams.get('i');
@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 		// If invite is not found, doesn't match email, or is already claimed: Error
 		if (!invite || inviteeEmail != invite?.inviteeEmail || invite?.claimId)
-			throw error(404, m.invite_notFoundError());
+			error(404, m.invite_notFoundError());
 	}
 
 	return {
@@ -47,7 +47,7 @@ export const actions: Actions = {
 		const requestData = await request.formData();
 		const email = stripTags(requestData.get('email')?.toString());
 		const inviteId = stripTags(requestData.get('inviteId')?.toString());
-		if (!email || !email.toString().includes('@')) throw error(400, m.login_emailNotParsedError());
+		if (!email || !email.toString().includes('@')) error(400, m.login_emailNotParsedError());
 
 		// Validate org and ensure user exists
 		let userIdentifier = await prisma.identifier.findFirst({
@@ -65,9 +65,9 @@ export const actions: Actions = {
 		let outstandingInvite: ClaimEndorsement | null = null;
 		if (inviteId) {
 			outstandingInvite = await prisma.claimEndorsement.findUnique({ where: { id: inviteId } });
-			if (!outstandingInvite) throw error(400, m.login_invitationRequiredError());
+			if (!outstandingInvite) error(400, m.login_invitationRequiredError());
 		} else if (!userIdentifier) {
-			throw error(400, m.login_invitationRequiredError());
+			error(400, m.login_invitationRequiredError());
 		}
 
 		const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -88,7 +88,7 @@ export const actions: Actions = {
 			text: m.login_emailVerificationCodeIs({ code })
 		});
 		if (!emailResult.success) {
-			throw error(500, m.email_transmissionError({ message: emailResult.error?.message ?? '' }));
+			error(500, m.email_transmissionError({ message: emailResult.error?.message ?? '' }));
 		}
 
 		cookies.set('sessionId', session.id, {
@@ -116,7 +116,7 @@ export const actions: Actions = {
 		const sessionId = cookies.get('sessionId');
 		const nextPath = requestData.get('nextPath')?.toString();
 
-		if (!vcode) throw error(400, m.login_verificationCodeRequiredError());
+		if (!vcode) error(400, m.login_verificationCodeRequiredError());
 		// Validate sessionid and ensure code matches
 		// TODO: use unique indexed query for session somehow
 		// TODO: prevent brute force guessing
@@ -132,7 +132,7 @@ export const actions: Actions = {
 				invite: true
 			}
 		});
-		if (!session) throw error(401, m.login_incorrectCodeError());
+		if (!session) error(401, m.login_incorrectCodeError());
 
 		// Advance user to next step in invite claim: user account creation.
 		if (!session.userId && session.invite?.inviteeEmail) return { success: true, register: true };
@@ -188,8 +188,8 @@ export const actions: Actions = {
 		const familyName = stripTags(requestData.get('familyName')?.toString()) || '';
 		const agreeTerms = stripTags(requestData.get('agreeTerms')?.toString()) || 'no';
 
-		if (!vcode && !inviteId) throw error(400, m.login_incorrectCodeError());
-		if (agreeTerms == 'no') throw error(400, m.login_agreeTermsError());
+		if (!vcode && !inviteId) error(400, m.login_incorrectCodeError());
+		if (agreeTerms == 'no') error(400, m.login_agreeTermsError());
 
 		let session;
 		let currentInvite;
@@ -207,7 +207,7 @@ export const actions: Actions = {
 				Date.now() > currentInvite.createdAt.getTime() + INVITE_SESSION_VALIDITY_MS
 			) {
 				// User will be required to login by email if their invite is stale.
-				throw error(401, { message: m.unauthenticatedError(), code: 'invite_expired' });
+				error(401, { message: m.unauthenticatedError(), code: 'invite_expired' });
 			}
 		}
 
@@ -226,14 +226,14 @@ export const actions: Actions = {
 				}
 			});
 
-			if (!session) throw error(401, m.login_incorrectCodeError());
+			if (!session) error(401, m.login_incorrectCodeError());
 
 			if (session.userId || !session.invite?.inviteeEmail)
-				throw error(401, m.register_genericError());
+				error(401, m.register_genericError());
 		}
 
 		const userEmail = currentInvite?.inviteeEmail ?? session?.invite?.inviteeEmail;
-		if (!userEmail) throw error(400, m.register_genericError());
+		if (!userEmail) error(400, m.register_genericError());
 
 		const user = await prisma.user.create({
 			data: {

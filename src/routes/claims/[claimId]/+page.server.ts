@@ -7,7 +7,7 @@ import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim } from '$lib/data/achievementClaim';
 
 const throwRedirect = (url: URL) => {
-	throw redirect(307, `${url}/public`);
+	redirect(307, `${url}/public`);
 };
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		include: { user: true }
 	});
 
-	if (!claim || claim.organizationId != locals.org.id) throw error(404, m.claim_notFoundError());
+	if (!claim || claim.organizationId != locals.org.id) error(404, m.claim_notFoundError());
 
 	const achievement = await getAchievement(claim.achievementId, locals.org.id);
 	const config = achievement.achievementConfig;

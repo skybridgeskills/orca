@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { marked } from 'marked';
-	import stripTags from '$lib/utils/stripTags';
+  import { marked } from "marked";
+  import stripTags from "$lib/utils/stripTags";
 
-	export let value = '';
+  export let value = "";
 </script>
 
-<div class="markdown-preview">{@html marked(stripTags(value))}</div>
+<div class="markdown-preview">
+  <!-- eslint-disable svelte/no-at-html-tags -->{@html marked(stripTags(value))}
+</div>

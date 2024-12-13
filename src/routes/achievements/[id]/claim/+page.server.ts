@@ -23,14 +23,14 @@ export const load = async ({ locals, params, url }) => {
 		? await getUserClaim(locals.session?.user.id, params.id, locals.org.id)
 		: null;
 
-	if (existingBadgeClaim) throw redirect(303, `/claims/${existingBadgeClaim.id}`);
+	if (existingBadgeClaim) redirect(303, `/claims/${existingBadgeClaim.id}`);
 
 	// If the user has been directly invited to claim the badge, let them proceed
 	if (inviteId && inviteeEmail) {
 		invite = await prisma.claimEndorsement.findUnique({ where: { id: inviteId } });
 		if (invite && invite?.inviteeEmail != inviteeEmail)
-			throw error(403, m.claim_invitationInvalidError());
-		if (invite?.organizationId != locals.org.id) throw error(404, 'Invitation not found');
+			error(403, m.claim_invitationInvalidError());
+		if (invite?.organizationId != locals.org.id) error(404, 'Invitation not found');
 	}
 
 	// If this badge requires a member to hold another badge, get the relevant claim for that badge.
@@ -56,7 +56,7 @@ export const actions = {
 	// The authenticated user claims a badge
 	claim: async ({ locals, cookies, request, params }) => {
 		if (!locals.session?.user) {
-			throw error(401, m.claim_unauthenticatedError());
+			error(401, m.claim_unauthenticatedError());
 		}
 
 		const achievement = await getAchievement(params.id, locals.org.id);
@@ -76,12 +76,12 @@ export const actions = {
 		if (userEmails.length && inviteId) {
 			invite = await prisma.claimEndorsement.findUnique({ where: { id: inviteId } });
 			if (invite && invite?.achievementId != params.id)
-				throw error(403, m.claim_invitationInvalidError());
+				error(403, m.claim_invitationInvalidError());
 			else if (invite && !userEmails.includes(invite.inviteeEmail))
-				throw error(403, m.claim_invitationEmailReconciliationError());
+				error(403, m.claim_invitationEmailReconciliationError());
 		}
 
-		if (!invite && !config?.claimable) throw error(400, m.claim_achievementNotClaimableError());
+		if (!invite && !config?.claimable) error(400, m.claim_achievementNotClaimableError());
 
 		// get required badge claim if the user needs one
 		const requiredBadgeClaim =
@@ -90,10 +90,10 @@ export const actions = {
 				: null;
 
 		if (config?.claimRequiresId && !requiredBadgeClaim && !invite)
-			throw error(400, {
-				code: m.notFound(),
-				message: m.claim_userNotMeetsPrerequsiteError()
-			});
+			error(400, {
+            				code: m.notFound(),
+            				message: m.claim_userNotMeetsPrerequsiteError()
+            			});
 
 		let data: Prisma.AchievementClaimCreateInput = {
 			organization: { connect: { id: locals.org.id } },
@@ -182,13 +182,13 @@ export const actions = {
 			}
 		});
 
-		throw redirect(303, `/claims/${claim.id}`);
+		redirect(303, `/claims/${claim.id}`);
 	},
 	updateClaim: async ({ locals, cookies, request, params }) => {
-		if (!locals.session?.user) throw error(401, m.claim_unauthenticatedError());
+		if (!locals.session?.user) error(401, m.claim_unauthenticatedError());
 
 		const existingClaim = await getUserClaim(locals.session?.user?.id, params.id, locals.org.id);
-		if (!existingClaim) throw error(401, m.claim_noExistingFoundError());
+		if (!existingClaim) error(401, m.claim_noExistingFoundError());
 
 		const formData = await request.formData();
 		const claimStatus = formData.get('claimStatus')?.toString();

@@ -8,7 +8,7 @@ import { calculatePageAndSize } from '$lib/utils/pagination';
 import { apiResponse } from '$lib/utils/api';
 
 export const GET: RequestHandler = async ({ url, request, params, locals }) => {
-	if (prefersHtml(request)) throw redirect(302, '/achievements');
+	if (prefersHtml(request)) redirect(302, '/achievements');
 
 	const { page, pageSize, includeCount } = calculatePageAndSize(url);
 	const achievements = await prisma.achievement.findMany({

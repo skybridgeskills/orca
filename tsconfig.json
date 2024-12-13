@@ -1,11 +1,6 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		// "baseUrl": ".",
-		"paths": {
-			"$lib": ["./src/lib"],
-			"$lib/*": ["./src/lib/*"]
-		},
 		"rootDirs": ["..", ".", ".svelte-kit/types", "types"],
 		"typeRoots": ["./types", "./node_modules/@types"],
 		"allowJs": true,

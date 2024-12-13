@@ -10,7 +10,7 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 	const acceptPieces = accept.split(',');
 	const isHtml = acceptPieces.includes('text/html'); // TODO replace with a more glamorous priority check
 
-	if (isHtml) throw redirect(302, `/achievements/${params.achievementId}`);
+	if (isHtml) redirect(302, `/achievements/${params.achievementId}`);
 	else {
 		const achievement = await prisma.achievement.findUniqueOrThrow({
 			where: {
@@ -22,6 +22,6 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 		});
 		if (achievement?.organizationId === locals.org.id)
 			return json(badgeClassFromAchievement(achievement));
-		else throw error(404, m.notFound());
+		else error(404, m.notFound());
 	}
 };

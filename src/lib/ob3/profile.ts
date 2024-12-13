@@ -13,7 +13,7 @@ export interface OB3Profile {
 }
 
 export const ob3IssuerProfileFromOrganization = (
-	organization: Organization,
+	organization: App.Organization,
 	includeContext: false
 ): OB3Profile => {
 	return {

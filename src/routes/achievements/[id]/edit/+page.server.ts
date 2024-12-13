@@ -27,7 +27,7 @@ interface AchievementConfigForm {
 export const load: PageServerLoad = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't hold org admin role
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		throw redirect(302, `/achievements/${params.id}`);
+		redirect(302, `/achievements/${params.id}`);
 
 	const achievement = await prisma.achievement.findFirstOrThrow({
 		where: {
@@ -59,7 +59,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 export const actions: Actions = {
 	default: async ({ locals, cookies, request, params }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			error(403, m.error_unauthorized());
 
 		const requestData = await request.formData();
 		const imageUpdated = requestData.get('imageEdited') === 'true';
@@ -182,7 +182,7 @@ export const actions: Actions = {
 					});
 				}
 			}
-			throw error(500, m.claimConfiguration_unexpectedSaveError());
+			error(500, m.claimConfiguration_unexpectedSaveError());
 		}
 
 		const updated = await prisma.achievement.update({

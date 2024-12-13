@@ -10,8 +10,8 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 	const acceptPieces = accept.split(',');
 	const isHtml = acceptPieces.includes('text/html'); // TODO replace with a more glamorous priority check
 
-	if (isHtml && locals.session?.user?.id) throw redirect(302, `/claims/${params.claimId}`);
-	else if (isHtml) throw redirect(302, `/claims/${params.claimId}/public`);
+	if (isHtml && locals.session?.user?.id) redirect(302, `/claims/${params.claimId}`);
+	else if (isHtml) redirect(302, `/claims/${params.claimId}/public`);
 	else {
 		const claim = await prisma.achievementClaim.findUniqueOrThrow({
 			where: {
@@ -31,9 +31,9 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 			}
 		});
 		if (!claim?.validFrom || claim?.claimStatus !== 'ACCEPTED')
-			throw error(404, m.claim_notFoundOrNotShareableError());
+			error(404, m.claim_notFoundOrNotShareableError());
 		else if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
-		else throw error(404, m.notFound());
+		else error(404, m.notFound());
 	}
 };

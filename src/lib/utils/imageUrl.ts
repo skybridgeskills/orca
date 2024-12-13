@@ -10,7 +10,7 @@ import type { Achievement, Organization } from '@prisma/client';
  * @returns Fully qualified URL to the achievement image
  */
 export function staticImageUrlForAchievement(
-	achievement: Achievement & { organization: Organization }
+	achievement: Achievement & { organization: App.Organization }
 ): string {
 	const imageBaseDomain = `${PUBLIC_HTTP_PROTOCOL}://${achievement.organization.domain}`;
 	return `${imageBaseDomain}/achievements/${achievement.id}/image`;

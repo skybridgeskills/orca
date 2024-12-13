@@ -28,7 +28,7 @@ interface OB3Achievement {
 }
 
 export const ob3AchievementFromAchievement = (
-	achievement: Achievement & { organization: Organization },
+	achievement: Achievement & { organization: App.Organization },
 	includeContext = false
 ): OB3Achievement => {
 	const baseDomain = `${PUBLIC_HTTP_PROTOCOL}://${achievement.organization.domain}`;

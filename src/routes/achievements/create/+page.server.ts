@@ -19,7 +19,7 @@ dotenv.config();
 export const load: PageServerLoad = async ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		throw redirect(302, '/achievements');
+		redirect(302, '/achievements');
 
 	const categories = await prisma.achievementCategory.findMany({
 		where: {
@@ -39,7 +39,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			error(403, m.error_unauthorized());
 
 		const newIdentifier = uuidv4();
 		const requestData = await request.formData();
@@ -66,7 +66,7 @@ export const actions: Actions = {
 		try {
 			await achievementFormSchema.validate(formData);
 		} catch (err) {
-			if (err instanceof ValidationError) throw error(400, err.message);
+			if (err instanceof ValidationError) error(400, err.message);
 		}
 
 		if (formData.capabilities_inviteRequires) {
@@ -128,7 +128,7 @@ export const actions: Actions = {
 				}
 			});
 			if (!inviteRequiresAchievement) {
-				throw error(400, m.inviteRequires_notFound());
+				error(400, m.inviteRequires_notFound());
 			}
 		}
 

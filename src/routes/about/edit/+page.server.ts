@@ -15,16 +15,16 @@ dotenv.config();
 export const load: PageServerLoad = ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		throw redirect(302, '/');
+		redirect(302, '/');
 };
 
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			error(403, m.error_unauthorized());
 
 		const requestData = await request.formData();
-		const imageUpdated = requestData.get('imageEdited') === 'true';
+		const imageUpdated = requestData.get('imageEdited')?.toString() === 'true';
 		const imageKey = requestData.get('imageExtension')
 			? `org-${locals.org.id}/${uuidv4().slice(-8)}-raw-image.${requestData.get('imageExtension')}`
 			: null;
@@ -39,7 +39,7 @@ export const actions: Actions = {
 		try {
 			await formSchema.validate(formData);
 		} catch (err) {
-			if (err instanceof ValidationError) throw error(400, err.message);
+			if (err instanceof ValidationError) error(400, err.message);
 		}
 
 		// Get the tagline from the form data
