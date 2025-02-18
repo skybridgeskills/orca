@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-
+import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 import {
 	testAchievement,
 	testAchievementClaim,
@@ -17,7 +17,7 @@ test('issuerFromOrganization', () => {
 
 	const expectedResult: OB2Issuer = {
 		'@context': 'https://w3id.org/openbadges/v2',
-		id: 'http://example.com/ob2/i',
+		id: `${PUBLIC_HTTP_PROTOCOL}://example.com/ob2/i`,
 		type: 'Issuer',
 		name: testOrganization.name,
 		url: testOrganization.url!,
@@ -26,7 +26,7 @@ test('issuerFromOrganization', () => {
 		related: [
 			{
 				type: ['https://purl.imsglobal.org/spec/vc/ob/vocab.html#Profile'],
-				id: 'http://example.com/.well-known/did.json',
+				id: `${PUBLIC_HTTP_PROTOCOL}://example.com/.well-known/did.json`,
 				'schema:sameAs': new OrganizationDID(testOrganization).didString(),
 				version: 'Open Badges v3p0'
 			}
@@ -45,7 +45,7 @@ test('badgeClassFromAchievement', () => {
 
 	const expectedResult: OB2BadgeClass = {
 		'@context': 'https://w3id.org/openbadges/v2',
-		id: `http://${testAchievementWithOrganization.organization.domain}/ob2/b/${testAchievement.id}`,
+		id: `${PUBLIC_HTTP_PROTOCOL}://${testAchievementWithOrganization.organization.domain}/ob2/b/${testAchievement.id}`,
 		type: 'BadgeClass',
 		name: testAchievement.name,
 		description: testAchievement.description,
@@ -53,9 +53,9 @@ test('badgeClassFromAchievement', () => {
 			type: 'Criteria',
 			narrative: testAchievement.criteriaNarrative!
 		}, //TODO: test with criteriaUrl
-		image: `http://${testAchievementWithOrganization.organization.domain}/achievements/${testAchievement.id}/image`,
+		image: `${PUBLIC_HTTP_PROTOCOL}://${testAchievementWithOrganization.organization.domain}/achievements/${testAchievement.id}/image`,
 		issuer: {
-			id: 'http://example.com/ob2/i',
+			id: `${PUBLIC_HTTP_PROTOCOL}://example.com/ob2/i`,
 			type: 'Issuer',
 			name: testOrganization.name,
 			url: testOrganization.url!,
@@ -64,7 +64,7 @@ test('badgeClassFromAchievement', () => {
 			related: [
 				{
 					type: ['https://purl.imsglobal.org/spec/vc/ob/vocab.html#Profile'],
-					id: 'http://example.com/.well-known/did.json',
+					id: `${PUBLIC_HTTP_PROTOCOL}://example.com/.well-known/did.json`,
 					'schema:sameAs': new OrganizationDID(testOrganization).didString(),
 					version: 'Open Badges v3p0'
 				}
@@ -73,7 +73,7 @@ test('badgeClassFromAchievement', () => {
 		related: [
 			{
 				type: ['https://purl.imsglobal.org/spec/vc/ob/vocab.html#Achievement'],
-				id: `http://${testAchievementWithOrganization.organization.domain}/a/${testAchievement.id}`,
+				id: `${PUBLIC_HTTP_PROTOCOL}://${testAchievementWithOrganization.organization.domain}/a/${testAchievement.id}`,
 				version: 'Open Badges v3p0'
 			}
 		]
@@ -99,7 +99,7 @@ test('badgeAssertionFromAchievementClaim', () => {
 	);
 	expect(ob2BadgeAssertion).toEqual({
 		'@context': 'https://w3id.org/openbadges/v2',
-		id: `http://${testAchievementClaimWithAchievementWithOrganization.achievement.organization.domain}/ob2/a/${testAchievementClaimWithAchievementWithOrganization.id}`,
+		id: `${PUBLIC_HTTP_PROTOCOL}://${testAchievementClaimWithAchievementWithOrganization.achievement.organization.domain}/ob2/a/${testAchievementClaimWithAchievementWithOrganization.id}`,
 		type: 'Assertion',
 		badge: {
 			criteria: {
@@ -107,12 +107,12 @@ test('badgeAssertionFromAchievementClaim', () => {
 				type: 'Criteria'
 			},
 			description: 'Achievement for Unit Test',
-			id: 'http://example.com/ob2/b/test-achievement-id',
-			image: `http://${testAchievementClaimWithAchievementWithOrganization.achievement.organization.domain}/achievements/${testAchievementClaimWithAchievementWithOrganization.achievement.id}/image`,
+			id: `${PUBLIC_HTTP_PROTOCOL}://example.com/ob2/b/test-achievement-id`,
+			image: `${PUBLIC_HTTP_PROTOCOL}://${testAchievementClaimWithAchievementWithOrganization.achievement.organization.domain}/achievements/${testAchievementClaimWithAchievementWithOrganization.achievement.id}/image`,
 			name: 'Test Achievement',
 			related: [
 				{
-					id: 'http://example.com/a/test-achievement-id',
+					id: `${PUBLIC_HTTP_PROTOCOL}://example.com/a/test-achievement-id`,
 					type: ['https://purl.imsglobal.org/spec/vc/ob/vocab.html#Achievement'],
 					version: 'Open Badges v3p0'
 				}
@@ -121,11 +121,11 @@ test('badgeAssertionFromAchievementClaim', () => {
 			issuer: {
 				description: 'A unit test organization',
 				email: 'admin@example.com',
-				id: 'http://example.com/ob2/i',
+				id: `${PUBLIC_HTTP_PROTOCOL}://example.com/ob2/i`,
 				name: 'Test Org',
 				related: [
 					{
-						id: 'http://example.com/.well-known/did.json',
+						id: `${PUBLIC_HTTP_PROTOCOL}://example.com/.well-known/did.json`,
 						'schema:sameAs': 'did:web:example.com',
 						type: ['https://purl.imsglobal.org/spec/vc/ob/vocab.html#Profile'],
 						version: 'Open Badges v3p0'
@@ -147,7 +147,7 @@ test('badgeAssertionFromAchievementClaim', () => {
 		},
 		related: [
 			{
-				id: 'http://example.com/a/test-achievement-id',
+				id: `${PUBLIC_HTTP_PROTOCOL}://example.com/a/test-achievement-id`,
 				type: ['https://purl.imsglobal.org/spec/vc/ob/vocab.html#Achievement'],
 				version: 'Open Badges v3p0'
 			}
