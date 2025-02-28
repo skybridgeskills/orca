@@ -21,7 +21,7 @@ const main = () => {
 			{
 				name: 'orgDomain',
 				message: 'What domain will this org access the app on?',
-				default: 'localhost'
+				default: 'localhost:5173'
 			},
 			{
 				name: 'orgEmail',
