@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { imageUrl } from '$lib/utils/imageUrl';
 	import { page } from '$app/stores';
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
@@ -10,6 +11,7 @@
 	import type { PageData } from './$types';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
+	import Card from '$lib/components/Card.svelte';
 	export let data: PageData;
 	let member = data.member;
 	let showShareModal = false;
@@ -68,18 +70,39 @@
 	<Pagination
 		paging={{ ...calculatePageAndSize($page.url), count: member._count.receivedAchievementClaims }}
 	/>
+
+		<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
 	{#each member.receivedAchievementClaims as claim}
-		<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-			<a
-				href={`/claims/${claim.id}`}
-				class="text-blue-700 dark:text-blue-400 font-bold underline hover:no-underline"
-				>{claim.achievement.name}</a
-			>
-		</p>
-		<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-			{m.status_created()}: {claim.createdOn}
-		</p>
+	
+				<Card maxWidth="" hoverEffect={true} href="/claims/{claim.id}">
+					<div class="grid grid-cols-4 gap-2">
+						<div class="m-auto">
+							{#if claim.achievement.image}
+								<img
+									src={imageUrl(claim.achievement.image)}
+									class=""
+									aria-hidden
+								/>
+							{:else}
+								<div class="text-gray-400 dark:text-gray-700">
+									<Ribbon />
+								</div>
+							{/if}
+						</div>
+
+						<div class="col-span-3">
+							<h3 class="mb-2 text-base font-bold tracking-tight text-gray-900 dark:text-white">
+								{claim.achievement.name}
+							</h3>
+
+							<p class="mb-3 text-xs font-normal text-gray-700 dark:text-gray-400">
+								{m.status_created()}: {claim.createdOn}
+							</p>
+						</div>
+					</div>
+				</Card>
 	{/each}
+	</div>
 {/if}
 
 {#if member.id == data.session?.user?.id}
