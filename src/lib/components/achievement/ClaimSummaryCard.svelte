@@ -38,7 +38,7 @@
 	};
 	const handleCopyToClipboard = () => {
 		if (!claim || !navigator.clipboard) {
-			notifications.addNotification(new Notification(m.clipboard_couldNotCopyError()));
+			notifications.add(new Notification(m.clipboard_couldNotCopyError()));
 		}
 		navigator.clipboard.writeText(`${PUBLIC_HTTP_PROTOCOL}://${org.domain}/ob2/a/${claim.id}`);
 	};

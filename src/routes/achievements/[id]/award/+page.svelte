@@ -27,7 +27,7 @@
 	const breadcrumbItems = [
 		{ text: 'Home', href: '/' },
 		{ text: 'Achievements', href: '/achievements' },
-		{ text: data.achievement?.name }
+		{ text: data.achievement?.name, href: `/achievements/${data.achievement.id}` }
 	];
 </script>
 

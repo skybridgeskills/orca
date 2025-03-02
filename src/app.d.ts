@@ -36,7 +36,7 @@ declare namespace App {
 	}
 	interface Locals {
 		theme: string;
-		org: Organization;
+		org: import('@prisma/client').Organization;
 		token: string;
 		session: SessionData?;
 		locale: import('$lib/i18n/runtime').AvailableLanguageTag;
