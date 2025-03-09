@@ -133,16 +133,16 @@ export const actions = {
 		if (achievement.achievementConfig?.reviewRequiresId) {
 			const reviewerClaims = await prisma.achievementClaim.findMany({
 				where: {
-					userId: {
-						in: existingEndorsements
-							.map((ee) => ee.creatorId)
-							.flatMap((cid) => (cid !== null ? [cid] : []))
-						// or replace above 2 lines with the one below
-						// .map((ee) => ee.creatorId !== null ? [ee.creatorId]: []).flat(1)
+					AND: {
+						userId: {
+							in: existingEndorsements
+								.map((ee) => (ee.creatorId !== null ? [ee.creatorId] : []))
+								.flat(1)
+						},
+						achievementId: achievement.achievementConfig?.reviewRequiresId,
+						validFrom: { not: null }
 					},
-					achievementId: achievement.achievementConfig?.reviewRequiresId,
-					validFrom: { not: null },
-					validUntil: { not: null } // TODO: Adjust to be an OR so it's OK if a scheduled end date exists in the future.
+					OR: [{ validUntil: null }, { validUntil: { gt: new Date() } }]
 				}
 			});
 			const numReviewsRequired = achievement.achievementConfig.reviewsRequired ?? 1;
