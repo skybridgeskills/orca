@@ -12,6 +12,7 @@
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	import Card from '$lib/components/Card.svelte';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	export let data: PageData;
 	let member = data.member;
 	let showShareModal = false;
@@ -71,37 +72,33 @@
 		paging={{ ...calculatePageAndSize($page.url), count: member._count.receivedAchievementClaims }}
 	/>
 
-		<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
-	{#each member.receivedAchievementClaims as claim}
-	
-				<Card maxWidth="" hoverEffect={true} href="/claims/{claim.id}">
-					<div class="grid grid-cols-4 gap-2">
-						<div class="m-auto">
-							{#if claim.achievement.image}
-								<img
-									src={imageUrl(claim.achievement.image)}
-									class=""
-									aria-hidden
-								/>
-							{:else}
-								<div class="text-gray-400 dark:text-gray-700">
-									<Ribbon />
-								</div>
-							{/if}
-						</div>
-
-						<div class="col-span-3">
-							<h3 class="mb-2 text-base font-bold tracking-tight text-gray-900 dark:text-white">
-								{claim.achievement.name}
-							</h3>
-
-							<p class="mb-3 text-xs font-normal text-gray-700 dark:text-gray-400">
-								{m.status_created()}: {claim.createdOn}
-							</p>
-						</div>
+	<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
+		{#each member.receivedAchievementClaims as claim}
+			<Card maxWidth="" hoverEffect={true} href="/claims/{claim.id}">
+				<div class="grid grid-cols-4 gap-2">
+					<div class="m-auto">
+						{#if claim.achievement.image}
+							<!-- svelte-ignore a11y-missing-attribute -->
+							<img src={imageUrl(claim.achievement.image)} class="" aria-hidden />
+						{:else}
+							<div class="text-gray-400 dark:text-gray-700">
+								<Ribbon />
+							</div>
+						{/if}
 					</div>
-				</Card>
-	{/each}
+
+					<div class="col-span-3">
+						<h3 class="mb-2 text-base font-bold tracking-tight text-gray-900 dark:text-white">
+							{claim.achievement.name}
+						</h3>
+
+						<p class="mb-3 text-xs font-normal text-gray-700 dark:text-gray-400">
+							{m.status_created()}: {claim.createdOn}
+						</p>
+					</div>
+				</div>
+			</Card>
+		{/each}
 	</div>
 {/if}
 
