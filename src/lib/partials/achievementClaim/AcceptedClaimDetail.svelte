@@ -45,7 +45,7 @@
 	const sendToWallet = async () => {
 		if (existingBadgeClaim?.claimStatus != 'ACCEPTED') return;
 		if (!navigator.credentials) {
-			notifications.addNotification(new Notification(m.chapi_noPolyfillError()));
+			notifications.add(new Notification(m.chapi_noPolyfillError()));
 			return;
 		}
 
@@ -66,7 +66,7 @@
 		};
 		const webCredential = new window.WebCredential(presentation.type, presentation);
 		const chapiResult = await navigator.credentials.store(webCredential);
-		if (!chapiResult) notifications.addNotification(new Notification(m.chapi_cancelFailError()));
+		if (!chapiResult) notifications.add(new Notification(m.chapi_cancelFailError()));
 	};
 </script>
 

@@ -32,10 +32,10 @@ const generateNotificationStore = () => {
 
 	return {
 		subscribe,
-		addNotification: (notification: Notification) => {
+		add: (notification: Notification) => {
 			update((n) => [...n, notification]);
 		},
-		dismissNotification: (id: string) => {
+		dismiss: (id: string) => {
 			update((n) => n.filter((notification) => notification.id != id || !notification.dismissable));
 		}
 	};

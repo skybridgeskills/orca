@@ -19,7 +19,8 @@ export const testOrganization: Organization = {
 	url: 'https://cooltestorg.example.com',
 	email: 'admin@example.com',
 	primaryColor: null,
-	logo: null
+	logo: null,
+	json: '{}'
 };
 
 export const testUser: User = {

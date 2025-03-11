@@ -44,10 +44,10 @@
 			{#each $notifications as n (n.id)}
 				<Alert
 					message={n.message}
-					dismissable={true}
+					dismissable={n.dismissable}
 					level={n.level}
 					on:close={() => {
-						notifications.dismissNotification(n.id);
+						notifications.dismiss(n.id);
 					}}
 				>
 					{#each n.actions as action}

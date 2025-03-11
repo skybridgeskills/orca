@@ -9,6 +9,7 @@ import stripTags from '$lib/utils/stripTags';
 import type { ClaimEndorsement } from '@prisma/client';
 import type { PageServerLoad } from './$types';
 import { INVITE_SESSION_VALIDITY_MS } from '$lib/utils/session';
+import { USE_SECURE_COOKIES } from '$env/static/private';
 
 dotenv.config();
 
@@ -91,7 +92,7 @@ export const actions: Actions = {
 		}
 
 		cookies.set('sessionId', session.id, {
-			secure: process.env.USE_SECURE_COOKIES == 'true',
+			secure: USE_SECURE_COOKIES == 'true',
 			path: '/',
 			expires: session.expiresAt,
 			httpOnly: true
@@ -196,6 +197,7 @@ export const actions: Actions = {
 		if (inviteId && !sessionId) {
 			currentInvite = await prisma.claimEndorsement.findFirst({
 				where: {
+					organizationId: locals.org.id,
 					id: inviteId
 				}
 			});

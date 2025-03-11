@@ -45,7 +45,6 @@
 				const formData = new FormData();
 				formData.append('email', $claimEmail);
 				formData.append('narrative', 'Self-invitation of open claiming badge');
-				formData.append('skipEmailNotification', 'on');
 				const response = await fetch(`/achievements/${achievement.id}/award`, {
 					method: 'POST',
 					body: formData

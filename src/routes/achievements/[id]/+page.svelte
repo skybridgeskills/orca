@@ -78,7 +78,10 @@
 			data.editAchievementCapability ||
 			(!!config?.json?.capabilities?.inviteRequires &&
 				!!$backpackClaims.find(
-					(c) => c.achievementId == config?.json?.capabilities?.inviteRequires
+					(c) =>
+						c.achievementId == config?.json?.capabilities?.inviteRequires &&
+						c.validFrom &&
+						c.claimStatus == 'ACCEPTED'
 				));
 
 		reviewRequires = data.relatedAchievements
@@ -290,24 +293,17 @@
 	})}`}
 />
 
-{#if data.achievement._count.achievementClaims > 0}
-	{#if data.session?.user}
-		<div class="relative overflow-x-auto">
-			<ClaimList
-				data={{
-					...calculatePageAndSize($page.url),
-					total: data.achievement._count.achievementClaims
-				}}
-			/>
-		</div>
-	{:else}
-		<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
-			{m.achievement_badgesClaimed_loginCTA_description()}
-		</div>
-	{/if}
+{#if data.session?.user}
+	<div class="relative overflow-x-auto">
+		<ClaimList
+			{...calculatePageAndSize($page.url)}
+			totalCount={data.achievement._count.achievementClaims}
+			enableInvites={inviteCapability}
+		/>
+	</div>
 {:else}
 	<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
-		{m.achievement_badgesClaimed_noneAvailable()}
+		{m.achievement_badgesClaimed_loginCTA_description()}
 	</div>
 {/if}
 

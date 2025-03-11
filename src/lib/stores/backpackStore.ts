@@ -22,7 +22,7 @@ export const fetchBackpackClaims = async (): Promise<LoadingStatus> => {
 	backpackClaimsLoading.set(LoadingStatus.Loading);
 	const page1 = await fetch('/api/v1/backpack/claims?includeCount=true');
 	if (page1.status !== 200) {
-		notifications.addNotification(new Notification(m.backpack_errorFetchingData(), true, 'error'));
+		notifications.add(new Notification(m.backpack_errorFetchingData(), true, 'error'));
 		return LoadingStatus.Error;
 	}
 	const { data, meta } = await page1.json();
@@ -32,9 +32,7 @@ export const fetchBackpackClaims = async (): Promise<LoadingStatus> => {
 		for (let i = 2; i <= meta.totalPages; i++) {
 			const page = await fetch(`/api/v1/achievements?page=${i}`);
 			if (page.status !== 200) {
-				notifications.addNotification(
-					new Notification(m.backpack_errorFetchingData(), true, 'error')
-				);
+				notifications.add(new Notification(m.backpack_errorFetchingData(), true, 'error'));
 				return LoadingStatus.Error;
 			}
 			const { data: pageData } = await page.json();
@@ -66,9 +64,7 @@ export const outstandingInvitesLoading = writable<LoadingStatus>(LoadingStatus.N
 export const fetchOutstandingInvites = async (): Promise<LoadingStatus> => {
 	const res = await fetch('/api/v1/backpack/invites');
 	if (res.status !== 200) {
-		notifications.addNotification(
-			new Notification('Error fetching outstanding invites!', true, 'error')
-		);
+		notifications.add(new Notification('Error fetching outstanding invites!', true, 'error'));
 		return LoadingStatus.Error;
 	}
 	const { data }: { data: ClaimEndorsement[] } = await res.json();

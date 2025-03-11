@@ -25,7 +25,7 @@ const getOrganizationFromRequest = async function (event: RequestEvent) {
 };
 
 const getSession = async function (sessionId: string, orgId: string) {
-	return await prisma.session.findFirst({
+	const session = await prisma.session.findFirst({
 		where: {
 			id: sessionId,
 			organizationId: orgId
@@ -47,33 +47,31 @@ const getSession = async function (sessionId: string, orgId: string) {
 			}
 		}
 	});
+	if (session?.valid && new Date(session.expiresAt).getTime() > Date.now()) return session;
+	return null;
+};
+
+const getAuthHeaderTokenValue = function (authHeader: string | null) {
+	if (!authHeader) return null;
+	const parts = authHeader.split(' ');
+	if (parts[0] !== 'Bearer' || !parts[1]) return null;
+	return parts[1];
 };
 
 export const handle: Handle = async function ({ event, resolve }) {
 	event.locals.org = await getOrganizationFromRequest(event);
 
 	const cookies = cookie.parse(event.request.headers.get('cookie') || '');
-	if (cookies.sessionId) {
-		const session = await getSession(cookies.sessionId, event.locals.org.id);
-
-		if (session?.valid && new Date(session.expiresAt).getTime() > Date.now())
-			event.locals.session = session;
+	const sessionId =
+		cookies.sessionId ?? getAuthHeaderTokenValue(event.request.headers.get('Authorization'));
+	if (sessionId) {
+		event.locals.session = await getSession(sessionId, event.locals.org.id);
 	}
-
-	if (cookies.locale) {
-		event.locals.locale = availableLanguageTags.includes(
-			(cookies.locale as AvailableLanguageTag) ?? 'en-US'
-		)
-			? (cookies.locale as AvailableLanguageTag)
-			: 'en-US';
-	} else {
-		event.locals.locale = 'en-US';
-	}
+	event.locals.locale = availableLanguageTags.includes(cookies.locale as AvailableLanguageTag)
+		? (cookies.locale as AvailableLanguageTag)
+		: 'en-US';
 	setLanguageTag(event.locals.locale);
-
-	let theme = cookies.theme;
-
-	if (theme !== 'dark' && theme !== 'light') theme = 'default';
+	const theme = ['dark', 'light'].includes(cookies.theme) ? cookies.theme : 'default';
 
 	const response = await resolve(event);
 

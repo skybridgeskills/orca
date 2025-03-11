@@ -133,16 +133,16 @@ export const actions = {
 		if (achievement.achievementConfig?.reviewRequiresId) {
 			const reviewerClaims = await prisma.achievementClaim.findMany({
 				where: {
-					userId: {
-						in: existingEndorsements
-							.map((ee) => ee.creatorId)
-							.flatMap((cid) => (cid !== null ? [cid] : []))
-						// or replace above 2 lines with the one below
-						// .map((ee) => ee.creatorId !== null ? [ee.creatorId]: []).flat(1)
+					AND: {
+						userId: {
+							in: existingEndorsements
+								.map((ee) => (ee.creatorId !== null ? [ee.creatorId] : []))
+								.flat(1)
+						},
+						achievementId: achievement.achievementConfig?.reviewRequiresId,
+						validFrom: { not: null }
 					},
-					achievementId: achievement.achievementConfig?.reviewRequiresId,
-					validFrom: { not: null },
-					validUntil: { not: null } // TODO: Adjust to be an OR so it's OK if a scheduled end date exists in the future.
+					OR: [{ validUntil: null }, { validUntil: { gt: new Date() } }]
 				}
 			});
 			const numReviewsRequired = achievement.achievementConfig.reviewsRequired ?? 1;
@@ -197,6 +197,33 @@ export const actions = {
 
 		let updatedClaim: AchievementClaim | null = null;
 		if (claimStatus == 'ACCEPTED') {
+			// Update validFrom if needed, based on the achievement's review rules and existing endorsements.
+			let { validFrom } = existingClaim;
+			if (!validFrom) {
+				const achievement = await getAchievement(params.id, locals.org.id);
+				if (achievement.achievementConfig?.reviewRequiresId) {
+					// If review is required, we find some reviews and check if they are enough.
+					const numReviewsRequired = achievement.achievementConfig?.reviewsRequired ?? 1;
+					const reviewerClaims = await prisma.achievementClaim.findMany({
+						where: {
+							AND: {
+								achievementId: achievement.achievementConfig?.reviewRequiresId,
+								validFrom: { not: null }
+							},
+							OR: [{ validUntil: null }, { validUntil: { gt: new Date() } }]
+						},
+						take: numReviewsRequired
+					});
+
+					if (reviewerClaims?.length >= numReviewsRequired) {
+						validFrom = new Date();
+					}
+				} else {
+					// If review is not required, claim becomes valid immediately.
+					validFrom = new Date();
+				}
+			}
+
 			updatedClaim = await prisma.achievementClaim.update({
 				where: {
 					userId_achievementId: {
@@ -206,6 +233,7 @@ export const actions = {
 				},
 				data: {
 					claimStatus,
+					validFrom,
 					json: JSON.stringify(
 						Object.fromEntries(
 							[

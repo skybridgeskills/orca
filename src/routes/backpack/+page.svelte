@@ -102,78 +102,80 @@
 	</div>
 {/each}
 
-<Pagination
-	paging={{
-		page: currentPageNum,
-		pageSize,
-		count: $backpackClaims.length,
-		action: (p) => {
-			currentPageNum = p;
-		}
-	}}
-/>
-{#each currentPageData as claim (claim.id)}
-	{@const achievement = getAchievementById(claim.achievementId)}
-	{#if achievement}
-		<div class="mb-4">
-			<AchievementSummary
-				{claim}
-				{achievement}
-				isClickable={true}
-				href={`/claims/${claim.id}`}
-				linkAchievement={false}
-			>
-				<div slot="moredescription">
-					<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
-						{m.claimed()}
-						{dayjs(claim.createdOn).fromNow()}
-					</p>
-				</div>
-				<div slot="actions">
-					{#if claim.claimStatus === 'ACCEPTED' && claim.validFrom}
-						<div class="p-2 flex flex-row space-x-3">
-							<a
-								class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
-								tabindex="0"
-								href={`/claims/${claim.id}`}
-							>
-								<span class="sr-only">View details</span>
-								<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
-							</a>
-							<button
-								class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
-								tabindex="0"
-								on:click={(e) => {
-									handleShare({ ...claim, achievement });
-									e.preventDefault();
-									e.stopPropagation();
-								}}
-								on:keypress={(e) => {
-									handleShare({ ...claim, achievement });
-									e.preventDefault();
-									e.stopPropagation();
-								}}
-							>
-								<span class="sr-only">{m.share()}</span>
-								<Icon src={FaShareSquare} size="20" color="currentColor" />
-							</button>
-						</div>
-					{/if}
-				</div>
-			</AchievementSummary>
-		</div>
-	{/if}
-{:else}
-	<EmptyStateZone title="You haven't claimed any badges yet.">
-		<Backpack slot="image" />
-		<p slot="description">
-			{m.backpack_emptyState_description()}
-			<br /><a href="/achievements" class="font-bold underline hover:no-underline"
-				>{m.backpack_emptyStateCTA()}</a
-			>.
-		</p>
-	</EmptyStateZone>
-{/each}
+{#if $backpackClaimsLoading == LoadingStatus.Complete && $achievementsLoading == LoadingStatus.Complete}
+	<Pagination
+		paging={{
+			page: currentPageNum,
+			pageSize,
+			count: $backpackClaims.length,
+			action: (p) => {
+				currentPageNum = p;
+			}
+		}}
+	/>
+	{#each currentPageData as claim (claim.id)}
+		{@const achievement = getAchievementById(claim.achievementId)}
+		{#if achievement}
+			<div class="mb-4">
+				<AchievementSummary
+					{claim}
+					{achievement}
+					isClickable={true}
+					href={`/claims/${claim.id}`}
+					linkAchievement={false}
+				>
+					<div slot="moredescription">
+						<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
+							{m.claimed()}
+							{dayjs(claim.createdOn).fromNow()}
+						</p>
+					</div>
+					<div slot="actions">
+						{#if claim.claimStatus === 'ACCEPTED' && claim.validFrom}
+							<div class="p-2 flex flex-row space-x-3">
+								<a
+									class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
+									tabindex="0"
+									href={`/claims/${claim.id}`}
+								>
+									<span class="sr-only">View details</span>
+									<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
+								</a>
+								<button
+									class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
+									tabindex="0"
+									on:click={(e) => {
+										handleShare({ ...claim, achievement });
+										e.preventDefault();
+										e.stopPropagation();
+									}}
+									on:keypress={(e) => {
+										handleShare({ ...claim, achievement });
+										e.preventDefault();
+										e.stopPropagation();
+									}}
+								>
+									<span class="sr-only">{m.share()}</span>
+									<Icon src={FaShareSquare} size="20" color="currentColor" />
+								</button>
+							</div>
+						{/if}
+					</div>
+				</AchievementSummary>
+			</div>
+		{/if}
+	{:else}
+		<EmptyStateZone title="You haven't claimed any badges yet.">
+			<Backpack slot="image" />
+			<p slot="description">
+				{m.backpack_emptyState_description()}
+				<br /><a href="/achievements" class="font-bold underline hover:no-underline"
+					>{m.backpack_emptyStateCTA()}</a
+				>.
+			</p>
+		</EmptyStateZone>
+	{/each}
+{/if}
 
 <Modal
 	id="share-modal"

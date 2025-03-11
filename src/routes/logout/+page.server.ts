@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import { prisma } from '../../prisma/client';
 import type { Actions, PageServerLoad } from './$types';
+import { USE_SECURE_COOKIES } from '$env/static/private';
 
 export const load: PageServerLoad = async () => {
 	// we only use this endpoint for the api
@@ -14,7 +15,8 @@ export const actions: Actions = {
 		// destroy the cookie
 		cookies.set('sessionId', '', {
 			path: '/',
-			expires: new Date(0)
+			expires: new Date(0),
+			secure: USE_SECURE_COOKIES == 'true'
 		});
 
 		if (sessionId) {

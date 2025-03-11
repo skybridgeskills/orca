@@ -16,7 +16,7 @@ export const acLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
 export const fetchAchievementCategories = async (): Promise<LoadingStatus> => {
 	const res = await fetch('/api/v1/achievementCategories');
 	if (res.status !== 200) {
-		notifications.addNotification(new Notification('Error fetching categories!', true, 'error'));
+		notifications.add(new Notification('Error fetching categories!', true, 'error'));
 		return LoadingStatus.Error;
 	}
 	const { data }: { data: AchievementCategoryWithCount[] } = await res.json();
