@@ -78,8 +78,11 @@
 				<div class="grid grid-cols-4 gap-2">
 					<div class="m-auto">
 						{#if claim.achievement.image}
-							<!-- svelte-ignore a11y-missing-attribute -->
-							<img src={imageUrl(claim.achievement.image)} class="" aria-hidden />
+							<img
+								src={imageUrl(claim.achievement.image)}
+								alt={m.dull_bright_ostrich_delight({ achievementName: claim.achievement.name })}
+								aria-hidden
+							/>
 						{:else}
 							<div class="text-gray-400 dark:text-gray-700">
 								<Ribbon />
