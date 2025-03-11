@@ -78,7 +78,7 @@ export const inviteToClaim = async ({
 		| App.AchievementConfigWithJson
 		| undefined;
 
-	// UNAUTHENTICATD USERS: can create an invite for open-claim achievements only.
+	// UNAUTHENTICATED USERS: can create an invite for open-claim achievements only.
 	if (
 		!session?.user?.id &&
 		achievement.achievementConfig?.claimable &&
