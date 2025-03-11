@@ -68,7 +68,7 @@ Customize Environment file with `.env`. Initialize your environment file by copy
 
 Migrate database: `npm run migrate:dev`
 
-Create your organization: `npm run createOrganization`. Select an org domain like `localhost:5173` where the app will run. Do not include `http://` in the domain field.
+Create your organization: `npm run createOrganization`. Select an org domain like `localhost:5173` where the app will run. Do not include `http://` in the domain field. This should match `DEFAULT_ORG_DOMAIN` in your `.env` file.
 
 Create your admin: `npm run createAdmin`.
 
