@@ -62,7 +62,7 @@ export const inviteToClaim = async ({
 		json: json
 	};
 
-	if (inviteeEmail === undefined)
+	if (!inviteeEmail)
 		throw error(400, {
 			code: 'recipientEmail',
 			message: m.invite_recipientIdentifierRequiredError()
