@@ -56,7 +56,7 @@
 		if (category == 'AchievementClaim') claims = responseJson.data;
 		else {
 			outstandingInvites = responseJson.data;
-			if (responseJson.meta?.count) inviteCount = responseJson.meta.count;
+			if (responseJson.meta?.totalCount) inviteCount = responseJson.meta.totalCount;
 		}
 		loading = false;
 	};

@@ -4,8 +4,6 @@ import { error, json } from '@sveltejs/kit';
 
 type ApiMetaInput = PaginationData & {
 	type: string;
-	page: number;
-	pageSize: number;
 	totalCount?: number;
 	totalPages?: number;
 	getTotalCount?: () => Promise<number>;

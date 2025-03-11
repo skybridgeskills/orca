@@ -15,7 +15,7 @@ export const GET = async ({ url, params, locals }: RequestEvent) => {
 	}
 
 	const editAchievementCapability = locals.session?.user?.orgRole == 'GENERAL_ADMIN';
-	const { page, pageSize } = calculatePageAndSize(url);
+	const { page, pageSize, includeCount } = calculatePageAndSize(url);
 	const claims = await prisma.achievementClaim.findMany({
 		where: {
 			achievementId: achievementId,
@@ -43,6 +43,7 @@ export const GET = async ({ url, params, locals }: RequestEvent) => {
 		data: claims,
 		meta: {
 			type: 'AchievementClaim',
+			includeCount,
 			getTotalCount: async () => {
 				return await prisma.achievementClaim.count({
 					where: {
