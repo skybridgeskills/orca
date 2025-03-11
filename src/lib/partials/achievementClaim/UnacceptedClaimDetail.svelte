@@ -34,17 +34,18 @@
 
 <div class="max-w-2xl flex justify-between items-center mt-4">
 	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.claim_statusInvited()}</h2>
-	<div>
+	<div class="flex justify">
 		{#if !showClaimForm}
 			<Button
-				text="Reject"
+				text={m.known_such_scallop_gaze()}
+				submodule="danger"
 				on:click={() => {
 					claimIntent = 'REJECTED';
 					showClaimForm = true;
 				}}
 			/>
 			<Button
-				text="Accept"
+				text={m.proof_funny_dog_pat()}
 				on:click={() => {
 					claimIntent = 'ACCEPTED';
 					showClaimForm = true;

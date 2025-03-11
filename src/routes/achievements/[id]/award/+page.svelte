@@ -8,7 +8,6 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
-	import type { Achievement, AchievementConfig } from '@prisma/client';
 
 	export let data: PageData;
 	export let form;
@@ -22,7 +21,6 @@
 	}
 
 	let awardNarrative = '';
-	let forceCreateUser = false;
 
 	const breadcrumbItems = [
 		{ text: 'Home', href: '/' },
@@ -41,32 +39,32 @@
 
 		<AchievementSummary achievement={data.achievement} linkAchievement={false} />
 
-		{#if form.status?.selfClaim}
+		{#if form.selfClaim}
 			<p class="mt-4 mb-8 text-sm text-gray-500 dark:text-gray-400">
 				{m.achievement_youHaveClaimed_description()}
 				<a
-					href={`/claims/${form.claim?.id}`}
+					href={`/claims/${form.endorsement?.claim?.id}`}
 					class="text-blue-700 text-underline hover:no-underline"
 				>
 					{m.claim_viewCTA()}
 				</a>
 			</p>
-		{:else if form.status?.invited}
+		{:else if form.invited}
 			<p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
 				{m.claim_youHaveInvited({
-					inviteeEmail: form.endorsement?.inviteeEmail
+					inviteeEmail: form.endorsement?.inviteeEmail ?? ''
 				})}
 			</p>
 		{:else}
 			<p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
 				{m.claim_youHaveAwarded({
-					givenName: form.identifier?.user?.givenName,
-					familyName: form.identifier?.user?.familyName
+					givenName: form.identifier?.user?.givenName ?? 'another',
+					familyName: form.identifier?.user?.familyName ?? 'user'
 				})}
 			</p>
 		{/if}
 
-		{#if !form.status?.selfClaim && form.status?.created === false}
+		{#if !form.selfClaim && form.created === false}
 			<Alert
 				message="You already recommended this person for this achievement. Previous data is shown below."
 				level="warning"
@@ -166,60 +164,6 @@
 					placeholder="https://portfolio.example.com/..."
 				/>
 			</div>
-			{#if data.session?.user?.orgRole}
-				<div class="mb-6">
-					<div class="flex items-center">
-						<input
-							id="forceCreateUser"
-							type="checkbox"
-							name="forceCreateUser"
-							bind:checked={forceCreateUser}
-							class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-						/>
-						<label
-							for="forceCreateUser"
-							class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-						>
-							{m.award_createUserIfNotExistsOption()}
-						</label>
-					</div>
-				</div>
-
-				{#if forceCreateUser}
-					<div class="mb-6">
-						<label
-							for="register_givenName"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-						>
-							{m.givenName()}
-						</label>
-						<input
-							type="text"
-							id="register_givenName"
-							name="givenName"
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-							placeholder="Alice"
-							required
-						/>
-					</div>
-
-					<div class="mb-6">
-						<label
-							for="register_familyName"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-						>
-							{m.familyName()}
-						</label>
-						<input
-							type="text"
-							id="register_familyName"
-							name="familyName"
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-							required
-						/>
-					</div>
-				{/if}
-			{/if}
 
 			<button
 				type="submit"

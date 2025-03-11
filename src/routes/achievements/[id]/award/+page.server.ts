@@ -55,12 +55,7 @@ export const actions = {
 			json: JSON.stringify({
 				id: stripTags(requestData.get('evidenceUrl')?.toString()),
 				narrative: stripTags(requestData.get('narrative')?.toString())
-			} as App.EvidenceItem),
-
-			// Admin-only force-create user options
-			forceCreateUser: (stripTags(requestData.get('forceCreateUser')?.toString()) ?? 'no') != 'no',
-			givenName: stripTags(requestData.get('givenName')?.toString()) || '',
-			familyName: stripTags(requestData.get('familyName')?.toString()) || ''
+			} as App.EvidenceItem)
 		};
 		const result = await inviteToClaim(claimData);
 		return result;

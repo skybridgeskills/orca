@@ -1,7 +1,15 @@
 import * as m from '$lib/i18n/messages';
-import { ActionResult, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
-import { Identifier, Organization, Prisma, Session, User } from '@prisma/client';
+import {
+	Achievement,
+	AchievementClaim,
+	ClaimEndorsement,
+	Identifier,
+	Organization,
+	Prisma,
+	User
+} from '@prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
@@ -26,11 +34,6 @@ export interface InviteArgs {
 	inviteeEmail: string;
 	json: Prisma.JsonObject | string;
 	session: App.SessionData | null;
-
-	// Force create options only apply if user has admin role
-	forceCreateUser?: boolean;
-	givenName?: string;
-	familyName?: string;
 }
 
 export const inviteToClaim = async ({
@@ -38,11 +41,20 @@ export const inviteToClaim = async ({
 	org,
 	inviteeEmail,
 	json,
-	session,
-	forceCreateUser,
-	givenName,
-	familyName
-}: InviteArgs) => {
+	session
+}: InviteArgs): Promise<{
+	status: 201;
+	type: 'success';
+	data: {
+		created: boolean;
+		invited: boolean;
+		selfClaim: boolean;
+		endorsement:
+			| (ClaimEndorsement & { claim?: AchievementClaim })
+			| { id: string; claim: AchievementClaim; inviteeEmail?: string; createdAt: Date };
+		identifier: (Identifier & { user: User }) | null;
+	};
+}> => {
 	const data: Prisma.ClaimEndorsementCreateInput = {
 		achievement: { connect: { id: achievementId } },
 		organization: { connect: { id: org.id } },
@@ -69,20 +81,18 @@ export const inviteToClaim = async ({
 	) {
 		// achievement is claimable without any prerequisite. Unauthenticated
 		// user will create a self-endorsement (with null creator) and then use it as an invite-code.
-		const endorsement = await prisma.claimEndorsement.upsert({
-			where: {
-				creatorId_achievementId_inviteeEmail: {
-					creatorId: '',
-					achievementId: achievementId,
-					inviteeEmail: inviteeEmail
-				}
-			},
-			create: data,
-			select: {
-				id: true
-			},
-			update: {}
-		});
+		const endorsement: ClaimEndorsement & { claim?: AchievementClaim } =
+			await prisma.claimEndorsement.upsert({
+				where: {
+					creatorId_achievementId_inviteeEmail: {
+						creatorId: '',
+						achievementId: achievementId,
+						inviteeEmail: inviteeEmail
+					}
+				},
+				create: data,
+				update: {}
+			});
 
 		// This will always claim it's created, even if not. Attacker won't be able to tell that the account
 		// predated their first request, they'll only be able to tell that it was at least created as of
@@ -95,8 +105,7 @@ export const inviteToClaim = async ({
 				invited: false,
 				selfClaim: true,
 				endorsement,
-				identifier: null,
-				claim: null
+				identifier: null
 			}
 		};
 	} else if (!session?.user?.id) {
@@ -119,7 +128,7 @@ export const inviteToClaim = async ({
 	) {
 		const inviteQualificationClaim = await prisma.achievementClaim.findFirst({
 			where: {
-				achievementId,
+				achievementId: achievementConfig?.json?.capabilities?.inviteRequires,
 				userId: session.user.id
 			}
 		});
@@ -131,42 +140,16 @@ export const inviteToClaim = async ({
 	// ADMIN USERS and QUALIFIED INVITERS: May create claims for other users in unaccepted state.
 	data.creator = { connect: { id: session.user.id } };
 
-	let identifier: Identifier | null = await prisma.identifier.findFirst({
+	let identifier = await prisma.identifier.findFirst({
 		where: {
 			identifier: data.inviteeEmail,
 			organizationId: org.id
+		},
+		include: {
+			user: true
 		}
 	});
 
-	// Force create account option for admins only
-	if (
-		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none') &&
-		forceCreateUser &&
-		!identifier?.verifiedAt
-	) {
-		// TODO remove this feature now that qualified invitation is improving.
-		const user = await prisma.user.create({
-			data: {
-				givenName,
-				familyName,
-				organization: { connect: { id: org.id } },
-				identifiers: {
-					create: [
-						{
-							type: 'EMAIL',
-							identifier: data.inviteeEmail,
-							organization: { connect: { id: org.id } },
-							verifiedAt: new Date()
-						}
-					]
-				}
-			},
-			include: {
-				identifiers: true
-			}
-		});
-		identifier = user.identifiers.find((i) => true) ?? null;
-	}
 	// If there is a member, ensure that there is an AchievementClaim
 	if (identifier?.verifiedAt) {
 		const isSelfClaim = session.user.id == identifier?.userId;
@@ -184,19 +167,18 @@ export const inviteToClaim = async ({
 				organization: { connect: { id: org.id } },
 				achievement: { connect: { id: achievementId } },
 				claimStatus: isSelfClaim ? 'ACCEPTED' : 'UNACCEPTED',
-				validFrom: new Date(),
+
+				// If the achievement requires review, the claim is not valid until reviewed.
+				validFrom: !achievement.achievementConfig?.reviewRequiresId ? new Date() : null,
 				creator: { connect: { id: session.user.id } },
-				json: isSelfClaim || forceCreateUser ? data.json : '{}'
+				json: isSelfClaim ? data.json : '{}'
 			},
-			update: {},
-			include: {
-				achievement: true
-			}
+			update: {}
 		});
 
 		// Ensure there is an endorsement for this claim, on behalf of this admin, if not self-awarding
 		const endorsement = isSelfClaim
-			? null
+			? { id: '', claim, createdAt: new Date() }
 			: await prisma.claimEndorsement.upsert({
 					where: {
 						creatorId_achievementId_inviteeEmail: {
@@ -206,7 +188,7 @@ export const inviteToClaim = async ({
 						}
 					},
 					create: { ...data, claim: { connect: { id: claim.id } } },
-					update: {}
+					update: {} // We don't replace previous invite content, maybe we should though.
 			  });
 
 		// Notify user of claim
@@ -215,7 +197,7 @@ export const inviteToClaim = async ({
 			to: data.inviteeEmail,
 			subject: m.awardedBadge(),
 			text: m.awardedBadge_email_description({
-				achievementName: claim.achievement.name,
+				achievementName: achievement.name,
 				communityName: org.name,
 				badgeUrl: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/login?e=${encodeURIComponent(
 					data.inviteeEmail
@@ -230,31 +212,27 @@ export const inviteToClaim = async ({
 			status: 201,
 			type: 'success',
 			data: {
-				success: true,
 				created: true,
 				invited: false,
 				selfClaim: isSelfClaim,
 				endorsement,
-				identifier,
-				claim
+				identifier
 			}
 		};
 	} else {
 		// If there is not a member, create a claimEndorsement without a claim connected
-		const endorsement = await prisma.claimEndorsement.upsert({
-			where: {
-				creatorId_achievementId_inviteeEmail: {
-					creatorId: session.user.id,
-					inviteeEmail,
-					achievementId
-				}
-			},
-			create: data,
-			update: {},
-			include: {
-				achievement: true
-			}
-		});
+		const endorsement: ClaimEndorsement & { claim?: AchievementClaim; achievement?: Achievement } =
+			await prisma.claimEndorsement.upsert({
+				where: {
+					creatorId_achievementId_inviteeEmail: {
+						creatorId: session.user.id,
+						inviteeEmail,
+						achievementId
+					}
+				},
+				create: data,
+				update: {}
+			});
 
 		// If there isn't already a user, we'll invite them to join by email
 		const emailResult = await sendOrcaMail({
@@ -262,7 +240,7 @@ export const inviteToClaim = async ({
 			to: data.inviteeEmail,
 			subject: m.org_inviteToJoin({ orgName: org.name }),
 			text: m.org_inviteToJoin_description({
-				achievementName: endorsement.achievement.name,
+				achievementName: endorsement.achievement?.name ?? '',
 				orgName: org.name,
 				inviteLink: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/achievements/${
 					endorsement.achievementId
@@ -283,8 +261,7 @@ export const inviteToClaim = async ({
 				invited: !identifier?.verifiedAt,
 				selfClaim: false,
 				endorsement,
-				identifier,
-				claim: null
+				identifier
 			}
 		};
 	}

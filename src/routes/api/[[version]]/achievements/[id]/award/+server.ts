@@ -22,10 +22,12 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 		}
 	};
 
-	const result = await inviteToClaim(claimData);
+	const actionResult = await inviteToClaim(claimData);
+	const endorsement = actionResult.data.endorsement;
+
 	return await apiResponse({
 		params,
-		data: [result.data],
+		data: endorsement ? [endorsement] : [],
 		meta: {
 			type: 'ClaimEndorsement',
 			getTotalCount: async () => 1,

@@ -1,7 +1,6 @@
 import { arrayOf } from '$lib/utils/arrayOf';
 import type { PaginationData } from './pagination';
 import { error, json } from '@sveltejs/kit';
-import Link from 'http-link-header';
 
 type ApiMetaInput = PaginationData & {
 	type: string;
@@ -37,7 +36,7 @@ type ApiFunction<T> = (d: ApiInputWithParams<T>) => Promise<Response>;
 /**
  * Augments V1 envelope with total pagecount
  */
-const v1: V1ApiFunction<{ id: string }> = async ({ data, meta }) => {
+const v1: V1ApiFunction<Partial<{ id: string }>> = async ({ data, meta }) => {
 	const result = arrayOf(data);
 
 	return {
@@ -90,7 +89,7 @@ const v1MetaWithRequestedCounts = async (
 /**
  * Returns API Response for the desired API version
  */
-export const apiResponse: ApiFunction<{ id: string }> = async ({ params, data, meta }) => {
+export const apiResponse: ApiFunction<Partial<{ id: string }>> = async ({ params, data, meta }) => {
 	if (params.version === 'v1') return json(await v1({ data, meta }));
 	throw error(500, 'Unsupported API version');
 };

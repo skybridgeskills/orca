@@ -5,12 +5,12 @@ import { apiResponse } from '$lib/utils/api';
 import { calculatePageAndSize } from '$lib/utils/pagination';
 
 export const GET = async ({ url, params, locals }: RequestEvent) => {
-	if (!locals.session) {
+	if (!locals.session?.user) {
 		throw error(401, 'Unauthorized');
 	}
 
 	const achievementId = params.id;
-	const isAdmin = !locals.session?.user?.orgRole == 'GENERAL_ADMIN';
+	const isAdmin = locals.session.user.orgRole == 'GENERAL_ADMIN';
 	const { page, pageSize, includeCount } = calculatePageAndSize(url);
 
 	const invites = await prisma.claimEndorsement.findMany({

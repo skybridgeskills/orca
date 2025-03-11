@@ -28,8 +28,8 @@
 	let category: 'AchievementClaim' | 'ClaimEndorsement' = 'AchievementClaim';
 	let loading = true;
 
-	const session = getContext('session');
-	const achievementId = getContext('achievementId');
+	const session: App.SessionData | undefined = getContext('session');
+	const achievementId: string = getContext('achievementId');
 
 	const getFetchUrl = (pageToFetch: number) => {
 		if (category == 'AchievementClaim')
@@ -206,7 +206,7 @@
 							</td>
 						</tr>
 					{/each}
-					{#if !inviteCount}
+					{#if !outstandingInvites.length}
 						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 w-full">
 							<td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
 								No outstanding invites.
