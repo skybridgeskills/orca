@@ -41,7 +41,7 @@ export const GET = async ({ url, params, locals }: RequestEvent) => {
 						achievementId: achievementId,
 						organizationId: locals.org.id,
 						claimId: null,
-						...(isAdmin ? {} : { creatorId: locals.session.user.id })
+						...(isAdmin ? {} : { creatorId: locals.session?.user?.id })
 					}
 				});
 			},
