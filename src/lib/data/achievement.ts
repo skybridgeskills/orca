@@ -12,6 +12,7 @@ import {
 } from '@prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
+import { validateEmailAddress } from '$lib/utils/email';
 
 export const getAchievement = async (achievementId: string, orgId: string) => {
 	return await prisma.achievement.findFirstOrThrow({
@@ -62,11 +63,15 @@ export const inviteToClaim = async ({
 		json: json
 	};
 
-	if (!inviteeEmail)
+	if (!inviteeEmail) {
 		throw error(400, {
 			code: 'recipientEmail',
 			message: m.invite_recipientIdentifierRequiredError()
 		});
+	}
+	if (!validateEmailAddress(inviteeEmail)) {
+		throw error(400, m.sunny_grand_lemur_race());
+	}
 
 	const achievement = await getAchievement(achievementId, org.id);
 	const achievementConfig = achievement.achievementConfig as
