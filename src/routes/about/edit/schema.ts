@@ -11,5 +11,6 @@ export const formSchema = yup.object().shape({
 	logo: yup
 		.string()
 		.matches(/\.(svg|png)$/)
-		.nullable()
+		.nullable(),
+	tagline: yup.string().nullable()
 });
