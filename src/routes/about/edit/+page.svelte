@@ -14,19 +14,21 @@
 	export let data: PageData;
 
 	let formData = {
-		name: data.organization.name,
-		description: data.organization.description,
-		url: data.organization.url,
-		primaryColor: data.organization.primaryColor,
-		logo: data.organization.logo,
-		imageExtension: data.organization.logo ? imageExtension(data.organization.logo) : null
+		name: data.org.name,
+		description: data.org.description,
+		url: data.org.url,
+		primaryColor: data.org.primaryColor,
+		logo: data.org.logo,
+		imageExtension: data.org.logo ? imageExtension(data.org.logo) : null,
+		tagline: data.org.json?.tagline
 	};
 	const noErrors: { [key: string]: string | null } = {
 		name: null,
 		description: null,
 		url: null,
 		primaryColor: null,
-		logo: null
+		logo: null,
+		tagline: null
 	};
 	let errors = { ...noErrors };
 
@@ -56,7 +58,7 @@
 
 		// see if the form data image is a dataURI, it is this in case of new file or one loaded from DB
 		const imageEdited =
-			`${formData.logo}`.startsWith('data:') || (!formData.logo && !!data.organization.logo);
+			`${formData.logo}`.startsWith('data:') || (!formData.logo && !!data.org.logo);
 		formsData.append('imageEdited', `${imageEdited}`);
 
 		if (formData['imageExtension']) formsData.append('imageExtension', formData.imageExtension);
@@ -147,6 +149,25 @@
 			on:blur={validate}
 		/>
 		{#if errors.url}<p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.url}</p>{/if}
+	</div>
+
+	<div class="mb-6" class:isError={errors.tagline}>
+		<label
+			for="orgEdit_tagline"
+			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tagline</label
+		>
+		<input
+			type="text"
+			id="orgEdit_tagline"
+			name="tagline"
+			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+			placeholder={m.moving_east_okapi_shine()}
+			bind:value={formData.tagline}
+			on:blur={validate}
+		/>
+		{#if errors.tagline}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+				{errors.tagline}
+			</p>{/if}
 	</div>
 
 	<div class="mb-6" class:isError={errors.primaryColor}>

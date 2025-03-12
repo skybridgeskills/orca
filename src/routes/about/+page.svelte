@@ -6,14 +6,16 @@
 	export let data: PageData;
 </script>
 
-{#if data.editOrganizationCapability}
+{#if data.session?.user?.orgRole === 'GENERAL_ADMIN'}
 	<div class="max-w-2xl flex justify-between items-center">
 		<h1 class="inline-flex mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white">
 			{m.about()}
 			{data.org.name}
 		</h1>
 		<p class="">
-			<a class="text-gray-900 dark:text-gray-100" href="/about/edit"><Button text="Edit" /></a>
+			<a class="text-gray-900 dark:text-gray-100" href="/about/edit"
+				><Button text={m.editCTA()} /></a
+			>
 		</p>
 	</div>
 {:else}

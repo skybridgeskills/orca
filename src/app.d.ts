@@ -23,20 +23,16 @@ declare namespace App {
 		valid: boolean;
 	}
 
-	interface Organization {
-		id: string;
-		createdAt: Date;
-		name: string;
-		description: string;
-		domain: string;
-		url: string?;
-		email: string;
-		primaryColor: string?;
-		logo: string?;
-	}
+	type OrganizationConfig = import('@prisma/client').Prisma.JsonObject & {
+		tagline?: string;
+	};
+	type Organization = import('@prisma/client').Organization & {
+		json: OrganizationConfig;
+	};
+
 	interface Locals {
 		theme: string;
-		org: import('@prisma/client').Organization;
+		org: Organization;
 		token: string;
 		session: SessionData?;
 		locale: import('$lib/i18n/runtime').AvailableLanguageTag;

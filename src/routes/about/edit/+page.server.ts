@@ -16,10 +16,6 @@ export const load: PageServerLoad = ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
 		throw redirect(302, '/');
-
-	return {
-		organization: locals.org
-	};
 };
 
 export const actions: Actions = {
@@ -46,13 +42,28 @@ export const actions: Actions = {
 			if (err instanceof ValidationError) throw error(400, err.message);
 		}
 
+		// Get the tagline from the form data
+		const tagline = stripTags(requestData.get('tagline')?.toString() || '');
+
+		// Parse the current json object
+		const jsonData: App.OrganizationConfig =
+			typeof locals.org?.json === 'string' ? JSON.parse(locals.org.json) : locals.org?.json || {};
+
+		// Update the json object with the new tagline
+		const updatedJson: App.OrganizationConfig = {
+			...jsonData,
+			tagline: tagline
+		};
+
 		await prisma.organization.update({
 			where: {
 				id: locals.org.id
 			},
-			data: formData
+			data: {
+				...formData,
+				json: updatedJson
+			}
 		});
-
 		const imageUploadUrl = imageUpdated && imageKey ? await getUploadUrl(imageKey) : '';
 
 		return { imageUploadUrl };
