@@ -36,7 +36,7 @@
 
 {#if userHoldsAchievement()}
 	<div class="mt-4">
-		<Alert heading="Badge claimed:" message="You hold a badge for this achievement.">
+		<Alert heading="Badge claimed:" message={m.merry_trite_seahorse_relish()}>
 			{#each relatedClaims.filter((c) => c.achievementId == achievement.id) as claim (claim.id)}
 				<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 					{m.date()}: {claim.createdOn}
