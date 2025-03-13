@@ -28,13 +28,13 @@
 	}
 
 	const breadcrumbItems = [
-		{ text: 'Home', href: '/' },
+		{ text: m.home(), href: '/' },
 		{ text: data.achievement.name, href: `/achievements/${data.achievement.id}` },
 		{
 			text: `${data.claim.user.givenName} ${data.claim.user.familyName}`,
 			href: `../${data.claim.id}`
 		},
-		{ text: 'Endorse badge' }
+		{ text: m.endorseFormCTA() }
 	];
 </script>
 
