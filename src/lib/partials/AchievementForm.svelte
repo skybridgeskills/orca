@@ -313,7 +313,7 @@
 					name="claimableSelectedOption"
 					id="achievementEdit_claimableSelectedOption_badge"
 				>
-					<span class="inline">Claimable by holders of a specific badge: </span>
+					<span class="inline">{m.tired_top_fish_bask()}</span>
 					<AchievementSelect
 						badgeId={formData.claimRequires}
 						on:unselected={() => {
@@ -372,14 +372,14 @@
 					bind:selectedOption={formData.reviewableSelectedOption}
 					value="none"
 					name="config_reviewable"
-					label="No"
+					label={m.fancy_antsy_ray_gaze()}
 					id="achievementEdit_reviewOption_none"
 				/>
 				<RadioOption
 					bind:selectedOption={formData.reviewableSelectedOption}
 					value="admin"
 					name="config_reviewable"
-					label="Reviewed by an admin"
+					label={m.gray_fluffy_myna_pet()}
 					id="achievementEdit_reviewOption_admin"
 				/>
 				<RadioOption
@@ -419,7 +419,7 @@
 									}`}
 									tabindex={formData.reviewableSelectedOption == 'badge' ? 0 : -1}
 								>
-									Choose...
+									{m.every_flat_lamb_favor()}
 								</button>
 							{/if}
 						</span>
@@ -473,7 +473,7 @@
 					bind:selectedOption={formData.inviteSelectedOption}
 					value="none"
 					name="config_inviteable"
-					label="Only admins"
+					label={m.aqua_alive_cougar_tickle()}
 					id="achievementEdit_inviteOption_none"
 				/>
 				<RadioOption
