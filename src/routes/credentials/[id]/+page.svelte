@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/i18n/messages';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import type { PageData } from './$types';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
@@ -8,9 +9,9 @@
 	let achievement = data.credential.achievement;
 
 	let breadcrumbItems = [
-		{ text: 'Home', href: '/' },
+		{ text: m.home(), href: '/' },
 		{ text: achievement.name, href: `/achievements/${achievement.id}` },
-		{ text: 'Award Details' }
+		{ text: m.top_fancy_trout_compose() }
 	];
 </script>
 

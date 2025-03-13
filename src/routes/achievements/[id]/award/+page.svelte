@@ -23,8 +23,8 @@
 	let awardNarrative = '';
 
 	const breadcrumbItems = [
-		{ text: 'Home', href: '/' },
-		{ text: 'Achievements', href: '/achievements' },
+		{ text: m.home(), href: '/' },
+		{ text: m.achievement_other(), href: '/achievements' },
 		{ text: data.achievement?.name, href: `/achievements/${data.achievement.id}` }
 	];
 </script>
