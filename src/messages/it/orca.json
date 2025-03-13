@@ -275,5 +275,12 @@
 	"achievementConfig_claimRequiresCrossValidationMessage": "Se la richiesto, è necessario selezionare un risultato.",
 	"achievementConfig_inviteREquiresCrossValidationMessage": "Se è richiesta la revisione tramite invito, è necessario selezionare un badge.",
 	"achievementConfig_inviteRequiredGeneric": "Questo risultato può essere conferito solo su invito.",
-	"claimConfiguration_inviteRequiresDescription": "Gli inviti a presentare richiesta possono essere inoltrati dai titolari di:"
+	"claimConfiguration_inviteRequiresDescription": "Gli inviti a presentare richiesta possono essere inoltrati dai titolari di:",
+	"sunny_grand_lemur_race": "Indirizzo email non valido",
+	"tense_raw_cuckoo_dart": "Non puoi invitare altri a reclamare questo risultato, perché il tuo badge di qualificazione non è ancora valido.",
+	"bad_bold_shrimp_express": "Data",
+	"known_such_scallop_gaze": "Rifiutare",
+	"authentication_couldNotLogIn": "Impossibile effettuare l'accesso.",
+	"proof_funny_dog_pat": "Accettare",
+	"dull_bright_ostrich_delight": "Immagine del badge {achievementName}"
 }
