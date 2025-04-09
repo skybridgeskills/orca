@@ -283,6 +283,7 @@
 	actions={[
 		{
 			label: 'Cancel',
+			submodule: 'secondary',
 			onClick: closeDeleteModal
 		},
 		{
