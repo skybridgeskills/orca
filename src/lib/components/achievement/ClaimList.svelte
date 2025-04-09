@@ -237,11 +237,14 @@
 								{invite.inviteeEmail}
 							</th>
 							<td class="px-6 py-4">
-								<a href="/members/{invite.creatorId}" class="hover:underline">
-									{invite.creator?.givenName}
-									{invite.creator?.familyName}
-								</a>
+								{#if invite.creator}
+									<a href="/members/{invite.creatorId}" class="hover:underline">
+										{invite.creator?.givenName ?? ''}
+										{invite.creator?.familyName ?? ''}
+									</a>
+								{/if}
 								{#if session?.user?.id == invite.creatorId}({m.me()}){/if}
+								{#if !invite.creator}{m.silly_patchy_anaconda_fry()}{/if}
 							</td>
 							<td class="px-6 py-4">
 								{invite.createdAt}
