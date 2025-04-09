@@ -23,7 +23,8 @@
 		reviewsRequired: data.achievement.achievementConfig?.reviewsRequired || 0,
 		reviewRequires: data.achievement.achievementConfig?.reviewRequiresId,
 		capabilities_inviteRequires:
-			data.achievement.achievementConfig?.json?.capabilities?.inviteRequires || ''
+			data.achievement.achievementConfig?.json?.capabilities?.inviteRequires || '',
+		claimTemplate: data.achievement.achievementConfig?.json?.claimTemplate || ''
 	};
 
 	let breadcrumbItems = [

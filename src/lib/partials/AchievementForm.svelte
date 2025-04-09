@@ -54,7 +54,8 @@
 		claimRequires: '',
 		reviewsRequired: '',
 		reviewRequires: '',
-		inviteRequires: ''
+		inviteRequires: '',
+		claimTemplate: ''
 	};
 	let errors = { ...noErrors };
 
@@ -99,6 +100,9 @@
 		formsData.append('imageEdited', `${imageEdited}`);
 
 		if (formData['imageExtension']) formsData.append('imageExtension', formData.imageExtension);
+
+		// Add claimTemplate to the form data
+		formsData.append('claimTemplate', formData.claimTemplate || '');
 
 		const response = await fetch($page.url, { method: 'POST', body: formsData });
 		const responseText = await response.text();
@@ -538,7 +542,21 @@
 			</div>
 		</CollapsiblePane>
 		<CollapsiblePane title={m.weary_legal_crossbill_approve()}>
-			What should go here? TODO
+			<div class="flex flex-col gap-3">
+				<!-- Claim Template -->
+				<div class:isError={errors.claimTemplate}>
+					<FormFieldLabel for="claimTemplate">Claim Template</FormFieldLabel>
+					<div class="mb-6">
+						<MarkdownEditor bind:value={formData.claimTemplate} />
+
+						{#if errors.claimTemplate}
+							<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+								{errors.claimTemplate}
+							</p>
+						{/if}
+					</div>
+				</div>
+			</div>
 		</CollapsiblePane>
 		<!-- Submit/Cancel -->
 		<div class="flex items-center lg:order-2 mt-6">

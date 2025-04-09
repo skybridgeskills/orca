@@ -22,6 +22,7 @@ interface AchievementConfigForm {
 		capabilities: {
 			inviteRequires: string | null;
 		};
+		claimTemplate: string;
 	};
 }
 
@@ -172,7 +173,8 @@ export const actions: Actions = {
 		configData['json'] = {
 			capabilities: {
 				inviteRequires: formData.capabilities_inviteRequires
-			}
+			},
+			claimTemplate: stripTags(requestData.get('claimTemplate')?.toString() || '')
 		};
 
 		// "Reviewed by an admin requires only one review, no matter what."
