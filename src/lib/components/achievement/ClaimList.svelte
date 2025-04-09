@@ -251,7 +251,7 @@
 									<IconButton
 										id="trash-button"
 										src={FaSolidTrash}
-										text="Delete invite"
+										text={m.wide_acidic_racoon_read()}
 										size="16"
 										on:click={() => showDeleteModal(invite)}
 									/>
