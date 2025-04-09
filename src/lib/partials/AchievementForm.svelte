@@ -21,6 +21,7 @@
 	import { ensureLoaded } from '$lib/stores/common';
 	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
+	import CollapsiblePane from '$lib/components/CollapsiblePane.svelte';
 
 	export let categories: Array<AchievementCategory>;
 	export let initialData;
@@ -286,266 +287,271 @@
 				</p>{/if}
 		</div>
 
-		<Heading title={m.setting_other()} level="h3" />
+		<CollapsiblePane title={m.dry_fluffy_guppy_view()}>
+			<div class="flex flex-col gap-3">
+				<!-- Claim Settings -->
+				<div class:isError={errors.claimRequires}>
+					<FormFieldLabel for="claimable">{m.claimConfiguration_allow()}</FormFieldLabel>
+					<input type="hidden" name="claimable" bind:value={formData.claimable} />
+					<div class="space-y-2">
+						<RadioOption
+							bind:selectedOption={formData.claimableSelectedOption}
+							value="off"
+							name="claimableSelectedOption"
+							label={m.achievement_awardByInvitation()}
+							id="achievementEdit_claimable_off"
+						/>
+						<RadioOption
+							bind:selectedOption={formData.claimableSelectedOption}
+							value="public"
+							name="claimableSelectedOption"
+							label={m.achievement_openClaimable_description()}
+							id="achievementEdit_claimableSelectedOption_public"
+						/>
+						<RadioOption
+							bind:selectedOption={formData.claimableSelectedOption}
+							value="badge"
+							name="claimableSelectedOption"
+							id="achievementEdit_claimableSelectedOption_badge"
+						>
+							<span class="inline">{m.tired_top_fish_bask()}</span>
+							<AchievementSelect
+								badgeId={formData.claimRequires}
+								on:unselected={() => {
+									formData.claimable = 'off';
+									formData.claimRequires = null;
+								}}
+								on:selected={(e) => {
+									formData.claimRequires = e.detail;
+								}}
+								disabled={formData.claimableSelectedOption != 'badge'}
+								label={m.claimConfiguration_requiredAchievement()}
+								description={m.claimConfiguration_requiredAchievement_description()}
+								achievementFilter={(a) => a.id != achievementId}
+								inputId="achievementEdit_claimRequires"
+								inputName="claimRequires"
+								errorMessage={errors.claimRequires}
+							>
+								<span slot="invoker" class="inline" let:handler>
+									{#if !formData.claimRequires}
+										<button
+											on:click|preventDefault={() => {
+												formData.claimable = 'on';
+												handler();
+											}}
+											class={`font-medium${
+												formData.claimable == 'on'
+													? ' underline hover:no-underline'
+													: 'text-gray-700 dark:text-gray-500 cursor-auto'
+											}`}
+											tabindex={formData.claimable == 'on' ? 0 : -1}
+										>
+											Choose...
+										</button>
+									{/if}
+								</span>
+							</AchievementSelect>
+						</RadioOption>
+					</div>
+					{#if errors.claimable}
+						<p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.claimable}</p>
+					{/if}
+				</div>
 
-		<!-- Claim Settings -->
-		<div class:isError={errors.claimRequires}>
-			<FormFieldLabel for="claimable">{m.claimConfiguration_allow()}</FormFieldLabel>
-			<input type="hidden" name="claimable" bind:value={formData.claimable} />
-			<div class="space-y-2">
-				<RadioOption
-					bind:selectedOption={formData.claimableSelectedOption}
-					value="off"
-					name="claimableSelectedOption"
-					label={m.achievement_awardByInvitation()}
-					id="achievementEdit_claimable_off"
-				/>
-				<RadioOption
-					bind:selectedOption={formData.claimableSelectedOption}
-					value="public"
-					name="claimableSelectedOption"
-					label={m.achievement_openClaimable_description()}
-					id="achievementEdit_claimableSelectedOption_public"
-				/>
-				<RadioOption
-					bind:selectedOption={formData.claimableSelectedOption}
-					value="badge"
-					name="claimableSelectedOption"
-					id="achievementEdit_claimableSelectedOption_badge"
-				>
-					<span class="inline">{m.tired_top_fish_bask()}</span>
-					<AchievementSelect
-						badgeId={formData.claimRequires}
-						on:unselected={() => {
-							formData.claimable = 'off';
-							formData.claimRequires = null;
-						}}
-						on:selected={(e) => {
-							formData.claimRequires = e.detail;
-						}}
-						disabled={formData.claimableSelectedOption != 'badge'}
-						label={m.claimConfiguration_requiredAchievement()}
-						description={m.claimConfiguration_requiredAchievement_description()}
-						achievementFilter={(a) => a.id != achievementId}
-						inputId="achievementEdit_claimRequires"
-						inputName="claimRequires"
-						errorMessage={errors.claimRequires}
-					>
-						<span slot="invoker" class="inline" let:handler>
-							{#if !formData.claimRequires}
-								<button
-									on:click|preventDefault={() => {
-										formData.claimable = 'on';
-										handler();
-									}}
-									class={`font-medium${
-										formData.claimable == 'on'
-											? ' underline hover:no-underline'
-											: 'text-gray-700 dark:text-gray-500 cursor-auto'
-									}`}
-									tabindex={formData.claimable == 'on' ? 0 : -1}
-								>
-									Choose...
-								</button>
-							{/if}
-						</span>
-					</AchievementSelect>
-				</RadioOption>
-			</div>
-			{#if errors.claimable}
-				<p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.claimable}</p>
-			{/if}
-		</div>
-
-		<!-- Review Settings -->
-		<input
-			type="hidden"
-			name="reviewableSelectedOption"
-			bind:value={formData.reviewableSelectedOption}
-		/>
-		<div class:isError={errors.reviewRequires}>
-			<FormFieldLabel for="config_reviewOption"
-				>{m.achievementConfig_reviewRequiresLabel()}</FormFieldLabel
-			>
-			<div class="space-y-2">
-				<RadioOption
-					bind:selectedOption={formData.reviewableSelectedOption}
-					value="none"
-					name="config_reviewable"
-					label={m.fancy_antsy_ray_gaze()}
-					id="achievementEdit_reviewOption_none"
-				/>
-				<RadioOption
-					bind:selectedOption={formData.reviewableSelectedOption}
-					value="admin"
-					name="config_reviewable"
-					label={m.gray_fluffy_myna_pet()}
-					id="achievementEdit_reviewOption_admin"
-				/>
-				<RadioOption
-					bind:selectedOption={formData.reviewableSelectedOption}
-					value="badge"
-					name="config_reviewable"
-					id="achievementEdit_reviewOption_badge"
-				>
-					<span class="inline">{m.achievementConfig_reviewRequiresLabelSpecific()}</span>
-					<AchievementSelect
-						badgeId={formData.reviewRequires}
-						on:unselected={() => {
-							if (formData.reviewableSelectedOption == 'badge') {
-								// only unselect if something a badge selected
-								// not "admin"
-								formData.reviewableSelectedOption = 'none';
-							}
-							formData.reviewRequires = null;
-						}}
-						on:selected={(e) => {
-							formData.reviewRequires = e.detail;
-						}}
-						disabled={formData.reviewableSelectedOption != 'badge'}
-						label={m.claimConfiguration_requiredAchievement()}
-						description={m.claimConfiguration_requiredAchievement_description()}
-						inputId="achievementEdit_reviewRequires"
-						inputName="reviewRequires"
-						errorMessage={errors.reviewRequires}
-					>
-						<span slot="invoker" class="inline" let:handler>
-							{#if !formData.reviewRequires}
-								<button
-									on:click|preventDefault={() => {
-										formData.reviewableSelectedOption = 'badge';
-										handler();
-									}}
-									class={`font-medium${
-										formData.reviewableSelectedOption == 'badge'
-											? ' underline hover:no-underline'
-											: 'text-gray-700 dark:text-gray-500 cursor-auto'
-									}`}
-									tabindex={formData.reviewableSelectedOption == 'badge' ? 0 : -1}
-								>
-									{m.every_flat_lamb_favor()}
-								</button>
-							{/if}
-						</span>
-					</AchievementSelect>
-				</RadioOption>
-				{#if errors.reviewRequires}
-					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
-						{errors.reviewRequires}
-					</p>
-				{/if}
-			</div>
-
-			<div class:isError={errors.reviewsRequired} class="mt-2">
-				<FormFieldLabel
-					for="achievementEdit_reviewsRequired"
-					disabled={formData.reviewableSelectedOption != 'badge'}
-				>
-					{m.claimConfiguration_reviewsRequired()}
-				</FormFieldLabel>
+				<!-- Review Settings -->
 				<input
-					type="number"
-					min="0"
-					max="5"
-					id="achievementEdit_reviewsRequired"
-					name="reviewsRequired"
-					class={`w-36 bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 ${
-						formData.reviewableSelectedOption == 'badge'
-							? 'text-gray-900 dark:text-white'
-							: 'text-gray-700 dark:text-gray-500 cursor-not-allowed'
-					} dark:focus:ring-blue-500 dark:focus:border-blue-500`}
-					placeholder=""
-					bind:value={formData.reviewsRequired}
-					on:blur={validate}
-					disabled={formData.reviewableSelectedOption != 'badge'}
+					type="hidden"
+					name="reviewableSelectedOption"
+					bind:value={formData.reviewableSelectedOption}
 				/>
-				{#if errors.reviewsRequired}
-					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
-						{errors.reviewsRequired}
-					</p>
-				{/if}
-			</div>
-		</div>
 
-		<!-- Invite Settings -->
-		<div class:isError={errors.inviteRequires}>
-			<FormFieldLabel for="capabilities_inviteRequires"
-				>{m.achievementConfig_inviteRequiresLabel()}</FormFieldLabel
-			>
-			<div class="space-y-2">
-				<RadioOption
-					bind:selectedOption={formData.inviteSelectedOption}
-					value="none"
-					name="config_inviteable"
-					label={m.aqua_alive_cougar_tickle()}
-					id="achievementEdit_inviteOption_none"
-				/>
-				<RadioOption
-					bind:selectedOption={formData.inviteSelectedOption}
-					value="badge"
-					name="config_invitable"
-					id="achievementEdit_inviteOption_badge"
-				>
-					<span class="inline">{m.achievementConfig_requirementHoldersOf()}</span>
-					<AchievementSelect
-						badgeId={formData.capabilities_inviteRequires}
-						on:unselected={() => {
-							formData.inviteSelectedOption = 'none';
-							formData.capabilities_inviteRequires = null;
-							errors.inviteRequires = '';
-						}}
-						on:selected={(e) => {
-							formData.capabilities_inviteRequires = e.detail;
-							errors.inviteRequires = '';
-						}}
-						disabled={formData.inviteSelectedOption != 'badge'}
-						label=""
-						description=""
-						inputId="capabilities_inviteRequires_input"
-						inputName="capabilities_inviteRequires"
-						errorMessage={errors.inviteRequires}
+				<div class:isError={errors.reviewRequires}>
+					<FormFieldLabel for="config_reviewOption"
+						>{m.achievementConfig_reviewRequiresLabel()}</FormFieldLabel
 					>
-						<span slot="invoker" class="inline" let:handler>
-							{#if !formData.capabilities_inviteRequires}
-								<button
-									on:click|preventDefault={() => {
-										formData.inviteSelectedOption = 'badge';
-										handler();
-									}}
-									class={`font-medium${
-										formData.capabilities_inviteRequires == 'badge'
-											? ' underline hover:no-underline'
-											: 'text-gray-700 dark:text-gray-500 cursor-auto'
-									}`}
-									tabindex={formData.capabilities_inviteRequires == 'badge' ? 0 : -1}
-								>
-									{m.chooseCTA()}
-								</button>
-							{/if}
-						</span>
-					</AchievementSelect>
-				</RadioOption>
+					<div class="space-y-2">
+						<RadioOption
+							bind:selectedOption={formData.reviewableSelectedOption}
+							value="none"
+							name="config_reviewable"
+							label={m.fancy_antsy_ray_gaze()}
+							id="achievementEdit_reviewOption_none"
+						/>
+						<RadioOption
+							bind:selectedOption={formData.reviewableSelectedOption}
+							value="admin"
+							name="config_reviewable"
+							label={m.gray_fluffy_myna_pet()}
+							id="achievementEdit_reviewOption_admin"
+						/>
+						<RadioOption
+							bind:selectedOption={formData.reviewableSelectedOption}
+							value="badge"
+							name="config_reviewable"
+							id="achievementEdit_reviewOption_badge"
+						>
+							<span class="inline">{m.achievementConfig_reviewRequiresLabelSpecific()}</span>
+							<AchievementSelect
+								badgeId={formData.reviewRequires}
+								on:unselected={() => {
+									if (formData.reviewableSelectedOption == 'badge') {
+										// only unselect if something a badge selected
+										// not "admin"
+										formData.reviewableSelectedOption = 'none';
+									}
+									formData.reviewRequires = null;
+								}}
+								on:selected={(e) => {
+									formData.reviewRequires = e.detail;
+								}}
+								disabled={formData.reviewableSelectedOption != 'badge'}
+								label={m.claimConfiguration_requiredAchievement()}
+								description={m.claimConfiguration_requiredAchievement_description()}
+								inputId="achievementEdit_reviewRequires"
+								inputName="reviewRequires"
+								errorMessage={errors.reviewRequires}
+							>
+								<span slot="invoker" class="inline" let:handler>
+									{#if !formData.reviewRequires}
+										<button
+											on:click|preventDefault={() => {
+												formData.reviewableSelectedOption = 'badge';
+												handler();
+											}}
+											class={`font-medium${
+												formData.reviewableSelectedOption == 'badge'
+													? ' underline hover:no-underline'
+													: 'text-gray-700 dark:text-gray-500 cursor-auto'
+											}`}
+											tabindex={formData.reviewableSelectedOption == 'badge' ? 0 : -1}
+										>
+											{m.every_flat_lamb_favor()}
+										</button>
+									{/if}
+								</span>
+							</AchievementSelect>
+						</RadioOption>
+						{#if errors.reviewRequires}
+							<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+								{errors.reviewRequires}
+							</p>
+						{/if}
+					</div>
 
-				{#if errors.inviteRequires}
-					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
-						{errors.inviteRequires}
-					</p>
-				{/if}
-			</div>
+					<div class:isError={errors.reviewsRequired} class="mt-2">
+						<FormFieldLabel
+							for="achievementEdit_reviewsRequired"
+							disabled={formData.reviewableSelectedOption != 'badge'}
+						>
+							{m.claimConfiguration_reviewsRequired()}
+						</FormFieldLabel>
+						<input
+							type="number"
+							min="0"
+							max="5"
+							id="achievementEdit_reviewsRequired"
+							name="reviewsRequired"
+							class={`w-36 bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 ${
+								formData.reviewableSelectedOption == 'badge'
+									? 'text-gray-900 dark:text-white'
+									: 'text-gray-700 dark:text-gray-500 cursor-not-allowed'
+							} dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+							placeholder=""
+							bind:value={formData.reviewsRequired}
+							on:blur={validate}
+							disabled={formData.reviewableSelectedOption != 'badge'}
+						/>
+						{#if errors.reviewsRequired}
+							<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+								{errors.reviewsRequired}
+							</p>
+						{/if}
+					</div>
+				</div>
 
-			<!-- Submit/Cancel -->
-			<div class="flex items-center lg:order-2 mt-6">
-				<button
-					type="submit"
-					class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-					>{m.submitCTA()}</button
-				>
-				<a
-					href="/achievements"
-					class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
-					>{m.cancelCTA()}</a
-				>
+				<!-- Invite Settings -->
+				<div class:isError={errors.inviteRequires}>
+					<FormFieldLabel for="capabilities_inviteRequires"
+						>{m.achievementConfig_inviteRequiresLabel()}</FormFieldLabel
+					>
+					<div class="space-y-2">
+						<RadioOption
+							bind:selectedOption={formData.inviteSelectedOption}
+							value="none"
+							name="config_inviteable"
+							label={m.aqua_alive_cougar_tickle()}
+							id="achievementEdit_inviteOption_none"
+						/>
+						<RadioOption
+							bind:selectedOption={formData.inviteSelectedOption}
+							value="badge"
+							name="config_invitable"
+							id="achievementEdit_inviteOption_badge"
+						>
+							<span class="inline">{m.achievementConfig_requirementHoldersOf()}</span>
+							<AchievementSelect
+								badgeId={formData.capabilities_inviteRequires}
+								on:unselected={() => {
+									formData.inviteSelectedOption = 'none';
+									formData.capabilities_inviteRequires = null;
+									errors.inviteRequires = '';
+								}}
+								on:selected={(e) => {
+									formData.capabilities_inviteRequires = e.detail;
+									errors.inviteRequires = '';
+								}}
+								disabled={formData.inviteSelectedOption != 'badge'}
+								label=""
+								description=""
+								inputId="capabilities_inviteRequires_input"
+								inputName="capabilities_inviteRequires"
+								errorMessage={errors.inviteRequires}
+							>
+								<span slot="invoker" class="inline" let:handler>
+									{#if !formData.capabilities_inviteRequires}
+										<button
+											on:click|preventDefault={() => {
+												formData.inviteSelectedOption = 'badge';
+												handler();
+											}}
+											class={`font-medium${
+												formData.capabilities_inviteRequires == 'badge'
+													? ' underline hover:no-underline'
+													: 'text-gray-700 dark:text-gray-500 cursor-auto'
+											}`}
+											tabindex={formData.capabilities_inviteRequires == 'badge' ? 0 : -1}
+										>
+											{m.chooseCTA()}
+										</button>
+									{/if}
+								</span>
+							</AchievementSelect>
+						</RadioOption>
+
+						{#if errors.inviteRequires}
+							<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+								{errors.inviteRequires}
+							</p>
+						{/if}
+					</div>
+				</div>
 			</div>
+		</CollapsiblePane>
+		<CollapsiblePane title={m.weary_legal_crossbill_approve()}>
+			What should go here? TODO
+		</CollapsiblePane>
+		<!-- Submit/Cancel -->
+		<div class="flex items-center lg:order-2 mt-6">
+			<button
+				type="submit"
+				class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+				>{m.submitCTA()}</button
+			>
+			<a
+				href="/achievements"
+				class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
+				>{m.cancelCTA()}</a
+			>
 		</div>
 	</div>
 </form>
