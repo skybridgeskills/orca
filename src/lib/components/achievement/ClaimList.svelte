@@ -294,12 +294,9 @@
 	]}
 >
 	<p>
-		Are you sure you want to delete the invite sent to <strong
-			>{inviteToDelete?.inviteeEmail}</strong
-		>?
+		{m.shy_dry_dingo_emerge()} <strong>{inviteToDelete?.inviteeEmail}</strong>?
 	</p>
 	<p class="text-sm text-gray-500 mt-2">
-		This action cannot be undone. The invited user will no longer be able to claim this achievement
-		using this link.
+		{m.curly_early_mouse_feel()}
 	</p>
 </Modal>
