@@ -96,7 +96,7 @@
 			$claimNarrative = claimJson.narrative || '';
 			$claimUrl = claimJson.id || '';
 		} else if (!existingBadgeClaim && !$claimPending) {
-			$claimNarrative = '';
+			// Do not set $claimNarrative to empty string here so the initialValue can be used
 			$claimUrl = '';
 		}
 	});
@@ -163,7 +163,7 @@
 					{m.claimForm_narrativeInstructions()}
 				{/if}
 			</p>
-			<MarkdownEditor bind:value={$claimNarrative} inputName="narrative" />
+			<MarkdownEditor bind:value={$claimNarrative} inputName="narrative" initialValue={achievementConfig?.json?.claimTemplate} />
 		</div>
 		<div class="mb-6">
 			<label

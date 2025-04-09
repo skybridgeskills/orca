@@ -9,6 +9,12 @@
 
 	export let value: string;
 	export let inputName: string = 'criteriaNarrative';
+	export let initialValue: string | undefined = undefined;
+	
+	// Set the initial value if provided and value is empty
+	if (initialValue && !value) {
+		value = initialValue;
+	}
 
 	const carta = new Carta({
 		sanitizer: (dirty?: string): string => {

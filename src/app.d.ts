@@ -54,6 +54,7 @@ declare namespace App {
 			capabilities: {
 				inviteRequires: string | null;
 			};
+			claimTemplate: string;
 		}?;
 	}
 
