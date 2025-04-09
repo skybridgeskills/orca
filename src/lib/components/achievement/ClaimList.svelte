@@ -299,7 +299,7 @@
 		>?
 	</p>
 	<p class="text-sm text-gray-500 mt-2">
-		This action cannot be undone. The invited user will no longer be able to claim this achievement
-		using this link.
+		This action cannot be undone. The invited user will no longer be able to claim this
+		achievement\n\t\tusing this link.
 	</p>
 </Modal>
