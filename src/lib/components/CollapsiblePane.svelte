@@ -5,7 +5,8 @@
 	export let title: string = '';
 	let rotation: string = 'rotate(-90)';
 
-	function handleClick() {
+	function handleClick(e: MouseEvent) {
+		e.preventDefault();
 		open = !open;
 		if (rotation == '') {
 			rotation = 'rotate(-90)';
@@ -15,9 +16,9 @@
 	}
 </script>
 
-<button on:click={handleClick} tabindex="0">
+<button on:click={(e) => handleClick(e)} tabindex="0">
 	<span
-		class="inline-flex items-center px-2.5 py-0.5 rounded me-2 text-slate-600 dark:text-slate-500"
+		class="inline-flex items-center pr-2.5 py-0.5 rounded me-2 text-slate-600 dark:text-slate-500"
 	>
 		<svg
 			version="1.1"
@@ -26,7 +27,7 @@
 			xmlns:xlink="http://www.w3.org/1999/xlink"
 			x="0px"
 			y="0px"
-			width="35"
+			width="20"
 			viewBox="0 0 1024 1024"
 			transform={rotation}
 			fill="currentColor"
