@@ -11,9 +11,13 @@
   import { imageExtension } from "$lib/utils/imageUrl";
   import type { SubmitFunction } from "@sveltejs/kit";
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
 
-  let formInputData = {
+  let { data }: Props = $props();
+
+  let formInputData = $state({
     name: data.org.name,
     description: data.org.description,
     url: data.org.url,
@@ -21,7 +25,7 @@
     logo: data.org.logo,
     imageExtension: data.org.logo ? imageExtension(data.org.logo) : null,
     tagline: data.org.json?.tagline,
-  };
+  });
   const noErrors: { [key: string]: string | null } = {
     name: null,
     description: null,
@@ -30,7 +34,7 @@
     logo: null,
     tagline: null,
   };
-  let errors = { ...noErrors };
+  let errors = $state({ ...noErrors });
 
   const validate = () => {
     formSchema
@@ -126,7 +130,7 @@
       class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       placeholder="What makes this community special is..."
       bind:value={formInputData.description}
-    />
+></textarea>
     {#if errors.description}<p
         class="mt-2 text-sm text-red-600 dark:text-red-500"
       >
@@ -146,7 +150,7 @@
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       placeholder="https://example.com"
       bind:value={formInputData.url}
-      on:blur={validate}
+      onblur={validate}
     />
     {#if errors.url}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
         {errors.url}
@@ -166,7 +170,7 @@
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       placeholder={m.moving_east_okapi_shrine()}
       bind:value={formInputData.tagline}
-      on:blur={validate}
+      onblur={validate}
     />
     {#if errors.tagline}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
         {errors.tagline}
@@ -185,7 +189,7 @@
       name="primaryColor"
       class=""
       bind:value={formInputData.primaryColor}
-      on:blur={validate}
+      onblur={validate}
     />
     {#if errors.primaryColor}
       <p class="mt-2 text-sm text-red-600 dark:text-red-500">

@@ -1,9 +1,15 @@
 <script lang="ts">
+	import { stopPropagation } from 'svelte/legacy';
+
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { FileDrop } from 'svelte-droplet';
-	export let errorMessage: string | null = null;
-	export let currentValue: string | null;
-	export let imageExtension: string | null;
+	interface Props {
+		errorMessage?: string | null;
+		currentValue: string | null;
+		imageExtension: string | null;
+	}
+
+	let { errorMessage = $bindable(null), currentValue = $bindable(), imageExtension = $bindable() }: Props = $props();
 
 	const handleFiles = (files: File[]) => {
 		// There will only be one file
@@ -76,7 +82,7 @@
 					<p class="text-xs text-gray-500 dark:text-gray-400">SVG or PNG (MAX. 800x800px)</p>
 
 					<div class="text-xs text-gray-500 dark:text-gray-400 absolute top-7 right-4">
-						<button on:click|stopPropagation={handleClearImage}>Clear</button>
+						<button onclick={stopPropagation(handleClearImage)}>Clear</button>
 					</div>
 				</div>
 			{/if}

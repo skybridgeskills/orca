@@ -10,7 +10,11 @@
 	import { claimEmail, claimId, inviteId, inviteCreatedAt } from '$lib/stores/activeClaimStore';
 	import type { Achievement, AchievementConfig } from '@prisma/client';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 	const config = data.achievement.achievementConfig as
 		| undefined
 		| (AchievementConfig &

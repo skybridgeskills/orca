@@ -17,16 +17,25 @@
 		};
 	};
 
-	export let pageSize: number = MAX_PAGE_SIZE;
-	export let page: number = 1;
-	export let totalCount: number;
-	export let enableInvites: boolean = false;
+	interface Props {
+		pageSize?: number;
+		page?: number;
+		totalCount: number;
+		enableInvites?: boolean;
+	}
 
-	let claims: AchievementClaimTableData[] = [];
-	let outstandingInvites: (ClaimEndorsement & { creator: User })[] = [];
-	let inviteCount: number | undefined = undefined;
-	let category: 'AchievementClaim' | 'ClaimEndorsement' = 'AchievementClaim';
-	let loading = true;
+	let {
+		pageSize = $bindable(MAX_PAGE_SIZE),
+		page = $bindable(1),
+		totalCount,
+		enableInvites = false
+	}: Props = $props();
+
+	let claims: AchievementClaimTableData[] = $state([]);
+	let outstandingInvites: (ClaimEndorsement & { creator: User })[] = $state([]);
+	let inviteCount: number | undefined = $state(undefined);
+	let category: 'AchievementClaim' | 'ClaimEndorsement' = $state('AchievementClaim');
+	let loading = $state(true);
 
 	const session: App.SessionData | undefined = getContext('session');
 	const achievementId: string = getContext('achievementId');

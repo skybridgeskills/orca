@@ -1,15 +1,32 @@
 <script lang="ts">
   import RightArrow from "$lib/illustrations/RightArrow.svelte";
   import { createEventDispatcher } from "svelte";
-  let klass = "";
-  export { klass as class };
-  export let text: string = "";
-  export let href: string = "";
-  export let id: string = "";
-  export let disabled = false;
-  export let buttonType: "button" | "submit" = "button";
-  export let moreProps: Object = {};
-  export let submodule: App.ButtonRole = "primary";
+
+  interface Props {
+    class?: string;
+    text?: string;
+    href?: string;
+    id?: string;
+    disabled?: boolean;
+    buttonType?: "button" | "submit";
+    moreProps?: Object;
+    onclick?: () => void;
+    submodule?: App.ButtonRole;
+    children?: import("svelte").Snippet;
+  }
+
+  let {
+    class: klass = "",
+    text = "",
+    href = "",
+    id = "",
+    disabled = false,
+    buttonType = "button",
+    moreProps = {},
+    onclick = () => {},
+    submodule = "primary",
+    children,
+  }: Props = $props();
 
   const dispatch = createEventDispatcher();
 
@@ -27,7 +44,7 @@
 
   const handleClick = () => {
     if (!disabled) {
-      dispatch("click");
+      onclick();
     }
   };
 </script>
@@ -41,15 +58,15 @@
       ? disabledClassList[submodule]
       : submoduleClassList[submodule]}
   >
-    <slot>{text}</slot>
+    {#if children}{@render children()}{:else}{text}{/if}
   </a>
 {:else}
   <button
     {id}
     type={buttonType}
     {...moreProps}
-    on:click={handleClick}
-    on:keypress={(e) => {
+    onclick={handleClick}
+    onkeypress={(e) => {
       if (e.key == "Enter" || e.key == " ") handleClick();
     }}
     class={disabled
@@ -57,6 +74,6 @@
       : submoduleClassList[submodule]}
     {disabled}
   >
-    <slot>{text}</slot>
+    {#if children}{@render children()}{:else}{text}{/if}
   </button>
 {/if}

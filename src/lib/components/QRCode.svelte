@@ -1,9 +1,13 @@
 <script lang="ts">
 	import QRCode from 'qrcode';
 	import { onMount } from 'svelte';
-	export let url = '';
-	export let alt = '';
-	let dataUri = '';
+	interface Props {
+		url?: string;
+		alt?: string;
+	}
+
+	let { url = '', alt = '' }: Props = $props();
+	let dataUri = $state('');
 
 	onMount(async () => {
 		dataUri = await QRCode.toDataURL(url);

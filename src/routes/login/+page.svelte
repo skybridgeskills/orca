@@ -16,14 +16,18 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 
-	export let form: ActionData;
-	export let data: PageData;
-	let register = false;
-	let verificationCode = '';
+	interface Props {
+		form: ActionData;
+		data: PageData;
+	}
 
-	let sessionId = form?.sessionId || '';
-	let email = $claimEmail || data.inviteeEmail || ''; // Initialize claimEmail but don't necessarily overwrite it in the store?
-	let errorMessage = '';
+	let { form, data }: Props = $props();
+	let register = $state(false);
+	let verificationCode = $state('');
+
+	let sessionId = $state(form?.sessionId || '');
+	let email = $state($claimEmail || data.inviteeEmail || ''); // Initialize claimEmail but don't necessarily overwrite it in the store?
+	let errorMessage = $state('');
 
 	onMount(() => {
 		// Automatically submit the login form if the user previously submitted a badge claim while unauthenticated
@@ -105,7 +109,7 @@
 			id="registerForm"
 			method="POST"
 			action="?/register"
-			on:submit={() => {
+			onsubmit={() => {
 				errorMessage = '';
 			}}
 			use:enhance={registerHandler}

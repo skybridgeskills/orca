@@ -1,10 +1,23 @@
 <script lang="ts">
-	export let value = '';
-	export let selectedOption = '';
-	export let name = '';
-	export let label = '';
-	export let id = '';
-	export let disabled = false;
+	interface Props {
+		value?: string;
+		selectedOption?: string;
+		name?: string;
+		label?: string;
+		id?: string;
+		disabled?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let {
+		value = '',
+		selectedOption = $bindable(''),
+		name = '',
+		label = '',
+		id = '',
+		disabled = false,
+		children
+	}: Props = $props();
 </script>
 
 <div class="flex">
@@ -23,6 +36,6 @@
 			disabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-gray-300'
 		}`}
 	>
-		<slot>{label}</slot>
+		{#if children}{@render children()}{:else}{label}{/if}
 	</label>
 </div>

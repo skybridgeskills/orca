@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import * as m from '$lib/i18n/messages';
 	import type {
 		Achievement,
@@ -24,14 +26,24 @@
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 
-	export let existingBadgeClaim: AchievementClaim | null = null;
-	export let achievement: Achievement;
-	export let achievementConfig: AchievementConfig | null = null;
-	export let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
 	const userIdentifiers: Identifier[] = $page.data.user?.identifiers || [];
 	const userEmails = userIdentifiers.filter((iden) => iden.type == 'EMAIL');
 
-	export let handleSubmit = async (e: SubmitEvent) => {
+	interface Props {
+		existingBadgeClaim?: AchievementClaim | null;
+		achievement: Achievement;
+		achievementConfig?: AchievementConfig | null;
+		claimIntent?: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED';
+		handleSubmit?: any;
+		handleCancel: () => void;
+	}
+
+	let {
+		existingBadgeClaim = null,
+		achievement,
+		achievementConfig = null,
+		claimIntent = 'ACCEPTED',
+		handleSubmit = async (e: SubmitEvent) => {
 		if (
 			!$session?.user &&
 			($inviteId || (achievementConfig?.claimable && !achievementConfig?.claimRequiresId))
@@ -66,8 +78,9 @@
 			}, 100);
 			// Bubble through to default form handling otherwise after setting up the form to be reset.
 		}
-	};
-	export let handleCancel: () => void;
+	},
+		handleCancel
+	}: Props = $props();
 
 	const maybeSubmit = () => {
 		if ($claimPending && $session?.user) {
@@ -101,9 +114,9 @@
 		}
 	});
 
-	$: {
+	run(() => {
 		if ($session?.user) maybeSubmit();
-	}
+	});
 </script>
 
 <form
@@ -112,7 +125,7 @@
 		? `/achievements/${achievement.id}/claim?/updateClaim`
 		: `/achievements/${achievement.id}/claim?/claim`}
 	class="max-w-2xl"
-	on:submit={handleSubmit}
+	onsubmit={handleSubmit}
 >
 	<input type="hidden" name="claimStatus" value={claimIntent} />
 	<input type="hidden" name="inviteId" value={$inviteId} />

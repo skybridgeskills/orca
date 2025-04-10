@@ -10,7 +10,8 @@
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
-	export let achievement: Achievement & {
+	interface Props {
+		achievement: Achievement & {
 		category: AchievementCategory | null;
 		achievementConfig:
 			| (AchievementConfig & {
@@ -19,9 +20,12 @@
 			  })
 			| null;
 	};
-	export let existingBadgeClaim: AchievementClaim | undefined;
-	let claimIntent: 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' = 'ACCEPTED';
-	let showClaimForm = false;
+		existingBadgeClaim: AchievementClaim | undefined;
+	}
+
+	let { achievement, existingBadgeClaim }: Props = $props();
+	let claimIntent: 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' = $state('ACCEPTED');
+	let showClaimForm = $state(false);
 </script>
 
 <h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.claim_claimBadgeCTA()}</h1>

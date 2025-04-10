@@ -2,7 +2,11 @@
   import { marked } from "marked";
   import stripTags from "$lib/utils/stripTags";
 
-  export let value = "";
+  interface Props {
+    value?: string;
+  }
+
+  let { value = "" }: Props = $props();
 </script>
 
 <div class="markdown-preview">

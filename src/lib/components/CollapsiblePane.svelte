@@ -1,40 +1,40 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
-	export let open: boolean = false;
-	export let title: string = '';
-	let rotation: string = 'rotate(-90)';
+  import { slide } from "svelte/transition";
+  import { quintOut } from "svelte/easing";
+  import type { Snippet } from "svelte";
 
-	function handleClick() {
-		open = !open;
-		if (rotation == '') {
-			rotation = 'rotate(-90)';
-		} else {
-			rotation = '';
-		}
-	}
+  interface Props {
+    open?: boolean;
+    title?: string;
+    children?: Snippet;
+  }
+
+  let { open = $bindable(false), title = "", children }: Props = $props();
+  const handleClick = () => {
+    open = !open;
+  };
 </script>
 
-<button on:click={handleClick} tabindex="0">
-	<span
-		class="inline-flex items-center px-2.5 py-0.5 rounded me-2 text-slate-600 dark:text-slate-500"
-	>
-		<svg
-			version="1.1"
-			id="Layer_1"
-			xmlns="http://www.w3.org/2000/svg"
-			xmlns:xlink="http://www.w3.org/1999/xlink"
-			x="0px"
-			y="0px"
-			width="35"
-			viewBox="0 0 1024 1024"
-			transform={rotation}
-			fill="currentColor"
-		>
-			<path
-				opacity="1.000000"
-				stroke="none"
-				d="
+<button onclick={handleClick} tabindex="0">
+  <span
+    class="inline-flex items-center px-2.5 py-0.5 rounded me-2 text-slate-600 dark:text-slate-500"
+  >
+    <svg
+      version="1.1"
+      id="Layer_1"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      x="0px"
+      y="0px"
+      width="35"
+      viewBox="0 0 1024 1024"
+      transform={open ? "" : "rotate(-90)"}
+      fill="currentColor"
+    >
+      <path
+        opacity="1.000000"
+        stroke="none"
+        d="
                 M750.578369,483.571228 
                 C760.778015,474.707428 770.731445,466.099609 780.629883,457.428955 
                 C783.126892,455.241608 785.445740,455.333801 787.630676,457.660950 
@@ -56,19 +56,26 @@
                 C511.863129,687.172485 514.200500,686.989136 517.347412,684.273987 
                 C544.589355,660.768982 572.002014,637.461792 599.273438,613.990723 
                 C649.651855,570.632568 699.969055,527.203430 750.578369,483.571228 z"
-			/>
-		</svg>
-		<span class="whitespace-pre-line text-xl font-semibold text-black dark:text-white">{title}</span
-		>
-	</span>
+      />
+    </svg>
+    <span
+      class="whitespace-pre-line text-xl font-semibold text-black dark:text-white"
+      >{title}</span
+    >
+  </span>
 </button>
 
 <hr class="h-px mb-2 mx-2 bg-gray-300 border-0 dark:bg-gray-700" />
 {#if open}
-	<div
-		transition:slide={{ delay: 250, duration: 300, easing: quintOut, axis: 'y' }}
-		class="ml-12 mr-12 mb-4 text-black dark:text-white"
-	>
-		<slot />
-	</div>
+  <div
+    transition:slide={{
+      delay: 250,
+      duration: 300,
+      easing: quintOut,
+      axis: "y",
+    }}
+    class="ml-12 mr-12 mb-4 text-black dark:text-white"
+  >
+    {@render children?.()}
+  </div>
 {/if}

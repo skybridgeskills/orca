@@ -27,12 +27,12 @@
 		weight: number;
 	}
 
-	let currentlyEditingCategory: CategoryForm = {
+	let currentlyEditingCategory: CategoryForm = $state({
 		id: null,
 		name: '',
 		weight: 1000
-	};
-	let deleteId: string | null;
+	});
+	let deleteId: string | null = $state();
 
 	const handleEditClick = (category: CategoryForm) => {
 		currentlyEditingCategory = {
@@ -232,8 +232,8 @@
 	{/if}
 </div>
 
-<form id="createCategoryForm" method="POST" action="?/create" use:enhance={enhanceUpsert} />
-<form id="updateCategoryForm" method="POST" action="?/update" use:enhance={enhanceUpsert} />
+<form id="createCategoryForm" method="POST" action="?/create" use:enhance={enhanceUpsert}></form>
+<form id="updateCategoryForm" method="POST" action="?/update" use:enhance={enhanceUpsert}></form>
 <form id="deleteCategoryForm" method="POST" action="?/delete" use:enhance={enhanceDelete}>
 	<input
 		form="deleteCategoryForm"

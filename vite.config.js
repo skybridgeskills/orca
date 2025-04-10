@@ -2,17 +2,17 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { nodeLoaderPlugin } from '@vavite/node-loader/plugin';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import { defineConfig } from 'vite';
-import { paraglide } from '@inlang/paraglide-sveltekit/vite';
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-/** @type {import('vite').UserConfig} */
 export default defineConfig(({ mode }) => {
 	let plugins = [
-		paraglide({
+		paraglideVitePlugin({
 			project: './project.inlang',
-			outdir: './src/lib/i18n'
+			outdir: './src/lib/i18n',
+			strategy: ['cookie', 'baseLocale']
 		}),
 		sveltekit()
 	];
@@ -31,6 +31,9 @@ export default defineConfig(({ mode }) => {
 		},
 		test: {
 			include: ['**/tests/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
+		},
+		server: {
+			allowedHosts: true
 		},
 		plugins
 	};

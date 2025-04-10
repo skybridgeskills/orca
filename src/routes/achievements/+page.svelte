@@ -24,7 +24,11 @@
 	import Alert from '$lib/components/Alert.svelte';
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 	const U = {
 		id: 'uncategorized',
 		organizationId: data.org.id,
@@ -34,7 +38,7 @@
 
 	const categoryAchievements: {
 		[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;
-	} = {};
+	} = $state({});
 	const mapCategories = () => {
 		[...$achievementCategories, U].map(
 			(c: AchievementCategory) =>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run, preventDefault } from 'svelte/legacy';
+
 	import * as m from '$lib/i18n/messages';
 	import { page } from '$app/stores';
 	import { deserialize } from '$app/forms';
@@ -22,10 +24,14 @@
 	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 
-	export let categories: Array<AchievementCategory>;
-	export let initialData;
-	export let achievementId = '';
-	let formData = {
+	interface Props {
+		categories: Array<AchievementCategory>;
+		initialData: any;
+		achievementId?: string;
+	}
+
+	let { categories, initialData, achievementId = '' }: Props = $props();
+	let formData = $state({
 		...initialData,
 		claimable: initialData.claimable ? 'on' : 'off',
 		claimableSelectedOption: initialData.claimable
@@ -39,7 +45,7 @@
 				: 'admin'
 			: 'none',
 		inviteSelectedOption: initialData.capabilities_inviteRequires ? 'badge' : 'none'
-	};
+	});
 
 	let noErrors = {
 		name: '',
@@ -55,7 +61,7 @@
 		reviewRequires: '',
 		inviteRequires: ''
 	};
-	let errors = { ...noErrors };
+	let errors = $state({ ...noErrors });
 
 	const validate = () => {
 		achievementFormSchema
@@ -142,7 +148,7 @@
 		await ensureLoaded(achievementsLoading, fetchAchievements);
 	});
 
-	$: {
+	run(() => {
 		if (formData.reviewableSelectedOption == 'none' && formData.reviewsRequired > 0) {
 			formData.reviewsRequired = 0;
 		} else if (formData.reviewableSelectedOption == 'badge' && formData.reviewsRequired == 0) {
@@ -157,10 +163,10 @@
 		} else {
 			formData.claimable = 'on';
 		}
-	}
+	});
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
+<form onsubmit={preventDefault(handleSubmit)}>
 	<div class="flex flex-col sm:flex-row gap-4 flex-grow">
 		<!-- Image -->
 		<div class="sm:w-5/12">
@@ -218,7 +224,7 @@
 					class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 					placeholder="A learning process that is created and molded by the learner..."
 					bind:value={formData.description}
-				/>
+				></textarea>
 				{#if errors.description}
 					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 						{errors.description}
@@ -279,7 +285,7 @@
 				class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 				placeholder="https://example.com/criteria"
 				bind:value={formData.criteriaId}
-				on:blur={validate}
+				onblur={validate}
 			/>
 			{#if errors.criteriaId}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 					{errors.criteriaId}
@@ -331,24 +337,26 @@
 						inputName="claimRequires"
 						errorMessage={errors.claimRequires}
 					>
-						<span slot="invoker" class="inline" let:handler>
-							{#if !formData.claimRequires}
-								<button
-									on:click|preventDefault={() => {
+						{#snippet invoker({ handler })}
+												<span  class="inline" >
+								{#if !formData.claimRequires}
+									<button
+										onclick={preventDefault(() => {
 										formData.claimable = 'on';
 										handler();
-									}}
-									class={`font-medium${
-										formData.claimable == 'on'
-											? ' underline hover:no-underline'
-											: 'text-gray-700 dark:text-gray-500 cursor-auto'
-									}`}
-									tabindex={formData.claimable == 'on' ? 0 : -1}
-								>
-									Choose...
-								</button>
-							{/if}
-						</span>
+									})}
+										class={`font-medium${
+											formData.claimable == 'on'
+												? ' underline hover:no-underline'
+												: 'text-gray-700 dark:text-gray-500 cursor-auto'
+										}`}
+										tabindex={formData.claimable == 'on' ? 0 : -1}
+									>
+										Choose...
+									</button>
+								{/if}
+							</span>
+											{/snippet}
 					</AchievementSelect>
 				</RadioOption>
 			</div>
@@ -405,24 +413,26 @@
 						inputName="reviewRequires"
 						errorMessage={errors.reviewRequires}
 					>
-						<span slot="invoker" class="inline" let:handler>
-							{#if !formData.reviewRequires}
-								<button
-									on:click|preventDefault={() => {
+						{#snippet invoker({ handler })}
+												<span  class="inline" >
+								{#if !formData.reviewRequires}
+									<button
+										onclick={preventDefault(() => {
 										formData.reviewableSelectedOption = 'badge';
 										handler();
-									}}
-									class={`font-medium${
-										formData.reviewableSelectedOption == 'badge'
-											? ' underline hover:no-underline'
-											: 'text-gray-700 dark:text-gray-500 cursor-auto'
-									}`}
-									tabindex={formData.reviewableSelectedOption == 'badge' ? 0 : -1}
-								>
-									{m.every_flat_lamb_favor()}
-								</button>
-							{/if}
-						</span>
+									})}
+										class={`font-medium${
+											formData.reviewableSelectedOption == 'badge'
+												? ' underline hover:no-underline'
+												: 'text-gray-700 dark:text-gray-500 cursor-auto'
+										}`}
+										tabindex={formData.reviewableSelectedOption == 'badge' ? 0 : -1}
+									>
+										{m.every_flat_lamb_favor()}
+									</button>
+								{/if}
+							</span>
+											{/snippet}
 					</AchievementSelect>
 				</RadioOption>
 				{#if errors.reviewRequires}
@@ -452,7 +462,7 @@
 					} dark:focus:ring-blue-500 dark:focus:border-blue-500`}
 					placeholder=""
 					bind:value={formData.reviewsRequired}
-					on:blur={validate}
+					onblur={validate}
 					disabled={formData.reviewableSelectedOption != 'badge'}
 				/>
 				{#if errors.reviewsRequired}
@@ -501,24 +511,26 @@
 						inputName="capabilities_inviteRequires"
 						errorMessage={errors.inviteRequires}
 					>
-						<span slot="invoker" class="inline" let:handler>
-							{#if !formData.capabilities_inviteRequires}
-								<button
-									on:click|preventDefault={() => {
+						{#snippet invoker({ handler })}
+												<span  class="inline" >
+								{#if !formData.capabilities_inviteRequires}
+									<button
+										onclick={preventDefault(() => {
 										formData.inviteSelectedOption = 'badge';
 										handler();
-									}}
-									class={`font-medium${
-										formData.capabilities_inviteRequires == 'badge'
-											? ' underline hover:no-underline'
-											: 'text-gray-700 dark:text-gray-500 cursor-auto'
-									}`}
-									tabindex={formData.capabilities_inviteRequires == 'badge' ? 0 : -1}
-								>
-									{m.chooseCTA()}
-								</button>
-							{/if}
-						</span>
+									})}
+										class={`font-medium${
+											formData.capabilities_inviteRequires == 'badge'
+												? ' underline hover:no-underline'
+												: 'text-gray-700 dark:text-gray-500 cursor-auto'
+										}`}
+										tabindex={formData.capabilities_inviteRequires == 'badge' ? 0 : -1}
+									>
+										{m.chooseCTA()}
+									</button>
+								{/if}
+							</span>
+											{/snippet}
 					</AchievementSelect>
 				</RadioOption>
 

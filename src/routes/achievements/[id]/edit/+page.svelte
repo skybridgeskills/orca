@@ -5,8 +5,13 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import { imageExtension } from '$lib/utils/imageUrl';
 
-	// export let form: ActionData;
-	export let data: PageData & { achievement: { achievementConfig: App.AchievementConfigWithJson } };
+	
+	interface Props {
+		// export let form: ActionData;
+		data: PageData & { achievement: { achievementConfig: App.AchievementConfigWithJson } };
+	}
+
+	let { data }: Props = $props();
 	const categories = data.categories;
 
 	let formData = {

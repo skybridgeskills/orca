@@ -3,7 +3,11 @@
 	import type { PageData } from './$types';
 	import Button from '$lib/components/Button.svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 {#if data.session?.user?.orgRole === 'GENERAL_ADMIN'}

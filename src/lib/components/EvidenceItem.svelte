@@ -2,7 +2,11 @@
 	import * as m from '$lib/i18n/messages';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 
-	export let item: App.EvidenceItem;
+	interface Props {
+		item: App.EvidenceItem;
+	}
+
+	let { item }: Props = $props();
 </script>
 
 <div>

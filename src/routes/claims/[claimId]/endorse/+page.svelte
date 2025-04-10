@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import * as m from '$lib/i18n/messages';
 	import Alert from '$lib/components/Alert.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
@@ -11,21 +13,25 @@
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 
-	export let data: PageData;
-	export let form;
+	interface Props {
+		data: PageData;
+		form: any;
+	}
+
+	let { data, form }: Props = $props();
 	let endorsementJson: {
 		narrative?: string;
 		id?: string;
-	} = JSON.parse(data.myEndorsements[0]?.json?.toString() || '{}');
-	let endorsementNarrative = endorsementJson.narrative || '';
-	let endorsementUrl = endorsementJson.id || '';
+	} = $state(JSON.parse(data.myEndorsements[0]?.json?.toString() || '{}'));
+	let endorsementNarrative = $state(endorsementJson.narrative || '');
+	let endorsementUrl = $state(endorsementJson.id || '');
 
-	$: {
+	run(() => {
 		if (form) endorsementJson = JSON.parse(form?.endorsement?.json?.toString() || '{}');
 		else if (data.myEndorsements.length) {
 			endorsementJson = JSON.parse(data.myEndorsements[0].json?.toString() || '{}');
 		}
-	}
+	});
 
 	const breadcrumbItems = [
 		{ text: 'Home', href: '/' },
@@ -94,7 +100,9 @@
 		<ActionHeading
 			text={`${data.claim.user.givenName} ${data.claim.user.familyName} claimed this badge`}
 		>
-			<span slot="actions">{data.claim.createdOn.toDateString()}</span>
+			{#snippet actions()}
+						<span >{data.claim.createdOn.toDateString()}</span>
+					{/snippet}
 		</ActionHeading>
 
 		<EvidenceItem item={evidenceItem(data.claim)} />
@@ -108,7 +116,7 @@
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>{m.achievement_narrative()}</label
 			>
-			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative} />
+			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative}></textarea>
 			<MarkdownEditor bind:value={endorsementNarrative} />
 		</div>
 		<div class="mb-6">

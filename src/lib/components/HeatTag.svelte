@@ -1,7 +1,11 @@
 <script lang="ts">
-	export let heat = 0.0;
-	export let text = '';
-	export let href = '';
+	interface Props {
+		heat?: number;
+		text?: string;
+		href?: string;
+	}
+
+	let { heat = 0.0, text = '', href = '' }: Props = $props();
 	let elem = href ? 'a' : 'span';
 
 	type BarCount = 0 | 1 | 2 | 3 | 4;
@@ -24,7 +28,7 @@
 	};
 
 	let klass =
-		'rounded-full py-0.5 px-2 text-xs font-semibold inline-flex items-center me-2 leading-6 bg-slate-500 dark:bg-slate-700 text-white dark:text-slate-100';
+		$state('rounded-full py-0.5 px-2 text-xs font-semibold inline-flex items-center me-2 leading-6 bg-slate-500 dark:bg-slate-700 text-white dark:text-slate-100');
 	// Link hover color
 	if (href) {
 		klass += ' hover:bg-blue-500 dark:hover:bg-blue-500';

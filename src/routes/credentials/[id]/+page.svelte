@@ -4,7 +4,11 @@
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 	let achievement = data.credential.achievement;
 
 	let breadcrumbItems = [

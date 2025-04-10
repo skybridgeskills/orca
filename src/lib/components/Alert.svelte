@@ -2,11 +2,23 @@
   import * as m from "$lib/i18n/messages";
   import { createEventDispatcher } from "svelte";
   import { v4 as uuidv4 } from "uuid";
-  export let level: App.NotificationLevel = "info";
-  export let message: string = "";
-  export let heading: string = "";
-  export let dismissable: boolean = false;
-  export let elementId: string = uuidv4();
+  interface Props {
+    level?: App.NotificationLevel;
+    message?: string;
+    heading?: string;
+    dismissable?: boolean;
+    elementId?: string;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    level = "info",
+    message = "",
+    heading = "",
+    dismissable = false,
+    elementId = uuidv4(),
+    children
+  }: Props = $props();
   const dispatch = createEventDispatcher();
 
   const levelClasses = {
@@ -35,7 +47,7 @@
   >
     <div class="ml-3 text-sm font-medium">
       {message}
-      <slot />
+      {@render children?.()}
     </div>
     <button
       type="button"
@@ -44,7 +56,7 @@
       ]}"
       data-dismiss-target={elementId}
       aria-label={m.close()}
-      on:click={() => {
+      onclick={() => {
         dispatch("close");
       }}
     >
@@ -73,6 +85,6 @@
   >
     {#if heading}<span class="font-medium">{heading}</span>{/if}
     {message}
-    <slot />
+    {@render children?.()}
   </div>
 {/if}

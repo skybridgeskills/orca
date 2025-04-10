@@ -5,8 +5,12 @@
 		href?: string;
 		onClick?: () => void;
 	}
-	export let items: TabItem[] = [];
-	export let currentItemId = '';
+	interface Props {
+		items?: TabItem[];
+		currentItemId?: string;
+	}
+
+	let { items = [], currentItemId = '' }: Props = $props();
 
 	const currentClasses =
 		'inline-block p-4 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500';
@@ -24,7 +28,7 @@
 			{:else}
 				<button
 					class={item.id == currentItemId ? currentClasses : defaultClasses}
-					on:click={item.onClick}
+					onclick={item.onClick}
 				>
 					{item.name}
 				</button>

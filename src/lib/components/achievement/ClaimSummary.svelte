@@ -11,18 +11,27 @@
 		ClaimStatus
 	} from '@prisma/client';
 
-	export let achievement: Achievement & {
+	interface Props {
+		achievement: Achievement & {
 		category: AchievementCategory | null;
 		achievementConfig: AchievementConfig | null;
 	};
-	export let relatedAchievements: Array<
+		relatedAchievements: Array<
 		Achievement & {
 			category: AchievementCategory | null;
 			achievementConfig: AchievementConfig | null;
 		}
 	>;
-	export let relatedClaims: AchievementClaim[];
-	export let showClaimLink = false;
+		relatedClaims: AchievementClaim[];
+		showClaimLink?: boolean;
+	}
+
+	let {
+		achievement,
+		relatedAchievements,
+		relatedClaims,
+		showClaimLink = false
+	}: Props = $props();
 
 	const userHoldsAchievement = () =>
 		relatedClaims.filter((c) => c.achievementId == achievement.id).length > 0;

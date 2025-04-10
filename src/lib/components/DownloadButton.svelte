@@ -1,31 +1,48 @@
 <script lang="ts">
-	import Button from './Button.svelte';
+  import Button from "./Button.svelte";
 
-	export let text: string = '';
-	export let sourceUrl: string = '';
-	export let fileName: string | null = null;
+  interface Props {
+    text?: string;
+    sourceUrl?: string;
+    fileName?: string | null;
+    class?: string;
+    id?: string;
+    buttonType?: "button" | "submit";
+    moreProps?: Object;
+    submodule?: App.ButtonRole;
+  }
 
-	let klass = '';
-	export { klass as class };
-	export let id: string = '';
-	export let buttonType: 'button' | 'submit' = 'button';
-	export let moreProps: Object = {};
-	export let submodule: App.ButtonRole = 'primary';
+  let {
+    text = "",
+    sourceUrl = "",
+    fileName = null,
+    class: klass = "",
+    id = "",
+    buttonType = "button",
+    moreProps = {},
+    submodule = "primary",
+  }: Props = $props();
 
-	const download = async () => {
-		const response = await fetch(sourceUrl, { method: 'POST', body: '' });
+  const download = async () => {
+    const response = await fetch(sourceUrl, { method: "POST", body: "" });
 
-		const responseBlob = await response.blob();
-		const href = URL.createObjectURL(responseBlob);
-		const aTag = document.createElement('a');
-		aTag.href = href;
-		aTag.download = fileName || 'download.json'; // TODO: extract extension from response header content type
+    const responseBlob = await response.blob();
+    const href = URL.createObjectURL(responseBlob);
+    const aTag = document.createElement("a");
+    aTag.href = href;
+    aTag.download = fileName || "download.json"; // TODO: extract extension from response header content type
 
-		document.body.appendChild(aTag);
-		aTag.click();
-		document.body.removeChild(aTag);
-	};
+    document.body.appendChild(aTag);
+    aTag.click();
+    document.body.removeChild(aTag);
+  };
 </script>
 
-<Button {id} {buttonType} {submodule} {...moreProps} onClick={download} class={klass}>{text}</Button
+<Button
+  {id}
+  {buttonType}
+  {submodule}
+  {...moreProps}
+  onclick={download}
+  class={klass}>{text}</Button
 >

@@ -6,7 +6,11 @@
 	import PublicClaimDetail from '$lib/partials/achievementClaim/PublicClaimDetail.svelte';
 	import { staticImageUrlForAchievement } from '$lib/utils/imageUrl';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 	const achievementWithOrgData = {
 		...data.claim.achievement,
 		organization: data.org

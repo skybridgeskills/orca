@@ -1,16 +1,12 @@
 import * as m from '$lib/i18n/messages';
-import type { PageServerLoad, Actions } from './$types';
 import { error, redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import type { Prisma } from '@prisma/client';
 import { ClaimStatus, type Identifier } from '@prisma/client';
 import stripTags from '$lib/utils/stripTags';
-import { ValidationError } from 'yup';
-import { achievementFormSchema } from '$lib/data/achievementForm';
 import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim } from '$lib/data/achievementClaim';
-import type { AchievementClaim, AchievementCredential, ClaimEndorsement } from '@prisma/client';
-import { inviteId } from '$lib/stores/activeClaimStore';
+import type { AchievementClaim, ClaimEndorsement } from '@prisma/client';
 
 export const load = async ({ locals, params, url }) => {
 	const inviteId = url.searchParams.get('i');

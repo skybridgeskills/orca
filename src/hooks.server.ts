@@ -3,9 +3,8 @@ import { error, type Handle, type RequestEvent } from '@sveltejs/kit';
 import cookie from 'cookie';
 import { prisma } from './prisma/client';
 import {
-	setLanguageTag,
-	availableLanguageTags,
-	type AvailableLanguageTag
+	setLocale,
+	locales
 } from '$lib/i18n/runtime';
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 
@@ -16,7 +15,7 @@ const getOrganizationFromRequest = async function (event: RequestEvent) {
 		where: {
 			domain: DEFAULT_ORG_ENABLED === 'true' ? { in: [domain, DEFAULT_ORG_DOMAIN ?? ''] } : domain
 		}
-	});
+	}) as App.Organization[];
 	if (orgs.length == 0) {
 		error(404, m.organization_notFoundError());
 	}
@@ -67,13 +66,15 @@ export const handle: Handle = async function ({ event, resolve }) {
 	if (sessionId) {
 		event.locals.session = await getSession(sessionId, event.locals.org.id);
 	}
-	event.locals.locale = availableLanguageTags.includes(cookies.locale as AvailableLanguageTag)
-		? (cookies.locale as AvailableLanguageTag)
+	event.locals.locale = (locales as readonly string[]).includes(cookies.locale ?? '')
+		? (cookies.locale as typeof locales[number])
 		: 'en-US';
-	setLanguageTag(event.locals.locale);
-	const theme = ['dark', 'light'].includes(cookies.theme) ? cookies.theme : 'default';
+	setLocale(event.locals.locale as typeof locales[number]);
+	const theme = ['dark', 'light'].includes(cookies.theme ?? '') ? cookies.theme : 'default';
 
-	const response = await resolve(event);
+	const response = await resolve(event, {
+		transformPageChunk: ({ html }) => html.replace('%lang%', event.locals.locale)
+	});
 
 	if (!cookies.theme)
 		response.headers.append(

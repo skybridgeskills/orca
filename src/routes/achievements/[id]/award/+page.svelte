@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import * as m from '$lib/i18n/messages';
 	import Alert from '$lib/components/Alert.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
@@ -9,18 +11,22 @@
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
 
-	export let data: PageData;
-	export let form;
+	interface Props {
+		data: PageData;
+		form: any;
+	}
+
+	let { data, form = $bindable() }: Props = $props();
 	let endorsementJson: {
 		narrative?: string;
 		id?: string;
-	};
+	} = $state();
 
-	$: {
+	run(() => {
 		if (form) endorsementJson = JSON.parse(form?.endorsement?.json ?? '{}');
-	}
+	});
 
-	let awardNarrative = '';
+	let awardNarrative = $state('');
 
 	const breadcrumbItems = [
 		{ text: 'Home', href: '/' },
@@ -147,7 +153,7 @@
 					class="hidden"
 					placeholder={m.award_narrative_placeholder()}
 					bind:value={awardNarrative}
-				/>
+				></textarea>
 				<MarkdownEditor bind:value={awardNarrative} />
 			</div>
 			<div class="mb-6">

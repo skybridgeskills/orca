@@ -5,7 +5,11 @@
   import AchievementForm from "$lib/partials/AchievementForm.svelte";
   import Heading from "$lib/components/Heading.svelte";
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
   const categories = data.categories;
 
   let formData = {

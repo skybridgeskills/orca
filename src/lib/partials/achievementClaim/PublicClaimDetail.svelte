@@ -11,12 +11,16 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import AchievementCriteria from '../achievement/AchievementCriteria.svelte';
 
-	export let existingBadgeClaim: AchievementClaim & {
+	interface Props {
+		existingBadgeClaim: AchievementClaim & {
 		achievement: Achievement & {
 			organization: Organization;
 			category: AchievementCategory | null;
 		};
 	};
+	}
+
+	let { existingBadgeClaim }: Props = $props();
 </script>
 
 <Heading level="h1" title={`${m.earnedBadge()}: ${existingBadgeClaim.achievement.name}`} />

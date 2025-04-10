@@ -7,14 +7,33 @@
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { createEventDispatcher } from 'svelte';
 
-	export let achievement: Achievement;
-	export let linkAchievement = true;
-	export let achievementHref = '';
-	export let claim: AchievementClaim | null = null;
-	export let href = '';
-	export let imageSize: '16' | '32' = '32'; // Tailwind width https://tailwindcss.com/docs/width
-	export let isClickable = false;
-	export let disabled = false;
+	interface Props {
+		achievement: Achievement;
+		linkAchievement?: boolean;
+		achievementHref?: string;
+		claim?: AchievementClaim | null;
+		href?: string;
+		imageSize?: '16' | '32'; // Tailwind width https://tailwindcss.com/docs/width
+		isClickable?: boolean;
+		disabled?: boolean;
+		image?: import('svelte').Snippet;
+		moredescription?: import('svelte').Snippet;
+		actions?: import('svelte').Snippet;
+	}
+
+	let {
+		achievement,
+		linkAchievement = true,
+		achievementHref = '',
+		claim = null,
+		href = '',
+		imageSize = '32',
+		isClickable = false,
+		disabled = false,
+		image,
+		moredescription,
+		actions
+	}: Props = $props();
 
 	const dispatcher = createEventDispatcher();
 </script>
@@ -22,7 +41,7 @@
 <svelte:element
 	this={!!href ? 'a' : 'section'}
 	href={href || undefined}
-	on:click={() => {
+	onclick={() => {
 		if (isClickable) dispatcher('click');
 	}}
 	role={isClickable ? 'button' : 'listitem'}
@@ -43,7 +62,7 @@
 
 	<div class="flex flex-col sm:flex-row gap-4">
 		<!-- Image -->
-		<slot name="image">
+		{#if image}{@render image()}{:else}
 			{#if achievement.image}
 				<img
 					src={imageUrl(achievement.image)}
@@ -62,7 +81,7 @@
 					<Ribbon />
 				</div>
 			{/if}
-		</slot>
+		{/if}
 		<div>
 			<!-- Name -->
 
@@ -90,10 +109,10 @@
 					{achievement.description}
 				</p>
 			{/if}
-			<slot name="moredescription" />
+			{@render moredescription?.()}
 		</div>
 	</div>
 	<div class="absolute bottom-0 right-2">
-		<slot name="actions" />
+		{@render actions?.()}
 	</div>
 </svelte:element>

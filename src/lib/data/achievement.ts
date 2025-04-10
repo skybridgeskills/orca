@@ -1,7 +1,7 @@
 import * as m from '$lib/i18n/messages';
 import { error } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
-import {
+import type {
 	Achievement,
 	AchievementClaim,
 	ClaimEndorsement,

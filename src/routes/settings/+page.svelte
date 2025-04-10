@@ -4,7 +4,11 @@
   import ButtonGroup from "$lib/components/ButtonGroup.svelte";
   import Heading from "$lib/components/Heading.svelte";
   import type { ActionData, PageData } from "./$types";
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
   const noErrors: { [key: string]: string | null } = {
     givenName: null,
     familyName: null,
@@ -12,14 +16,14 @@
     defaultVisibility: null,
   };
   let errors = { ...noErrors };
-  let formData = {
+  let formData = $state({
     givenName: data.session?.user?.givenName ?? "",
     familyName: data.session?.user?.familyName ?? "",
     identifierVisibility:
       data.session?.user?.identifiers.find((a) => true)?.visibility ??
       "COMMUNITY",
     defaultVisibility: data.session?.user?.defaultVisibility ?? "COMMUNITY",
-  };
+  });
 </script>
 
 <h1 class="text-xl sm:text-2xl mb-3 dark:text-white">
