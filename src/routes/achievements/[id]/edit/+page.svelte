@@ -6,7 +6,7 @@
 	import { imageExtension } from '$lib/utils/imageUrl';
 
 	// export let form: ActionData;
-	export let data: PageData & { achievement: { achievementConfig: App.AchievementConfigWithJson } };
+	export let data: PageData;
 	const categories = data.categories;
 
 	let formData = {
