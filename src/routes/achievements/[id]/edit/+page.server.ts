@@ -1,8 +1,8 @@
 import * as m from '$lib/i18n/messages';
-import type { PageServerLoad, Actions } from './$types';
+import type { Actions } from './$types';
 import { error, fail, json, redirect } from '@sveltejs/kit';
 import { prisma } from '../../../../prisma/client';
-import { Prisma } from '@prisma/client';
+import { Achievement, Prisma } from '@prisma/client';
 import stripTags from '../../../../lib/utils/stripTags';
 import { ValidationError } from 'yup';
 import { achievementFormSchema } from '$lib/data/achievementForm';
@@ -26,7 +26,7 @@ interface AchievementConfigForm {
 	};
 }
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+export const load = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't have permission to edit achievements
 	if (!locals.session?.user?.id) {
 		throw redirect(302, `/achievements/${params.id}`);
@@ -47,16 +47,15 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		throw redirect(302, `/achievements/${params.id}`);
 	}
 
-	const achievement = await prisma.achievement.findFirstOrThrow({
+	const achievement = (await prisma.achievement.findFirstOrThrow({
 		where: {
 			id: params.id,
 			organizationId: locals.org.id
 		},
 		include: {
-			category: true,
 			achievementConfig: true
 		}
-	});
+	})) as Achievement & { achievementConfig?: App.AchievementConfig };
 
 	const categories = await prisma.achievementCategory.findMany({
 		where: {
