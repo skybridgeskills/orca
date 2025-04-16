@@ -166,7 +166,7 @@
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>
-	<div class="flex flex-col sm:flex-row gap-4 flex-grow">
+	<div class="flex flex-col sm:flex-row gap-4 flex-grow max-w-4xl">
 		<!-- Image -->
 		<div class="sm:w-5/12">
 			<div class:isError={errors.image}>
@@ -221,7 +221,7 @@
 					name="description"
 					rows="4"
 					class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-					placeholder="A learning process that is created and molded by the learner..."
+					placeholder={m.dark_major_goat_support()}
 					bind:value={formData.description}
 				/>
 				{#if errors.description}
@@ -257,7 +257,7 @@
 		</div>
 	</div>
 
-	<div class="max-w-2xl space-y-6">
+	<div class="max-w-4xl space-y-6">
 		<!-- Criteria -->
 
 		<Heading title={m.criteria()} description={m.criteria_description()} level="h3" />
@@ -540,6 +540,9 @@
 		<CollapsiblePane title={m.weary_legal_crossbill_approve()}>
 			<div class="flex flex-col gap-3">
 				<!-- Claim Template -->
+				<p>
+					{m.funny_warm_panther_intend()}
+				</p>
 				<div class:isError={errors.claimTemplate}>
 					<FormFieldLabel for="claimTemplate">Claim Template</FormFieldLabel>
 					<div class="mb-6">
