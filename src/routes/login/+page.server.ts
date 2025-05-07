@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	// redirect user if logged in
 	if (locals.session) {
-		throw redirect(302, '/');
+		throw redirect(302, nextPath ?? '/');
 	}
 
 	const inviteId = url.searchParams.get('i');
