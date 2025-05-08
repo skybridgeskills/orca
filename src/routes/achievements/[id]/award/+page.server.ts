@@ -58,6 +58,6 @@ export const actions = {
 			} as App.EvidenceItem)
 		};
 		const result = await inviteToClaim(claimData);
-		return result;
+		return result.data;
 	}
 } satisfies Actions;
