@@ -1,6 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import StatusTag from '$lib/components/StatusTag.svelte';
+
+	import FaSolidTrash from 'svelte-icons-pack/fa/FaSolidTrash.js';
 	import Button from '$lib/components/Button.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Tabs from '$lib/components/Tabs.svelte';
@@ -9,6 +11,8 @@
 	import type { AchievementClaim, ClaimEndorsement, User } from '@prisma/client';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
+	import IconButton from '$lib/components/IconButton.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	type AchievementClaimTableData = AchievementClaim & {
 		user: User;
@@ -27,6 +31,8 @@
 	let inviteCount: number | undefined = undefined;
 	let category: 'AchievementClaim' | 'ClaimEndorsement' = 'AchievementClaim';
 	let loading = true;
+	let deleteModalVisible = false;
+	let inviteToDelete: (ClaimEndorsement & { creator: User }) | null = null;
 
 	const session: App.SessionData | undefined = getContext('session');
 	const achievementId: string = getContext('achievementId');
@@ -83,6 +89,45 @@
 			}
 		}
 	];
+
+	const showDeleteModal = (invite: ClaimEndorsement & { creator: User }) => {
+		inviteToDelete = invite;
+		deleteModalVisible = true;
+	};
+
+	const closeDeleteModal = () => {
+		deleteModalVisible = false;
+		inviteToDelete = null;
+	};
+
+	const deleteInvite = async () => {
+		if (!inviteToDelete) return;
+
+		try {
+			const res = await fetch(
+				`/api/v1/achievements/${achievementId}/invites/${inviteToDelete.id}`,
+				{
+					method: 'DELETE'
+				}
+			);
+
+			if (!res.ok) {
+				const errorBody = await res.json();
+				notifications.add(
+					new Notification(errorBody.message || 'Error deleting invite', false, 'error')
+				);
+				return;
+			}
+
+			notifications.add(new Notification('Invite deleted successfully', true, 'success'));
+			// Refresh the data after successful deletion
+			getData(page);
+		} catch (err) {
+			notifications.add(new Notification('Error deleting invite', false, 'error'));
+		} finally {
+			closeDeleteModal();
+		}
+	};
 
 	onMount(() => {
 		if (totalCount === 0) {
@@ -192,17 +237,28 @@
 								{invite.inviteeEmail}
 							</th>
 							<td class="px-6 py-4">
-								<a href="/members/{invite.creatorId}" class="hover:underline">
-									{invite.creator?.givenName}
-									{invite.creator?.familyName}
-								</a>
+								{#if invite.creator}
+									<a href="/members/{invite.creatorId}" class="hover:underline">
+										{invite.creator?.givenName ?? ''}
+										{invite.creator?.familyName ?? ''}
+									</a>
+								{/if}
 								{#if session?.user?.id == invite.creatorId}({m.me()}){/if}
+								{#if !invite.creator}{m.silly_patchy_anaconda_fry()}{/if}
 							</td>
 							<td class="px-6 py-4">
 								{invite.createdAt}
 							</td>
 							<td class="px-6 py-4">
-								<!-- no actions available -->
+								{#if session?.user?.id === invite.creatorId}
+									<IconButton
+										id="trash-button"
+										src={FaSolidTrash}
+										text={m.wide_acidic_racoon_read()}
+										size="16"
+										on:click={() => showDeleteModal(invite)}
+									/>
+								{/if}
 							</td>
 						</tr>
 					{/each}
@@ -218,3 +274,29 @@
 		{/if}
 	</div>
 {/if}
+
+<!-- Delete confirmation modal -->
+<Modal
+	visible={deleteModalVisible}
+	title="Delete Invite"
+	on:close={closeDeleteModal}
+	actions={[
+		{
+			label: 'Cancel',
+			submodule: 'secondary',
+			onClick: closeDeleteModal
+		},
+		{
+			label: 'Delete',
+			submodule: 'danger',
+			onClick: deleteInvite
+		}
+	]}
+>
+	<p>
+		{m.shy_dry_dingo_emerge()} <strong>{inviteToDelete?.inviteeEmail}</strong>?
+	</p>
+	<p class="text-sm text-gray-500 mt-2">
+		{m.curly_early_mouse_feel()}
+	</p>
+</Modal>
