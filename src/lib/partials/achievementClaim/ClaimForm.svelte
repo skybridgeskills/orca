@@ -1,11 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import type {
-		Achievement,
-		AchievementClaim,
-		AchievementConfig,
-		Identifier
-	} from '@prisma/client';
+	import type { Achievement, AchievementClaim, Identifier } from '@prisma/client';
 	import { session } from '$lib/stores/sessionStore';
 	import {
 		claimEmail,
@@ -23,10 +18,9 @@
 	import Button from '$lib/components/Button.svelte';
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
-
 	export let existingBadgeClaim: AchievementClaim | null = null;
 	export let achievement: Achievement;
-	export let achievementConfig: AchievementConfig | null = null;
+	export let achievementConfig: App.AchievementConfig | null = null;
 	export let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
 	const userIdentifiers: Identifier[] = $page.data.user?.identifiers || [];
 	const userEmails = userIdentifiers.filter((iden) => iden.type == 'EMAIL');
@@ -90,13 +84,14 @@
 			maybeSubmit();
 		}
 
-		if (existingBadgeClaim && !$claimNarrative && !$claimUrl) {
+		if (existingBadgeClaim) {
 			const claimJson = JSON.parse(existingBadgeClaim.json?.toString() || '{}') || {};
 
-			$claimNarrative = claimJson.narrative || '';
-			$claimUrl = claimJson.id || '';
+			// Priority: Existing claim narrative, template narrative, or empty string
+			$claimNarrative = claimJson.narrative || achievementConfig?.json?.claimTemplate || '';
+			$claimUrl = claimJson.id ?? '';
 		} else if (!existingBadgeClaim && !$claimPending) {
-			$claimNarrative = '';
+			$claimNarrative = achievementConfig?.json?.claimTemplate ?? '';
 			$claimUrl = '';
 		}
 	});

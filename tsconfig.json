@@ -24,6 +24,7 @@
 		".svelte-kit/ambient.d.ts",
 		".svelte-kit/types/**/$types.d.ts",
 		"types/**/*.d.ts",
+		"src/**/*.d.ts",
 		"vite.config.ts",
 		"src/**/*.js",
 		"src/**/*.ts",

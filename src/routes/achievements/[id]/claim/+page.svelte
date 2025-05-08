@@ -11,13 +11,7 @@
 	import type { Achievement, AchievementConfig } from '@prisma/client';
 
 	export let data: PageData;
-	const config = data.achievement.achievementConfig as
-		| undefined
-		| (AchievementConfig &
-				App.AchievementConfigWithJson & {
-					claimRequires: undefined | Achievement;
-					reviewRequires: undefined | Achievement;
-				});
+	const config = data.achievement.achievementConfig;
 
 	onMount(() => {
 		if (data.inviteId) $inviteId = data.inviteId;

@@ -61,19 +61,21 @@
 					<p class="text-xs text-gray-500 dark:text-gray-400">SVG or PNG (MAX. 800x800px)</p>
 				</div>
 			{:else}
-				<div class="relative flex flex-col justify-center items-center pt-5 pb-6">
+				<div
+					class="relative flex flex-row sm:flex-col justify-center items-center pt-5 pb-6 max-w-full max-h-full"
+				>
 					<img
 						src={imageUrl(currentValue)}
-						width="70%"
-						height="auto"
 						role="presentation"
 						alt="Org Logo"
-						class="p-3 rounded-md"
+						class="p-3 rounded-md max-w-[80%] max-h-64 object-contain"
 					/>
-					<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-						<span class="font-semibold">Click to replace</span> or drag and drop
-					</p>
-					<p class="text-xs text-gray-500 dark:text-gray-400">SVG or PNG (MAX. 800x800px)</p>
+					<div class="p-1">
+						<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+							<span class="font-semibold">Click to replace</span> or drag and drop
+						</p>
+						<p class="text-xs text-gray-500 dark:text-gray-400">SVG or PNG (MAX. 800x800px)</p>
+					</div>
 
 					<div class="text-xs text-gray-500 dark:text-gray-400 absolute top-7 right-4">
 						<button on:click|stopPropagation={handleClearImage}>Clear</button>

@@ -60,7 +60,8 @@ export const actions: Actions = {
 			reviewsRequired: parseInt(requestData.get('reviewsRequired')?.toString() || '') || 0,
 			reviewableSelectedOption: requestData.get('reviewableSelectedOption')?.toString() || 'none',
 			capabilities_inviteRequires:
-				requestData.get('capabilities_inviteRequires')?.toString() || null
+				requestData.get('capabilities_inviteRequires')?.toString() || null,
+			claimTemplate: stripTags(requestData.get('claimTemplate')?.toString())
 		};
 
 		try {
@@ -110,7 +111,8 @@ export const actions: Actions = {
 					json: {
 						capabilities: {
 							inviteRequires: formData.capabilities_inviteRequires
-						}
+						},
+						claimTemplate: formData.claimTemplate
 					}
 				}
 			}
