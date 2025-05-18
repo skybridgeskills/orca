@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url, request, params, locals }) => {
 			type: 'Achievement',
 			getTotalCount: () =>
 				prisma.achievementClaim.count({
-					where: { organizationId: locals.org.id, userId: locals.session.user.id }
+					where: { organizationId: locals.org.id, userId: locals.session?.user?.id }
 				}),
 			page,
 			pageSize,
