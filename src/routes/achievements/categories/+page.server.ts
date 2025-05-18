@@ -50,7 +50,7 @@ export const actions: Actions = {
 		// Can only search by unique inputs on update, so verify first this category is in this org
 		const existingCategory = await prisma.achievementCategory.findFirstOrThrow({
 			where: {
-				organization: locals.org,
+				organizationId: locals.org.id,
 				id: categoryId
 			}
 		});
@@ -76,7 +76,7 @@ export const actions: Actions = {
 		// Can only search by unique inputs on update, so verify first this category is in this org
 		const existingCategory = await prisma.achievementCategory.findFirstOrThrow({
 			where: {
-				organization: locals.org,
+				organizationId: locals.org.id,
 				id: categoryId
 			}
 		});
