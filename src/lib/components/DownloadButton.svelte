@@ -27,5 +27,6 @@
 	};
 </script>
 
-<Button {id} {buttonType} {submodule} {...moreProps} onClick={download} class={klass}>{text}</Button
+<Button {id} {buttonType} {submodule} {...moreProps} on:click={download} class={klass}
+	>{text}</Button
 >
