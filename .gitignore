@@ -17,3 +17,4 @@ src/**/*.js.map
 /test-results/
 /playwright-report/
 /playwright/.cache/
+project.inlang

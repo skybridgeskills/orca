@@ -83,6 +83,8 @@ export const actions: Actions = {
 			}
 		}
 
+		type AchievementInput = Prisma.AchievementCreateInput;
+
 		const achievementData = {
 			id: newIdentifier,
 			identifier: `urn:uuid:${newIdentifier}`,

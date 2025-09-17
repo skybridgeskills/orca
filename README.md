@@ -34,7 +34,7 @@ Prerequisites:
 - NodeJS (`lts/hydrogen` v18.x), NPM
 - A Postgres database which can be run locally on one of 2 ways:
   - Install PostgreSQL ([How to](https://www.moncefbelyamani.com/how-to-install-postgresql-on-a-mac-with-homebrew-and-lunchy/) install PostgreSQL on a Mac with Homebrew)
-  - Install Docker (https://www.docker.com/products/docker-desktop/) and use the provided docker compose
+  - Install Docker (https://www.docker.com/products/docker-v-desktop/) and use the provided docker compose
 
 Optional, but helpful enhancements:
 
