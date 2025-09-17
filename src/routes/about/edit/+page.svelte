@@ -84,6 +84,7 @@
 
 		const response = await fetch($page.url, { method: 'POST', body: formsData });
 		const result = deserialize(await response.text());
+		
 		switch (result.type) {
 			case 'failure':
 			// fall through to success block
