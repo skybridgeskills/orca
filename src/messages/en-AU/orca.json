@@ -276,6 +276,7 @@
 	"achievementConfig_inviteREquiresCrossValidationMessage": "A badge must be selected if review by invite is required.",
 	"achievementConfig_inviteRequiredGeneric": "This achievement is only awardable by invitation.",
 	"claimConfiguration_inviteRequiresDescription": "Invitations to claim may be made by holders of:",
+	"topical_clear_gadfly_gaze": "passkey created",
 	"authentication_couldNotLogIn": "Could not log in.",
 	"bad_bold_shrimp_express": "Date",
 	"tense_raw_cuckoo_dart": "You may not invite others to claim this achievement, because your qualifying badge is not yet valid.",

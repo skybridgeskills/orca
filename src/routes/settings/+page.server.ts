@@ -100,21 +100,20 @@ export const actions: Actions = {
 	},
 
 	//hm: cant delete off of device for security reasons
-	deletePasskey: async ({ locals, cookies, request, params }) => {
+//	deletePasskey: async ({ locals, cookies, request, params }) => {
+	// 	const requestData = await request.formData();
+	// 	const createPasskey = requestData.get('newPasskey')?.toString() ?? "";
 
-		const requestData = await request.formData();
-		const createPasskey = requestData.get('newPasskey')?.toString() ?? "";
-
-		let data: any = 9
-		const passkeyDeleted = await prisma.passkey.delete({
-			 where: {
-				id: "bc7787a7-702d-42e4-8fad-27424fad2b8a"
-			 }
+	// 	let data: any = 9
+	// 	const passkeyDeleted = await prisma.passkey.delete({
+	// 		 where: {
+	// 			id: "bc7787a7-702d-42e4-8fad-27424fad2b8a"
+	// 		 }
 			
-			})
-			return { 
-				success: true, 
-				passkey: passkeyDeleted
-			};
-	}
+	// 		})
+	// 		return { 
+	// 			success: true, 
+	// 			passkey: passkeyDeleted
+	// 		};
+	// }
 };
