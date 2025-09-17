@@ -12,7 +12,9 @@
 	import { Data } from 'ws';
 	import { submitCTA } from '$lib/i18n/messages';
 	import { tick } from 'svelte';
-
+	import { notifications, Notification } from '$lib/stores/notificationStore';
+	import * as m from '$lib/i18n/messages';
+	
 	export let data: PageData;
 
 	const noErrors: { [key: string]: string | null } = {
@@ -125,6 +127,10 @@
 				if (form) {
 					await tick();
 					form.submit();
+				}
+
+				if(userVerified) {
+					notifications.addNotification(new Notification(m.topical_clear_gadfly_gaze(), true, 'success'))
 				}
 
 				passkeyGenerating = false;
@@ -336,12 +342,11 @@
 	actions={[]}
 >
 
-	<form id="newPassKeyForm" action="?/deletePasskey" method="POST" use:enhance>
+
 	<Button buttonType="button" on:click={() => deletePasskeyHelper()} submodule="primary"
 		>Yes, I'm sure</Button
 	>
 	<Button buttonType="button" on:click={() => (delKey = false)} submodule="primary">No, take me back</Button>
-	</form>
 </Modal>
 
 <Modal
@@ -366,6 +371,7 @@
 			<p class=" -mt-5 mb-6 text-sm text-gray-500 dark:text-gray-400 max-w-prose p-6">
 				Your passkey has been successfully generated. You can close this popup.
 			</p>
+
 		{:else}
 			<p class=" -mt-5 text-sm text-gray-500 dark:text-gray-400 max-w-prose p-6">
 				Your passkey could not be created. <br /> <br />{errorString}
