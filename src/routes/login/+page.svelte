@@ -9,6 +9,9 @@
 	import { nextPath, session } from '$lib/stores/sessionStore';
 	import Heading from '$lib/components/Heading.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
+	import { createAuthenticationOptionsForUser, verifyUserResponseAuth } from '$lib/utils/passkeys';
+	import { startAuthentication } from '@simplewebauthn/browser';
+	import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 
 	export let form: ActionData;
 	export let data: PageData;
@@ -66,6 +69,23 @@
 			update();
 		};
 	};
+
+
+	const loginWithPasskey = async() => {
+		const options = await createAuthenticationOptionsForUser()
+
+
+		const verifyRpID = options.rpId!
+		const challengeVerify = options.challenge
+
+		const optionsVerify = await verifyUserResponseAuth(verifyRpID, challengeVerify)
+		
+
+		startAuthentication()
+	
+		alert("clicked!")
+	}
+
 </script>
 
 <div
@@ -225,4 +245,8 @@
 			</div>
 		</form>
 	{/if}
+	<hr class="my-5">
+	<p class="my-4 text-sm text-gray-500 dark:text-gray-400 max-w-2xl">Log in with Passkey</p>
+	<Button on:click={loginWithPasskey} id="passkeyLogin" buttonType="button" text="Login with Passkey" />
 </div>
+

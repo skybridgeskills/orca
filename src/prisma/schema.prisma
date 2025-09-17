@@ -31,6 +31,8 @@ model Organization {
   userSessions          Session[]
   signingKeys           SigningKey[]
   users                 User[]
+
+  userPasskeys          Passkey[]
 }
 
 model User {
@@ -47,6 +49,7 @@ model User {
   identifiers               Identifier[]
   sessions                  Session[]
   organization              Organization            @relation(fields: [organizationId], references: [id])
+  passkeys                  Passkey[]
 }
 
 model Identifier {
@@ -61,6 +64,16 @@ model Identifier {
   user           User           @relation(fields: [userId], references: [id])
 
   @@unique([organizationId, identifier])
+}
+
+model Passkey {
+  id                String                  @id @default(uuid())
+  passkeyId         String                  @unique
+  json              Json                    @default("{}")
+  userId            String
+  user              User                    @relation(fields: [userId], references: [id])
+  organizationId    String
+  organization      Organization            @relation(fields: [organizationId], references: [id])
 }
 
 model Achievement {
