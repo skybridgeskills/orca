@@ -15,7 +15,7 @@
 	import { tick } from 'svelte';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
 	import * as m from '$lib/i18n/messages';
-	
+
 	export let data: PageData;
 
 	const noErrors: { [key: string]: string | null } = {
@@ -50,7 +50,8 @@
 		identifierVisibility:
 			data.session?.user?.identifiers.find((a) => true)?.visibility ?? 'COMMUNITY',
 		defaultVisibility: data.session?.user?.defaultVisibility ?? 'COMMUNITY',
-		newPasskey: ''
+		newPasskey: '',
+		delpasskeyID: ''
 	};
 
 	let modalTitle = '';
@@ -127,7 +128,7 @@
 
 				if (form) {
 					await tick();
-					form.submit();
+					form.requestSubmit();
 				}
 
 				if(userVerified) {
@@ -145,31 +146,24 @@
 	};
 	let errorMessage = '';
 
-	const addPasskey = () => {
-		finished = true;
-
-		return ({ result }: { result: ActionResult }) => {
-			if (result.type === 'error') errorMessage = result.error?.message;
-			else if (result.type === 'success' && result.data?.passkey) {
-				const data = result.data;
-				console.log(data);
-			} else {
-				alert("There's an issue: " + errorMessage);
-			}
-		};
-	};
-
 	let delKey = false;
 	let verifyDelete = false;
 
-	const deletePasskey = () => {
+	const deletePasskey = (passkey_id: string) => {
 		delKey = true;
-		
+		formData.delpasskeyID = passkey_id;
 	};
 
-	const deletePasskeyHelper = () => {
+	const deletePasskeyHelper = async () => {
+			
+		const form = document.getElementById('delPassKeyForm') as HTMLFormElement;
 
+		if (form) {
+			await tick();
+			form.requestSubmit();
+		}
 
+		formData.delpasskeyID = "";
 			alert('Passkey deleted');
 			verifyDelete = false;
 			delKey = false;
@@ -291,7 +285,7 @@
 								{passkeyJSON(passkey.json, 'timestamp')}
 							</td>
 							<td class="py-4">
-								<Button buttonType="button" on:click={() => deletePasskey()} submodule="secondary"
+								<Button buttonType="button" on:click={() => deletePasskey(passkey.id)} submodule="secondary"
 									>Delete</Button
 								>
 							</td>
@@ -342,10 +336,13 @@
 	actions={[]}
 >
 
+<form id="delPassKeyForm" action="?/deletePasskey" method="POST" use:enhance>
+	<Button buttonType="button" on:click={() => deletePasskeyHelper()} submodule="primary">
+		Yes, I'm sure
+	</Button>
+	<input id="settings_passkeydelete" name="delpasskeyID" bind:value={formData.delpasskeyID}/>
+</form>
 
-	<Button buttonType="button" on:click={() => deletePasskeyHelper()} submodule="primary"
-		>Yes, I'm sure</Button
-	>
 	<Button buttonType="button" on:click={() => (delKey = false)} submodule="primary">No, take me back</Button>
 </Modal>
 
@@ -358,7 +355,7 @@
 	}}
 	actions={[]}
 >
-	<form id="newPassKeyForm" action="?/savePasskey" method="POST" use:enhance>
+	<form id="newPassKeyForm" action="?/savePasskey" method="POST"  use:enhance>
 		<button type="submit" class="hidden" id="hiddenSubmit">Submit</button>
 		<input id="settings_passkeycreate" name="newPasskey" value={formData.newPasskey} />
 
