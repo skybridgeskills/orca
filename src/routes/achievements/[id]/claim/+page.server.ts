@@ -149,6 +149,16 @@ export const actions = {
 			if (reviewerClaims?.length >= numReviewsRequired) {
 				data.validFrom = new Date();
 			}
+		} else if (
+			achievement.achievementConfig?.reviewsRequired &&
+			achievement.achievementConfig.reviewsRequired > 0
+		) {
+			// Admin review required - check if current user is an admin
+			if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none')) {
+				// Current user is an admin, so they can make the claim immediately valid
+				data.validFrom = new Date();
+			}
+			// If not an admin, validFrom remains undefined (claim will need admin endorsement)
 		} else {
 			// If review is not required, claim becomes valid immediately.
 			data.validFrom = new Date();
