@@ -392,7 +392,11 @@
 					<AchievementSelect
 						badgeId={formData.reviewRequires}
 						on:unselected={() => {
-							formData.reviewableSelectedOption = 'none';
+							if (formData.reviewableSelectedOption == 'badge') {
+								// only unselect if something a badge selected
+								// not "admin"
+								formData.reviewableSelectedOption = 'none';
+							}
 							formData.reviewRequires = null;
 						}}
 						on:selected={(e) => {
