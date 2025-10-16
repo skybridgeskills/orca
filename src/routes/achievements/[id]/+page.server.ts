@@ -4,12 +4,25 @@ import type { ClaimEndorsement, User } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { canEditAchievements } from '$lib/server/permissions';
 
 export const load: PageServerLoad = async ({ url, params, locals }) => {
 	const achievementId = params.id;
 
-	// Don't include edit controls if not an admin
-	const editAchievementCapability = locals.session?.user?.orgRole == 'GENERAL_ADMIN';
+	// Check if user has permission to edit achievements
+	let editAchievementCapability = false;
+	if (locals.session?.user?.id) {
+		editAchievementCapability = await canEditAchievements({
+			user: {
+				id: locals.session.user.id,
+				orgRole: locals.session.user.orgRole
+			},
+			org: {
+				id: locals.org.id,
+				json: locals.org.json
+			}
+		});
+	}
 	const achievement = await prisma.achievement.findFirstOrThrow({
 		where: {
 			id: achievementId,
@@ -86,7 +99,7 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 };
 
 export const actions: Actions = {
-	delete: async ({ locals, cookies, params, request }) => {
+	delete: async ({ locals, params }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
 			throw error(403, m.error_unauthorized());
 
@@ -129,13 +142,30 @@ export const actions: Actions = {
 			}
 		});
 
+		// Clean up organization permissions that reference this achievement
+		let orgPermissionCleanup = undefined;
+		// Check if the org's permissions point to this achievement
+		if (
+			locals.org?.json?.permissions?.editAchievementCapability?.requiresAchievement === params.id
+		) {
+			const newJson = JSON.parse(JSON.stringify(locals.org.json)) as App.OrganizationConfig;
+			if (newJson.permissions && newJson.permissions.editAchievementCapability) {
+				newJson.permissions.editAchievementCapability.requiresAchievement = null;
+			}
+			orgPermissionCleanup = prisma.organization.update({
+				where: { id: locals.org.id },
+				data: { json: newJson }
+			});
+		}
+
 		await prisma.$transaction([
 			configDelete,
 			requiredConfigDelete,
 			credentialsDelete,
 			achievementClaimsDelete,
 			claimEndorsementDelete,
-			achievementDelete
+			achievementDelete,
+			...(orgPermissionCleanup ? [orgPermissionCleanup] : [])
 		]);
 
 		throw redirect(303, '/achievements');

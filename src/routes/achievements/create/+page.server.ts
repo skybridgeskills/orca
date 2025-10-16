@@ -13,13 +13,30 @@ import { v4 as uuidv4 } from 'uuid';
 import { connect } from 'http2';
 import { getUploadUrl } from '$lib/server/media';
 import { getAchievement } from '$lib/data/achievement';
+import { canEditAchievements } from '$lib/server/permissions';
 
 dotenv.config();
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// redirect user if logged out or doesn't hold org admin role
-	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
+	// redirect user if logged out or doesn't have permission to create achievements
+	if (!locals.session?.user?.id) {
 		throw redirect(302, '/achievements');
+	}
+
+	const hasPermission = await canEditAchievements({
+		user: {
+			id: locals.session.user.id,
+			orgRole: locals.session.user.orgRole
+		},
+		org: {
+			id: locals.org.id,
+			json: locals.org.json
+		}
+	});
+
+	if (!hasPermission) {
+		throw redirect(302, '/achievements');
+	}
 
 	const categories = await prisma.achievementCategory.findMany({
 		where: {
@@ -38,8 +55,24 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
+		if (!locals.session?.user?.id) {
 			throw error(403, m.error_unauthorized());
+		}
+
+		const hasPermission = await canEditAchievements({
+			user: {
+				id: locals.session.user.id,
+				orgRole: locals.session.user.orgRole
+			},
+			org: {
+				id: locals.org.id,
+				json: locals.org.json
+			}
+		});
+
+		if (!hasPermission) {
+			throw error(403, m.error_unauthorized());
+		}
 
 		const newIdentifier = uuidv4();
 		const requestData = await request.formData();

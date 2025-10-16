@@ -9,6 +9,7 @@ import { achievementFormSchema } from '$lib/data/achievementForm';
 import { getUploadUrl } from '$lib/server/media';
 import { v4 as uuidv4 } from 'uuid';
 import { getAchievement } from '$lib/data/achievement';
+import { canEditAchievements } from '$lib/server/permissions';
 
 interface AchievementConfigForm {
 	claimable: boolean;
@@ -25,9 +26,25 @@ interface AchievementConfigForm {
 }
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	// redirect user if logged out or doesn't hold org admin role
-	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
+	// redirect user if logged out or doesn't have permission to edit achievements
+	if (!locals.session?.user?.id) {
 		throw redirect(302, `/achievements/${params.id}`);
+	}
+
+	const hasPermission = await canEditAchievements({
+		user: {
+			id: locals.session.user.id,
+			orgRole: locals.session.user.orgRole
+		},
+		org: {
+			id: locals.org.id,
+			json: locals.org.json
+		}
+	});
+
+	if (!hasPermission) {
+		throw redirect(302, `/achievements/${params.id}`);
+	}
 
 	const achievement = await prisma.achievement.findFirstOrThrow({
 		where: {
@@ -58,8 +75,24 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 export const actions: Actions = {
 	default: async ({ locals, cookies, request, params }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
+		if (!locals.session?.user?.id) {
 			throw error(403, m.error_unauthorized());
+		}
+
+		const hasPermission = await canEditAchievements({
+			user: {
+				id: locals.session.user.id,
+				orgRole: locals.session.user.orgRole
+			},
+			org: {
+				id: locals.org.id,
+				json: locals.org.json
+			}
+		});
+
+		if (!hasPermission) {
+			throw error(403, m.error_unauthorized());
+		}
 
 		const requestData = await request.formData();
 		const imageUpdated = requestData.get('imageEdited') === 'true';

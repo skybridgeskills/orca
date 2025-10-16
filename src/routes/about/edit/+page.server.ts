@@ -42,18 +42,47 @@ export const actions: Actions = {
 			if (err instanceof ValidationError) throw error(400, err.message);
 		}
 
-		// Get the tagline from the form data
+		// Get the tagline and permissions from the form data
 		const tagline = stripTags(requestData.get('tagline')?.toString() || '');
+		const editAchievementCapability = requestData.get('editAchievementCapability')?.toString();
+		const editAchievementRequires = requestData.get('editAchievementRequires')?.toString();
 
 		// Parse the current json object
 		const jsonData: App.OrganizationConfig =
 			typeof locals.org?.json === 'string' ? JSON.parse(locals.org.json) : locals.org?.json || {};
 
-		// Update the json object with the new tagline
+		// Update the json object with the new tagline and permissions
 		const updatedJson: App.OrganizationConfig = {
 			...jsonData,
 			tagline: tagline
 		};
+
+		// Handle edit achievement capability permissions
+		if (editAchievementCapability === 'achievement' && editAchievementRequires) {
+			// Validate that the achievement exists in this organization
+			const achievement = await prisma.achievement.findFirst({
+				where: {
+					id: editAchievementRequires,
+					organizationId: locals.org.id
+				}
+			});
+
+			if (!achievement) {
+				throw error(400, 'Selected achievement does not exist in this organization');
+			}
+
+			updatedJson.permissions = {
+				...updatedJson.permissions,
+				editAchievementCapability: {
+					requiresAchievement: editAchievementRequires
+				}
+			};
+		} else {
+			// Clear the permission setting (default to admins only)
+			if (updatedJson.permissions?.editAchievementCapability) {
+				delete updatedJson.permissions.editAchievementCapability;
+			}
+		}
 
 		await prisma.organization.update({
 			where: {

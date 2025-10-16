@@ -55,7 +55,7 @@
 
 <Heading title={m.achievement_other()} description={m.achievements_description()} />
 
-{#if $session?.user?.orgRole}
+{#if data.editAchievementCapability}
 	<div class="flex items-center mb-9">
 		<Button href="/achievements/create" text={m.createNewCTA()} />
 		<Button href="/achievements/categories" text={m.categories_editCTA()} submodule="secondary" />
