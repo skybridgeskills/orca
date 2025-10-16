@@ -1,9 +1,23 @@
 import { prisma } from '../../prisma/client';
 import type { PageServerLoad } from './$types';
+import { canEditAchievements } from '$lib/server/permissions';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	// Don't include edit controls if not an admin
-	let editAchievementCapability = locals.session?.user?.orgRole == 'GENERAL_ADMIN';
+	// Check if user has permission to edit achievements
+	let editAchievementCapability = false;
+	if (locals.session?.user?.id) {
+		editAchievementCapability = await canEditAchievements({
+			user: {
+				id: locals.session.user.id,
+				orgRole: locals.session.user.orgRole
+			},
+			org: {
+				id: locals.org.id,
+				json: locals.org.json
+			}
+		});
+	}
+
 	const achievements = await prisma.achievement.findMany({
 		where: {
 			organizationId: locals.org.id

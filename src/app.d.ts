@@ -25,6 +25,11 @@ declare namespace App {
 
 	type OrganizationConfig = import('@prisma/client').Prisma.JsonObject & {
 		tagline?: string;
+		permissions?: {
+			editAchievementCapability?: {
+				requiresAchievement: string | null;
+			};
+		};
 	};
 	type Organization = import('@prisma/client').Organization & {
 		json: OrganizationConfig;

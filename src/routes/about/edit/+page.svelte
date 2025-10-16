@@ -9,6 +9,15 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { imageExtension } from '$lib/utils/imageUrl';
+	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
+	import RadioOption from '$lib/components/forms/RadioOption.svelte';
+	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
+	import {
+		achievements,
+		achievementsLoading,
+		fetchAchievements
+	} from '$lib/stores/achievementStore';
+	import { ensureLoaded } from '$lib/stores/common';
 
 	export let form: ActionData;
 	export let data: PageData;
@@ -20,7 +29,13 @@
 		primaryColor: data.org.primaryColor,
 		logo: data.org.logo,
 		imageExtension: data.org.logo ? imageExtension(data.org.logo) : null,
-		tagline: data.org.json?.tagline
+		tagline: data.org.json?.tagline,
+		editAchievementCapability: data.org.json?.permissions?.editAchievementCapability
+			?.requiresAchievement
+			? 'achievement'
+			: 'admin',
+		editAchievementRequires:
+			data.org.json?.permissions?.editAchievementCapability?.requiresAchievement || null
 	};
 	const noErrors: { [key: string]: string | null } = {
 		name: null,
@@ -28,7 +43,9 @@
 		url: null,
 		primaryColor: null,
 		logo: null,
-		tagline: null
+		tagline: null,
+		editAchievementCapability: null,
+		editAchievementRequires: null
 	};
 	let errors = { ...noErrors };
 
@@ -42,8 +59,10 @@
 				errors = { ...noErrors };
 				console.log(errors);
 				err.inner.map((err) => {
-					errors[err.path] = err.message;
-					errors = errors;
+					if (err.path) {
+						errors[err.path] = err.message;
+						errors = errors;
+					}
 				});
 			});
 	};
@@ -71,9 +90,9 @@
 			case 'success':
 				//read the upload url and put the image data to it.
 				if (formData['logo'] && result.data?.imageUploadUrl) {
-					const imageAsBlob = await (await fetch(formData['logo'])).blob();
+					const imageAsBlob = await (await fetch(formData['logo'] as string)).blob();
 					const contentType = `image/${formData['imageExtension'] === 'png' ? 'png' : 'svg+xml'}`;
-					await fetch(result.data.imageUploadUrl, {
+					await fetch(result.data.imageUploadUrl as string, {
 						method: 'PUT',
 						body: imageAsBlob,
 						headers: {
@@ -93,6 +112,10 @@
 			errors['name'] = result.status?.toString() || m.factual_agent_mantis_jump();
 		}
 	};
+
+	onMount(async () => {
+		await ensureLoaded(achievementsLoading, fetchAchievements);
+	});
 </script>
 
 <h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.org_editCTA()}</h1>
@@ -190,6 +213,78 @@
 				{errors.primaryColor}
 			</p>
 		{/if}
+	</div>
+
+	<!-- Permissions -->
+	<div class="mb-6">
+		<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Permissions</h3>
+		<div class:isError={errors.editAchievementCapability}>
+			<FormFieldLabel for="editAchievementCapability"
+				>Who can create and edit achievements?</FormFieldLabel
+			>
+			<input
+				type="hidden"
+				name="editAchievementCapability"
+				bind:value={formData.editAchievementCapability}
+			/>
+			<div class="space-y-2">
+				<RadioOption
+					bind:selectedOption={formData.editAchievementCapability}
+					value="admin"
+					name="editAchievementCapability"
+					label="Only administrators"
+					id="orgEdit_editAchievementCapability_admin"
+				/>
+				<RadioOption
+					bind:selectedOption={formData.editAchievementCapability}
+					value="achievement"
+					name="editAchievementCapability"
+					id="orgEdit_editAchievementCapability_achievement"
+				>
+					<span class="inline">Holders of this achievement:</span>
+					<AchievementSelect
+						badgeId={formData.editAchievementRequires || ''}
+						on:unselected={() => {
+							formData.editAchievementCapability = 'admin';
+							formData.editAchievementRequires = null;
+						}}
+						on:selected={(e) => {
+							formData.editAchievementRequires = e.detail;
+						}}
+						disabled={formData.editAchievementCapability != 'achievement'}
+						label=""
+						description=""
+						inputId="orgEdit_editAchievementRequires"
+						inputName="editAchievementRequires"
+						errorMessage={errors.editAchievementRequires || ''}
+					>
+						<span slot="invoker" class="inline" let:handler>
+							{#if !formData.editAchievementRequires}
+								<button
+									on:click|preventDefault={() => {
+										formData.editAchievementCapability = 'achievement';
+										handler();
+									}}
+									class={`font-medium${
+										formData.editAchievementCapability == 'achievement'
+											? ' underline hover:no-underline'
+											: 'text-gray-700 dark:text-gray-500 cursor-auto'
+									}`}
+									tabindex={formData.editAchievementCapability == 'achievement' ? 0 : -1}
+								>
+									Choose...
+								</button>
+							{/if}
+						</span>
+					</AchievementSelect>
+				</RadioOption>
+			</div>
+			{#if errors.editAchievementCapability}
+				<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+					{errors.editAchievementCapability}
+				</p>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Image -->
