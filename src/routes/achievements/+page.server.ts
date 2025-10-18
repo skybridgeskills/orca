@@ -3,9 +3,12 @@ import type { PageServerLoad } from './$types';
 import { canEditAchievements } from '$lib/server/permissions';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
+	
 	// Check if user has permission to edit achievements
 	let editAchievementCapability = false;
+	let editCategoriesCapability = false;
 	if (locals.session?.user?.id) {
+		editCategoriesCapability = (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session.user.orgRole || 'none')) 
 		editAchievementCapability = await canEditAchievements({
 			user: {
 				id: locals.session.user.id,
@@ -37,6 +40,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	return {
 		editAchievementCapability,
+		editCategoriesCapability,
 		achievements,
 		categories
 	};
