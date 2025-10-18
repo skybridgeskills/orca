@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-/** @type {import('vite').UserConfig} */
+
 export default defineConfig(({ mode }) => {
 	let plugins = [
 		sveltekit(),
@@ -32,6 +32,11 @@ export default defineConfig(({ mode }) => {
 		test: {
 			include: ['**/tests/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
 		},
-		plugins
+		plugins,
+		server: {
+			port: 5173,
+			host: '0.0.0.0',
+			allowedHosts: true
+		}
 	};
 });
