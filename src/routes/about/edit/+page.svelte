@@ -215,9 +215,31 @@
 		{/if}
 	</div>
 
+	<!-- Image -->
+	<div class="sm:w-5/12">
+		<div class:isError={errors.logo}>
+			<label
+				for="achievementEdit_image"
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.image()}</label
+			>
+			<ImageFileDrop
+				bind:currentValue={formData.logo}
+				bind:errorMessage={errors['logo']}
+				bind:imageExtension={formData.imageExtension}
+			/>
+			{#if errors.logo}
+				<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+					{errors.logo}
+				</p>{/if}
+		</div>
+	</div>
+
 	<!-- Permissions -->
 	<div class="mb-6">
 		<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Permissions</h3>
+		<p class="text-sm mb-2 text-gray-900">
+			You can authorize community members to perform some actions to manage the community.
+		</p>
 		<div class:isError={errors.editAchievementCapability}>
 			<FormFieldLabel for="editAchievementCapability"
 				>Who can create and edit achievements?</FormFieldLabel
@@ -252,8 +274,8 @@
 							formData.editAchievementRequires = e.detail;
 						}}
 						disabled={formData.editAchievementCapability != 'achievement'}
-						label=""
-						description=""
+						label="Select achievement"
+						description="Holders of this achievement will be able to create and edit achievements in the community."
 						inputId="orgEdit_editAchievementRequires"
 						inputName="editAchievementRequires"
 						errorMessage={errors.editAchievementRequires || ''}
@@ -284,25 +306,6 @@
 					{errors.editAchievementCapability}
 				</p>
 			{/if}
-		</div>
-	</div>
-
-	<!-- Image -->
-	<div class="sm:w-5/12">
-		<div class:isError={errors.logo}>
-			<label
-				for="achievementEdit_image"
-				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.image()}</label
-			>
-			<ImageFileDrop
-				bind:currentValue={formData.logo}
-				bind:errorMessage={errors['logo']}
-				bind:imageExtension={formData.imageExtension}
-			/>
-			{#if errors.logo}
-				<p class="mt-2 text-sm text-red-600 dark:text-red-500">
-					{errors.logo}
-				</p>{/if}
 		</div>
 	</div>
 
