@@ -143,7 +143,7 @@
 				href={invite
 					? `/achievements/${invite.achievementId}/claim?i=${invite.id}&e=${encodeURIComponent(
 							invite.inviteeEmail
-					  )}`
+						)}`
 					: `/achievements/${data.achievement.id}/claim`}
 				text={m.claimCTA()}
 				submodule="primary"
@@ -209,7 +209,7 @@
 						href={invite
 							? `/achievements/${data.achievement.id}/claim?i=${invite?.id}&e=${encodeURIComponent(
 									invite?.inviteeEmail
-							  )}`
+								)}`
 							: `/achievements/${data.achievement.id}/claim`}
 					>
 						<span class="sr-only">{m.claimCTA()}</span>
@@ -278,6 +278,15 @@
 		{/if}
 	</Heading>
 </div>
+
+{#if data.org.json?.permissions?.editAchievementCapability?.requiresAchievement}
+	<div class="mt-4 max-w-2xl">
+		<p class="text-smtext-gray-500 dark:text-gray-400">
+			People who hold this achievement have the permission to create and edit achievements in this
+			community.
+		</p>
+	</div>
+{/if}
 
 <!-- Criteria -->
 <div class="my-4 max-w-2xl">

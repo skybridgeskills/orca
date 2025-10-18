@@ -55,12 +55,14 @@
 
 <Heading title={m.achievement_other()} description={m.achievements_description()} />
 
-{#if data.editAchievementCapability}
-	<div class="flex items-center mb-9">
+<div class="flex items-center mb-9">
+	{#if data.editAchievementCapability}
 		<Button href="/achievements/create" text={m.createNewCTA()} />
+	{/if}
+	{#if data.editCategoriesCapability}
 		<Button href="/achievements/categories" text={m.categories_editCTA()} submodule="secondary" />
-	</div>
-{/if}
+	{/if}
+</div>
 
 {#if $achievementsLoading == LoadingStatus.NotStarted || $achievementsLoading == LoadingStatus.Loading}
 	<LoadingSpinner />
