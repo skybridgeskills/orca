@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	let editAchievementCapability = false;
 	let editCategoriesCapability = false;
 	if (locals.session?.user?.id) {
-		editCategoriesCapability = (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session.user.orgRole || 'none')) 
+		editCategoriesCapability = (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session.user.orgRole || 'none')); 
 		editAchievementCapability = await canEditAchievements({
 			user: {
 				id: locals.session.user.id,

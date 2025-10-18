@@ -281,7 +281,7 @@
 
 {#if data.org.json?.permissions?.editAchievementCapability?.requiresAchievement}
 	<div class="mt-4 max-w-2xl">
-		<p class="text-smtext-gray-500 dark:text-gray-400">
+		<p class="text-sm text-gray-500 dark:text-gray-400">
 			People who hold this achievement have the permission to create and edit achievements in this
 			community.
 		</p>
