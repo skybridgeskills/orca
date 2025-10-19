@@ -8,7 +8,7 @@
 	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
 
 	export let value: string;
-	export let inputName: string = 'criteriaNarrative';
+	export let inputName: string | undefined;
 	export let disabled: boolean = false;
 
 	const carta = new Carta({
@@ -55,7 +55,9 @@
 	class:pointer-events-none={disabled}
 >
 	<CartaEditor {carta} {labels} bind:value theme="default" mode="tabs" />
-	<input type="hidden" bind:value name={inputName} />
+	{#if inputName}
+		<input type="hidden" bind:value name={inputName} />
+	{/if}
 </div>
 
 <style lang="postcss" global>

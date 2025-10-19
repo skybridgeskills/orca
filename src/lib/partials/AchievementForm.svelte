@@ -95,6 +95,7 @@
 			return;
 		}
 		const formsData = new FormData(e.target as HTMLFormElement);
+		formsData.delete('md'); // Remove input added by Carta editor if present.
 
 		// see if the form data image is a dataURI, it is this in case of new file or one loaded from DB
 		const imageEdited =
@@ -102,10 +103,6 @@
 		formsData.append('imageEdited', `${imageEdited}`);
 
 		if (formData['imageExtension']) formsData.append('imageExtension', formData.imageExtension);
-
-		// Add claimTemplate and whether it's enabled
-		formsData.append('claimTemplate', formData.claimTemplate || '');
-		formsData.append('claimTemplate_enabled', formData.claimTemplate_enabled ? 'true' : 'false');
 
 		const response = await fetch($page.url, { method: 'POST', body: formsData });
 		const responseText = await response.text();
@@ -265,7 +262,7 @@
 
 		<Heading title={m.criteria()} description={m.criteria_description()} level="h3" />
 		<div class="mb-6" class:isError={errors.criteriaNarrative}>
-			<MarkdownEditor bind:value={formData.criteriaNarrative} />
+			<MarkdownEditor bind:value={formData.criteriaNarrative} inputName="criteriaNarrative" />
 
 			{#if errors.criteriaNarrative}
 				<p class="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -552,11 +549,11 @@
 				{/if}
 			</div>
 			<div slot="when-closed">
-				<input type="hidden" name="claimable" bind:value={formData.claimable} />
+				<input type="hidden" name="claimable" value={formData.claimable} />
 				<input
 					type="hidden"
 					name="claimableSelectedOption"
-					bind:value={formData.claimableSelectedOption}
+					value={formData.claimableSelectedOption}
 				/>
 				<input type="hidden" name="claimRequires" bind:value={formData.claimRequires} />
 
@@ -637,9 +634,17 @@
 			<div slot="button-extra">
 				{#if formData.claimTemplate_enabled}
 					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
-						Custom claim template enabled.
+						{m.early_house_bat_climb()}
 					</p>
 				{/if}
+			</div>
+			<div slot="when-closed">
+				<input
+					type="hidden"
+					name="claimTemplate_enabled"
+					value={!!formData.claimTemplate_enabled ? 'on' : 'off'}
+				/>
+				<input type="hidden" name="claimTemplate" value={formData.claimTemplate} />
 			</div>
 		</CollapsiblePane>
 		<!-- Submit/Cancel -->

@@ -74,7 +74,7 @@ export const load = async ({ locals, params }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, cookies, request, params }) => {
+	default: async ({ locals, request, params }) => {
 		if (!locals.session?.user?.id) {
 			throw error(403, m.error_unauthorized());
 		}
