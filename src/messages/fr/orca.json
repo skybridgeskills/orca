@@ -313,5 +313,9 @@
 	"bad_mad_jackdaw_tap": "En tant qu'administrateur, vous pouvez voir toutes les invitations en attente.",
 	"great_merry_boar_ascend": "Vous ne pouvez voir que les invitations que vous avez créées.",
 	"lucky_alert_penguin_fry": "Invitation non trouvée",
-	"red_teary_eagle_drip": "Vous n'êtes pas autorisé à supprimer cette invitation."
+	"red_teary_eagle_drip": "Vous n'êtes pas autorisé à supprimer cette invitation.",
+	"frail_kind_mule_enchant": "Invitation supprimée avec succès",
+	"bad_ok_jackdaw_link": "Erreur lors de la suppression de l'invitation",
+	"petty_tidy_pug_file": "Invitations",
+	"cuddly_antsy_rabbit_cook": "Demandes"
 }

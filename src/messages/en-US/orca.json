@@ -302,7 +302,6 @@
 	"elegant_free_cow_cherish": "What makes this community special is...",
 	"grand_tangy_cheetah_buy": "Tagline",
 	"moving_east_okapi_shrine": "Celebrate your skills in community.",
-	"top_fancy_trout_compose": "Award Details",
 	"wide_acidic_racoon_read": "Delete invite",
 	"silly_patchy_anaconda_fry": "n/a",
 	"shy_dry_dingo_emerge": "Are you sure you want to delete the invite sent to",
@@ -314,5 +313,9 @@
 	"bad_mad_jackdaw_tap": "As an admin, you can see all outstanding invites.",
 	"great_merry_boar_ascend": "You may only view invites that you created.",
 	"lucky_alert_penguin_fry": "Invite not found",
-	"red_teary_eagle_drip": "You are not authorized to delete this invite."
+	"red_teary_eagle_drip": "You are not authorized to delete this invite.",
+	"frail_kind_mule_enchant": "Invite deleted successfully",
+	"bad_ok_jackdaw_link": "Error deleting invite",
+	"cuddly_antsy_rabbit_cook": "Claims",
+	"petty_tidy_pug_file": "Invites"
 }

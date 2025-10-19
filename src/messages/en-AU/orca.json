@@ -313,5 +313,9 @@
 	"bad_mad_jackdaw_tap": "As an admin, you can see all outstanding invites.",
 	"great_merry_boar_ascend": "You m only view invites that you created.",
 	"lucky_alert_penguin_fry": "Invite not found",
-	"red_teary_eagle_drip": "You are not authorized to delete this invite."
+	"red_teary_eagle_drip": "You are not authorized to delete this invite.",
+	"frail_kind_mule_enchant": "Invite deleted successfully",
+	"bad_ok_jackdaw_link": "Error deleting invite",
+	"petty_tidy_pug_file": "Invites",
+	"cuddly_antsy_rabbit_cook": "Claims"
 }

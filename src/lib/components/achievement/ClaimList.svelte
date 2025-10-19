@@ -76,14 +76,14 @@
 	const tabItems = [
 		{
 			id: 'AchievementClaim',
-			name: 'Claims',
+			name: m.cuddly_antsy_rabbit_cook(),
 			onClick: () => {
 				setTab('AchievementClaim');
 			}
 		},
 		{
 			id: 'ClaimEndorsement',
-			name: 'Invites',
+			name: m.petty_tidy_pug_file(),
 			onClick: () => {
 				setTab('ClaimEndorsement');
 			}
@@ -114,16 +114,16 @@
 			if (!res.ok) {
 				const errorBody = await res.json();
 				notifications.add(
-					new Notification(errorBody.message || 'Error deleting invite', false, 'error')
+					new Notification(errorBody.message || m.bad_ok_jackdaw_link(), false, 'error')
 				);
 				return;
 			}
 
-			notifications.add(new Notification('Invite deleted successfully', true, 'success'));
+			notifications.add(new Notification(m.frail_kind_mule_enchant(), true, 'success'));
 			// Refresh the data after successful deletion
 			getData(page);
 		} catch (err) {
-			notifications.add(new Notification('Error deleting invite', false, 'error'));
+			notifications.add(new Notification(m.bad_ok_jackdaw_link(), false, 'error'));
 		} finally {
 			closeDeleteModal();
 		}

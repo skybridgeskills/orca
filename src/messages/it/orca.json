@@ -313,5 +313,9 @@
 	"bad_mad_jackdaw_tap": "Come amministratore puoi visualizzare tutti gli inviti in sospeso.",
 	"great_merry_boar_ascend": "Potresti vedere solo gli inviti che hai creato.",
 	"lucky_alert_penguin_fry": "Invito non trovato",
-	"red_teary_eagle_drip": "Non sei autorizzato a eliminare questo invito."
+	"red_teary_eagle_drip": "",
+	"frail_kind_mule_enchant": "Invito eliminato con successo",
+	"bad_ok_jackdaw_link": "Errore durante l'eliminazione dell'invito",
+	"petty_tidy_pug_file": "Inviti",
+	"cuddly_antsy_rabbit_cook": "Richieste"
 }
