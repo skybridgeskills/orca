@@ -1,6 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import StatusTag from '$lib/components/StatusTag.svelte';
+
+	import FaSolidTrash from 'svelte-icons-pack/fa/FaSolidTrash.js';
 	import Button from '$lib/components/Button.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Tabs from '$lib/components/Tabs.svelte';
@@ -9,6 +11,8 @@
 	import type { AchievementClaim, ClaimEndorsement, User } from '@prisma/client';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
+	import IconButton from '$lib/components/IconButton.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	type AchievementClaimTableData = AchievementClaim & {
 		user: User;
@@ -27,6 +31,8 @@
 	let inviteCount: number | undefined = undefined;
 	let category: 'AchievementClaim' | 'ClaimEndorsement' = 'AchievementClaim';
 	let loading = true;
+	let deleteModalVisible = false;
+	let inviteToDelete: (ClaimEndorsement & { creator: User }) | null = null;
 
 	const session: App.SessionData | undefined = getContext('session');
 	const achievementId: string = getContext('achievementId');
@@ -70,19 +76,58 @@
 	const tabItems = [
 		{
 			id: 'AchievementClaim',
-			name: 'Claims',
+			name: m.cuddly_antsy_rabbit_cook(),
 			onClick: () => {
 				setTab('AchievementClaim');
 			}
 		},
 		{
 			id: 'ClaimEndorsement',
-			name: 'Invites',
+			name: m.petty_tidy_pug_file(),
 			onClick: () => {
 				setTab('ClaimEndorsement');
 			}
 		}
 	];
+
+	const showDeleteModal = (invite: ClaimEndorsement & { creator: User }) => {
+		inviteToDelete = invite;
+		deleteModalVisible = true;
+	};
+
+	const closeDeleteModal = () => {
+		deleteModalVisible = false;
+		inviteToDelete = null;
+	};
+
+	const deleteInvite = async () => {
+		if (!inviteToDelete) return;
+
+		try {
+			const res = await fetch(
+				`/api/v1/achievements/${achievementId}/invites/${inviteToDelete.id}`,
+				{
+					method: 'DELETE'
+				}
+			);
+
+			if (!res.ok) {
+				const errorBody = await res.json();
+				notifications.add(
+					new Notification(errorBody.message || m.bad_ok_jackdaw_link(), false, 'error')
+				);
+				return;
+			}
+
+			notifications.add(new Notification(m.frail_kind_mule_enchant(), true, 'success'));
+			// Refresh the data after successful deletion
+			getData(page);
+		} catch (err) {
+			notifications.add(new Notification(m.bad_ok_jackdaw_link(), false, 'error'));
+		} finally {
+			closeDeleteModal();
+		}
+	};
 
 	onMount(() => {
 		if (totalCount === 0) {
@@ -176,8 +221,8 @@
 					class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
 				>
 					<tr>
-						<th scope="col" class="px-6 py-3"> Invited Email </th>
-						<th scope="col" class="px-6 py-3"> Invited By </th>
+						<th scope="col" class="px-6 py-3"> {m.tiny_stout_turtle_ask()} </th>
+						<th scope="col" class="px-6 py-3"> {m.sleek_true_oryx_spin()} </th>
 						<th scope="col" class="px-6 py-3"> {m.bad_bold_shrimp_express()} </th>
 						<th scope="col" class="px-6 py-3"> {m.action_other()} </th>
 					</tr>
@@ -192,24 +237,35 @@
 								{invite.inviteeEmail}
 							</th>
 							<td class="px-6 py-4">
-								<a href="/members/{invite.creatorId}" class="hover:underline">
-									{invite.creator?.givenName}
-									{invite.creator?.familyName}
-								</a>
+								{#if invite.creator}
+									<a href="/members/{invite.creatorId}" class="hover:underline">
+										{invite.creator?.givenName ?? ''}
+										{invite.creator?.familyName ?? ''}
+									</a>
+								{/if}
 								{#if session?.user?.id == invite.creatorId}({m.me()}){/if}
+								{#if !invite.creator}N/A{/if}
 							</td>
 							<td class="px-6 py-4">
 								{invite.createdAt}
 							</td>
 							<td class="px-6 py-4">
-								<!-- no actions available -->
+								{#if session?.user?.id === invite.creatorId || ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none')}
+									<IconButton
+										id="trash-button"
+										src={FaSolidTrash}
+										text={m.wide_acidic_racoon_read()}
+										size="16"
+										on:click={() => showDeleteModal(invite)}
+									/>
+								{/if}
 							</td>
 						</tr>
 					{/each}
 					{#if !outstandingInvites.length}
 						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 w-full">
 							<td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-								No outstanding invites.
+								{m.mellow_sea_hound_jest()}
 							</td>
 						</tr>
 					{/if}
@@ -218,3 +274,29 @@
 		{/if}
 	</div>
 {/if}
+
+<!-- Delete confirmation modal -->
+<Modal
+	visible={deleteModalVisible}
+	title={m.calm_weird_robin_startle()}
+	on:close={closeDeleteModal}
+	actions={[
+		{
+			label: m.cancelCTA(),
+			submodule: 'secondary',
+			onClick: closeDeleteModal
+		},
+		{
+			label: m.deleteCTA(),
+			submodule: 'danger',
+			onClick: deleteInvite
+		}
+	]}
+>
+	<p>
+		{m.shy_dry_dingo_emerge()} <strong>{inviteToDelete?.inviteeEmail}</strong>?
+	</p>
+	<p class="text-sm text-gray-500 mt-2">
+		{m.curly_early_mouse_feel()}
+	</p>
+</Modal>
