@@ -6,7 +6,7 @@
 	import { imageExtension } from '$lib/utils/imageUrl';
 
 	// export let form: ActionData;
-	export let data: PageData & { achievement: { achievementConfig: App.AchievementConfigWithJson } };
+	export let data: PageData;
 	const categories = data.categories;
 
 	let formData = {
@@ -23,7 +23,8 @@
 		reviewsRequired: data.achievement.achievementConfig?.reviewsRequired || 0,
 		reviewRequires: data.achievement.achievementConfig?.reviewRequiresId,
 		capabilities_inviteRequires:
-			data.achievement.achievementConfig?.json?.capabilities?.inviteRequires || ''
+			data.achievement.achievementConfig?.json?.capabilities?.inviteRequires || '',
+		claimTemplate: data.achievement.achievementConfig?.json?.claimTemplate || ''
 	};
 
 	let breadcrumbItems = [

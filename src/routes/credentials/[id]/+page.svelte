@@ -10,8 +10,7 @@
 
 	let breadcrumbItems = [
 		{ text: m.home(), href: '/' },
-		{ text: achievement.name, href: `/achievements/${achievement.id}` },
-		{ text: m.top_fancy_trout_compose() }
+		{ text: achievement.name, href: `/achievements/${achievement.id}` }
 	];
 </script>
 

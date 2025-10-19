@@ -13,9 +13,10 @@ import {
 import { sendOrcaMail } from '$lib/email/sendEmail';
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 import { validateEmailAddress } from '$lib/utils/email';
+import { isAdmin } from '$lib/permissions/isAdmin';
 
 export const getAchievement = async (achievementId: string, orgId: string) => {
-	return await prisma.achievement.findFirstOrThrow({
+	const achievement = (await prisma.achievement.findFirstOrThrow({
 		where: {
 			id: achievementId,
 			organizationId: orgId
@@ -26,7 +27,13 @@ export const getAchievement = async (achievementId: string, orgId: string) => {
 				include: { claimRequires: true, reviewRequires: true }
 			}
 		}
-	});
+	})) as unknown; // Force application of the type including JSON fields.
+	return achievement as Achievement & {
+		achievementConfig?: App.AchievementConfig & {
+			claimRequires?: Achievement;
+			reviewRequires?: Achievement;
+		};
+	};
 };
 
 export interface InviteArgs {
@@ -74,9 +81,7 @@ export const inviteToClaim = async ({
 	}
 
 	const achievement = await getAchievement(achievementId, org.id);
-	const achievementConfig = achievement.achievementConfig as
-		| App.AchievementConfigWithJson
-		| undefined;
+	const achievementConfig = achievement.achievementConfig;
 
 	// UNAUTHENTICATED USERS: can create an invite for open-claim achievements only.
 	if (
@@ -118,10 +123,7 @@ export const inviteToClaim = async ({
 		throw error(403, m.invite_achievementUnauthorizedError());
 	}
 
-	if (
-		!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none') &&
-		!achievementConfig?.json?.capabilities?.inviteRequires
-	) {
+	if (!isAdmin({ user: session?.user }) && !achievementConfig?.json?.capabilities?.inviteRequires) {
 		// NON ADMIN USERS for a badge that is only inviteable by admins
 		throw error(403, m.invite_unauthorizedNonAdminError());
 	}

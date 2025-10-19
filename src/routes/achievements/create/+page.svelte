@@ -1,11 +1,9 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import type { ActionData, PageData } from './$types';
-	import { achievementFormSchema } from '$lib/data/achievementForm';
+	import type { PageData } from './$types';
 	import AchievementForm from '$lib/partials/AchievementForm.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 
-	export let form: ActionData;
 	export let data: PageData;
 	const categories = data.categories;
 

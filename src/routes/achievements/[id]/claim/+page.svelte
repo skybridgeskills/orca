@@ -2,22 +2,15 @@
 	import * as m from '$lib/i18n/messages';
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
-	import { claimEmail, claimId, inviteId, inviteCreatedAt } from '$lib/stores/activeClaimStore';
-	import type { Achievement, AchievementConfig } from '@prisma/client';
+	import { claimEmail, inviteId, inviteCreatedAt } from '$lib/stores/activeClaimStore';
 
 	export let data: PageData;
-	const config = data.achievement.achievementConfig as
-		| undefined
-		| (AchievementConfig &
-				App.AchievementConfigWithJson & {
-					claimRequires: undefined | Achievement;
-					reviewRequires: undefined | Achievement;
-				});
+	const config = data.achievement.achievementConfig;
 
 	onMount(() => {
 		if (data.inviteId) $inviteId = data.inviteId;

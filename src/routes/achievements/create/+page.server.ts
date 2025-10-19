@@ -79,7 +79,12 @@ export const actions: Actions = {
 		const imageKey = requestData.get('imageExtension')
 			? `achievement-${newIdentifier}/raw-image.${requestData.get('imageExtension')}`
 			: null;
-		let formData = {
+
+		const claimTemplate_enabled =
+			(requestData.get('claimTemplate_enabled')?.toString() || 'off') === 'on';
+
+		const rawClaimTemplate = stripTags(requestData.get('claimTemplate')?.toString() || '');
+		const formData = {
 			name: stripTags(requestData.get('name')?.toString()) || '',
 			description: stripTags(requestData.get('description')?.toString()) || '',
 			criteriaId: requestData.get('url')?.toString(),
@@ -93,7 +98,8 @@ export const actions: Actions = {
 			reviewsRequired: parseInt(requestData.get('reviewsRequired')?.toString() || '') || 0,
 			reviewableSelectedOption: requestData.get('reviewableSelectedOption')?.toString() || 'none',
 			capabilities_inviteRequires:
-				requestData.get('capabilities_inviteRequires')?.toString() || null
+				requestData.get('capabilities_inviteRequires')?.toString() || null,
+			claimTemplate: claimTemplate_enabled ? rawClaimTemplate : ''
 		};
 
 		try {
@@ -143,7 +149,8 @@ export const actions: Actions = {
 					json: {
 						capabilities: {
 							inviteRequires: formData.capabilities_inviteRequires
-						}
+						},
+						claimTemplate: formData.claimTemplate
 					}
 				}
 			}

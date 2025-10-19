@@ -54,12 +54,19 @@ declare namespace App {
 		narrative?: string;
 	}
 
-	interface AchievementConfigWithJson {
-		json?: {
-			capabilities: {
-				inviteRequires: string | null;
-			};
-		}?;
+	type AchievementConfigJson = import('@prisma/client').Prisma.JsonObject & {
+		capabilities: {
+			inviteRequires: string | null;
+		};
+		claimTemplate: string;
+	};
+	type AchievementConfig = import('@prisma/client').AchievementConfig & {
+		json: AchievementConfigJson;
+	};
+
+	interface ConfigWithRelations extends AchievementConfig {
+		claimRequires?: Achievement | null;
+		reviewRequires?: Achievement | null;
 	}
 
 	// Design System

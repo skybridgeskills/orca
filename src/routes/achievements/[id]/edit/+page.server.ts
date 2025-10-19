@@ -1,8 +1,8 @@
 import * as m from '$lib/i18n/messages';
-import type { PageServerLoad, Actions } from './$types';
+import type { Actions } from './$types';
 import { error, fail, json, redirect } from '@sveltejs/kit';
 import { prisma } from '../../../../prisma/client';
-import { Prisma } from '@prisma/client';
+import { Achievement, Prisma } from '@prisma/client';
 import stripTags from '../../../../lib/utils/stripTags';
 import { ValidationError } from 'yup';
 import { achievementFormSchema } from '$lib/data/achievementForm';
@@ -22,10 +22,11 @@ interface AchievementConfigForm {
 		capabilities: {
 			inviteRequires: string | null;
 		};
+		claimTemplate: string;
 	};
 }
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+export const load = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't have permission to edit achievements
 	if (!locals.session?.user?.id) {
 		throw redirect(302, `/achievements/${params.id}`);
@@ -46,16 +47,15 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		throw redirect(302, `/achievements/${params.id}`);
 	}
 
-	const achievement = await prisma.achievement.findFirstOrThrow({
+	const achievement = (await prisma.achievement.findFirstOrThrow({
 		where: {
 			id: params.id,
 			organizationId: locals.org.id
 		},
 		include: {
-			category: true,
 			achievementConfig: true
 		}
-	});
+	})) as Achievement & { achievementConfig?: App.AchievementConfig };
 
 	const categories = await prisma.achievementCategory.findMany({
 		where: {
@@ -74,7 +74,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, cookies, request, params }) => {
+	default: async ({ locals, request, params }) => {
 		if (!locals.session?.user?.id) {
 			throw error(403, m.error_unauthorized());
 		}
@@ -121,6 +121,12 @@ export const actions: Actions = {
 			reviewsRequired: parseInt(requestData.get('reviewsRequired')?.toString() || '') || 0,
 			reviewableSelectedOption: requestData.get('reviewableSelectedOption')?.toString() || 'none'
 		};
+
+		// read claim template enabled flag and claimTemplate value
+		const claimTemplate_enabled =
+			(requestData.get('claimTemplate_enabled')?.toString() || 'off') === 'on';
+		const rawClaimTemplate = stripTags(requestData.get('claimTemplate')?.toString() || '');
+		const claimTemplate = claimTemplate_enabled ? rawClaimTemplate : '';
 		const achievementData = {
 			name: formData.name,
 			description: formData.description,
@@ -172,7 +178,8 @@ export const actions: Actions = {
 		configData['json'] = {
 			capabilities: {
 				inviteRequires: formData.capabilities_inviteRequires
-			}
+			},
+			claimTemplate
 		};
 
 		// "Reviewed by an admin requires only one review, no matter what."
