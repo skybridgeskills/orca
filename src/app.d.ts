@@ -63,6 +63,12 @@ declare namespace App {
 	type AchievementConfig = import('@prisma/client').AchievementConfig & {
 		json: AchievementConfigJson;
 	};
+
+	interface ConfigWithRelations extends AchievementConfig {
+		claimRequires?: Achievement | null;
+		reviewRequires?: Achievement | null;
+	}
+
 	// Design System
 	type ButtonRole = 'primary' | 'secondary' | 'danger';
 	type NotificationLevel = 'info' | 'success' | 'warning' | 'error';

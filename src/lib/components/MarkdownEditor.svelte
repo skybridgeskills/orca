@@ -9,6 +9,7 @@
 
 	export let value: string;
 	export let inputName: string = 'criteriaNarrative';
+	export let disabled: boolean = false;
 
 	const carta = new Carta({
 		sanitizer: (dirty?: string): string => {
@@ -46,7 +47,13 @@
 	};
 </script>
 
-<div on:click|stopPropagation|preventDefault on:keypress|stopPropagation role="none">
+<div
+	on:click|stopPropagation|preventDefault
+	on:keypress|stopPropagation
+	role="none"
+	class:opacity-50={disabled}
+	class:pointer-events-none={disabled}
+>
 	<CartaEditor {carta} {labels} bind:value theme="default" mode="tabs" />
 	<input type="hidden" bind:value name={inputName} />
 </div>

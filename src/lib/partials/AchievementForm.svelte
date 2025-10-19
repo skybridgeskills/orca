@@ -28,6 +28,8 @@
 	export let achievementId = '';
 	let formData = {
 		...initialData,
+		// claim template toggle: enabled when there is an initial template
+		claimTemplate_enabled: !!initialData.claimTemplate,
 		claimable: initialData.claimable ? 'on' : 'off',
 		claimableSelectedOption: initialData.claimable
 			? initialData.claimRequires
@@ -101,8 +103,9 @@
 
 		if (formData['imageExtension']) formsData.append('imageExtension', formData.imageExtension);
 
-		// Add claimTemplate to the form data
+		// Add claimTemplate and whether it's enabled
 		formsData.append('claimTemplate', formData.claimTemplate || '');
+		formsData.append('claimTemplate_enabled', formData.claimTemplate_enabled ? 'true' : 'false');
 
 		const response = await fetch($page.url, { method: 'POST', body: formsData });
 		const responseText = await response.text();
@@ -540,17 +543,88 @@
 					</div>
 				</div>
 			</div>
+			<div slot="button-extra">
+				{#if formData.claimableSelectedOption != 'off' || formData.reviewableSelectedOption != 'none' || formData.inviteSelectedOption != 'none'}
+					<!-- IF any of the claim and review settings are not default -->
+					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
+						{m.sparse_happy_kite_march()}
+					</p>
+				{/if}
+			</div>
+			<div slot="when-closed">
+				<input type="hidden" name="claimable" bind:value={formData.claimable} />
+				<input
+					type="hidden"
+					name="claimableSelectedOption"
+					bind:value={formData.claimableSelectedOption}
+				/>
+				<input type="hidden" name="claimRequires" bind:value={formData.claimRequires} />
+
+				<input
+					type="hidden"
+					name="config_reviewable"
+					bind:value={formData.reviewableSelectedOption}
+				/>
+				<input type="hidden" name="reviewRequires" bind:value={formData.reviewRequires} />
+				<input type="hidden" name="reviewsRequired" bind:value={formData.reviewsRequired} />
+
+				<input
+					type="hidden"
+					name="inviteSelectedOption"
+					bind:value={formData.inviteSelectedOption}
+				/>
+				<input type="hidden" name="inviteRequires" bind:value={formData.inviteRequires} />
+				<input
+					type="hidden"
+					name="capabilities_inviteRequires"
+					bind:value={formData.capabilities_inviteRequires}
+				/>
+			</div>
 		</CollapsiblePane>
 		<CollapsiblePane title={m.weary_legal_crossbill_approve()}>
 			<div class="flex flex-col gap-3">
 				<!-- Claim Template -->
-				<p>
+				<p class="text-sm">
 					{m.funny_warm_panther_intend()}
 				</p>
 				<div class:isError={errors.claimTemplate}>
-					<FormFieldLabel for="claimTemplate">Claim Template</FormFieldLabel>
-					<div class="mb-6">
-						<MarkdownEditor bind:value={formData.claimTemplate} />
+					<div class="flex items-center justify-between">
+						<FormFieldLabel for="claimTemplate">{m.weary_legal_crossbill_approve()}</FormFieldLabel>
+						<label class="inline-flex items-center cursor-pointer">
+							<input
+								type="checkbox"
+								class="sr-only"
+								bind:checked={formData.claimTemplate_enabled}
+								name="claimTemplate_enabled"
+							/>
+							<div
+								class={`relative w-11 h-6 rounded-full ${
+									formData.claimTemplate_enabled
+										? 'bg-blue-600 dark:bg-blue-600'
+										: 'bg-gray-200 dark:bg-gray-700'
+								}`}
+							>
+								<div
+									class={`absolute top-[2px] start-[2px] bg-white border rounded-full h-5 w-5 transition-all ${
+										formData.claimTemplate_enabled
+											? 'translate-x-5 border-white'
+											: 'border-gray-300'
+									}`}
+								/>
+							</div>
+							<span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
+								>{formData.claimTemplate_enabled
+									? m.each_least_parrot_rest()
+									: m.upper_legal_marten_lead()}</span
+							>
+						</label>
+					</div>
+					<div class="mb-6 mt-3">
+						<MarkdownEditor
+							bind:value={formData.claimTemplate}
+							inputName="claimTemplate"
+							disabled={!formData.claimTemplate_enabled}
+						/>
 
 						{#if errors.claimTemplate}
 							<p class="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -559,6 +633,13 @@
 						{/if}
 					</div>
 				</div>
+			</div>
+			<div slot="button-extra">
+				{#if formData.claimTemplate_enabled}
+					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
+						Custom claim template enabled.
+					</p>
+				{/if}
 			</div>
 		</CollapsiblePane>
 		<!-- Submit/Cancel -->

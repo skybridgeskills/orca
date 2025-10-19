@@ -13,6 +13,7 @@ import {
 import { sendOrcaMail } from '$lib/email/sendEmail';
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 import { validateEmailAddress } from '$lib/utils/email';
+import { isAdmin } from '$lib/permissions/isAdmin';
 
 export const getAchievement = async (achievementId: string, orgId: string) => {
 	const achievement = (await prisma.achievement.findFirstOrThrow({
@@ -122,10 +123,7 @@ export const inviteToClaim = async ({
 		throw error(403, m.invite_achievementUnauthorizedError());
 	}
 
-	if (
-		!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none') &&
-		!achievementConfig?.json?.capabilities?.inviteRequires
-	) {
+	if (!isAdmin({ user: session?.user }) && !achievementConfig?.json?.capabilities?.inviteRequires) {
 		// NON ADMIN USERS for a badge that is only inviteable by admins
 		throw error(403, m.invite_unauthorizedNonAdminError());
 	}

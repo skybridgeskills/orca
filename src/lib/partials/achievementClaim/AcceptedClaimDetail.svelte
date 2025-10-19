@@ -22,12 +22,7 @@
 	export let achievement: Achievement & {
 		organization: Organization;
 		category: AchievementCategory | null;
-		achievementConfig:
-			| (AchievementConfig & {
-					claimRequires: Achievement | null;
-					reviewRequires: Achievement | null;
-			  })
-			| null;
+		achievementConfig?: App.ConfigWithRelations;
 	};
 	export let existingBadgeClaim: AchievementClaim | null;
 

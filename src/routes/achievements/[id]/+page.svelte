@@ -14,6 +14,7 @@
 	import FaTrashAlt from 'svelte-icons-pack/fa/FaTrashAlt.js';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
+	import { isAdmin } from '$lib/permissions/isAdmin';
 	import ClaimSummaryCard from '$lib/components/achievement/ClaimSummaryCard.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
@@ -21,14 +22,12 @@
 		Achievement,
 		AchievementCategory,
 		AchievementClaim,
-		AchievementConfig,
 		ClaimEndorsement,
 		User
 	} from '@prisma/client';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import {
 		acLoading,
-		achievementCategories,
 		fetchAchievementCategories,
 		getCategoryById
 	} from '$lib/stores/achievementCategoryStore';
@@ -60,7 +59,7 @@
 		{ text: data.achievement.name }
 	];
 
-	let config: (AchievementConfig & App.AchievementConfigWithJson) | null = null;
+	let config: App.AchievementConfig | null = null;
 	let claim: AchievementClaim | undefined;
 	let category: AchievementCategory | undefined;
 	let userHoldsRequiredAchievement = false;
@@ -68,14 +67,12 @@
 	let reviewRequires: Achievement | undefined;
 	let invite: (ClaimEndorsement & { creator: User | null }) | undefined;
 	$: {
-		config = data.achievement.achievementConfig as
-			| (AchievementConfig & App.AchievementConfigWithJson)
-			| null;
+		config = data.achievement.achievementConfig as App.AchievementConfig | null;
 		claim = data.relatedClaims.find((c) => data.achievement.id == c.achievementId);
 		userHoldsRequiredAchievement =
 			data.relatedClaims.filter((c) => c.achievementId == config?.claimRequiresId).length > 0;
 		inviteCapability =
-			data.editAchievementCapability ||
+			isAdmin({ user: data.session?.user || undefined }) ||
 			(!!config?.json?.capabilities?.inviteRequires &&
 				!!$backpackClaims.find(
 					(c) =>
@@ -119,6 +116,8 @@
 				submodule="secondary"
 				text={m.editCTA()}
 			/>
+		{/if}
+		{#if isAdmin({ user: data.session?.user || undefined })}
 			<Button
 				submodule="danger"
 				on:click={() => {

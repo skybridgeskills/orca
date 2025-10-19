@@ -121,6 +121,12 @@ export const actions: Actions = {
 			reviewsRequired: parseInt(requestData.get('reviewsRequired')?.toString() || '') || 0,
 			reviewableSelectedOption: requestData.get('reviewableSelectedOption')?.toString() || 'none'
 		};
+
+		// read claim template enabled flag and claimTemplate value
+		const claimTemplate_enabled =
+			(requestData.get('claimTemplate_enabled')?.toString() || 'off') === 'on';
+		const rawClaimTemplate = stripTags(requestData.get('claimTemplate')?.toString() || '');
+		const claimTemplate = claimTemplate_enabled ? rawClaimTemplate : '';
 		const achievementData = {
 			name: formData.name,
 			description: formData.description,
@@ -173,7 +179,7 @@ export const actions: Actions = {
 			capabilities: {
 				inviteRequires: formData.capabilities_inviteRequires
 			},
-			claimTemplate: stripTags(requestData.get('claimTemplate')?.toString() || '')
+			claimTemplate
 		};
 
 		// "Reviewed by an admin requires only one review, no matter what."

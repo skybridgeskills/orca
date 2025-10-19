@@ -1,25 +1,14 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import { onMount } from 'svelte';
-	import type {
-		Achievement,
-		AchievementCategory,
-		AchievementConfig,
-		AchievementClaim
-	} from '@prisma/client';
+	import type { Achievement, AchievementCategory, AchievementClaim } from '@prisma/client';
 	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 
 	export let achievement: Achievement & {
-		category: AchievementCategory | null;
-		achievementConfig:
-			| (AchievementConfig & {
-					claimRequires: Achievement | null;
-					reviewRequires: Achievement | null;
-			  })
-			| null;
+		category?: AchievementCategory | null;
+		achievementConfig?: App.ConfigWithRelations | null;
 	};
 	export let existingBadgeClaim: AchievementClaim | undefined;
 	let showClaimForm = false;

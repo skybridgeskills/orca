@@ -18,7 +18,7 @@
 
 	export let data: PageData;
 
-	const levelByStatus = {
+	const levelByStatus: Record<string, App.NotificationLevel> = {
 		UNACCEPTED: 'warning',
 		REJECTED: 'warning',
 		ACCEPTED: 'info'
@@ -38,7 +38,7 @@
 {#if data.session?.user?.id == data.claim.userId}
 	{#if data.claim.claimStatus == 'ACCEPTED'}
 		<AcceptedClaimDetail
-			achievement={{ ...data.achievement, organization: data.org }}
+			achievement={{ ...data.achievement, organization: data.org, category: null }}
 			existingBadgeClaim={data.claim}
 		/>
 	{:else if data.claim.claimStatus == 'REJECTED'}
