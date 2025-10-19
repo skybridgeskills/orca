@@ -143,7 +143,7 @@
 				href={invite
 					? `/achievements/${invite.achievementId}/claim?i=${invite.id}&e=${encodeURIComponent(
 							invite.inviteeEmail
-						)}`
+					  )}`
 					: `/achievements/${data.achievement.id}/claim`}
 				text={m.claimCTA()}
 				submodule="primary"
@@ -209,7 +209,7 @@
 						href={invite
 							? `/achievements/${data.achievement.id}/claim?i=${invite?.id}&e=${encodeURIComponent(
 									invite?.inviteeEmail
-								)}`
+							  )}`
 							: `/achievements/${data.achievement.id}/claim`}
 					>
 						<span class="sr-only">{m.claimCTA()}</span>
@@ -299,7 +299,11 @@
 	level="h3"
 	description={`${m.achievement_claimCountSummary({
 		count: data.achievement._count.achievementClaims
-	})}`}
+	})} ${
+		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(data.session?.user?.orgRole || 'none')
+			? m.bad_mad_jackdaw_tap()
+			: m.great_merry_boar_ascend()
+	}`}
 />
 
 {#if data.session?.user}

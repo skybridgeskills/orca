@@ -221,8 +221,8 @@
 					class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
 				>
 					<tr>
-						<th scope="col" class="px-6 py-3"> Invited Email </th>
-						<th scope="col" class="px-6 py-3"> Invited By </th>
+						<th scope="col" class="px-6 py-3"> {m.tiny_stout_turtle_ask()} </th>
+						<th scope="col" class="px-6 py-3"> {m.sleek_true_oryx_spin()} </th>
 						<th scope="col" class="px-6 py-3"> {m.bad_bold_shrimp_express()} </th>
 						<th scope="col" class="px-6 py-3"> {m.action_other()} </th>
 					</tr>
@@ -250,7 +250,7 @@
 								{invite.createdAt}
 							</td>
 							<td class="px-6 py-4">
-								{#if session?.user?.id === invite.creatorId}
+								{#if session?.user?.id === invite.creatorId || ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none')}
 									<IconButton
 										id="trash-button"
 										src={FaSolidTrash}
@@ -265,7 +265,7 @@
 					{#if !outstandingInvites.length}
 						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 w-full">
 							<td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-								No outstanding invites.
+								{m.mellow_sea_hound_jest()}
 							</td>
 						</tr>
 					{/if}
@@ -278,28 +278,25 @@
 <!-- Delete confirmation modal -->
 <Modal
 	visible={deleteModalVisible}
-	title="Delete Invite"
+	title={m.calm_weird_robin_startle()}
 	on:close={closeDeleteModal}
 	actions={[
 		{
-			label: 'Cancel',
+			label: m.cancelCTA(),
 			submodule: 'secondary',
 			onClick: closeDeleteModal
 		},
 		{
-			label: 'Delete',
+			label: m.deleteCTA(),
 			submodule: 'danger',
 			onClick: deleteInvite
 		}
 	]}
 >
 	<p>
-		Are you sure you want to delete the invite sent to <strong
-			>{inviteToDelete?.inviteeEmail}</strong
-		>?
+		{m.shy_dry_dingo_emerge()} <strong>{inviteToDelete?.inviteeEmail}</strong>?
 	</p>
 	<p class="text-sm text-gray-500 mt-2">
-		This action cannot be undone. The invited user will no longer be able to claim this
-		achievement\n\t\tusing this link.
+		{m.curly_early_mouse_feel()}
 	</p>
 </Modal>

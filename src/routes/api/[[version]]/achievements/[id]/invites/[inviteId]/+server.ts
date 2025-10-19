@@ -1,17 +1,19 @@
+import * as m from '$lib/i18n/messages';
 import { error } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
-import type { RequestEvent } from './$types';
 import { apiResponse } from '$lib/utils/api';
 
-export const DELETE = async ({ params, locals }: RequestEvent) => {
+export const DELETE = async ({ params, locals }) => {
 	// Authentication check
 	if (!locals.session?.user) {
-		throw error(401, 'Unauthorized');
+		throw error(401, m.error_unauthorized());
 	}
 
 	const { id: achievementId, inviteId } = params;
 	const userId = locals.session.user.id;
-	const isAdmin = locals.session.user.orgRole === 'GENERAL_ADMIN';
+	const isAdmin = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
+		locals.session.user.orgRole || 'none'
+	);
 
 	// Find the invite to verify ownership
 	const invite = await prisma.claimEndorsement.findUnique({
@@ -24,12 +26,12 @@ export const DELETE = async ({ params, locals }: RequestEvent) => {
 	});
 
 	if (!invite) {
-		throw error(404, 'Invite not found');
+		throw error(404, m.lucky_alert_penguin_fry());
 	}
 
 	// Authorization check - only creator or admin can delete
 	if (invite.creatorId !== userId && !isAdmin) {
-		throw error(403, 'You are not authorized to delete this invite');
+		throw error(403, m.red_teary_eagle_drip());
 	}
 
 	// Delete the invite
@@ -40,11 +42,13 @@ export const DELETE = async ({ params, locals }: RequestEvent) => {
 	});
 
 	return apiResponse({
+		data: [],
 		params,
-		data: { success: true },
 		meta: {
 			type: 'ClaimEndorsement',
-			message: 'Invite deleted successfully'
+			page: 1,
+			pageSize: 20,
+			includeCount: false
 		}
 	});
 };

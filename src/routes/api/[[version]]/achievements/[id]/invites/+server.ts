@@ -10,7 +10,9 @@ export const GET = async ({ url, params, locals }: RequestEvent) => {
 	}
 
 	const achievementId = params.id;
-	const isAdmin = locals.session.user.orgRole == 'GENERAL_ADMIN';
+	const isAdmin = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
+		locals.session?.user?.orgRole || 'none'
+	);
 	const { page, pageSize, includeCount } = calculatePageAndSize(url);
 
 	const invites = await prisma.claimEndorsement.findMany({

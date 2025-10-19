@@ -14,7 +14,9 @@ export const GET = async ({ url, params, locals }: RequestEvent) => {
 		throw error(400, 'Missing achievementId query parameter');
 	}
 
-	const editAchievementCapability = locals.session?.user?.orgRole == 'GENERAL_ADMIN';
+	const editAchievementCapability = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
+		locals.session?.user?.orgRole || 'none'
+	);
 	const { page, pageSize, includeCount } = calculatePageAndSize(url);
 	const claims = await prisma.achievementClaim.findMany({
 		where: {
