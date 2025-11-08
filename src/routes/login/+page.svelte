@@ -5,22 +5,42 @@
 	import Button from '$lib/components/Button.svelte';
 	import type { ActionData, PageData, SubmitFunction } from './$types';
 	import { claimPending, claimEmail, claimId, inviteId } from '$lib/stores/activeClaimStore';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { nextPath, session } from '$lib/stores/sessionStore';
 	import Heading from '$lib/components/Heading.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
-	import { createAuthenticationOptionsForUser, verifyUserResponseAuth } from '$lib/utils/passkeys';
 	import { startAuthentication } from '@simplewebauthn/browser';
-	import { verifyAuthenticationResponse } from '@simplewebauthn/server';
+	import { createAuthenticationOptionsForUser, verifyUserResponseAuth } from '$lib/utils/passkeys';
+
+	import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
 
 	export let form: ActionData;
 	export let data: PageData;
+	let email_login = true;
+
 	let register = false;
 	let verificationCode = '';
-
 	let sessionId = form?.sessionId || '';
 	let email = $claimEmail || data.inviteeEmail || ''; // Initialize claimEmail but don't necessarily overwrite it in the store?
 	let errorMessage = '';
+
+	let originURLHost = "localhost:5173";
+	let originURLProtocol = 'http://'
+		if (typeof window !== 'undefined') {
+		originURLHost = window.location.host; 
+		originURLProtocol = window.location.protocol; 
+	} 
+
+	let passkey_id = '';
+	let verify_Auth_JSON: string;
+	let challenge_JSON: string;
+	let credential;
+	let passkeyform: HTMLFormElement;
+	$: if (passkeyform && sessionId) {
+		passkeyform.requestSubmit();
+	}
+
+	let supports_passkeys = false
 
 	onMount(() => {
 		// Automatically submit the login form if the user previously submitted a badge claim while unauthenticated
@@ -31,6 +51,7 @@
 			const submitButton = document.getElementById('loginFormSubmit');
 			if (submitButton instanceof HTMLElement) submitButton.click();
 		}
+		supports_passkeys = browserSupportsWebAuthn()
 	});
 
 	const registerHandler: SubmitFunction = () => {
@@ -62,30 +83,92 @@
 		};
 	};
 
-	const loginHandler: SubmitFunction = () => {
-		return ({ result, update }) => {
-			if (result.type === 'success') sessionId = result.data?.sessionId ?? '';
-			else if (result.type === 'error') errorMessage = result.error?.message;
-			update();
+	const passkeyVerifyHandler: SubmitFunction = () => {
+		return ({ result }: { result: ActionResult }) => {
+			if (result.type === 'success' && result.data?.register) {
+				register = true;
+			} else if (result.type === 'error') {
+				errorMessage = result.error?.message;
+			} else if (result.type === 'success') {
+				$session = result.data?.session;
+
+				goto(result.data?.location);
+				$nextPath = undefined;
+				console.log('Processed nextPath and reset.');
+			}
 		};
 	};
 
-
-	const loginWithPasskey = async() => {
-		const options = await createAuthenticationOptionsForUser()
-
-
-		const verifyRpID = options.rpId!
-		const challengeVerify = options.challenge
-
-		const optionsVerify = await verifyUserResponseAuth(verifyRpID, challengeVerify)
-		
-
-		startAuthentication()
+	const loginHandler: SubmitFunction = () => {
+		return ({ result, update }) => {
+			if (result.type === 'success') {
+				sessionId = result.data?.sessionId ?? '';
+			} else if (result.type === 'error') errorMessage = result.error?.message;
+			update();
+		};
+	};
 	
-		alert("clicked!")
-	}
+	let challenge: any;
+	const loadPasskeys = async () => {
+		email_login = false;
 
+			challenge = await createAuthenticationOptionsForUser(originURLHost.replace(":" + window.location.port, ""));
+		
+		
+		challenge_JSON = JSON.stringify(challenge);
+		
+		try {
+			const verify_Auth = await startAuthentication({ optionsJSON: challenge });
+			verify_Auth_JSON = JSON.stringify(verify_Auth);
+
+			passkey_id = verify_Auth.id;
+
+		} catch(error) {
+			//trying to "delete" this for security reasons stated on the website
+			console.log(error)
+			challenge = await createAuthenticationOptionsForUser("")
+		}
+
+
+		const form = document.getElementById('passkeyLoginForm') as HTMLFormElement;
+
+
+		if (form) {
+			await tick();
+			form.requestSubmit();
+		}
+	};
+
+	const passkeyVerification = async (credential: any) => {
+		const auth_response = await verifyUserResponseAuth(
+			originURLHost.replace(":" + window.location.port, ""),
+			challenge_JSON,
+			verify_Auth_JSON,
+			credential
+		);
+
+		if (auth_response.verified) {
+			//login user
+			const submitButton = document.getElementById('loginFormSubmit');
+			if (submitButton instanceof HTMLElement) submitButton.click();
+		}
+	};
+	const loginWithPasskey: SubmitFunction = async () => {
+		return ({ result, update }) => {
+			if (result.type === 'success') {
+				credential = result.data?.credential ?? '';
+
+				if (credential) {
+					credential = JSON.parse(credential);
+					const credential_final = credential['registration']['credential'];
+					email = credential['account']['identifier'];
+					passkeyVerification(credential_final);
+				}
+
+			} else if (result.type === 'error') errorMessage = result.error?.message;
+			update();
+		};
+	};
 </script>
 
 <div
@@ -170,7 +253,7 @@
 
 			<Button buttonType="submit" text={m.submitCTA()} />
 		</form>
-	{:else if sessionId}
+	{:else if sessionId && email_login}
 		<!-- Step 2: Verify control of email to activate session -->
 		<Heading title={m.logInCTA()} description={m.login_checkEmailCTA_description()} />
 		<form id="verifyForm" method="POST" action="?/verify" use:enhance={verifyHandler}>
@@ -208,7 +291,6 @@
 		</form>
 	{:else}
 		<!-- Step 1: Enter email to login -->
-
 		{#if !$inviteId}
 			<Heading title={m.logInCTA()} description={m.loginCTA_description()} />
 		{:else}
@@ -245,8 +327,30 @@
 			</div>
 		</form>
 	{/if}
-	<hr class="my-5">
-	<p class="my-4 text-sm text-gray-500 dark:text-gray-400 max-w-2xl">Log in with Passkey</p>
-	<Button on:click={loginWithPasskey} id="passkeyLogin" buttonType="button" text="Login with Passkey" />
-</div>
 
+	{#if supports_passkeys && !sessionId }
+	<form id="passkeyLoginForm" method="POST" action="?/login_passkey" use:enhance={loginWithPasskey}>
+		<hr class="my-5" />
+		<p class="my-4 text-sm text-gray-500 dark:text-gray-400 max-w-2xl">Log in with Passkey</p>
+		<Button
+			id="passkeyLoginFormSubmit"
+			on:click={() => loadPasskeys()}
+			buttonType="button"
+			text="Login with Passkey"
+		/>
+		<input type="hidden" id="passkey_id" name="passkey_id" bind:value={passkey_id} />
+	</form>
+	{/if}
+	{#if sessionId && !email_login}
+		<form
+			id="verifyPasskeyForm"
+			method="POST"
+			action="?/passkey_verify"
+			bind:this={passkeyform}
+			use:enhance={passkeyVerifyHandler}
+		>
+			<input type="hidden" id="inviteId" name="inviteId" bind:value={$inviteId} />
+			<Button class="hidden" id="passkey_verify_submit" buttonType="submit" />
+		</form>
+	{/if}
+</div>

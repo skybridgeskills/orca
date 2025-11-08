@@ -37,11 +37,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
+	 //hm: added the credential in these things because it's throwing an error otherwise
 	login: async ({
 		cookies,
 		locals,
 		request
-	}): Promise<{ sessionId: string; register?: boolean }> => {
+	}): Promise<{ sessionId: string; register?: boolean; credential?: string }> => {
 		const requestData = await request.formData();
 		const email = stripTags(requestData.get('email')?.toString());
 		const inviteId = stripTags(requestData.get('inviteId')?.toString());
@@ -98,6 +99,7 @@ export const actions: Actions = {
 		return { sessionId: session.id };
 	},
 
+
 	verify: async ({
 		locals,
 		cookies,
@@ -108,6 +110,7 @@ export const actions: Actions = {
 		location?: string;
 		register?: boolean;
 		success?: boolean;
+		credential?: string;
 	}> => {
 		const requestData = await request.formData();
 		const vcode = requestData.get('verificationCode')?.toString();
@@ -167,6 +170,74 @@ export const actions: Actions = {
 				location: nextPath && nextPath?.startsWith('/') ? nextPath : '/'
 			};
 	},
+
+	passkey_verify: async ({
+		locals,
+		cookies,
+		request
+	}): Promise<{
+		sessionId?: string;
+		session?: Omit<Session, 'code' | 'createdAt' | 'userId'> & { user: User | null };
+		location?: string;
+		register?: boolean;
+		success?: boolean;
+		credential?: string;
+	}> => {
+
+		const requestData = await request.formData();
+		const sessionId = cookies.get('sessionId');
+		const nextPath = requestData.get('nextPath')?.toString();
+
+		// Validate sessionid and ensure code matches
+		// TODO: use unique indexed query for session somehow
+		// TODO: prevent brute force guessing
+		const session = await prisma.session.findFirst({
+			where: {
+				id: sessionId,
+				organizationId: locals.org.id,
+				valid: false
+			},
+			include: {
+				user: true,
+				invite: true
+			}
+		});
+		if (!session) throw error(401, m.login_incorrectCodeError());
+		// Advance user to next step in invite claim: user account creation.
+
+		const activatedSession = await prisma.session.update({
+			where: {
+				id: sessionId
+			},
+			data: {
+				valid: true
+			},
+			select: {
+				user: true,
+				id: true,
+				valid: true,
+				organizationId: true,
+				inviteId: true,
+				createdAt: false,
+				expiresAt: true,
+				code: false
+			}
+		});
+
+		if (session.invite)
+			return {
+				session: activatedSession,
+				location: `/achievements/${session.invite.achievementId}/claim?i=${
+					session.invite.id
+				}&e=${encodeURIComponent(session.invite.inviteeEmail)}`
+			};
+		else
+			return {
+				session: activatedSession,
+				location: nextPath && nextPath?.startsWith('/') ? nextPath : '/'
+			};
+	},
+	
 	register: async ({
 		locals,
 		cookies,
@@ -177,6 +248,7 @@ export const actions: Actions = {
 		location?: string;
 		register?: boolean;
 		success?: boolean;
+		credential?: string;
 	}> => {
 		const requestData = await request.formData();
 		const vcode = requestData.get('verificationCode')?.toString();
@@ -255,5 +327,33 @@ export const actions: Actions = {
 				}&e=${encodeURIComponent(invite.inviteeEmail ?? '')}`
 			};
 		} else return { session: activatedSession, location: '/' };
+	},
+
+	
+	login_passkey: async ({
+		cookies,
+		locals,
+		request
+	}): Promise<{		
+		sessionId?: string;
+		credential: string; }> => {
+		const requestData = await request.formData();
+		const passkey_id = stripTags(requestData.get('passkey_id')?.toString());
+
+		if (!passkey_id) throw error(400,  "Passkey not found. Please try again.");
+		
+		// Validate org and ensure user exists
+		let passkeyIdentifier = await prisma.passkey.findFirst({
+			where: {
+				passkeyId: passkey_id
+			}
+		});
+
+		if (!passkeyIdentifier) throw error(400, "Passkey not found. Please try again.");
+
+		const credential_JSON = JSON.stringify(passkeyIdentifier.json)
+
+		return { credential: credential_JSON };
 	}
+
 };

@@ -1,21 +1,17 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import ButtonGroup from '$lib/components/ButtonGroup.svelte';
 	import Heading from '$lib/components/Heading.svelte';
-	import type { ActionData, PageData } from './$types';
-	import type { Passkey } from '@prisma/client';
+	import type { PageData } from './$types';
 	import { enhance } from '$app/forms';
 	import { startRegistration } from '@simplewebauthn/browser';
 	import { createRegistrationOptionsForUser, verifyUserPasskey } from '$lib/utils/passkeys';
 	import Modal from '$lib/components/Modal.svelte';
-	import { json, type ActionResult, type SubmitFunction } from '@sveltejs/kit';
-	import { Data } from 'ws';
-	import { submitCTA } from '$lib/i18n/messages';
 	import { tick } from 'svelte';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
 	import * as m from '$lib/i18n/messages';
 
 	export let data: PageData;
+
 
 	const noErrors: { [key: string]: string | null } = {
 		givenName: null,
@@ -35,11 +31,12 @@
 			const year = pskDate.getFullYear();
 			pskDate = `${month}/${day}/${year}`;
 			return pskDate;
+		} else if(key == "account") {
+			return passkey.account.identifier
 		} else {
 			return passkey[key];
 		}
 	};
-	//hm: ask the user for a label
 
 	let errors = { ...noErrors };
 
@@ -53,29 +50,26 @@
 		delpasskeyID: ''
 	};
 
+	let originURLHost = "localhost";
+	let originURLProtocol = 'http://'
+		if (typeof window !== 'undefined') {
+		originURLHost = window.location.host; 
+		originURLProtocol = window.location.protocol; 
+	} 
+
+
 	let modalTitle = '';
 
 	let passkeyGenerating = false;
 	let finished = true;
 	let errorString: string = '';
 	let userVerified = false;
-	const originURL = data.org.domain; // localhost:5173. presumably data.org.url has the full URL
-
-	const setLoadingTitle = () => {
-		if (passkeyGenerating && !errorString) {
-			modalTitle = 'Loading...';
-		} else if (userVerified) {
-			modalTitle = 'Success!';
-		} else {
-			modalTitle = 'There has been an error.';
-		}
-	};
 
 	const handlePasskey = async () => {
 		finished = false;
 		userVerified = false;
 		passkeyGenerating = true;
-
+		modalTitle = 'Loading...';
 		errorString = '';
 
 		let userData;
@@ -83,57 +77,56 @@
 		let browserResponse;
 		let verification;
 
-		//let domain = originURL.split("http://")
-		let localHostDomain = originURL.split(':')[0]; //hm: only for localhost. Need to test the previous split with an actual URL
 
 		if (data.session?.user != null) {
 			userData = data.session?.user;
-			//optionsJSON = await createRegistrationOptionsForUser(userData, domain[0])
-			optionsJSON = await createRegistrationOptionsForUser(userData, localHostDomain);
-
+	
+			//Expects just the host name
+			optionsJSON = await createRegistrationOptionsForUser(userData, originURLHost.replace(":" + window.location.port, ""))
+		
+			
 			try {
 				browserResponse = await startRegistration({ optionsJSON });
 			} catch (error) {
+				finished = true
+				notifications.addNotification(new Notification("Passkey unable to be created. Please try again", true, 'error'))
+
+				//modalTitle = 'There has been an error.';
 				errorString = String(error);
 				throw error;
 			}
 			try {
-				//verification = await verifyUserPasskey(browserResponse, optionsJSON.challenge, originURL)
 				verification = await verifyUserPasskey(
 					browserResponse,
 					optionsJSON.challenge,
-					'http://' + originURL
+					originURLProtocol + "//" + originURLHost //Expects the full URL
 				);
 				optionsJSON.challenge = '';
 				userVerified = verification?.registrationInfo?.userVerified!!;
 
-				//hm: task - put the appropriate data into a json data structure. and the rest into the actual data structure.
-				//hm: what is the appropriate data to go into the JSON data structure, and what should go into the actual data structure?
-
-				//hm: get the passkey data structure in here to begin with so you can reference it WOOHOO!
 				const userDevice: string = navigator.userAgent;
 				formData.newPasskey = JSON.stringify({
 					device: userDevice,
-					publicKey: verification?.registrationInfo?.credential.publicKey,
-					transports: verification?.registrationInfo?.credential.transports,
-					deviceType: verification?.registrationInfo?.credentialDeviceType,
-					backedUp: verification?.registrationInfo?.credentialBackedUp,
-					timestamp: new Date(Date.now()).toISOString()
+					registration: verification?.registrationInfo,
+					timestamp: new Date(Date.now()).toISOString(),
+					account: data.session?.user?.identifiers[0],
+					domain: data.org.domain
 				});
 
 				const form = document.getElementById('newPassKeyForm') as HTMLFormElement;
-				const button = document.getElementById('hiddenSubmit') as HTMLFormElement;
-				const temp_input = document.getElementById('settings_passkeycreate') as HTMLFormElement;
+
 
 				if (form) {
 					await tick();
 					form.requestSubmit();
 				}
+				modalTitle = 'Success!';
+				finished = true
 
 				if(userVerified) {
 					notifications.addNotification(new Notification(m.topical_clear_gadfly_gaze(), true, 'success'))
 				}
-
+			
 				passkeyGenerating = false;
 			} catch (error) {
 				errorString = String(error);
@@ -143,7 +136,6 @@
 			errorString = 'Error: Could not find the user to create a passkey for.';
 		}
 	};
-	let errorMessage = '';
 
 	let delKey = false;
 	let verifyDelete = false;
@@ -163,11 +155,11 @@
 		}
 
 		formData.delpasskeyID = "";
-			alert('Passkey deleted');
-			verifyDelete = false;
-			delKey = false;
 
+		notifications.addNotification(new Notification("Passkey deleted", true, 'success'))
 
+		verifyDelete = false;
+		delKey = false;
 	};
 </script>
 
@@ -220,7 +212,7 @@
 	</div>
 
 	<Heading level="h3" title="Identifiers" />
-	<div class="overflow-x-auto relative my-6 z-0">
+	<div class="overflow-x-auto my-6 z-0">
 		<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
 			<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 				<tr>
@@ -262,14 +254,14 @@
 		Passkeys are a way to login without a password. View and manage your passkeys here, or add a new
 		one.
 	</p>
-	<div class="overflow-x-auto relative my-6 z-0">
+	<div class="overflow-x-auto my-6 z-0">
 		{#if data.passkeys.length != 0}
 			<table class="table-auto text-sm text-left text-gray-500 dark:text-gray-400">
 				<thead
 					class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
 				>
 					<tr>
-						<th scope="col" class="py-3 pl-6"> Device </th>
+						<th scope="col" class="py-3 pl-6"> Email </th>
 						<th scope="col" class="py-3 pr-8"> Date Created </th>
 						<th scope="col" class="py-3 pl-2"> Actions </th>
 					</tr>
@@ -278,8 +270,9 @@
 					<tbody>
 						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
 							<th scope="row" class="py-4 px-6 font-medium text-gray-900 dark:text-white">
-								<p>{passkeyJSON(passkey.json, 'device')}</p>
+								<p>{passkeyJSON(passkey.json, 'account')}</p>
 							</th>
+
 							<td class="py-4">
 								{passkeyJSON(passkey.json, 'timestamp')}
 							</td>
@@ -328,22 +321,24 @@
 
 <Modal
 	id="passkey-delete-modal"
-	title={modalTitle}
+	title={"Confirm Deletion"}
 	visible={delKey && !verifyDelete}
 	on:close={() => {
 		delKey = false
 	}}
 	actions={[]}
 >
-
-<form id="delPassKeyForm" action="?/deletePasskey" method="POST" use:enhance>
+<p class=" -mt-5 mb-6 text-sm text-gray-500 dark:text-gray-400 max-w-prose p-6">Are you sure you would like to delete this passkey? You won't be able to log in with this credential in the future.
+	<div class="flex ml-80">
+	<form id="delPassKeyForm" action="?/deletePasskey" method="POST" use:enhance>
 	<Button buttonType="button" on:click={() => deletePasskeyHelper()} submodule="primary">
 		Yes, I'm sure
 	</Button>
-	<input id="settings_passkeydelete" name="delpasskeyID" bind:value={formData.delpasskeyID}/>
+	<input type="hidden" id="settings_passkeydelete" name="delpasskeyID" bind:value={formData.delpasskeyID}/>
 </form>
 
 	<Button buttonType="button" on:click={() => (delKey = false)} submodule="primary">No, take me back</Button>
+	</div>
 </Modal>
 
 <Modal
@@ -357,14 +352,13 @@
 >
 	<form id="newPassKeyForm" action="?/savePasskey" method="POST"  use:enhance>
 		<button type="submit" class="hidden" id="hiddenSubmit">Submit</button>
-		<input id="settings_passkeycreate" name="newPasskey" value={formData.newPasskey} />
+		<input  type="hidden" id="settings_passkeycreate" name="newPasskey" value={formData.newPasskey} />
 
 		{#if passkeyGenerating && !errorString}
 			<p class=" -mt-5 mb-6 text-sm text-gray-500 dark:text-gray-400 max-w-prose p-6">
 				Please continue configuring your passkey using the pop-up.
 			</p>
 		{:else if userVerified}
-			<p>{formData.newPasskey}</p>
 			<p class=" -mt-5 mb-6 text-sm text-gray-500 dark:text-gray-400 max-w-prose p-6">
 				Your passkey has been successfully generated. You can close this popup.
 			</p>

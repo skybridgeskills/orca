@@ -60,7 +60,7 @@ export const actions: Actions = {
 			// to augment the user previously fetched, so we'll fetch user again.
 			locals.session.user = await prisma.user.findUnique({
 				where: { id: locals.session.user.id },
-				include: { identifiers: true} //hm: added passkeys because it was throwing an error
+				include: { identifiers: true} 
 			});
 		} else {
 			locals.session.user = user;
@@ -81,10 +81,11 @@ export const actions: Actions = {
 			const newIdentifier = uuidv4();
 			type PasskeyInput = Prisma.PasskeyCreateInput;
 
+			const passkey_data = JSON.parse(createPasskey)
 			let data: PasskeyInput =
 						{ id: newIdentifier, //hm: already does this by default, you don't need to do it again
-						passkeyId: uuidv4(), //hm: change this to the actual passkey ID
-						json: JSON.parse(createPasskey), 
+						passkeyId: passkey_data["registration"]["credential"]["id"],
+						json: passkey_data, 
 						user: { connect: { id: locals.session.user?.id} },
 						organization: { connect: { id: locals.org.id } }
 					}
@@ -99,12 +100,9 @@ export const actions: Actions = {
 		return fail(500, {message: 'Passkey creation failed'});
 	},
 
-	//hm: cant delete off of device for security reasons
 	deletePasskey: async ({ locals, cookies, request, params }) => {
 		const requestData = await request.formData();
 		const passkeyID = requestData.get('delpasskeyID')?.toString() ?? "";
-
-		console.log("LOOKIT: " +  passkeyID)
 
 		if (passkeyID) {
 			const passkeyDeleted = await prisma.passkey.delete({
