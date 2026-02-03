@@ -1,4 +1,8 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
+
+vi.mock('$env/static/public', () => ({
+	PUBLIC_HTTP_PROTOCOL: 'http'
+}));
 
 import {
 	testAchievement,

@@ -12,6 +12,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
+const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
+	return orgJson.orgStatus ?? 'ENABLED';
+};
+
 export const load: PageServerLoad = ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
@@ -51,10 +55,14 @@ export const actions: Actions = {
 		const jsonData: App.OrganizationConfig =
 			typeof locals.org?.json === 'string' ? JSON.parse(locals.org.json) : locals.org?.json || {};
 
+		// Extract and preserve orgStatus (cannot be modified by users)
+		const currentOrgStatus = getOrgStatus(jsonData);
+
 		// Update the json object with the new tagline and permissions
 		const updatedJson: App.OrganizationConfig = {
 			...jsonData,
-			tagline: tagline
+			tagline: tagline,
+			orgStatus: currentOrgStatus // Explicitly preserve orgStatus
 		};
 
 		// Handle edit achievement capability permissions

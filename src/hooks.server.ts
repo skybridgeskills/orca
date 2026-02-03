@@ -9,7 +9,11 @@ import {
 } from '$lib/i18n/runtime';
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 
-const getOrganizationFromRequest = async function (event: RequestEvent) {
+export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
+	return orgJson.orgStatus ?? 'ENABLED';
+};
+
+export const getOrganizationFromRequest = async function (event: RequestEvent) {
 	const domain = event.url.host || '';
 
 	let orgs = await prisma.organization.findMany({
@@ -21,7 +25,18 @@ const getOrganizationFromRequest = async function (event: RequestEvent) {
 		throw error(404, m.organization_notFoundError());
 	}
 
-	return orgs.find((org) => org.domain === domain) || orgs[0];
+	const org = orgs.find((org) => org.domain === domain) || orgs[0];
+
+	// Parse org.json and check status
+	const orgJson: App.OrganizationConfig =
+		typeof org.json === 'string' ? JSON.parse(org.json) : org.json || {};
+	const orgStatus = getOrgStatus(orgJson);
+
+	if (orgStatus === 'SUSPENDED') {
+		throw error(503, m.sunny_watery_sparrow_jest());
+	}
+
+	return org;
 };
 
 const getSession = async function (sessionId: string, orgId: string) {

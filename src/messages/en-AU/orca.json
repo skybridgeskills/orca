@@ -200,7 +200,7 @@
 	"org_editCTA": "Edit organisation",
 	"org_edit_description": "As an organisation admin, you may update descriptive information about the org.",
 	"org_inviteToJoin": "Invitation to join {orgName}",
-	"org_inviteToJoin_description": "You've been invited to claim a badge for the achievement {achievementName}\\n\\nBy claiming a badge, you can join the {orgName} community. Click here to join:\\n\\n{inviteLink}",
+	"org_inviteToJoin_description": "You've been invited to claim a badge for the achievement {achievementName}\\\\n\\\\nBy claiming a badge, you can join the {orgName} community. Click here to join:\\\\n\\\\n{inviteLink}",
 	"org_name": "Organisation name",
 	"org_primaryColor": "Primary colour",
 	"org_url": "Community homepage:",
@@ -326,5 +326,6 @@
 	"each_least_parrot_rest": "Enabled",
 	"upper_legal_marten_lead": "Disabled",
 	"early_house_bat_climb": "Custom claim template enabled.",
-	"next_arable_mule_zoom": "People who hold this achievement have the permission to create and edit achievements in this community."
+	"next_arable_mule_zoom": "People who hold this achievement have the permission to create and edit achievements in this community.",
+	"sunny_watery_sparrow_jest": "This community is suspended or is experiencing technical problems. Please try again later."
 }
