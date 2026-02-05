@@ -23,7 +23,7 @@ declare namespace App {
 		valid: boolean;
 	}
 
-	type OrgStatus = 'ENABLED' | 'SUSPENDED' | 'UNDER_REVIEW' | 'NOT_YET_ACTIVATED';
+	type OrgStatus = 'ENABLED' | 'SUSPENDED' | 'UNDER_REVIEW' | 'PENDING';
 
 	type OrganizationConfig = import('@prisma/client').Prisma.JsonObject & {
 		tagline?: string;
