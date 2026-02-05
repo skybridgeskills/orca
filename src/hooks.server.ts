@@ -34,7 +34,7 @@ export const getOrganizationFromRequest = async function (event: RequestEvent) {
 
 	if (orgStatus === 'SUSPENDED') {
 		throw error(503, m.sunny_watery_sparrow_jest());
-	} else if (['UNDER_REVIEW', 'PENDING'].includes(orgStatus)) {
+	} else if (orgStatus === 'PENDING') {
 		throw error(
 			403,
 			'This community is not yet activated. Please try again later. If you are the administrator, please check your email for activation instructions.'
