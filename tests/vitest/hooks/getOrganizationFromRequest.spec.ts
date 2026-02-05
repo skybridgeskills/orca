@@ -92,10 +92,10 @@ describe('getOrganizationFromRequest', () => {
 		expect(result).toEqual(underReviewOrg);
 	});
 
-	it('should allow access for NOT_YET_ACTIVATED status', async () => {
+	it('should not allow access for PENDING status', async () => {
 		const notActivatedOrg = {
 			...testOrganization,
-			json: JSON.stringify({ orgStatus: 'NOT_YET_ACTIVATED' })
+			json: JSON.stringify({ orgStatus: 'PENDING' })
 		};
 
 		vi.mocked(prisma.organization.findMany).mockResolvedValue([notActivatedOrg]);
@@ -104,7 +104,14 @@ describe('getOrganizationFromRequest', () => {
 			url: { host: 'example.com' }
 		} as any;
 
-		const result = await getOrganizationFromRequest(event);
-		expect(result).toEqual(notActivatedOrg);
+		// Check that error is 403
+		try {
+			await getOrganizationFromRequest(event);
+			expect.fail('Should have thrown an error');
+		} catch (err: any) {
+			expect(err.status).toBe(403);
+			const errorBody = typeof err.body === 'string' ? err.body : JSON.stringify(err.body);
+			expect(errorBody).toContain('not yet activated');
+		}
 	});
 });
