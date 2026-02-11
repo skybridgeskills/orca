@@ -88,7 +88,7 @@ export default defineConfig({
 
 	/* Run your local dev server before starting the tests */
 	webServer: {
-		command: `npx dotenv -e .env.test -- npm run migrate:dev && npx dotenv -e .env.test -- npm run dev -- --port ${process.env.SERVER_PORT}`,
+		command: `pnpm exec dotenv -e .env.test -- pnpm exec prisma migrate deploy --schema src/prisma/schema.prisma && pnpm exec dotenv -e .env.test -- pnpm run dev -- --port ${process.env.SERVER_PORT}`,
 		port: parseInt(process.env.SERVER_PORT!)
 	}
 });
