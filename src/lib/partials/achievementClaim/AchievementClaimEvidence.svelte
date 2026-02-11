@@ -9,7 +9,7 @@
 
 {#if claimData.narrative}
 	<p class="my-2 text-gray-500 dark:text-gray-400">
-		<span class="font-bold">{m.narrative()}</span>: <MarkdownRender value={claimData.narrative} />
+		<span class="font-bold">{m.fancy_flat_kite_relish()}</span>: <MarkdownRender value={claimData.narrative} />
 	</p>
 {/if}
 {#if claimData.id}

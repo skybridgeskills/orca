@@ -22,8 +22,8 @@
 	let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
 
 	const breadcrumbItems = [
-		{ text: m.home(), href: '/' },
-		{ text: m.achievement_other(), href: '/achievements' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name, href: `../${data.achievement.id}` },
 		{ text: m.bold_swift_eagle_claim() }
 	];

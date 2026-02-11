@@ -25,7 +25,7 @@
 	};
 
 	const breadcrumbItems = [
-		{ text: m.home(), href: '/' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: data.achievement.name, href: `../achievements/${data.achievement.id}` },
 		{ text: `${data.claim.user.givenName} ${data.claim.user.familyName}` }
 	];
@@ -68,7 +68,7 @@
 	</h1>
 
 	<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-		{m.claim_claimedByAnonMember()}
+		{m.smooth_calm_guppy_ask()}
 	</p>
 	<AchievementSummary achievement={data.achievement} />
 {/if}
@@ -90,18 +90,18 @@
 
 		<Alert level={levelByStatus[data.claim.claimStatus]}>
 			<p class="max-w-2xl text-sm">
-				<span class="font-bold">{m.acceptance()}</span>
+				<span class="font-bold">{m.kind_aqua_myna_jump()}</span>
 				{translatedStatus}
 			</p>
 			{#if data.claim.validFrom}
 				<p class="max-w-2xl mt-3 text-sm">
-					<span>{m.claim_validFrom()}:</span>
+					<span>{m.cuddly_fluffy_kite_drip()}:</span>
 					{data.claim.validFrom}
 				</p>
 			{/if}
 			{#if data.claim.validUntil}
 				<p class="max-w-2xl mt-3 text-sm">
-					<span>{m.claim_validUntil()}:</span>
+					<span>{m.tidy_fresh_seahorse_march()}:</span>
 					{data.claim.validUntil}
 				</p>
 			{/if}
@@ -113,24 +113,24 @@
 	<ActionHeading text={m.calm_steady_lynx_endorse({ count: data.endorsementCount })}>
 		<span slot="actions">
 			{#if data.hasProvidedEndorsement}
-				<a href={`${data.claim.id}/endorse`}><Button text={m.endorsement_updateCTA()} /></a>
+				<a href={`${data.claim.id}/endorse`}><Button text={m.antsy_slow_robin_persuade()} /></a>
 			{:else if data.session?.user?.id != data.claim.userId}
-				<a href={`${data.claim.id}/endorse`}><Button text={m.endorsement_addYoursCTA()} /></a>
+				<a href={`${data.claim.id}/endorse`}><Button text={m.bright_gentle_cheetah_shrine()} /></a>
 			{/if}
 		</span>
 	</ActionHeading>
 
 	{#if data.claim.validFrom && !data.achievement.achievementConfig?.reviewsRequired}
 		<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-			{m.claim_statusValidNoReviewRequired()}
+			{m.shy_male_thrush_jump()}
 		</p>
 	{:else if data.claim.validFrom && data.achievement.achievementConfig?.reviewsRequired}
 		<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-			{m.claim_statusValidSufficientReviews()}
+			{m.funny_piquant_guppy_deny()}
 		</p>
 	{:else if data.achievement.achievementConfig?.reviewsRequired && data.achievement.achievementConfig?.reviewRequires}
 		<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-			{m.status_notYetReviewed_description({
+			{m.curly_quiet_mantis_express({
 				count: data.achievement.achievementConfig?.reviewsRequired
 			})}
 			<a

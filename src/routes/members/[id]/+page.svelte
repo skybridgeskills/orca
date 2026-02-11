@@ -29,21 +29,21 @@
 	<div class="inline-flex items-center">
 		{#if member.id == data.session?.user?.id}
 			<Button
-				text={m.share()}
+				text={m.happy_sparse_lemur_clasp()}
 				submodule="secondary"
 				on:click={() => {
 					showShareModal = true;
 				}}
 			/>
-			<Button href={`/settings`} submodule="secondary" text={m.profile_editCTA()} />
+			<Button href={`/settings`} submodule="secondary" text={m.quiet_warm_dog_soar()} />
 		{/if}
 	</div>
 </div>
 <p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
 	{#if member.id == data.session?.user?.id}
-		{m.member_yourProfileGreeting()}
+		{m.merry_bright_rabbit_bask()}
 	{:else}
-		{m.member_otherUserProfileDescription()}
+		{m.red_wide_jackdaw_drip()}
 	{/if}
 </p>
 
@@ -58,7 +58,7 @@
 	{#each member.identifiers as identifier}
 		<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
 			{identifier.type}: {identifier.identifier}
-			{#if identifier.verifiedAt}({m.status_verified()}){/if}
+			{#if identifier.verifiedAt}({m.sad_vivid_myna_visit()}){/if}
 		</p>
 	{/each}
 {/if}
@@ -66,7 +66,7 @@
 {#if member._count.receivedAchievementClaims}
 	<h3 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
 		{member._count.receivedAchievementClaims}
-		{member._count.receivedAchievementClaims == 1 ? m.badge_one() : m.badge_other()}
+		{member._count.receivedAchievementClaims == 1 ? m.late_antsy_pug_grin() : m.soft_dense_boar_drip()}
 	</h3>
 	<Pagination
 		paging={{ ...calculatePageAndSize($page.url), count: member._count.receivedAchievementClaims }}
@@ -96,7 +96,7 @@
 						</h3>
 
 						<p class="mb-3 text-xs font-normal text-gray-700 dark:text-gray-400">
-							{m.status_created()}: {claim.createdOn}
+							{m.sharp_silly_hound_dart()}: {claim.createdOn}
 						</p>
 					</div>
 				</div>
@@ -108,13 +108,13 @@
 {#if member.id == data.session?.user?.id}
 	<Modal
 		visible={showShareModal}
-		title={m.share()}
+		title={m.happy_sparse_lemur_clasp()}
 		on:close={() => {
 			showShareModal = false;
 		}}
 		actions={[
 			{
-				label: m.share_copyUrl(),
+				label: m.lucky_tired_mole_ask(),
 				buttonType: 'button',
 				submodule: 'secondary',
 				onClick: (e) => {
@@ -123,7 +123,7 @@
 					}
 					const url = `${PUBLIC_HTTP_PROTOCOL}://${data.org.domain}/members/${member.id}`;
 					navigator.clipboard.writeText(url);
-					console.log(m.claim_shareUrlCopied() + url);
+					console.log(m.dense_cool_owl_nurture() + url);
 					e.preventDefault();
 					e.stopPropagation();
 				}
@@ -131,11 +131,11 @@
 		]}
 	>
 		<p class="text-sm text-gray-500 dark:text-gray-400">
-			{m.member_share_description()}
+			{m.slow_dense_scallop_startle()}
 		</p>
 		<QRCode
 			url={`${PUBLIC_HTTP_PROTOCOL}://${data.org.domain}/members/${member.id}`}
-			alt={m.share_qrCodeImageAltText()}
+			alt={m.plane_light_fish_view()}
 		/>
 	</Modal>
 {/if}

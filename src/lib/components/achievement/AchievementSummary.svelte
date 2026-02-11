@@ -27,7 +27,7 @@
 	}}
 	role={isClickable ? 'button' : 'listitem'}
 	tabindex="-1"
-	aria-roledescription={m.achievement_selectThisCTA()}
+	aria-roledescription={m.brave_light_lemur_scold()}
 	class="relative max-w-2xl bg-white p-6 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex flex-col {isClickable
 		? 'hover:shadow-lg hover:dark:shadow-gray-800 hover:border-gray-300 hover:dark:border-gray-500 cursor-pointer'
 		: ''}"

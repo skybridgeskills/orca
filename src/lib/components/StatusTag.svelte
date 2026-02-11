@@ -17,8 +17,8 @@
 	const statusText = {
 		ACCEPTED: m.status_accepted(),
 		REJECTED: m.status_rejected(),
-		UNACCEPTED: m.status_invited(),
-		UNDER_REVIEW: m.status_underReview()
+		UNACCEPTED: m.clear_clear_turtle_cook(),
+		UNDER_REVIEW: m.mad_fancy_penguin_read()
 	};
 
 	$: calculatedStatus =

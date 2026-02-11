@@ -6,7 +6,7 @@ import { apiResponse } from '$lib/utils/api';
 export const DELETE = async ({ params, locals }) => {
 	// Authentication check
 	if (!locals.session?.user) {
-		throw error(401, m.error_unauthorized());
+		throw error(401, m.lower_home_cow_view());
 	}
 
 	const { id: achievementId, inviteId } = params;

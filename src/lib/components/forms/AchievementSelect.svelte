@@ -78,7 +78,7 @@
 			}}
 			{disabled}
 		>
-			{m.achievement_chooseCTA()}
+			{m.sparse_petty_fox_jest()}
 		</Button>
 	{/if}
 </slot>
@@ -134,7 +134,7 @@
 			id="achievementSelect_searchInput"
 			name="claimRequires"
 			class="pl-10 bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-			placeholder={m.achievement_searchByName()}
+			placeholder={m.house_small_sparrow_succeed()}
 			bind:value={searchQuery}
 		/>
 	</div>
@@ -176,6 +176,6 @@
 			{/each}
 		</ul>
 	{:else}
-		<p class="mt-4 text-sm text-gray-900 dark:text-gray-300">{m.achievements_noneFound()}</p>
+		<p class="mt-4 text-sm text-gray-900 dark:text-gray-300">{m.tidy_sunny_seahorse_relish()}</p>
 	{/if}
 </Modal>

@@ -25,7 +25,7 @@ export const load: PageServerLoad = ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const imageUpdated = requestData.get('imageEdited') === 'true';

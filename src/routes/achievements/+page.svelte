@@ -28,7 +28,7 @@
 	const U = {
 		id: 'uncategorized',
 		organizationId: data.org.id,
-		name: m.uncategorized(),
+		name: m.light_early_owl_shrine(),
 		weight: -1
 	};
 
@@ -53,14 +53,14 @@
 	});
 </script>
 
-<Heading title={m.achievement_other()} description={m.achievements_description()} />
+<Heading title={m.antsy_grand_rabbit_gaze()} description={m.quick_happy_fox_fry()} />
 
 <div class="flex items-center mb-9">
 	{#if data.editAchievementCapability}
 		<Button href="/achievements/create" text={m.fresh_bright_sparrow_create()} />
 	{/if}
 	{#if data.editCategoriesCapability}
-		<Button href="/achievements/categories" text={m.categories_editCTA()} submodule="secondary" />
+		<Button href="/achievements/categories" text={m.tired_elegant_jackdaw_jump()} submodule="secondary" />
 	{/if}
 </div>
 
@@ -68,12 +68,12 @@
 	<LoadingSpinner />
 {/if}
 {#if $achievementsLoading == LoadingStatus.Error}
-	<Alert level="warning" message={m.achievements_errorLoading()} />
+	<Alert level="warning" message={m.petty_wet_marten_zoom()} />
 {/if}
 {#if $achievementsLoading == LoadingStatus.Complete && !$achievements?.length}
 	<EmptyStateZone
-		title={m.achievements_noneFound()}
-		description={m.achievements_noneFound_description()}
+		title={m.tidy_sunny_seahorse_relish()}
+		description={m.flat_sleek_mole_ascend()}
 	/>
 {/if}
 {#each [...$achievementCategories, U] as category (category.id)}

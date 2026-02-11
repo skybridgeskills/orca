@@ -28,7 +28,7 @@
 	}
 
 	const breadcrumbItems = [
-		{ text: m.home(), href: '/' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: data.achievement.name, href: `/achievements/${data.achievement.id}` },
 		{
 			text: `${data.claim.user.givenName} ${data.claim.user.familyName}`,
@@ -55,12 +55,12 @@
 	{#if form.endorsement}
 		<div class="mb-4">
 			<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-				<span class="font-bold">{m.status_created()}:</span>
+				<span class="font-bold">{m.sharp_silly_hound_dart()}:</span>
 				{form.endorsement?.createdAt}
 			</p>
 			{#if endorsementJson?.narrative}
 				<p class="font-bold max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-					{m.narrative()}:
+					{m.fancy_flat_kite_relish()}:
 				</p>
 				<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 					<MarkdownRender value={endorsementJson.narrative} />
@@ -106,7 +106,7 @@
 				{m.bright_happy_sparrow_narrdesc()}
 			</p>
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.achievement_narrative()}</label
+				>{m.patchy_crazy_marten_march()}</label
 			>
 			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative} />
 			<MarkdownEditor inputName="narrative" bind:value={endorsementNarrative} />

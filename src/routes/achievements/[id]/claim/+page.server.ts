@@ -29,7 +29,7 @@ export const load = async ({ locals, params, url }) => {
 	if (inviteId && inviteeEmail) {
 		invite = await prisma.claimEndorsement.findUnique({ where: { id: inviteId } });
 		if (invite && invite?.inviteeEmail != inviteeEmail)
-			throw error(403, m.claim_invitationInvalidError());
+			throw error(403, m.sharp_crazy_boar_climb());
 		if (invite?.organizationId != locals.org.id) throw error(404, 'Invitation not found');
 	}
 
@@ -56,7 +56,7 @@ export const actions = {
 	// The authenticated user claims a badge
 	claim: async ({ locals, cookies, request, params }) => {
 		if (!locals.session?.user) {
-			throw error(401, m.claim_unauthenticatedError());
+			throw error(401, m.smooth_bad_goat_cook());
 		}
 
 		const achievement = await getAchievement(params.id, locals.org.id);
@@ -76,12 +76,12 @@ export const actions = {
 		if (userEmails.length && inviteId) {
 			invite = await prisma.claimEndorsement.findUnique({ where: { id: inviteId } });
 			if (invite && invite?.achievementId != params.id)
-				throw error(403, m.claim_invitationInvalidError());
+				throw error(403, m.sharp_crazy_boar_climb());
 			else if (invite && !userEmails.includes(invite.inviteeEmail))
-				throw error(403, m.claim_invitationEmailReconciliationError());
+				throw error(403, m.soft_bright_robin_link());
 		}
 
-		if (!invite && !config?.claimable) throw error(400, m.claim_achievementNotClaimableError());
+		if (!invite && !config?.claimable) throw error(400, m.clear_weary_guppy_support());
 
 		// get required badge claim if the user needs one
 		const requiredBadgeClaim =
@@ -92,7 +92,7 @@ export const actions = {
 		if (config?.claimRequiresId && !requiredBadgeClaim && !invite)
 			throw error(400, {
 				code: m.fresh_bright_sparrow_notfound(),
-				message: m.claim_userNotMeetsPrerequsiteError()
+				message: m.wide_patchy_marten_view()
 			});
 
 		let data: Prisma.AchievementClaimCreateInput = {
@@ -195,10 +195,10 @@ export const actions = {
 		throw redirect(303, `/claims/${claim.id}`);
 	},
 	updateClaim: async ({ locals, cookies, request, params }) => {
-		if (!locals.session?.user) throw error(401, m.claim_unauthenticatedError());
+		if (!locals.session?.user) throw error(401, m.smooth_bad_goat_cook());
 
 		const existingClaim = await getUserClaim(locals.session?.user?.id, params.id, locals.org.id);
-		if (!existingClaim) throw error(401, m.claim_noExistingFoundError());
+		if (!existingClaim) throw error(401, m.legal_grand_goat_view());
 
 		const formData = await request.formData();
 		const claimStatus = formData.get('claimStatus')?.toString();

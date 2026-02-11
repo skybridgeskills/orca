@@ -73,7 +73,7 @@ export const inviteToClaim = async ({
 	if (!inviteeEmail) {
 		throw error(400, {
 			code: 'recipientEmail',
-			message: m.invite_recipientIdentifierRequiredError()
+			message: m.sharp_ok_jackdaw_cook()
 		});
 	}
 	if (!validateEmailAddress(inviteeEmail)) {
@@ -120,12 +120,12 @@ export const inviteToClaim = async ({
 		};
 	} else if (!session?.user?.id) {
 		// Not an open claim achievement, and not authenticated.
-		throw error(403, m.invite_achievementUnauthorizedError());
+		throw error(403, m.tiny_dark_ostrich_jump());
 	}
 
 	if (!isAdmin({ user: session?.user }) && !achievementConfig?.json?.capabilities?.inviteRequires) {
 		// NON ADMIN USERS for a badge that is only inviteable by admins
-		throw error(403, m.invite_unauthorizedNonAdminError());
+		throw error(403, m.patchy_aqua_turtle_support());
 	}
 
 	if (
@@ -212,7 +212,7 @@ export const inviteToClaim = async ({
 			})
 		});
 		if (!emailResult.success) {
-			throw error(500, m.email_transmissionError({ message: emailResult.error?.message ?? '' }));
+			throw error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
 		}
 
 		return {
@@ -245,8 +245,8 @@ export const inviteToClaim = async ({
 		const emailResult = await sendOrcaMail({
 			from: org.email,
 			to: data.inviteeEmail,
-			subject: m.org_inviteToJoin({ orgName: org.name }),
-			text: m.org_inviteToJoin_description({
+			subject: m.male_active_turtle_view({ orgName: org.name }),
+			text: m.grand_lucky_kite_climb({
 				achievementName: endorsement.achievement?.name ?? '',
 				orgName: org.name,
 				inviteLink: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/achievements/${
@@ -255,7 +255,7 @@ export const inviteToClaim = async ({
 			})
 		});
 		if (!emailResult.success) {
-			throw error(500, m.email_transmissionError({ message: emailResult.error?.message ?? '' }));
+			throw error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
 		}
 
 		// TODO: we can't actually tell whether created. Consider adopting a createdAt, updatedAt approach,

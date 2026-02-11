@@ -114,16 +114,16 @@
 	});
 </script>
 
-<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.org_editCTA()}</h1>
+<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.alert_shy_owl_march()}</h1>
 <p class="my-4 text-sm text-gray-500 dark:text-gray-400">
-	{m.org_edit_description()}
+	{m.sad_mellow_fox_ascend()}
 </p>
 
 <form method="POST" class="max-w-2xl" on:submit|preventDefault|stopPropagation={handleSubmit}>
 	<div class="mb-6" class:isError={errors.name}>
 		<label
 			for="orgEdit_name"
-			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{m.org_name()}</label
+			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{m.sad_petty_boar_approve()}</label
 		>
 		<input
 			type="text"
@@ -140,7 +140,7 @@
 		<label
 			for="orgEdit_description"
 			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
-			>{m.description()}</label
+			>{m.kind_mellow_pug_enchant()}</label
 		>
 		<textarea
 			id="orgEdit_description"
@@ -156,7 +156,7 @@
 	</div>
 	<div class="mb-6" class:isError={errors.url}>
 		<label for="orgEdit_url" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-			>{m.url()}</label
+			>{m.best_fancy_rabbit_shrine()}</label
 		>
 		<input
 			type="text"
@@ -194,7 +194,7 @@
 		<label
 			for="orgEdit_primaryColor"
 			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-			>{m.org_primaryColor()}</label
+			>{m.lower_happy_thrush_drip()}</label
 		>
 		<input
 			type="color"
@@ -216,7 +216,7 @@
 		<div class:isError={errors.logo}>
 			<label
 				for="achievementEdit_image"
-				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.image()}</label
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.vivid_dark_pug_file()}</label
 			>
 			<ImageFileDrop
 				bind:currentValue={formData.logo}

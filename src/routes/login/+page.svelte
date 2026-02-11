@@ -56,7 +56,7 @@
 						const loginData = await loginResult.json();
 						sessionId = loginData.sessionId;
 					} else {
-						errorMessage = m.authentication_couldNotLogIn();
+						errorMessage = m.plane_sad_guppy_support();
 					}
 				}
 			} else if (result.type === 'success' && result.data?.session) {
@@ -171,7 +171,7 @@
 						for="register_agreeTerms"
 						class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 					>
-						{m.tos_agreementCTA_description()}
+						{m.bright_sea_sparrow_work()}
 					</label>
 				</div>
 			</div>
@@ -180,7 +180,7 @@
 		</form>
 	{:else if sessionId}
 		<!-- Step 2: Verify control of email to activate session -->
-		<Heading title={m.bright_swift_eagle_login()} description={m.login_checkEmailCTA_description()} />
+		<Heading title={m.bright_swift_eagle_login()} description={m.tired_soft_goat_cherish()} />
 		<form id="verifyForm" method="POST" action="?/verify" use:enhance={verifyHandler}>
 			<input type="hidden" id="inviteId" name="inviteId" bind:value={$inviteId} />
 			<div class="mt-7">
@@ -249,7 +249,7 @@
 				{/if}
 			</div>
 			<div class="mt-5">
-				<Button id="loginFormSubmit" buttonType="submit" text={m.login_sendCodeCTA()} />
+				<Button id="loginFormSubmit" buttonType="submit" text={m.early_next_seahorse_change()} />
 			</div>
 		</form>
 	{/if}

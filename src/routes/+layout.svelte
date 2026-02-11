@@ -65,7 +65,7 @@
 					class="flex flex-wrap items-center mb-6 text-sm text-gray-500 sm:mb-0 dark:text-gray-400"
 				>
 					<li>
-						<a href="/" class="mr-4 hover:underline md:mr-6">{m.home()}</a>
+						<a href="/" class="mr-4 hover:underline md:mr-6">{m.each_fluffy_fox_view()}</a>
 					</li>
 					<li>
 						<a href="/privacy" class="mr-4 hover:underline md:mr-6">{m.warm_tangy_deer_privacy()}</a>
@@ -80,7 +80,7 @@
 			</div>
 			<hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
 			<span class="block text-sm text-gray-500 sm:text-center dark:text-gray-400"
-				>{data.org.json?.tagline || m.tagline()}</span
+				>{data.org.json?.tagline || m.legal_factual_lamb_jump()}</span
 			>
 		</div>
 	</footer>

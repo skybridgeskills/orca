@@ -24,7 +24,7 @@ export const load = async ({ locals, params }) => {
 		organization: locals.org,
 		claim,
 		myEndorsements,
-		achievement: claim.achievement
+		achievement: claim.merry_every_termite_fry
 	};
 };
 
@@ -32,7 +32,7 @@ export const actions: Actions = {
 	default: async ({ locals, cookies, request, params }) => {
 		// Award a badge to a user by id (DID) or email identifier, but generate no user claim for it
 		if (!locals.session?.user) {
-			throw error(401, m.claim_unauthenticatedUserEndorsementError());
+			throw error(401, m.quick_happy_kite_zoom());
 		}
 
 		const requestData = await request.formData();
@@ -61,7 +61,7 @@ export const actions: Actions = {
 		});
 
 		const inviteeEmail = claim.user.identifiers.filter((i) => i.type == 'EMAIL')[0]?.identifier;
-		if (!inviteeEmail) throw error(400, m.endorsement_couldNotIdentifyEmailAddressError());
+		if (!inviteeEmail) throw error(400, m.curly_tired_guppy_link());
 
 		const created = true;
 		// If there is a member, ensure that there is an AchievementClaim

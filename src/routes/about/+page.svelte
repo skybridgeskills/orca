@@ -9,7 +9,7 @@
 {#if data.session?.user?.orgRole === 'GENERAL_ADMIN'}
 	<div class="max-w-2xl flex justify-between items-center">
 		<h1 class="inline-flex mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white">
-			{m.about()}
+			{m.mellow_elegant_parrot_ask()}
 			{data.org.name}
 		</h1>
 		<p class="">
@@ -20,7 +20,7 @@
 	</div>
 {:else}
 	<h1 class="max-w-2xl text-xl sm:text-2xl mb-3 text-gray-800 dark:text-white">
-		{m.about()}
+		{m.mellow_elegant_parrot_ask()}
 		{data.org.name}
 	</h1>
 {/if}
@@ -31,7 +31,7 @@
 
 {#if data.org.url}
 	<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-		{m.org_url()}
+		{m.nice_aqua_scallop_climb()}
 		<a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href={data.org.url}
 			>{data.org.url}</a
 		>
@@ -40,5 +40,5 @@
 
 <hr class="max-w-2xl mt-10" />
 <p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-	{m.org_usesOrca()}
+	{m.antsy_dry_fox_grin()}
 </p>

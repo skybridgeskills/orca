@@ -39,12 +39,12 @@
 				level
 			]}"
 			data-dismiss-target={elementId}
-			aria-label={m.close()}
+			aria-label={m.weird_dry_hound_read()}
 			on:click={() => {
 				dispatch('close');
 			}}
 		>
-			<span class="sr-only">{m.close()}</span>
+			<span class="sr-only">{m.weird_dry_hound_read()}</span>
 			<svg
 				class="w-3 h-3"
 				aria-hidden="true"

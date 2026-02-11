@@ -18,7 +18,7 @@ export const fetchAchievements = async (): Promise<LoadingStatus> => {
 	let a: (Achievement & { achievementConfig: AchievementConfig | null })[] = [];
 	const page1 = await fetch('/api/v1/achievements?includeCount=true');
 	if (page1.status !== 200) {
-		notifications.add(new Notification(m.achievements_errorFetchingData(), true, 'error'));
+		notifications.add(new Notification(m.calm_great_panther_approve(), true, 'error'));
 		return LoadingStatus.Error;
 	}
 	const { data, meta } = await page1.json();
@@ -28,7 +28,7 @@ export const fetchAchievements = async (): Promise<LoadingStatus> => {
 		for (let i = 2; i <= meta.totalPages; i++) {
 			const page = await fetch(`/api/v1/achievements?page=${i}`);
 			if (page.status !== 200) {
-				notifications.add(new Notification(m.achievements_errorFetchingData(), true, 'error'));
+				notifications.add(new Notification(m.calm_great_panther_approve(), true, 'error'));
 				return LoadingStatus.Error;
 			}
 			const { data: pageData } = await page.json();

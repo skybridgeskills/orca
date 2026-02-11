@@ -39,27 +39,27 @@
 		<Alert heading="Badge claimed:" message={m.merry_trite_seahorse_relish()}>
 			{#each relatedClaims.filter((c) => c.achievementId == achievement.id) as claim (claim.id)}
 				<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-					{m.date()}: {claim.createdOn}
+					{m.warm_piquant_marten_read()}: {claim.createdOn}
 				</p>
 				<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 					{#if claim.claimStatus == 'UNACCEPTED'}
-						{m.status_invited_description()}
+						{m.kind_dry_panther_bask()}
 						<a
 							href={`/achievements/${achievement.id}/claim`}
-							class="text-bold underline hover:no-underline">{m.claim_viewCTA()}</a
+							class="text-bold underline hover:no-underline">{m.best_teary_shrimp_pause()}</a
 						>
 					{:else if claim.claimStatus == 'ACCEPTED'}
-						{m.claim_statusAccepted()}
+						{m.weary_bold_myna_buy()}
 						<a
 							href={`/achievements/${achievement.id}/claim`}
-							class="text-bold underline hover:no-underline">{m.claim_changeCTA()}</a
+							class="text-bold underline hover:no-underline">{m.gray_plane_kite_deny()}</a
 						>
 					{:else}
-						{m.status_rejected_description()}
+						{m.piquant_curly_mantis_tickle()}
 						{#if showClaimLink}
 							<a
 								href={`/achievements/${achievement.id}/claim`}
-								class="text-bold underline hover:no-underline">{m.claim_changeCTA()}</a
+								class="text-bold underline hover:no-underline">{m.gray_plane_kite_deny()}</a
 							>
 						{/if}
 					{/if}
@@ -71,9 +71,9 @@
 	<div class="max-w-2xl flex justify-between items-center mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
 			{#if userHoldsRequiredAchievement()}
-				{m.achievement_claimCTA()}
+				{m.early_light_goat_lead()}
 			{:else}
-				{m.status_prerequisiteRequired()}
+				{m.petty_warm_crossbill_approve()}
 			{/if}
 		</h2>
 		<div>
@@ -119,7 +119,7 @@
 	</div>
 
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
-		{m.achievement_openClaimable_description()}
+		{m.sharp_fluffy_mantis_delight()}
 	</p>
 {:else if !achievement.achievementConfig?.claimable || false}
 	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.firm_clear_fox_disabled()}</h2>

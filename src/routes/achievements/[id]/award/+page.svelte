@@ -30,8 +30,8 @@
 	let awardNarrative = '';
 
 	const breadcrumbItems = [
-		{ text: m.home(), href: '/' },
-		{ text: m.achievement_other(), href: '/achievements' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement?.name, href: `/achievements/${data.achievement.id}` }
 	];
 </script>
@@ -48,23 +48,23 @@
 
 		{#if form.selfClaim}
 			<p class="mt-4 mb-8 text-sm text-gray-500 dark:text-gray-400">
-				{m.achievement_youHaveClaimed_description()}
+				{m.patchy_silly_guppy_jump()}
 				<a
 					href={`/claims/${form.endorsement?.claim?.id}`}
 					class="text-blue-700 text-underline hover:no-underline"
 				>
-					{m.claim_viewCTA()}
+					{m.best_teary_shrimp_pause()}
 				</a>
 			</p>
 		{:else if form.invited}
 			<p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
-				{m.claim_youHaveInvited({
+				{m.great_swift_penguin_link({
 					inviteeEmail: form.endorsement?.inviteeEmail ?? ''
 				})}
 			</p>
 		{:else}
 			<p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
-				{m.claim_youHaveAwarded({
+				{m.petty_lucky_termite_view({
 					givenName: form.identifier?.user?.givenName ?? 'another',
 					familyName: form.identifier?.user?.familyName ?? 'user'
 				})}
@@ -81,12 +81,12 @@
 		{#if form.endorsement}
 			<div class="mb-4">
 				<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-					<span class="font-bold">{m.status_created()}:</span>
+					<span class="font-bold">{m.sharp_silly_hound_dart()}:</span>
 					{form.endorsement?.createdAt}
 				</p>
 				{#if endorsementJson?.narrative}
 					<p class="font-bold max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-						{m.narrative()}:
+						{m.fancy_flat_kite_relish()}:
 					</p>
 					<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 						<MarkdownRender value={endorsementJson.narrative} />
@@ -105,7 +105,7 @@
 
 		<div class="flex gap-1">
 			<Button
-				text={m.achievement_awardAnotherCTA()}
+				text={m.equal_petty_panther_file()}
 				submodule="secondary"
 				on:click={() => {
 					form = null;
@@ -122,7 +122,7 @@
 		<form method="POST" class="mt-4">
 			<div class="mb-6">
 				<label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-					>{m.award_recipientEmail()}</label
+					>{m.direct_top_giraffe_login()}</label
 				>
 				<input
 					type="email"
@@ -136,12 +136,12 @@
 
 			<div class="mb-6">
 				<p class="mb-3 text-sm text-gray-500 dark:text-gray-400">
-					{m.award_narrative_description()}
+					{m.lower_house_bat_propel()}
 				</p>
 				<label
 					for="narrative"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-					>{m.achievement_narrative()}</label
+					>{m.patchy_crazy_marten_march()}</label
 				>
 				{#if data.achievement.criteriaNarrative}
 					<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
@@ -152,7 +152,7 @@
 					id="narrative"
 					name="narrative"
 					class="hidden"
-					placeholder={m.award_narrative_placeholder()}
+					placeholder={m.elegant_soft_oryx_read()}
 					bind:value={awardNarrative}
 				/>
 				<MarkdownEditor bind:value={awardNarrative} inputName="narrative" />

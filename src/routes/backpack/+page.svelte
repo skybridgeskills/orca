@@ -46,13 +46,13 @@
 
 	let currentShareIntent: (AchievementClaim & { achievement: Achievement }) | null = null;
 
-	const breadcrumbItems = [{ text: m.home(), href: '/' }, { text: m.backpack() }];
+	const breadcrumbItems = [{ text: m.each_fluffy_fox_view(), href: '/' }, { text: m.bold_petty_dog_march() }];
 
 	const handleShare = (claim: AchievementClaim & { achievement: Achievement }) => {
 		if (navigator.share) {
 			navigator.share({
 				title: claim.achievement.name,
-				text: `${m.claim_shareText_heading({ name: claim.achievement.name })} 
+				text: `${m.piquant_dense_meerkat_link({ name: claim.achievement.name })} 
 				
 				${claim.achievement.description}`,
 				url: `${PUBLIC_HTTP_PROTOCOL}://${data.org.domain}/ob2/a/${claim.id}`
@@ -79,9 +79,9 @@
 <Breadcrumbs items={breadcrumbItems} />
 
 <Heading
-	title={m.backpack_yourBadges_heading()}
+	title={m.merry_major_parrot_tap()}
 	level="h1"
-	description={m.backpack_yourBadges_description()}
+	description={m.warm_hard_bat_emerge()}
 />
 
 {#if [LoadingStatus.NotStarted, LoadingStatus.Loading].includes($backpackClaimsLoading)}
@@ -90,7 +90,7 @@
 {#each data.outstandingInvites as invite}
 	<div class="my-2">
 		<Alert>
-			{m.status_invited_description()}
+			{m.kind_dry_panther_bask()}
 			<a
 				href={`/achievements/${invite.achievementId}/claim?i=${invite.id}&e=${encodeURIComponent(
 					invite.inviteeEmail
@@ -126,7 +126,7 @@
 				>
 					<div slot="moredescription">
 						<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
-							{m.claimed()}
+							{m.equal_active_parrot_march()}
 							{dayjs(claim.createdOn).fromNow()}
 						</p>
 					</div>
@@ -155,7 +155,7 @@
 										e.stopPropagation();
 									}}
 								>
-									<span class="sr-only">{m.share()}</span>
+									<span class="sr-only">{m.happy_sparse_lemur_clasp()}</span>
 									<Icon src={FaShareSquare} size="20" color="currentColor" />
 								</button>
 							</div>
@@ -168,9 +168,9 @@
 		<EmptyStateZone title="You haven't claimed any badges yet.">
 			<Backpack slot="image" />
 			<p slot="description">
-				{m.backpack_emptyState_description()}
+				{m.male_serious_pug_link()}
 				<br /><a href="/achievements" class="font-bold underline hover:no-underline"
-					>{m.backpack_emptyStateCTA()}</a
+					>{m.arable_aqua_deer_scribe()}</a
 				>.
 			</p>
 		</EmptyStateZone>
@@ -187,7 +187,7 @@
 	actions={[]}
 >
 	<p class="max-w-2xl mb-4 lg:mb-8 text-gray-500 text-sm md:text-md dark:text-gray-400">
-		{m.share_description()}
+		{m.quiet_quick_panther_emerge()}
 	</p>
 	<div class="flex mb-3 w-full">
 		<span

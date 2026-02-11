@@ -40,7 +40,7 @@
 </script>
 
 {#await getData(page)}
-	{m.status_loading()}
+	{m.merry_stout_rabbit_enchant()}
 {:then}
 	<div>
 		<Pagination paging={{ page, count: total, pageSize, action: getData }} />

@@ -9,7 +9,7 @@
 	let achievement = data.credential.achievement;
 
 	let breadcrumbItems = [
-		{ text: m.home(), href: '/' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: achievement.name, href: `/achievements/${achievement.id}` }
 	];
 </script>

@@ -8,7 +8,7 @@ import { isLocalDevFileMedia } from '$lib/server/media.js';
 
 export const GET = async ({ params }: RequestEvent) => {
 	if (!isLocalDevFileMedia())
-		throw error(500, { message: m.media_localMediaOnlyAvailableInDevError() });
+		throw error(500, { message: m.clear_mellow_goat_lead() });
 	const filePath = path.join(process.cwd(), 'dev-uploads', params.id, params.filename);
 
 	try {
@@ -30,7 +30,7 @@ export const GET = async ({ params }: RequestEvent) => {
 
 export const PUT = async ({ params, request }: RequestEvent) => {
 	if (!isLocalDevFileMedia())
-		throw error(500, { message: m.media_localMediaOnlyAvailableInDevError() });
+		throw error(500, { message: m.clear_mellow_goat_lead() });
 	try {
 		const dirPath = path.join(process.cwd(), 'dev-uploads', params.id);
 		const filePath = path.join(dirPath, params.filename);

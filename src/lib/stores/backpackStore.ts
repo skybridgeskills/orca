@@ -22,7 +22,7 @@ export const fetchBackpackClaims = async (): Promise<LoadingStatus> => {
 	backpackClaimsLoading.set(LoadingStatus.Loading);
 	const page1 = await fetch('/api/v1/backpack/claims?includeCount=true');
 	if (page1.status !== 200) {
-		notifications.add(new Notification(m.backpack_errorFetchingData(), true, 'error'));
+		notifications.add(new Notification(m.smooth_light_bat_relish(), true, 'error'));
 		return LoadingStatus.Error;
 	}
 	const { data, meta } = await page1.json();
@@ -32,7 +32,7 @@ export const fetchBackpackClaims = async (): Promise<LoadingStatus> => {
 		for (let i = 2; i <= meta.totalPages; i++) {
 			const page = await fetch(`/api/v1/achievements?page=${i}`);
 			if (page.status !== 200) {
-				notifications.add(new Notification(m.backpack_errorFetchingData(), true, 'error'));
+				notifications.add(new Notification(m.smooth_light_bat_relish(), true, 'error'));
 				return LoadingStatus.Error;
 			}
 			const { data: pageData } = await page.json();

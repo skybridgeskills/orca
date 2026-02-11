@@ -27,7 +27,7 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 			}
 		});
 		if (!claim?.validFrom || claim?.claimStatus !== 'ACCEPTED')
-			throw error(404, m.claim_notFoundOrNotShareableError());
+			throw error(404, m.sharp_flat_kite_clasp());
 		if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
 		// TODO return the OB3 version, once access control is properly implemented

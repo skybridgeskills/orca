@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ url, locals, params }) => {
 			}
 		}
 	});
-	if (member.organizationId != locals.org.id) throw error(404, m.member_notFoundError());
+	if (member.organizationId != locals.org.id) throw error(404, m.slow_clear_cheetah_spill());
 
 	return {
 		member

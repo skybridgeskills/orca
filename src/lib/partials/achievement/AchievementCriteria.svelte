@@ -6,7 +6,7 @@
 	export let achievement: Achievement;
 </script>
 
-<h3 class="text-l sm:text-xl mt-4 mb-3 dark:text-gray-100">{m.criteria()}</h3>
+<h3 class="text-l sm:text-xl mt-4 mb-3 dark:text-gray-100">{m.lower_piquant_lemur_grin()}</h3>
 
 {#if achievement.criteriaId}
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">

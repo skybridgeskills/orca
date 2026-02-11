@@ -45,9 +45,9 @@
 	};
 
 	let breadcrumbItems = [
-		{ text: m.home(), href: '/' },
-		{ text: m.achievement_other(), href: '/achievements' },
-		{ text: m.category_other() }
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
+		{ text: m.fluffy_merry_myna_march() }
 	];
 
 	const enhanceUpsert = () => {
@@ -70,11 +70,11 @@
 <Breadcrumbs items={breadcrumbItems} />
 
 <h1 class="max-w-2xl text-xl sm:text-2xl mb-3 text-gray-800 dark:text-white">
-	{m.categories_title()}
+	{m.dense_frail_bat_nurture()}
 </h1>
 
 <p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-	{m.categories_description()}
+	{m.sweet_serious_hound_intend()}
 </p>
 
 <div class="overflow-x-auto relative my-6">
@@ -86,10 +86,10 @@
 		<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
 			<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 				<tr>
-					<th scope="col" class="py-3 px-6"> {m.category_name()} </th>
-					<th scope="col" class="py-3 px-6"> {m.category_achievementCount()} </th>
-					<th scope="col" class="py-3 px-6"> {m.category_weight()} </th>
-					<th scope="col" class="py-3 px-6"> {m.action_other()} </th>
+					<th scope="col" class="py-3 px-6"> {m.moving_serious_parrot_emerge()} </th>
+					<th scope="col" class="py-3 px-6"> {m.piquant_antsy_ray_clasp()} </th>
+					<th scope="col" class="py-3 px-6"> {m.deft_factual_goat_buy()} </th>
+					<th scope="col" class="py-3 px-6"> {m.stout_teary_hound_support()} </th>
 				</tr>
 			</thead>
 
@@ -109,7 +109,7 @@
 									name="update_categoryId"
 									bind:value={category.id}
 								/>
-								<label for="update_categoryName" class="sr-only">{m.category_name()}</label>
+								<label for="update_categoryName" class="sr-only">{m.moving_serious_parrot_emerge()}</label>
 								<input
 									form="updateCategoryForm"
 									type="text"
@@ -117,7 +117,7 @@
 									name="update_categoryName"
 									bind:value={currentlyEditingCategory.name}
 									class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-									placeholder={m.membership()}
+									placeholder={m.bad_dry_pug_buy()}
 									required
 								/>
 							</th>
@@ -125,7 +125,7 @@
 								{category._count?.achievements}
 							</td>
 							<td class="py-4 px-6">
-								<label for="update_weight" class="sr-only">{m.category_weight()}</label>
+								<label for="update_weight" class="sr-only">{m.deft_factual_goat_buy()}</label>
 								<input
 									form="updateCategoryForm"
 									type="text"
@@ -191,14 +191,14 @@
 						scope="row"
 						class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
 					>
-						<label for="create_categoryName" class="sr-only">{m.category_name()}</label>
+						<label for="create_categoryName" class="sr-only">{m.moving_serious_parrot_emerge()}</label>
 						<input
 							form="createCategoryForm"
 							type="text"
 							id="create_categoryName"
 							name="create_categoryName"
 							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-							placeholder={m.membership()}
+							placeholder={m.bad_dry_pug_buy()}
 							required
 						/>
 					</th>
@@ -206,7 +206,7 @@
 						<!-- no achievements yet -->
 					</td>
 					<td class="py-4 px-6">
-						<label for="create_weight" class="sr-only">{m.category_weight()}</label>
+						<label for="create_weight" class="sr-only">{m.deft_factual_goat_buy()}</label>
 						<input
 							form="createCategoryForm"
 							type="text"

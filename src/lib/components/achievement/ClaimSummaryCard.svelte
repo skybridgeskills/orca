@@ -26,7 +26,7 @@
 		if (navigator.share) {
 			navigator.share({
 				title: achievement.name,
-				text: `${m.claim_shareText_heading({ name: achievement.name })} 
+				text: `${m.piquant_dense_meerkat_link({ name: achievement.name })} 
 				
 				${achievement.description}`,
 				url: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/ob2/a/${claim.id}`
@@ -38,7 +38,7 @@
 	};
 	const handleCopyToClipboard = () => {
 		if (!claim || !navigator.clipboard) {
-			notifications.add(new Notification(m.clipboard_couldNotCopyError()));
+			notifications.add(new Notification(m.home_true_jackdaw_emerge()));
 		}
 		navigator.clipboard.writeText(`${PUBLIC_HTTP_PROTOCOL}://${org.domain}/ob2/a/${claim.id}`);
 	};
@@ -49,19 +49,19 @@
 	achievementHref={`/achievements/${achievement.id}/claim`}
 	achievement={{
 		...achievement,
-		name: claim.claimStatus == 'ACCEPTED' ? m.claim_statusAccepted() : m.status_rejected(),
+		name: claim.claimStatus == 'ACCEPTED' ? m.weary_bold_myna_buy() : m.status_rejected(),
 		description: ''
 	}}
 >
 	<div slot="moredescription">
 		{#if claim.claimStatus === 'ACCEPTED'}
 			<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
-				{m.claimed()}
+				{m.equal_active_parrot_march()}
 				{dayjs(claim.createdOn).fromNow()}
 			</p>
 		{:else}
 			<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
-				{m.status_rejected_description()}
+				{m.piquant_curly_mantis_tickle()}
 			</p>
 		{/if}
 	</div>
@@ -85,7 +85,7 @@
 					tabindex="0"
 					href={`/claims/${claim.id}`}
 				>
-					<span class="sr-only">{m.view()}</span>
+					<span class="sr-only">{m.happy_next_robin_clasp()}</span>
 					<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
 				</a>
 				<button
@@ -98,7 +98,7 @@
 						handleShare();
 					}}
 				>
-					<span class="sr-only">{m.share()}</span>
+					<span class="sr-only">{m.happy_sparse_lemur_clasp()}</span>
 					<Icon src={FaShareSquare} size="20" color="currentColor" />
 				</button>
 			</div>
@@ -116,7 +116,7 @@
 	actions={[]}
 >
 	<p class="max-w-2xl mb-4 lg:mb-8 text-gray-500 text-sm md:text-md dark:text-gray-400">
-		{m.share_description()}
+		{m.quiet_quick_panther_emerge()}
 	</p>
 	<div class="flex mb-3 w-full">
 		<span
@@ -146,7 +146,7 @@
 		class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-none"
 		><img
 			src="/linkedin-add-to-profile-button.png"
-			alt={m.linkedin_addToProfileButton_label()}
+			alt={m.every_watery_kite_view()}
 		/></a
 	>
 </Modal>

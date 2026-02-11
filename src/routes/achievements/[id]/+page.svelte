@@ -54,8 +54,8 @@
 	let showShareModal = false;
 
 	const breadcrumbItems = [
-		{ text: m.home(), href: '/' },
-		{ text: m.achievement_other(), href: '/achievements' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name }
 	];
 
@@ -131,7 +131,7 @@
 			</Button>
 		{/if}
 		<Button
-			text={m.share()}
+			text={m.happy_sparse_lemur_clasp()}
 			submodule="secondary"
 			on:click={() => {
 				showShareModal = true;
@@ -154,7 +154,7 @@
 {#if category !== undefined}
 	<span
 		class="bg-gray-100 text-gray-800 text-md font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
-		>{m.category()}: {category.name}</span
+		>{m.serious_gentle_boar_nurture()}: {category.name}</span
 	>
 {/if}
 
@@ -182,13 +182,13 @@
 	{:else if invite || claim?.claimStatus == 'UNACCEPTED'}
 		<!-- C2: User does not have a claim, but has an invitation to claim (when a user existed at time of invite, this is represented by a claim with status unaccepted) -->
 		<AchievementSummary
-			achievement={{ ...data.achievement, name: m.status_invited_medium(), description: '' }}
+			achievement={{ ...data.achievement, name: m.frail_weary_rabbit_nurture(), description: '' }}
 		>
 			<div slot="moredescription">
 				<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
-					{m.status_invited_description()}
+					{m.kind_dry_panther_bask()}
 					{#if invite}
-						{m.achievement_invitedByNameAtTime({
+						{m.watery_fluffy_mole_pout({
 							givenName: invite?.creator?.givenName ?? '',
 							familyName: invite?.creator?.familyName ?? '',
 							timeAgo: dayjs(invite.createdAt).fromNow()
@@ -244,7 +244,7 @@
 		{:else if config?.claimable && !config?.claimRequiresId}
 			<!-- A3: Achievement is claimable by anybody, even members of the public -->
 			<span class="text-gray-500 dark:text-gray-400">
-				{m.achievement_openClaimable_description()}
+				{m.sharp_fluffy_mantis_delight()}
 			</span>
 		{/if}
 
@@ -293,9 +293,9 @@
 
 <!-- Existing community claims -->
 <Heading
-	title={m.achievement_badgesClaimed_heading()}
+	title={m.sad_antsy_crossbill_race()}
 	level="h3"
-	description={`${m.achievement_claimCountSummary({
+	description={`${m.vivid_best_bat_soar({
 		count: data.achievement._count.achievementClaims
 	})} ${
 		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(data.session?.user?.orgRole || 'none')
@@ -314,7 +314,7 @@
 	</div>
 {:else}
 	<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
-		{m.achievement_badgesClaimed_loginCTA_description()}
+		{m.sunny_brave_lemur_feel()}
 	</div>
 {/if}
 
@@ -322,7 +322,7 @@
 
 <Modal
 	visible={showDeleteModal}
-	title={m.achievement_deleteConfirm_heading()}
+	title={m.stout_sad_bat_spur()}
 	on:close={() => {
 		showDeleteModal = false;
 	}}
@@ -348,7 +348,7 @@
 	]}
 >
 	<p class="text-sm text-gray-500 dark:text-gray-400 max-w-prose">
-		{m.achievement_deleteConfirm_description({
+		{m.plane_fancy_goat_scribe({
 			name: data.achievement.name,
 			count: data.achievement._count.achievementClaims
 		})}
@@ -357,13 +357,13 @@
 
 <Modal
 	visible={showShareModal}
-	title={m.share()}
+	title={m.happy_sparse_lemur_clasp()}
 	on:close={() => {
 		showShareModal = false;
 	}}
 	actions={[
 		{
-			label: m.share_copyUrl(),
+			label: m.lucky_tired_mole_ask(),
 			buttonType: 'button',
 			submodule: 'secondary',
 			onClick: (e) => {
@@ -372,7 +372,7 @@
 				}
 				const url = `${PUBLIC_HTTP_PROTOCOL}://${data.org.domain}/achievements/${data.achievement.id}`;
 				navigator.clipboard.writeText(url);
-				console.log(m.claim_shareUrlCopied() + url);
+				console.log(m.dense_cool_owl_nurture() + url);
 				e.preventDefault();
 				e.stopPropagation();
 			}
@@ -380,10 +380,10 @@
 	]}
 >
 	<p class="text-sm text-gray-500 dark:text-gray-400">
-		{m.achievement_share_description()}
+		{m.best_fresh_honeybadger_pet()}
 	</p>
 	<QRCode
 		url={`${PUBLIC_HTTP_PROTOCOL}://${data.org.domain}/achievements/${data.achievement.id}`}
-		alt={m.share_qrCodeImageAltText()}
+		alt={m.plane_light_fish_view()}
 	/>
 </Modal>

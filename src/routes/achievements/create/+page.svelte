@@ -17,8 +17,8 @@
 </script>
 
 <Heading
-	title={m.achievement_createNewHeading()}
-	description={m.achievement_createNewDescription()}
+	title={m.wet_house_owl_cook()}
+	description={m.funny_grand_thrush_intend()}
 	level="h1"
 />
 

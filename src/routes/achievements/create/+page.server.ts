@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
 		if (!locals.session?.user?.id) {
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 		}
 
 		const hasPermission = await canEditAchievements({
@@ -71,7 +71,7 @@ export const actions: Actions = {
 		});
 
 		if (!hasPermission) {
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 		}
 
 		const newIdentifier = uuidv4();

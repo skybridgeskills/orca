@@ -115,7 +115,7 @@
 						result.data?.code ?? 'none'
 					)
 				)
-					errors[result.data?.code as keyof typeof errors] = m.requirement_statusInvalid();
+					errors[result.data?.code as keyof typeof errors] = m.great_late_sparrow_fry();
 				break;
 			case 'success':
 				//read the upload url and put the image data to it.
@@ -171,7 +171,7 @@
 			<div class:isError={errors.image}>
 				<label
 					for="achievementEdit_image"
-					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.image()}</label
+					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.vivid_dark_pug_file()}</label
 				>
 				<ImageFileDrop
 					bind:currentValue={formData.image}
@@ -191,7 +191,7 @@
 				<label
 					for="achievementEdit_name"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
-					>{m.achievement_name()}</label
+					>{m.grand_true_lynx_whisper()}</label
 				>
 				<input
 					type="text"
@@ -213,7 +213,7 @@
 				<label
 					for="achievementEdit_description"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
-					>{m.description()}</label
+					>{m.kind_mellow_pug_enchant()}</label
 				>
 				<textarea
 					id="achievementEdit_description"
@@ -234,7 +234,7 @@
 				<label
 					for="achievementEdit_category"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
-					>{m.category()}</label
+					>{m.serious_gentle_boar_nurture()}</label
 				>
 				<select
 					id="achievementEdit_category"
@@ -242,7 +242,7 @@
 					bind:value={formData.category}
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 				>
-					<option value="uncategorized">- {m.uncategorized()} -</option>
+					<option value="uncategorized">- {m.light_early_owl_shrine()} -</option>
 					{#each categories as category (category.id)}
 						<option value={category.id}>{category.name}</option>
 					{/each}
@@ -259,7 +259,7 @@
 	<div class="max-w-4xl space-y-6">
 		<!-- Criteria -->
 
-		<Heading title={m.criteria()} description={m.criteria_description()} level="h3" />
+		<Heading title={m.lower_piquant_lemur_grin()} description={m.pink_crazy_robin_gaze()} level="h3" />
 		<div class="mb-6" class:isError={errors.criteriaNarrative}>
 			<MarkdownEditor bind:value={formData.criteriaNarrative} inputName="criteriaNarrative" />
 
@@ -274,7 +274,7 @@
 			<label
 				for="achievementEdit_url"
 				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.criteria_url()}</label
+				>{m.deft_stout_panther_nurture()}</label
 			>
 			<input
 				type="text"
@@ -301,14 +301,14 @@
 							bind:selectedOption={formData.claimableSelectedOption}
 							value="off"
 							name="claimableSelectedOption"
-							label={m.achievement_awardByInvitation()}
+							label={m.each_funny_eagle_pause()}
 							id="achievementEdit_claimable_off"
 						/>
 						<RadioOption
 							bind:selectedOption={formData.claimableSelectedOption}
 							value="public"
 							name="claimableSelectedOption"
-							label={m.achievement_openClaimable_description()}
+							label={m.sharp_fluffy_mantis_delight()}
 							id="achievementEdit_claimableSelectedOption_public"
 						/>
 						<RadioOption

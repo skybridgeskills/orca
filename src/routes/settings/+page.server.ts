@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 export const actions: Actions = {
 	default: async ({ locals, cookies, request, params }) => {
-		if (!locals.session?.user?.id) throw error(403, m.member_settingsChangeUnauthenticedError());
+		if (!locals.session?.user?.id) throw error(403, m.silly_top_marten_view());
 
 		const requestData = await request.formData();
 		const givenName: string = requestData.get('givenName')?.toString() ?? '';
