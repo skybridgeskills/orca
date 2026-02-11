@@ -127,6 +127,17 @@ declare namespace App {
 	}
 }
 
+declare global {
+	interface Window {
+		credentialHandlerPolyfill: {
+			loadOnce: () => Promise<void>;
+		};
+		WebCredential: {
+			new (type: string, data: any): Credential;
+		};
+	}
+}
+
 /**
  * It's possible to tell SvelteKit how to type objects inside your app by declaring the `App` namespace. By default, a new project will have a file called `src/app.d.ts` containing the following:
  *

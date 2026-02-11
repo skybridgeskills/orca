@@ -61,7 +61,7 @@
 		};
 		const webCredential = new window.WebCredential(presentation.type, presentation);
 		const chapiResult = await navigator.credentials.store(webCredential);
-		if (!chapiResult) notifications.add(new Notification(m.chapi_cancelFailError()));
+		if (chapiResult === null) notifications.add(new Notification(m.chapi_cancelFailError()));
 	};
 </script>
 

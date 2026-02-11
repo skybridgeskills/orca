@@ -5,6 +5,7 @@ import { prisma } from '$lib/../prisma/client';
 
 import { achievementClaimToCredential } from '$lib/credentials/achievementCredential';
 import type { AchievementCredential } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { isCredentialCacheExired } from '$lib/credentials/credentialHelper';
 
 export const POST = async ({ locals, params }: RequestEvent) => {
@@ -40,7 +41,7 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 				data: {
 					identifier: signedCredential.id,
 					subjectId: signedCredential.credentialSubject.id,
-					json: { ...signedCredential }
+					json: JSON.parse(JSON.stringify(signedCredential)) as Prisma.InputJsonValue
 				}
 			});
 		} else {
@@ -54,7 +55,7 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 					identifier: signedCredential.id,
 					subjectId: signedCredential.credentialSubject.id,
 
-					json: { ...signedCredential }
+					json: JSON.parse(JSON.stringify(signedCredential)) as Prisma.InputJsonValue
 				}
 			});
 		}

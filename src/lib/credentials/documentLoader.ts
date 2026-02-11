@@ -27,5 +27,6 @@ export const extendedDocumentLoader = async (url: string) => {
 		};
 	}
 
-	return await jsigs.strictDocumentLoader(url);
+	const loader = jsigs.strictDocumentLoader as (url: string) => Promise<any>;
+	return await loader(url);
 };

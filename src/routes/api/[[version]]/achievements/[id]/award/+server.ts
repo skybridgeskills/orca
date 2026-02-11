@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { apiResponse } from '$lib/utils/api';
-import { inviteToClaim, InviteArgs } from '$lib/data/achievement';
+import { inviteToClaim } from '$lib/data/achievement';
+import type { InviteArgs } from '$lib/data/achievement';
 
 export const POST: RequestHandler = async ({ request, params, locals }) => {
 	const data = await request.json();

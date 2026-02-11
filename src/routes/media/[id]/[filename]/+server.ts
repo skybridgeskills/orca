@@ -16,7 +16,7 @@ export const GET = async ({ params }: RequestEvent) => {
 		if (!mimeType) throw error(404);
 
 		const data = await fs.readFile(filePath);
-		return new Response(data, {
+		return new Response(new Uint8Array(data), {
 			headers: { 'Content-type': mimeType }
 		});
 	} catch (err) {
@@ -41,7 +41,7 @@ export const PUT = async ({ params, request }: RequestEvent) => {
 		}
 
 		const requestBody = await request.arrayBuffer();
-		await fs.writeFile(filePath, Buffer.from(requestBody), { flag: 'w' });
+		await fs.writeFile(filePath, new Uint8Array(requestBody), { flag: 'w' });
 		return json({ path: filePath });
 	} catch (err) {
 		if (err instanceof Error) {

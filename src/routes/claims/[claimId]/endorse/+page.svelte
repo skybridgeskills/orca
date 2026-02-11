@@ -109,7 +109,7 @@
 				>{m.achievement_narrative()}</label
 			>
 			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative} />
-			<MarkdownEditor bind:value={endorsementNarrative} />
+			<MarkdownEditor inputName="narrative" bind:value={endorsementNarrative} />
 		</div>
 		<div class="mb-6">
 			<label

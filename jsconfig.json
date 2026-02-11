@@ -8,6 +8,14 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"sourceMap": true,
-		"strict": true
-	}
+		"strict": true,
+		"typeRoots": ["./types", "./node_modules/@types"]
+	},
+	"include": [
+		"src/app.d.ts"
+	],
+	"exclude": [
+		"src/lib/i18n/messages/**/*.js",
+		"src/lib/i18n/messages.js"
+	]
 }
