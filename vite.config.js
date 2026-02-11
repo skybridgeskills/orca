@@ -10,27 +10,31 @@ import path from 'path';
 dotenv.config();
 
 // Plugin to fix SvelteKit-generated tsconfig.json with deprecated TypeScript options
+const fixTsconfig = () => {
+	const tsconfigPath = path.resolve('.svelte-kit/tsconfig.json');
+	if (fs.existsSync(tsconfigPath)) {
+		try {
+			const config = JSON.parse(fs.readFileSync(tsconfigPath, 'utf-8'));
+			if (config.compilerOptions) {
+				config.compilerOptions.verbatimModuleSyntax = true;
+				delete config.compilerOptions.importsNotUsedAsValues;
+				delete config.compilerOptions.preserveValueImports;
+				fs.writeFileSync(tsconfigPath, JSON.stringify(config, null, '\t') + '\n');
+			}
+		} catch (e) {
+			// Ignore errors
+		}
+	}
+};
+
 const fixTsconfigPlugin = () => ({
 	name: 'fix-tsconfig',
 	buildStart() {
-		const tsconfigPath = path.resolve('.svelte-kit/tsconfig.json');
-		if (fs.existsSync(tsconfigPath)) {
-			try {
-				const config = JSON.parse(fs.readFileSync(tsconfigPath, 'utf-8'));
-				if (config.compilerOptions) {
-					config.compilerOptions.verbatimModuleSyntax = true;
-					delete config.compilerOptions.importsNotUsedAsValues;
-					delete config.compilerOptions.preserveValueImports;
-					fs.writeFileSync(tsconfigPath, JSON.stringify(config, null, '\t') + '\n');
-				}
-			} catch (e) {
-				// Ignore errors
-			}
-		}
+		fixTsconfig();
 	},
 	configureServer() {
 		// Also fix on dev server start
-		this.buildStart();
+		fixTsconfig();
 	}
 });
 

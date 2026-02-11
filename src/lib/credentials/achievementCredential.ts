@@ -91,10 +91,9 @@ export const achievementClaimToCredential = async function (
 
 	const keyPair = await Ed25519VerificationKey2020.from(keyData);
 
-	const suite = new Ed25519Signature2020({ 
-		key: keyPair,
-		date: new Date().toISOString()
-	}); //might need to use signer param
+	const suite = new Ed25519Signature2020({ key: keyPair }); //might need to use signer param
+	// Set date as property (not in type definition but works at runtime)
+	(suite as any).date = new Date().toISOString();
 
 	const signedCredential = await jsigs.sign(credentialTemplate, {
 		suite,
