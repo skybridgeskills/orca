@@ -11,6 +11,7 @@ import {
 type AvailableLanguageTag = typeof locales[number];
 import { paraglideMiddleware } from '$lib/i18n/server';
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
+import { getLanguageForRequest } from '$lib/utils/language-selection';
 
 export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
 	return orgJson.orgStatus ?? 'ENABLED';
@@ -94,14 +95,27 @@ export const handle: Handle = ({ event, resolve }) =>
 			event.locals.session = await getSession(sessionId, event.locals.org.id);
 		}
 
-		// Use locale from paraglideMiddleware
-		event.locals.locale = locale as AvailableLanguageTag;
+		// Determine language using our selection logic (cookie → org default → en-US)
+		const cookieLanguage = cookies.locale;
+		const orgJson: App.OrganizationConfig =
+			typeof event.locals.org.json === 'string'
+				? JSON.parse(event.locals.org.json)
+				: event.locals.org.json || {};
+		const orgDefaultLanguage = orgJson.defaultLanguage;
+		const selectedLanguage = getLanguageForRequest(
+			cookieLanguage,
+			orgDefaultLanguage,
+			locales
+		);
+
+		// Use the selected language
+		event.locals.locale = selectedLanguage;
 		setLocale(event.locals.locale, { reload: false });
 		const theme = ['dark', 'light'].includes(cookies.theme) ? cookies.theme : 'default';
 
 		const response = await resolve(event, {
 			transformPageChunk: ({ html }) => {
-				return html.replace('%lang%', locale);
+				return html.replace('%lang%', selectedLanguage);
 			}
 		});
 
@@ -113,7 +127,7 @@ export const handle: Handle = ({ event, resolve }) =>
 		if (!cookies.locale)
 			response.headers.append(
 				'set-cookie',
-				`locale=${locale};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
+				`locale=${selectedLanguage};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
 			);
 
 		return response;
