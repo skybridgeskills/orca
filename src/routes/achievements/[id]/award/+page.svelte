@@ -41,7 +41,7 @@
 	{#if form}
 		<!-- Result of form submission: a new Endorsement or a previous one-->
 		<h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-			{m.awardedBadge()}
+			{m.warm_tangy_deer_awarded()}
 		</h3>
 
 		<AchievementSummary achievement={data.achievement} linkAchievement={false} />
@@ -94,7 +94,7 @@
 				{/if}
 				{#if endorsementJson?.id}
 					<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-						<span class="font-bold">{m.evidenceURL()}:</span>
+						<span class="font-bold">{m.calm_steady_lynx_evidence()}:</span>
 						<a href={endorsementJson.id} class="text-blue-700 text-underline hover:no-underline">
 							{endorsementJson.id}
 						</a>
@@ -161,7 +161,7 @@
 				<label
 					for="evidenceUrl"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-					>{m.evidenceURL()}</label
+					>{m.calm_steady_lynx_evidence()}</label
 				>
 				<input
 					type="text"

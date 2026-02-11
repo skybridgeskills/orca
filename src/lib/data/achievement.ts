@@ -202,8 +202,8 @@ export const inviteToClaim = async ({
 		const emailResult = await sendOrcaMail({
 			from: org.email,
 			to: data.inviteeEmail,
-			subject: m.awardedBadge(),
-			text: m.awardedBadge_email_description({
+			subject: m.warm_tangy_deer_awarded(),
+			text: m.gentle_brave_falcon_awardeddesc({
 				achievementName: achievement.name,
 				communityName: org.name,
 				badgeUrl: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/login?e=${encodeURIComponent(

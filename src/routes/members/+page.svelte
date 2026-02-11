@@ -24,7 +24,7 @@
 				<h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
 					{member.givenName}
 					{member.familyName}
-					{#if member.orgRole}<Tag open={true}>{m.adminRoleLabel()}</Tag>{/if}
+					{#if member.orgRole}<Tag open={true}>{m.sharp_clear_fox_admin()}</Tag>{/if}
 				</h5>
 			</a>
 			<a

@@ -147,7 +147,7 @@
 			<Button
 				class="text-xs"
 				submodule="secondary"
-				text={m.qrCode()}
+				text={m.sharp_quiet_panther_qr()}
 				on:click={() => {
 					showQRShareModal = true;
 				}}

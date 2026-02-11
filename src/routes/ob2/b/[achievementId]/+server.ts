@@ -22,6 +22,6 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 		});
 		if (achievement?.organizationId === locals.org.id)
 			return json(badgeClassFromAchievement(achievement));
-		else throw error(404, m.notFound());
+		else throw error(404, m.fresh_bright_sparrow_notfound());
 	}
 };

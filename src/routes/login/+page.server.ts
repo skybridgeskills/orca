@@ -207,7 +207,7 @@ export const actions: Actions = {
 				Date.now() > currentInvite.createdAt.getTime() + INVITE_SESSION_VALIDITY_MS
 			) {
 				// User will be required to login by email if their invite is stale.
-				throw error(401, { message: m.unauthenticatedError(), code: 'invite_expired' });
+				throw error(401, { message: m.quick_clear_owl_unauth(), code: 'invite_expired' });
 			}
 		}
 

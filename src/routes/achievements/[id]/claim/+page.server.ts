@@ -91,7 +91,7 @@ export const actions = {
 
 		if (config?.claimRequiresId && !requiredBadgeClaim && !invite)
 			throw error(400, {
-				code: m.notFound(),
+				code: m.fresh_bright_sparrow_notfound(),
 				message: m.claim_userNotMeetsPrerequsiteError()
 			});
 

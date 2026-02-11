@@ -14,7 +14,7 @@
 <Heading title={data.org.name} description={data.org.description} />
 
 {#if data.highlightedAchievements.length}
-	<h2 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.mostAwardedAchievements()}</h2>
+	<h2 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.swift_steady_falcon_mostawarded()}</h2>
 
 	<ul class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
 		{#each data.highlightedAchievements as achievement}
@@ -24,7 +24,7 @@
 						<img
 							src={imageUrl(achievement.image)}
 							class=""
-							alt={m.achievementImageAltText({ name: achievement.name })}
+							alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
 						/>
 					{:else}
 						<div class="text-gray-400 dark:text-gray-700">

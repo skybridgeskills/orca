@@ -27,6 +27,6 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 					true
 				)
 			);
-		else throw error(404, m.notFound());
+		else throw error(404, m.fresh_bright_sparrow_notfound());
 	}
 };

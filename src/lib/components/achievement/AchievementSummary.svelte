@@ -51,7 +51,7 @@
 					class:w-32={imageSize === '32'}
 					class:w-16={imageSize === '16'}
 					class:opacity-50={disabled}
-					alt={m.achievementImageAltText({ name: achievement.name })}
+					alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
 				/>
 			{:else}
 				<div

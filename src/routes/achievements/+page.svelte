@@ -88,7 +88,7 @@
 								<img
 									src={imageUrl(achievement.image)}
 									class=""
-									alt={m.achievementImageAltText({ name: achievement.name })}
+									alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
 								/>
 							{:else}
 								<div class="text-gray-400 dark:text-gray-700">

@@ -61,7 +61,7 @@
 	{/if}
 {:else}
 	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
-		{m.otherUserBadge_heading({
+		{m.quick_clear_owl_otherbadge({
 			givenName: data.claim.user.givenName ?? '',
 			familyName: data.claim.user.familyName ?? ''
 		})}

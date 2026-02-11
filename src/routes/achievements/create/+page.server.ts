@@ -168,7 +168,7 @@ export const actions: Actions = {
 				}
 			});
 			if (!inviteRequiresAchievement) {
-				throw error(400, m.inviteRequires_notFound());
+				throw error(400, m.sharp_quiet_panther_invitereq());
 			}
 		}
 

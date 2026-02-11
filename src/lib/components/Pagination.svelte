@@ -29,7 +29,7 @@
 {#if count > 0 && maxPage > 1}
 	<div class="text-right my-2">
 		<span class="mr-4 text-sm text-gray-500 dark:text-gray-400 inline-block"
-			>{m.paginationSummary({ page, maxPage, count })}</span
+			>{m.sharp_clear_fox_pagination({ page, maxPage, count })}</span
 		>
 		<span>
 			{#if page > 1 && maxPage > 1}

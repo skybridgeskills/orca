@@ -14,7 +14,7 @@
 {/if}
 {#if claimData.id}
 	<p class="my-2 text-gray-500 dark:text-gray-400">
-		<span class="font-bold">{m.evidenceURL()}</span>:
+		<span class="font-bold">{m.calm_steady_lynx_evidence()}</span>:
 		<a
 			href={claimData.id}
 			target="_{claim?.achievementId || 'blank'}"

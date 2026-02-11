@@ -149,7 +149,7 @@
 
 		<div class="mb-6">
 			<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-				{m.claimForm_narrative_description()}
+				{m.firm_clear_fox_narrdesc()}
 			</p>
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>{m.achievement_narrative()}</label
@@ -158,7 +158,7 @@
 				{#if achievement.criteriaNarrative}
 					<MarkdownRender value={achievement.criteriaNarrative} />
 				{:else}
-					{m.claimForm_narrativeInstructions()}
+					{m.bright_swift_eagle_narrinst()}
 				{/if}
 			</p>
 			<MarkdownEditor bind:value={$claimNarrative} inputName="narrative" />
@@ -167,7 +167,7 @@
 			<label
 				for="evidenceUrl"
 				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.evidenceURL()}</label
+				>{m.calm_steady_lynx_evidence()}</label
 			>
 			<input
 				type="text"

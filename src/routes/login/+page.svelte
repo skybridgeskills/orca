@@ -131,7 +131,7 @@
 					for="register_givenName"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>
-					{m.givenName()}
+					{m.bright_swift_eagle_given()}
 				</label>
 				<input
 					type="text"
@@ -148,7 +148,7 @@
 					for="register_familyName"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>
-					{m.familyName()}
+					{m.calm_steady_lynx_family()}
 				</label>
 				<input
 					type="text"
@@ -188,7 +188,7 @@
 					for="verificationCode"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>
-					{m.verificationCode()}
+					{m.quick_safe_deer_verify()}
 				</label>
 				<input
 					type="number"
@@ -231,7 +231,7 @@
 			{/if}
 			<div class="mt-7">
 				<label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-					>{m.yourEmail()}</label
+					>{m.firm_clear_fox_email()}</label
 				>
 				<input
 					type="email"

@@ -31,6 +31,6 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 		if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
 		// TODO return the OB3 version, once access control is properly implemented
-		else throw error(404, m.notFound());
+		else throw error(404, m.fresh_bright_sparrow_notfound());
 	}
 };

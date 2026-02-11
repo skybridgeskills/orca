@@ -23,7 +23,7 @@
 		{member.givenName}
 		{member.familyName}
 		{#if member.orgRole}
-			<Tag>{m.adminRoleLabel()}</Tag>
+			<Tag>{m.sharp_clear_fox_admin()}</Tag>
 		{/if}
 	</h1>
 	<div class="inline-flex items-center">
@@ -50,9 +50,9 @@
 {#if member.identifiers.length}
 	<h3 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
 		{#if member.identifiers.length == 1}
-			1 {m.identifierListLabel()}
+			1 {m.calm_steady_lynx_identifier()}
 		{:else}
-			{member.identifiers.length} {m.identifierListLabel_other()}
+			{member.identifiers.length} {m.bright_happy_sparrow_identifier()}
 		{/if}
 	</h3>
 	{#each member.identifiers as identifier}

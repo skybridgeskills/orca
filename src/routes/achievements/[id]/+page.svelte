@@ -162,7 +162,7 @@
 	{#if data.achievement.image}
 		<img
 			src={imageUrl(data.achievement.image)}
-			alt={m.achievementImageAltText({ name: data.achievement.name })}
+			alt={m.firm_steady_boar_imagealt({ name: data.achievement.name })}
 		/>
 	{:else}
 		<div class="text-gray-400 dark:text-gray-700">

@@ -34,6 +34,6 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 			throw error(404, m.claim_notFoundOrNotShareableError());
 		else if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
-		else throw error(404, m.notFound());
+		else throw error(404, m.fresh_bright_sparrow_notfound());
 	}
 };

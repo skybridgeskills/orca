@@ -68,10 +68,10 @@
 						<a href="/" class="mr-4 hover:underline md:mr-6">{m.home()}</a>
 					</li>
 					<li>
-						<a href="/privacy" class="mr-4 hover:underline md:mr-6">{m.privacyPolicy()}</a>
+						<a href="/privacy" class="mr-4 hover:underline md:mr-6">{m.warm_tangy_deer_privacy()}</a>
 					</li>
 					<li>
-						<a href="/terms" class="mr-4 hover:underline md:mr-6">{m.termsOfService()}</a>
+						<a href="/terms" class="mr-4 hover:underline md:mr-6">{m.gentle_brave_falcon_terms()}</a>
 					</li>
 					<li>
 						<a href="/contact" class="hover:underline">{m.calm_steady_lynx_contact()}</a>
