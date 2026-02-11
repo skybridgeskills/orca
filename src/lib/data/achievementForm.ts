@@ -23,16 +23,16 @@ export const achievementFormSchema = yup
 	})
 	.test(
 		'claimRequires',
-		m.achievementConfig_claimRequiresCrossValidationMessage(),
+		m.gentle_brave_falcon_claimcross(),
 		(value) => !(value.claimableSelectedOption == 'badge' && !value.claimRequires)
 	)
 	.test(
 		'reviewRequires',
-		m.achievementConfig_reviewRequiredCrossValidationMessage(),
+		m.bright_swift_eagle_crossval(),
 		(value) => !(value.reviewableSelectedOption == 'badge' && !value.reviewRequires)
 	)
 	.test(
 		'inviteRequires',
-		m.achievementConfig_inviteREquiresCrossValidationMessage(),
+		m.fresh_bright_sparrow_invitecross(),
 		(value) => !(value.inviteSelectedOption == 'badge' && !value.capabilities_inviteRequires)
 	);

@@ -59,7 +59,7 @@
 	</div>
 {:else if !config?.claimable && config?.json?.capabilities?.inviteRequires}
 	<div class="max-w-2xl">
-		<Alert level="error" message={m.achievementConfig_inviteRequiredGeneric()} />
+		<Alert level="error" message={m.swift_steady_falcon_invitereq()} />
 	</div>
 {:else}
 	<div class="max-w-2xl">

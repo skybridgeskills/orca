@@ -370,7 +370,7 @@
 
 				<div class:isError={errors.reviewRequires}>
 					<FormFieldLabel for="config_reviewOption"
-						>{m.achievementConfig_reviewRequiresLabel()}</FormFieldLabel
+						>{m.firm_clear_fox_reviewlabel()}</FormFieldLabel
 					>
 					<div class="space-y-2">
 						<RadioOption
@@ -393,7 +393,7 @@
 							name="config_reviewable"
 							id="achievementEdit_reviewOption_badge"
 						>
-							<span class="inline">{m.achievementConfig_reviewRequiresLabelSpecific()}</span>
+							<span class="inline">{m.quick_safe_deer_reviewspec()}</span>
 							<AchievementSelect
 								badgeId={formData.reviewRequires}
 								on:unselected={() => {
@@ -475,7 +475,7 @@
 				<!-- Invite Settings -->
 				<div class:isError={errors.inviteRequires}>
 					<FormFieldLabel for="capabilities_inviteRequires"
-						>{m.achievementConfig_inviteRequiresLabel()}</FormFieldLabel
+						>{m.sharp_quiet_panther_invitelabel()}</FormFieldLabel
 					>
 					<div class="space-y-2">
 						<RadioOption
@@ -491,7 +491,7 @@
 							name="config_invitable"
 							id="achievementEdit_inviteOption_badge"
 						>
-							<span class="inline">{m.achievementConfig_requirementHoldersOf()}</span>
+							<span class="inline">{m.warm_tangy_deer_holders()}</span>
 							<AchievementSelect
 								badgeId={formData.capabilities_inviteRequires}
 								on:unselected={() => {
