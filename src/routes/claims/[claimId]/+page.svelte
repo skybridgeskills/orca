@@ -110,7 +110,7 @@
 {/if}
 
 <div class="max-w-2xl mt-2">
-	<ActionHeading text={`${data.endorsementCount} endorsements`}>
+	<ActionHeading text={m.calm_steady_lynx_endorse({ count: data.endorsementCount })}>
 		<span slot="actions">
 			{#if data.hasProvidedEndorsement}
 				<a href={`${data.claim.id}/endorse`}><Button text={m.endorsement_updateCTA()} /></a>
