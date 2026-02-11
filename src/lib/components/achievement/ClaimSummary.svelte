@@ -87,15 +87,15 @@
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
 		{#each relatedAchievements.filter((rc) => achievement.achievementConfig?.claimRequiresId == rc.id) as claimRequires (claimRequires.id)}
 			<span>
-				{m.claimConfiguration_claimRequiresSummary()}
+				{m.sharp_quiet_panther_requires()}
 				<a
 					href={`/achievements/${claimRequires.id}`}
 					class="font-bold underline hover:no-underline"
 				>
 					{claimRequires.name}</a
-				>{#if userHoldsRequiredAchievement()}. {m.claimConfiguration_userMeetsRequirement()}
-				{:else}
-					{m.claimConfiguration_userNotMeetsRequirement()}
+				>{#if userHoldsRequiredAchievement()}. {m.swift_steady_falcon_meets()}
+					{:else}
+					{m.sharp_clear_fox_notmeets()}
 				{/if}
 			</span>
 		{/each}
@@ -104,9 +104,9 @@
 	<div class="max-w-2xl flex justify-between items-center mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
 			{#if $page.data.session?.user.id}
-				{m.claimConfiguration_openClaimableCTA()}
+				{m.fresh_bright_sparrow_openclaim()}
 			{:else}
-				{m.claimConfiguration_claimEnabled()}
+				{m.quick_safe_deer_enabled()}
 			{/if}
 		</h2>
 		<div>
@@ -122,8 +122,8 @@
 		{m.achievement_openClaimable_description()}
 	</p>
 {:else if !achievement.achievementConfig?.claimable || false}
-	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.claimConfiguration_claimDisabled()}</h2>
+	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.firm_clear_fox_disabled()}</h2>
 	<p class="max-w-2xl mt-4 text-sm text-gray-500 dark:text-gray-400">
-		{m.claimConfiguration_adminOnly_description()}
+		{m.calm_steady_lynx_adminonly()}
 	</p>
 {/if}

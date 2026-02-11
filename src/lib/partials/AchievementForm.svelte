@@ -294,7 +294,7 @@
 			<div class="flex flex-col gap-3">
 				<!-- Claim Settings -->
 				<div class:isError={errors.claimRequires}>
-					<FormFieldLabel for="claimable">{m.claimConfiguration_allow()}</FormFieldLabel>
+					<FormFieldLabel for="claimable">{m.bright_swift_eagle_allow()}</FormFieldLabel>
 					<input type="hidden" name="claimable" bind:value={formData.claimable} />
 					<div class="space-y-2">
 						<RadioOption
@@ -328,8 +328,8 @@
 									formData.claimRequires = e.detail;
 								}}
 								disabled={formData.claimableSelectedOption != 'badge'}
-								label={m.claimConfiguration_requiredAchievement()}
-								description={m.claimConfiguration_requiredAchievement_description()}
+								label={m.quick_clear_owl_required()}
+								description={m.sharp_clear_fox_requireddesc()}
 								achievementFilter={(a) => a.id != achievementId}
 								inputId="achievementEdit_claimRequires"
 								inputName="claimRequires"
@@ -408,8 +408,8 @@
 									formData.reviewRequires = e.detail;
 								}}
 								disabled={formData.reviewableSelectedOption != 'badge'}
-								label={m.claimConfiguration_requiredAchievement()}
-								description={m.claimConfiguration_requiredAchievement_description()}
+								label={m.quick_clear_owl_required()}
+								description={m.sharp_clear_fox_requireddesc()}
 								inputId="achievementEdit_reviewRequires"
 								inputName="reviewRequires"
 								errorMessage={errors.reviewRequires}
@@ -446,7 +446,7 @@
 							for="achievementEdit_reviewsRequired"
 							disabled={formData.reviewableSelectedOption != 'badge'}
 						>
-							{m.claimConfiguration_reviewsRequired()}
+							{m.firm_steady_boar_reviews()}
 						</FormFieldLabel>
 						<input
 							type="number"

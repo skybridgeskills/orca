@@ -222,23 +222,23 @@
 
 <!-- Claim Rules -->
 <div class="mt-4 max-w-2xl">
-	<Heading title={m.claimConfiguration_heading()} level="h3">
+	<Heading title={m.warm_tangy_deer_heading()} level="h3">
 		{#if !config?.claimable}
 			<!-- A1: Achievement is not claimable -->
-			{m.claimConfiguration_claimDisabled()}.
+			{m.firm_clear_fox_disabled()}.
 		{/if}
 
 		{#if config?.claimable && config?.claimRequiresId}
 			<!-- A2: Achievement is claimable, and requires a prerequisite -->
 			{@const claimRequires = $achievements.find((a) => config?.claimRequiresId == a.id)}
 			{#if claimRequires}
-				{m.claimConfiguration_claimRequiresSummary()}
+				{m.sharp_quiet_panther_requires()}
 				<a href={`/achievements/${claimRequires.id}`} class="font-bold underline hover:no-underline"
 					>{claimRequires.name}</a
 				>. {#if userHoldsRequiredAchievement}
-					{m.claimConfiguration_userMeetsRequirement()}
+					{m.swift_steady_falcon_meets()}
 				{:else}
-					{m.claimConfiguration_userNotMeetsRequirement()}
+					{m.sharp_clear_fox_notmeets()}
 				{/if}
 			{/if}
 		{:else if config?.claimable && !config?.claimRequiresId}
@@ -252,16 +252,16 @@
 			? $achievements.find((a) => config?.json?.capabilities?.inviteRequires == a.id)
 			: undefined}
 		{#if inviteRequires}
-			{m.claimConfiguration_inviteRequiresDescription()}
+			{m.bright_happy_sparrow_invitedesc()}
 			<a href={`/achievements/${inviteRequires?.id}`} class="font-bold underline hover:no-underline"
 				>{inviteRequires?.name}</a
 			>.
 		{:else if !config?.claimable}
-			{m.claimConfiguration_adminOnly_description()}
+			{m.calm_steady_lynx_adminonly()}
 		{/if}
 
 		{#if reviewRequires && !!config?.reviewsRequired}
-			{m.claimConfiguration_reviewsRequiredSummary({
+			{m.warm_tangy_deer_reviewsum({
 				reviewsRequired: config?.reviewsRequired ?? 0
 			})}
 			<a
@@ -271,9 +271,9 @@
 				{reviewRequires.name}</a
 			>.
 		{:else if !config?.reviewRequiresId && config?.reviewsRequired}
-			{m.claimConfiguration_anAdminReviewRequired()}
+			{m.calm_steady_lynx_adminreview()}
 		{:else}
-			{m.claimConfiguration_noReviewsRequired_description()}
+			{m.gentle_brave_falcon_noreviews()}
 		{/if}
 	</Heading>
 </div>

@@ -46,15 +46,15 @@
 	<AchievementSummary achievement={data.achievement} />
 	<div class="max-w-2xl mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
-			{m.claimConfiguration_userNotMeetRequirement_heading()}
+			{m.quick_clear_owl_notmeet()}
 		</h2>
 
 		<Alert level="warning">
-			{m.claimConfiguration_claimRequiresSummary()}
+			{m.sharp_quiet_panther_requires()}
 			<a
 				href={`/achievements/${config?.claimRequiresId}`}
 				class="font-bold underline hover:no-underline">{config?.claimRequires?.name}</a
-			>. {m.claimConfiguration_userNotMeetsRequirement()}
+			>. {m.sharp_clear_fox_notmeets()}
 		</Alert>
 	</div>
 {:else if !config?.claimable && config?.json?.capabilities?.inviteRequires}
@@ -65,7 +65,7 @@
 	<div class="max-w-2xl">
 		<Alert
 			level="error"
-			message={`${m.claimConfiguration_claimDisabled()} ${m.claimConfiguration_adminOnly_description()}`}
+			message={`${m.firm_clear_fox_disabled()} ${m.calm_steady_lynx_adminonly()}`}
 		/>
 	</div>
 {/if}

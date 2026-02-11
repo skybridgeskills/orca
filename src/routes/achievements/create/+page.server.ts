@@ -117,7 +117,7 @@ export const actions: Actions = {
 			} catch (e) {
 				return fail(400, {
 					code: 'inviteRequires',
-					message: m.claimConfiguration_relatedAchievementNotFoundError()
+					message: m.swift_steady_falcon_notfound()
 				});
 			}
 		}

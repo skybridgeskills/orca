@@ -172,7 +172,7 @@ export const actions: Actions = {
 			} catch (e) {
 				return fail(400, {
 					code: 'inviteRequires',
-					message: m.claimConfiguration_relatedAchievementNotFoundError()
+					message: m.swift_steady_falcon_notfound()
 				});
 			}
 		}
@@ -219,11 +219,11 @@ export const actions: Actions = {
 				if (e.code == 'P2025') {
 					return fail(400, {
 						code: 'claimRequires',
-						message: m.claimConfiguration_relatedAchievementNotFoundError()
+						message: m.swift_steady_falcon_notfound()
 					});
 				}
 			}
-			throw error(500, m.claimConfiguration_unexpectedSaveError());
+			throw error(500, m.fresh_bright_sparrow_saveerror());
 		}
 
 		const updated = await prisma.achievement.update({
