@@ -4,13 +4,40 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 import { defineConfig } from 'vite';
 import { paraglide } from '@inlang/paraglide-js-adapter-vite';
 import * as dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
+// Plugin to fix SvelteKit-generated tsconfig.json with deprecated TypeScript options
+const fixTsconfigPlugin = () => ({
+	name: 'fix-tsconfig',
+	buildStart() {
+		const tsconfigPath = path.resolve('.svelte-kit/tsconfig.json');
+		if (fs.existsSync(tsconfigPath)) {
+			try {
+				const config = JSON.parse(fs.readFileSync(tsconfigPath, 'utf-8'));
+				if (config.compilerOptions) {
+					config.compilerOptions.verbatimModuleSyntax = true;
+					delete config.compilerOptions.importsNotUsedAsValues;
+					delete config.compilerOptions.preserveValueImports;
+					fs.writeFileSync(tsconfigPath, JSON.stringify(config, null, '\t') + '\n');
+				}
+			} catch (e) {
+				// Ignore errors
+			}
+		}
+	},
+	configureServer() {
+		// Also fix on dev server start
+		this.buildStart();
+	}
+});
 
 export default defineConfig(({ mode }) => {
 	let plugins = [
 		sveltekit(),
+		fixTsconfigPlugin(),
 		paraglide({
 			project: './project.inlang',
 			outdir: './src/lib/i18n'

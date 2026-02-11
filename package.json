@@ -5,8 +5,7 @@
 	"scripts": {
 		"dev": "vite dev --host 0.0.0.0",
 		"debug-dev": "vavite-loader vite dev --m debug-dev --host 0.0.0.0",
-		"fix-tsconfig": "node -e \"const fs=require('fs');const p='.svelte-kit/tsconfig.json';if(fs.existsSync(p)){const d=JSON.parse(fs.readFileSync(p));d.compilerOptions.verbatimModuleSyntax=true;delete d.compilerOptions.importsNotUsedAsValues;delete d.compilerOptions.preserveValueImports;fs.writeFileSync(p,JSON.stringify(d,null,'\\t')+'\\n');}\"",
-		"build": "pnpm run fix-tsconfig && vite build",
+		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./jsconfig.json --watch",
