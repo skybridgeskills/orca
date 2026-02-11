@@ -44,6 +44,9 @@ importers:
       jsonld-signatures:
         specifier: ^11.2.0
         version: 11.6.0
+      marked:
+        specifier: ^9.1.6
+        version: 9.1.6
       mime-types:
         specifier: ^2.1.35
         version: 2.1.35

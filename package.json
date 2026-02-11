@@ -98,6 +98,7 @@
 		"credential-handler-polyfill": "^3.2.0",
 		"dayjs": "^1.11.9",
 		"jsonld-signatures": "^11.2.0",
+		"marked": "^9.1.6",
 		"mime-types": "^2.1.35",
 		"nodemailer-mailgun-transport": "^2.1.5",
 		"qrcode": "^1.5.3",
