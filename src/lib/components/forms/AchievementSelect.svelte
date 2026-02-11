@@ -107,7 +107,7 @@
 						}}
 						{disabled}
 					>
-						{m.removeCTA()}
+						{m.firm_clear_fox_remove()}
 					</button>
 				</div>
 			</AchievementSummary>

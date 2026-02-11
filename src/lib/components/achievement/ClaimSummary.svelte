@@ -79,7 +79,7 @@
 		<div>
 			{#if showClaimLink && userHoldsRequiredAchievement()}
 				<a href={`/achievements/${achievement.id}/claim`}>
-					<Button text={m.claimCTA()} />
+					<Button text={m.bold_swift_eagle_claim()} />
 				</a>
 			{/if}
 		</div>

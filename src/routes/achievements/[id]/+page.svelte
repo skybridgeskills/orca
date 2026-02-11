@@ -107,14 +107,14 @@
 	</h1>
 	<div class="inline-flex items-center">
 		{#if inviteCapability}
-			<Button href={`/achievements/${data.achievement.id}/award`} text={m.awardCTA()} />
+			<Button href={`/achievements/${data.achievement.id}/award`} text={m.bright_happy_sparrow_award()} />
 		{/if}
 
 		{#if data.editAchievementCapability}
 			<Button
 				href={`/achievements/${data.achievement.id}/edit`}
 				submodule="secondary"
-				text={m.editCTA()}
+				text={m.sharp_clear_fox_edit()}
 			/>
 		{/if}
 		{#if isAdmin({ user: data.session?.user || undefined })}
@@ -124,7 +124,7 @@
 					showDeleteModal = true;
 				}}
 			>
-				<span class="sr-only">{m.deleteCTA()}</span>
+				<span class="sr-only">{m.firm_steady_boar_delete()}</span>
 				<div class="h-4 w-4">
 					<Icon src={FaTrashAlt} size="16" color="currentColor" />
 				</div>
@@ -144,7 +144,7 @@
 							invite.inviteeEmail
 					  )}`
 					: `/achievements/${data.achievement.id}/claim`}
-				text={m.claimCTA()}
+				text={m.bold_swift_eagle_claim()}
 				submodule="primary"
 			/>
 		{/if}
@@ -211,7 +211,7 @@
 							  )}`
 							: `/achievements/${data.achievement.id}/claim`}
 					>
-						<span class="sr-only">{m.claimCTA()}</span>
+						<span class="sr-only">{m.bold_swift_eagle_claim()}</span>
 						<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
 					</a>
 				</div>
@@ -328,7 +328,7 @@
 	}}
 	actions={[
 		{
-			label: m.cancelCTA(),
+			label: m.calm_steady_lynx_cancel(),
 			buttonType: 'button',
 			submodule: 'secondary',
 			onClick: () => {
@@ -336,7 +336,7 @@
 			}
 		},
 		{
-			label: m.deleteCTA(),
+			label: m.firm_steady_boar_delete(),
 			buttonType: 'button',
 			submodule: 'danger',
 			onClick: () => {

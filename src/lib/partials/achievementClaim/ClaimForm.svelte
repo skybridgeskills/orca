@@ -190,13 +190,13 @@
 		<Button
 			submodule="primary"
 			buttonType="submit"
-			text={m.submitCTA()}
+			text={m.bold_swift_eagle_submit()}
 			id="claimFormSubmitButton"
 		/>
 		<Button
 			submodule="secondary"
 			buttonType="button"
-			text={m.cancelCTA()}
+			text={m.calm_steady_lynx_cancel()}
 			on:click={handleCancel}
 		/>
 	</div>

@@ -11,7 +11,6 @@
 		fetchAchievementCategories,
 		acLoading
 	} from '$lib/stores/achievementCategoryStore';
-	import { deleteCTA } from '$lib/i18n/messages';
 	import { enhance } from '$app/forms';
 	import type { PageData } from './$types';
 	import { stringify } from 'uuid';
@@ -143,11 +142,11 @@
 								<ButtonGroup
 									buttons={[
 										{
-											text: m.saveCTA(),
+											text: m.quick_safe_deer_save(),
 											onClick: () => {},
 											props: { type: 'submit', form: 'updateCategoryForm' }
 										},
-										{ text: m.cancelCTA(), onClick: () => cancelEdit(), props: {} }
+										{ text: m.calm_steady_lynx_cancel(), onClick: () => cancelEdit(), props: {} }
 									]}
 								/>
 							</td>
@@ -170,9 +169,9 @@
 							<td class="py-4 px-6">
 								<ButtonGroup
 									buttons={[
-										{ text: m.editCTA(), onClick: () => handleEditClick(category), props: {} },
+										{ text: m.sharp_clear_fox_edit(), onClick: () => handleEditClick(category), props: {} },
 										{
-											text: m.deleteCTA(),
+											text: m.firm_steady_boar_delete(),
 											onClick: () => {
 												cancelEdit();
 												deleteId = category.id;
@@ -223,7 +222,7 @@
 							form="createCategoryForm"
 							type="submit"
 							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-							>{m.createNewCTA()}</button
+							>{m.fresh_bright_sparrow_create()}</button
 						>
 					</td>
 				</tr>

@@ -81,7 +81,7 @@
 				{#if existingBadgeClaim?.claimStatus === 'ACCEPTED'}
 					<DownloadButton
 						sourceUrl="/claims/{existingBadgeClaim?.id}/download"
-						text={m.downloadCTA()}
+						text={m.swift_steady_falcon_download()}
 						submodule="secondary"
 						id="download-{existingBadgeClaim?.id}"
 						fileName="{achievement.name.split(' ').join('-')}-credential.json"

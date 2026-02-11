@@ -129,6 +129,6 @@
 			{#if errors.name}<p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.name}</p>{/if}
 		</div>
 
-		<Button buttonType="submit" submodule="primary">{m.saveCTA()}</Button>
+		<Button buttonType="submit" submodule="primary">{m.quick_safe_deer_save()}</Button>
 	</div>
 </form>

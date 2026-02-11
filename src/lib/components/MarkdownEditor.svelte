@@ -43,7 +43,7 @@
 	});
 	const labels = {
 		writeTab: m.writeCTA(),
-		previewTab: m.previewCTA()
+		previewTab: m.sharp_quiet_panther_preview()
 	};
 </script>
 

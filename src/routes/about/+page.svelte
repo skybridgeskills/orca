@@ -14,7 +14,7 @@
 		</h1>
 		<p class="">
 			<a class="text-gray-900 dark:text-gray-100" href="/about/edit"
-				><Button text={m.editCTA()} /></a
+				><Button text={m.sharp_clear_fox_edit()} /></a
 			>
 		</p>
 	</div>

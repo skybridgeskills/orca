@@ -132,7 +132,7 @@
 				handleCopyToClipboard();
 			}}
 		>
-			{m.copyCTA()}
+			{m.quick_clear_owl_copy()}
 		</button>
 	</div>
 

@@ -57,7 +57,7 @@
 
 <div class="flex items-center mb-9">
 	{#if data.editAchievementCapability}
-		<Button href="/achievements/create" text={m.createNewCTA()} />
+		<Button href="/achievements/create" text={m.fresh_bright_sparrow_create()} />
 	{/if}
 	{#if data.editCategoriesCapability}
 		<Button href="/achievements/categories" text={m.categories_editCTA()} submodule="secondary" />

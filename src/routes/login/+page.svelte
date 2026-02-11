@@ -176,7 +176,7 @@
 				</div>
 			</div>
 
-			<Button buttonType="submit" text={m.submitCTA()} />
+			<Button buttonType="submit" text={m.bold_swift_eagle_submit()} />
 		</form>
 	{:else if sessionId}
 		<!-- Step 2: Verify control of email to activate session -->
@@ -211,7 +211,7 @@
 				{/if}
 			</div>
 			<div class="mt-5">
-				<Button buttonType="submit" text={m.submitCTA()} />
+				<Button buttonType="submit" text={m.bold_swift_eagle_submit()} />
 			</div>
 		</form>
 	{:else}

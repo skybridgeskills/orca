@@ -282,12 +282,12 @@
 	on:close={closeDeleteModal}
 	actions={[
 		{
-			label: m.cancelCTA(),
+			label: m.calm_steady_lynx_cancel(),
 			submodule: 'secondary',
 			onClick: closeDeleteModal
 		},
 		{
-			label: m.deleteCTA(),
+			label: m.firm_steady_boar_delete(),
 			submodule: 'danger',
 			onClick: deleteInvite
 		}
