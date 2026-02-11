@@ -166,7 +166,7 @@
 	"invite_recipientIdentifierRequiredError": "Recipient identifier is required.",
 	"invite_unauthorizedNonAdminError": "You may not invite others to claim this achievement.",
 	"linkedin_addToProfileButton_label": "LinkedIn Add to Profile button",
-	"logInCTA": "Log in",
+	"bright_swift_eagle_login": "Log in",
 	"logOutCTA": "Log out",
 	"loginCTA_description": "If you are a registered user, you can sign in to manage skills in this community.",
 	"loginInviteCTA": "Log in to accept invite",

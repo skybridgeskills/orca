@@ -166,7 +166,7 @@
 	"invite_recipientIdentifierRequiredError": "È obbligatorio l'identificativo del destinatario.",
 	"invite_unauthorizedNonAdminError": "Non puoi invitare altri a reclamare questo risultato.",
 	"linkedin_addToProfileButton_label": "Pulsante Aggiungi al profilo LinkedIn",
-	"logInCTA": "Login",
+	"bright_swift_eagle_login": "Login",
 	"logOutCTA": "Esci",
 	"loginCTA_description": "Se sei un utente registrato, puoi effettuare l'accesso per gestire le competenze in questa community.",
 	"loginInviteCTA": "Accedi per accettare l'invito",

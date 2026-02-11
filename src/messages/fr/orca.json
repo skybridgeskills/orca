@@ -166,7 +166,7 @@
 	"invite_recipientIdentifierRequiredError": "L'identifiant du destinataire est requis.",
 	"invite_unauthorizedNonAdminError": "Vous ne pouvez pas inviter d'autres personnes à revendiquer ce badge.",
 	"linkedin_addToProfileButton_label": "Bouton Ajouter au profil LinkedIn",
-	"logInCTA": "Se connecter",
+	"bright_swift_eagle_login": "Se connecter",
 	"logOutCTA": "Se déconnecter",
 	"loginCTA_description": "Si vous êtes enregistré comme membre, vous pouvez vous connecter pour gérer les reconnaissances dans cette communauté.",
 	"loginInviteCTA": "Connectez-vous pour accepter l'invitation",

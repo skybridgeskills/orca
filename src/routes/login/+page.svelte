@@ -101,7 +101,7 @@
 	{#if register || (!sessionId && Date.now() < ($inviteCreatedAt?.getTime() ?? 0) + 86400000)}
 		<!-- Step 3: User needs to fill out the rest of the registration form. -->
 		<!-- Or a user goes directly here if they have a fresh (less than 1 day old) invite -->
-		<Heading title={m.logInCTA()} description={m.loginInviteCTA_description()} />
+		<Heading title={m.bright_swift_eagle_login()} description={m.loginInviteCTA_description()} />
 		<form
 			id="registerForm"
 			method="POST"
@@ -180,7 +180,7 @@
 		</form>
 	{:else if sessionId}
 		<!-- Step 2: Verify control of email to activate session -->
-		<Heading title={m.logInCTA()} description={m.login_checkEmailCTA_description()} />
+		<Heading title={m.bright_swift_eagle_login()} description={m.login_checkEmailCTA_description()} />
 		<form id="verifyForm" method="POST" action="?/verify" use:enhance={verifyHandler}>
 			<input type="hidden" id="inviteId" name="inviteId" bind:value={$inviteId} />
 			<div class="mt-7">
@@ -218,7 +218,7 @@
 		<!-- Step 1: Enter email to login -->
 
 		{#if !$inviteId}
-			<Heading title={m.logInCTA()} description={m.loginCTA_description()} />
+			<Heading title={m.bright_swift_eagle_login()} description={m.loginCTA_description()} />
 		{:else}
 			<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.loginInviteCTA()}</h1>
 			<p class="my-4 text-sm text-gray-500 dark:text-gray-400">
