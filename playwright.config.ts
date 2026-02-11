@@ -39,7 +39,7 @@ export default defineConfig({
 		/* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
 		actionTimeout: 0,
 		/* Base URL to use in actions like `await page.goto('/')`. */
-		baseURL: 'http://test.test:5173',
+		baseURL: `http://test.test:${process.env.SERVER_PORT || 5173}`,
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 		trace: 'on-first-retry'
@@ -88,7 +88,9 @@ export default defineConfig({
 
 	/* Run your local dev server before starting the tests */
 	webServer: {
-		command: `pnpm exec dotenv -e .env.test -- pnpm exec prisma migrate deploy --schema src/prisma/schema.prisma && pnpm exec dotenv -e .env.test -- pnpm run dev -- --port ${process.env.SERVER_PORT}`,
-		port: parseInt(process.env.SERVER_PORT!)
+		command: `pnpm exec dotenv -e .env.test -- bash tests/playwright/start-server.sh`,
+		port: parseInt(process.env.SERVER_PORT!),
+		timeout: 120000, // Increase timeout to 2 minutes
+		reuseExistingServer: !process.env.CI
 	}
 });

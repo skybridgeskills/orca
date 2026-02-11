@@ -65,7 +65,7 @@ export default defineConfig(({ mode }) => {
 		},
 		plugins,
 		server: {
-			port: 5173,
+			port: parseInt(process.env.SERVER_PORT || process.env.PORT || '5173'),
 			host: '0.0.0.0',
 			allowedHosts: true
 		}
