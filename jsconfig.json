@@ -9,5 +9,9 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true
-	}
+	},
+	"exclude": [
+		"src/lib/i18n/messages/**/*.js",
+		"src/lib/i18n/messages.js"
+	]
 }
