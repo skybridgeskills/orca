@@ -1,16 +1,12 @@
 <script lang="ts">
-	import {
-		availableLanguageTags,
-		languageTag,
-		sourceLanguageTag,
-		type AvailableLanguageTag
-	} from '$lib/i18n/runtime';
-	import * as cookie from 'cookie';
+	import { locales, getLocale, baseLocale } from '$lib/i18n/runtime';
 	import { onMount, type SvelteComponent } from 'svelte';
 	import PopupMenu from './PopupMenu.svelte';
 
+	type AvailableLanguageTag = (typeof locales)[number];
+
 	let languageDropdownMenu: SvelteComponent;
-	let currentLang: AvailableLanguageTag = languageTag() ?? sourceLanguageTag;
+	let currentLang: AvailableLanguageTag = getLocale() ?? baseLocale;
 	let languageSelectorOpen = false;
 	const toggleLanguageSelector = (e: Event | KeyboardEvent) => {
 		e.stopPropagation();
@@ -23,10 +19,10 @@
 	};
 
 	onMount(() => {
-		currentLang = languageTag() ?? sourceLanguageTag;
+		currentLang = getLocale() ?? baseLocale;
 	});
 
-	const setLanguageTag = (langTag: string) => {
+	const setLocale = (langTag: string) => {
 		document.cookie = `locale=${langTag}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
 		window.location.reload();
 	};
@@ -40,7 +36,7 @@
 	on:keypress={toggleLanguageSelector}
 >
 	<div class="text-sm text-gray-700 dark:text-gray-400 h-8 p-2">
-		{languageTag() ?? 'YOOOOO'}
+		{getLocale() ?? 'en-US'}
 	</div>
 	<PopupMenu
 		menuId="language-selector-menu"
@@ -50,10 +46,10 @@
 	>
 		{#if languageSelectorOpen}
 			<ul
-				class="py-2 text-sm text-gray-700 dark:text-gray-400"
+				class="list-none m-0 p-0 py-2 text-sm text-gray-700 dark:text-gray-400"
 				aria-labelledby="language-selector-button"
 			>
-				{#each availableLanguageTags as langTag}
+				{#each locales as langTag}
 					{#if langTag == currentLang}
 						<li>
 							<button class="block px-4 py-2">{langTag}</button>
@@ -63,7 +59,7 @@
 							<button
 								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 								on:click={() => {
-									setLanguageTag(langTag);
+									setLocale(langTag);
 									languageSelectorOpen = false;
 								}}>{langTag}</button
 							>

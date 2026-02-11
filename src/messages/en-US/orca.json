@@ -226,7 +226,7 @@
 	"share_qrCode_heading": "Share by QR code",
 	"share_qrCodeImageAltText": "A QR Code image that may be scanned with a phone or scanner",
 	"status": "Status",
-	"status_accepted": "Accepted",
+	"bright_swift_eagle_soar": "Accepted",
 	"status_created": "Created",
 	"status_invited": "Invited",
 	"status_invited_description": "You have been invited to claim this badge, but you have not accepted.",
@@ -235,7 +235,7 @@
 	"status_notYetReviewed": "This badge is still under review.",
 	"status_notYetReviewed_description": "Not yet reviewed. This badge is valid once it accumulates {count} endorsements by holders of:",
 	"status_prerequisiteRequired": "Prerequisite required",
-	"status_rejected": "Rejected",
+	"sharp_clear_fox_deny": "Rejected",
 	"status_rejected_description": "You were invited to claim this badge, but you have rejected this claim. No other members of the community will see that you have the achievement.",
 	"status_underReview": "Under Review",
 	"status_valid": "Valid",
@@ -327,5 +327,7 @@
 	"upper_legal_marten_lead": "Disabled",
 	"early_house_bat_climb": "Custom claim template enabled.",
 	"next_arable_mule_zoom": "People who hold this achievement have the permission to create and edit achievements in this community.",
-	"sunny_watery_sparrow_jest": "This community is suspended or is experiencing technical problems. Please try again later."
+	"sunny_watery_sparrow_jest": "This community is suspended or is experiencing technical problems. Please try again later.",
+	"swift_bold_eagle_announce": "{givenName} {familyName} claimed this badge",
+	"calm_steady_lynx_pause": "Unaccepted"
 }

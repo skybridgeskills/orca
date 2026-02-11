@@ -226,7 +226,7 @@
 	"share_qrCode_heading": "Condividi tramite codice QR",
 	"share_qrCodeImageAltText": "Un'immagine del codice QR che può essere scansionata con un telefono o uno scanner",
 	"status": "Stato",
-	"status_accepted": "Accettato",
+	"bright_swift_eagle_soar": "Accettato",
 	"status_created": "Creato",
 	"status_invited": "Invitato",
 	"status_invited_description": "Sei stato invitato a reclamare questo badge, ma non l'hai accettato.",
@@ -235,7 +235,7 @@
 	"status_notYetReviewed": "Questo badge è ancora in fase di revisione.",
 	"status_notYetReviewed_description": "Non ancora esaminato. Questo badge sarà valido una volta accumulati {count} valutazioni da parte dei titolari di:",
 	"status_prerequisiteRequired": "Prerequisito richiesto",
-	"status_rejected": "Respinto",
+	"sharp_clear_fox_deny": "Respinto",
 	"status_rejected_description": "Sei stato invitato a reclamare questo badge, ma hai rifiutato questa richiesta. Nessun altro membro della community vedrà che hai ottenuto l'obiettivo.",
 	"status_underReview": "In fase di revisione",
 	"status_valid": "Valido",
@@ -327,5 +327,7 @@
 	"upper_legal_marten_lead": "Disabilitato",
 	"early_house_bat_climb": "Modello di richiesta personalizzato abilitato.",
 	"next_arable_mule_zoom": "Le persone che possiedono questo risultato hanno il permesso di creare e modificare i risultati in questa community.",
-	"sunny_watery_sparrow_jest": "Questa community è sospesa o sta riscontrando problemi tecnici. Si prega di riprovare più tardi."
+	"sunny_watery_sparrow_jest": "Questa community è sospesa o sta riscontrando problemi tecnici. Si prega di riprovare più tardi.",
+	"swift_bold_eagle_announce": "{givenName} {familyName} ha richiesto questo badge",
+	"calm_steady_lynx_pause": "Non accettato"
 }

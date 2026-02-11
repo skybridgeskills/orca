@@ -226,7 +226,7 @@
 	"share_qrCode_heading": "Partager par QR code",
 	"share_qrCodeImageAltText": "Une image QR Code qui peut être numérisée avec un téléphone ou un scanner",
 	"status": "Condition",
-	"status_accepted": "Accepté",
+	"bright_swift_eagle_soar": "Accepté",
 	"status_created": "Créé",
 	"status_invited": "Invité",
 	"status_invited_description": "Vous avez été invité à revendiquer ce badge, mais vous n'avez pas accepté.",
@@ -235,7 +235,7 @@
 	"status_notYetReviewed": "Ce badge est toujours en cours d'examen.",
 	"status_notYetReviewed_description": "Pas encore examiné. Ce badge est valide une fois qu'il accumule {count} endossements par les détenteurs du badge :",
 	"status_prerequisiteRequired": "Prérequis",
-	"status_rejected": "Rejeté",
+	"sharp_clear_fox_deny": "Rejeté",
 	"status_rejected_description": "Vous avez été invité à revendiquer ce badge, mais vous avez rejeté cette invitation. Aucun autre membre de la communauté ne verra que vous avez été invité à revendiquer ce badge.",
 	"status_underReview": "En cours d'examen",
 	"status_valid": "Valide",
@@ -327,5 +327,7 @@
 	"upper_legal_marten_lead": "Désactivé",
 	"early_house_bat_climb": "Modèle de réclamation personnalisé activé.",
 	"next_arable_mule_zoom": "Les personnes qui détiennent cette réussite ont la permission de créer et de modifier des réussites dans cette communauté.",
-	"sunny_watery_sparrow_jest": "Cette communauté est suspendue ou rencontre des problèmes techniques. Veuillez réessayer ultérieurement."
+	"sunny_watery_sparrow_jest": "Cette communauté est suspendue ou rencontre des problèmes techniques. Veuillez réessayer ultérieurement.",
+	"swift_bold_eagle_announce": "{givenName} {familyName} a revendiqué ce badge",
+	"calm_steady_lynx_pause": "Non accepté"
 }

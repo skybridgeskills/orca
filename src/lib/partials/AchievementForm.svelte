@@ -12,12 +12,11 @@
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import {
-		achievements,
 		achievementsLoading,
 		fetchAchievements,
 		upsertAchievement
 	} from '$lib/stores/achievementStore';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { ensureLoaded } from '$lib/stores/common';
 	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';

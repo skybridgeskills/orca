@@ -32,12 +32,14 @@
 	};
 </script>
 
-<button
+<div
 	id={menuId}
 	class={baseClass}
 	class:hidden
+	role="menu"
+	tabindex="0"
 	on:click|stopPropagation
 	on:keypress|stopPropagation
 >
 	<slot />
-</button>
+</div>

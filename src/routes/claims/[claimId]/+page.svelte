@@ -31,6 +31,19 @@
 	];
 
 	setContext('claimId', data.claim.id);
+
+	$: translatedStatus = (() => {
+		switch (data.claim.claimStatus) {
+			case 'ACCEPTED':
+				return m.bright_swift_eagle_soar();
+			case 'REJECTED':
+				return m.sharp_clear_fox_deny();
+			case 'UNACCEPTED':
+				return m.calm_steady_lynx_pause();
+			default:
+				return data.claim.claimStatus; // fallback to raw value
+		}
+	})();
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
@@ -63,7 +76,10 @@
 {#if data.claim.userId != data.session?.user?.id}
 	<div class="max-w-2xl my-6">
 		<ActionHeading
-			text={`${data.claim.user.givenName} ${data.claim.user.familyName} claimed this badge`}
+			text={m.swift_bold_eagle_announce({
+				givenName: data.claim.user.givenName ?? '',
+				familyName: data.claim.user.familyName ?? ''
+			})}
 		>
 			<span slot="actions" class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400"
 				>{data.claim.createdOn.toDateString()}</span
@@ -75,7 +91,7 @@
 		<Alert level={levelByStatus[data.claim.claimStatus]}>
 			<p class="max-w-2xl text-sm">
 				<span class="font-bold">{m.acceptance()}</span>
-				{data.claim.claimStatus}
+				{translatedStatus}
 			</p>
 			{#if data.claim.validFrom}
 				<p class="max-w-2xl mt-3 text-sm">

@@ -3,10 +3,13 @@ import { error, type Handle, type RequestEvent } from '@sveltejs/kit';
 import cookie from 'cookie';
 import { prisma } from './prisma/client';
 import {
-	setLanguageTag,
-	availableLanguageTags,
-	type AvailableLanguageTag
+	setLocale,
+	locales,
+	baseLocale
 } from '$lib/i18n/runtime';
+
+type AvailableLanguageTag = typeof locales[number];
+import { paraglideMiddleware } from '$lib/i18n/server';
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 
 export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
@@ -78,33 +81,40 @@ const getAuthHeaderTokenValue = function (authHeader: string | null) {
 	return parts[1];
 };
 
-export const handle: Handle = async function ({ event, resolve }) {
-	event.locals.org = await getOrganizationFromRequest(event);
+export const handle: Handle = ({ event, resolve }) =>
+	paraglideMiddleware(event.request, async ({ request: localizedRequest, locale }) => {
+		event.request = localizedRequest;
 
-	const cookies = cookie.parse(event.request.headers.get('cookie') || '');
-	const sessionId =
-		cookies.sessionId ?? getAuthHeaderTokenValue(event.request.headers.get('Authorization'));
-	if (sessionId) {
-		event.locals.session = await getSession(sessionId, event.locals.org.id);
-	}
-	event.locals.locale = availableLanguageTags.includes(cookies.locale as AvailableLanguageTag)
-		? (cookies.locale as AvailableLanguageTag)
-		: 'en-US';
-	setLanguageTag(event.locals.locale);
-	const theme = ['dark', 'light'].includes(cookies.theme) ? cookies.theme : 'default';
+		event.locals.org = await getOrganizationFromRequest(event);
 
-	const response = await resolve(event);
+		const cookies = cookie.parse(event.request.headers.get('cookie') || '');
+		const sessionId =
+			cookies.sessionId ?? getAuthHeaderTokenValue(event.request.headers.get('Authorization'));
+		if (sessionId) {
+			event.locals.session = await getSession(sessionId, event.locals.org.id);
+		}
 
-	if (!cookies.theme)
-		response.headers.append(
-			'set-cookie',
-			`theme=${theme};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
-		);
-	if (!cookies.locale)
-		response.headers.append(
-			'set-cookie',
-			`locale=${event.locals.locale};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
-		);
+		// Use locale from paraglideMiddleware
+		event.locals.locale = locale as AvailableLanguageTag;
+		setLocale(event.locals.locale, { reload: false });
+		const theme = ['dark', 'light'].includes(cookies.theme) ? cookies.theme : 'default';
 
-	return response;
-};
+		const response = await resolve(event, {
+			transformPageChunk: ({ html }) => {
+				return html.replace('%lang%', locale);
+			}
+		});
+
+		if (!cookies.theme)
+			response.headers.append(
+				'set-cookie',
+				`theme=${theme};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
+			);
+		if (!cookies.locale)
+			response.headers.append(
+				'set-cookie',
+				`locale=${locale};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
+			);
+
+		return response;
+	});

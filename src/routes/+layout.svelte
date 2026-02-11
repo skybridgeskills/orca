@@ -1,14 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import { MetaTags } from 'svelte-meta-tags';
-
-	import { page } from '$app/stores';
 	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
-	import {
-		achievements,
-		achievementsLoading,
-		fetchAchievements
-	} from '$lib/stores/achievementStore';
 	import { onMount } from 'svelte';
 	import { session, sessionStatus } from '$lib/stores/sessionStore';
 	import { notifications } from '$lib/stores/notificationStore';
@@ -16,12 +9,12 @@
 	import Nav from '$lib/components/Nav.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import type { PageData } from './$types';
-	import { languageTag, setLanguageTag } from '$lib/i18n/runtime';
+	import { setLocale } from '$lib/i18n/runtime';
 	import { LoadingStatus } from '$lib/stores/common';
 
 	export let data: PageData;
 	preferredTheme.initialize(data.cookieTheme || 'light');
-	setLanguageTag(data.locale);
+	setLocale(data.locale);
 
 	onMount(() => {
 		preferredTheme.initialize(data.cookieTheme || 'light'); // reinitialize but with the ability to set document.cookie
