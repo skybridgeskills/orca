@@ -55,14 +55,14 @@
 		{/each}
 	</ul>
 	<p class="my-4 text-sm text-gray-500 dark:text-gray-400 text-center">
-		{m.seeCTA()}
+		{m.bright_swift_eagle_see()}
 		<a href="/achievements" class="underline hover:no-underline">{m.achievements_all()}</a>.
 	</p>
 {:else}
 	<EmptyStateZone title={m.award_noneYet()}>
 		<Ribbon slot="image" />
 		<p slot="description">
-			{m.seeCTA()}
+			{m.bright_swift_eagle_see()}
 			<a href="/achievements" class="underline hover:no-underline">{m.achievements_all()}</a>.
 		</p>
 	</EmptyStateZone>

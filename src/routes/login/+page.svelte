@@ -101,7 +101,7 @@
 	{#if register || (!sessionId && Date.now() < ($inviteCreatedAt?.getTime() ?? 0) + 86400000)}
 		<!-- Step 3: User needs to fill out the rest of the registration form. -->
 		<!-- Or a user goes directly here if they have a fresh (less than 1 day old) invite -->
-		<Heading title={m.bright_swift_eagle_login()} description={m.loginInviteCTA_description()} />
+		<Heading title={m.bright_swift_eagle_login()} description={m.gentle_brave_falcon_logininvdesc()} />
 		<form
 			id="registerForm"
 			method="POST"
@@ -218,11 +218,11 @@
 		<!-- Step 1: Enter email to login -->
 
 		{#if !$inviteId}
-			<Heading title={m.bright_swift_eagle_login()} description={m.loginCTA_description()} />
+			<Heading title={m.bright_swift_eagle_login()} description={m.fresh_bright_sparrow_logindesc()} />
 		{:else}
-			<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.loginInviteCTA()}</h1>
+			<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.warm_tangy_deer_logininvite()}</h1>
 			<p class="my-4 text-sm text-gray-500 dark:text-gray-400">
-				{m.inviteJoinCTA_description({ name: data.org.name })}
+				{m.quick_clear_owl_invitejoin({ name: data.org.name })}
 			</p>
 		{/if}
 		<form id="loginForm" method="POST" action="?/login" use:enhance={loginHandler}>

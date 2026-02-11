@@ -74,7 +74,7 @@
 						<a href="/terms" class="mr-4 hover:underline md:mr-6">{m.termsOfService()}</a>
 					</li>
 					<li>
-						<a href="/contact" class="hover:underline">{m.contactCTA()}</a>
+						<a href="/contact" class="hover:underline">{m.calm_steady_lynx_contact()}</a>
 					</li>
 				</ul>
 			</div>

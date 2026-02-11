@@ -115,7 +115,7 @@
 		</div>
 	{:else}
 		<!-- Submission form -->
-		<Heading title={m.gentle_brave_falcon_award()} description={m.awardBadgeCTA_description()} />
+		<Heading title={m.gentle_brave_falcon_award()} description={m.sharp_quiet_panther_awarddesc()} />
 
 		<AchievementSummary achievement={data.achievement} />
 

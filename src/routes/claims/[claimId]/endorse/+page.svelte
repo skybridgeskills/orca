@@ -49,7 +49,7 @@
 	<AchievementSummary achievement={data.achievement} />
 
 	{#if form.status?.created === false}
-		<Alert message={m.endorseForm_alreadyRecommendedError()} level="warning" />
+		<Alert message={m.sharp_clear_fox_alreadyrec()} level="warning" />
 	{/if}
 
 	{#if form.endorsement}
@@ -82,7 +82,7 @@
 	<!-- Submission form -->
 	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.warm_tangy_deer_endorseform()}</h1>
 	<p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
-		{m.endorseForm_description({
+		{m.calm_steady_lynx_endorsedesc({
 			givenName: data.claim.user.givenName ?? '',
 			familyName: data.claim.user.familyName ?? ''
 		})}
@@ -103,7 +103,7 @@
 	<form method="POST" class="max-w-2xl mt-4">
 		<div class="mb-6">
 			<p class="mb-3 text-sm text-gray-500 dark:text-gray-400">
-				{m.endorseForm_narrative_description()}
+				{m.bright_happy_sparrow_narrdesc()}
 			</p>
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>{m.achievement_narrative()}</label

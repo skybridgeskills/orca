@@ -42,7 +42,7 @@
 		disableIcons: ['taskList']
 	});
 	const labels = {
-		writeTab: m.writeCTA(),
+		writeTab: m.firm_clear_fox_write(),
 		previewTab: m.sharp_quiet_panther_preview()
 	};
 </script>

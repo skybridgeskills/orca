@@ -96,7 +96,7 @@
 						}}
 						{disabled}
 					>
-						{m.changeCta()}
+						{m.quick_safe_deer_change()}
 					</button>
 					<button
 						type="button"
