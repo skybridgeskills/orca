@@ -17,3 +17,6 @@ src/**/*.js.map
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Local development notes
+docs/plans
