@@ -12,14 +12,10 @@
 	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
 	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
-	import {
-		achievements,
-		achievementsLoading,
-		fetchAchievements
-	} from '$lib/stores/achievementStore';
+	import { achievementsLoading, fetchAchievements } from '$lib/stores/achievementStore';
 	import { ensureLoaded } from '$lib/stores/common';
 
-	export let form: ActionData;
+	export const form: ActionData | undefined = undefined;
 	export let data: PageData;
 
 	let formData = {

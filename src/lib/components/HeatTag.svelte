@@ -31,7 +31,7 @@
 	}
 </script>
 
-<svelte:element this={elem} class={klass} {href} tabindex="0">
+<svelte:element this={elem} class={klass} {...(elem === 'a' ? { href } : {})} tabindex="0">
 	<span class="truncate text-xs tagwidth">
 		{text}
 	</span>

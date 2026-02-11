@@ -110,6 +110,7 @@ declare module '@digitalbazaar/ed25519-signature-2020/Ed25519Signature2020' {
 	export {};
 }
 declare module '@digitalbazaar/ed25519-signature-2020' {
-	export { Ed25519Signature2020 } from './Ed25519Signature2020.js';
-	export { suiteContext };
+	import { Ed25519Signature2020 } from '@digitalbazaar/ed25519-signature-2020/Ed25519Signature2020';
+	export { Ed25519Signature2020 };
+	export const suiteContext: any;
 }

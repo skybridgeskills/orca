@@ -41,7 +41,7 @@ export const getOrganizationFromRequest = async function (event: RequestEvent) {
 		);
 	}
 
-	return org;
+	return org as App.Organization;
 };
 
 const getSession = async function (sessionId: string, orgId: string) {

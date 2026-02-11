@@ -45,7 +45,6 @@ export const achievementClaimToCredential = async function (
 			description: organization.description
 		},
 		issuanceDate: claim.validFrom?.toISOString() ?? new Date().toISOString(),
-		name: claim.achievement.name,
 		credentialSubject: {
 			id: generatedSubjectDid.didString(),
 			type: 'AchievementSubject',
@@ -92,14 +91,16 @@ export const achievementClaimToCredential = async function (
 
 	const keyPair = await Ed25519VerificationKey2020.from(keyData);
 
-	const suite = new Ed25519Signature2020({ key: keyPair }); //might need to use signer param
-	suite.date = new Date().toISOString();
+	const suite = new Ed25519Signature2020({ 
+		key: keyPair,
+		date: new Date().toISOString()
+	}); //might need to use signer param
 
 	const signedCredential = await jsigs.sign(credentialTemplate, {
 		suite,
 		purpose: new AssertionProofPurpose(),
 		documentLoader: extendedDocumentLoader
-	});
+	} as any);
 
 	return signedCredential as App.OpenBadgeCredential;
 };

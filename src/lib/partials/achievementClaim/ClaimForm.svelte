@@ -47,7 +47,10 @@
 					throw error(400, m.claim_couldNotObtainInvitationError());
 				} else {
 					const responseData = deserialize(await response.text());
-					$inviteId = responseData.data?.endorsement?.id;
+					if (responseData && typeof responseData === 'object' && 'data' in responseData) {
+						const data = responseData.data as { endorsement?: { id?: string } };
+						$inviteId = data?.endorsement?.id ?? '';
+					}
 				}
 			}
 			goto('/login');

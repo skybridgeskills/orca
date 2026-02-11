@@ -17,7 +17,14 @@
 	};
 
 	$: {
-		if (form) endorsementJson = JSON.parse(form?.endorsement?.json ?? '{}');
+		if (form && form.endorsement) {
+			const endorsement = form.endorsement as any;
+			if ('json' in endorsement && typeof endorsement.json === 'string') {
+				endorsementJson = JSON.parse(endorsement.json);
+			} else {
+				endorsementJson = {};
+			}
+		}
 	}
 
 	let awardNarrative = '';
@@ -148,7 +155,7 @@
 					placeholder={m.award_narrative_placeholder()}
 					bind:value={awardNarrative}
 				/>
-				<MarkdownEditor bind:value={awardNarrative} />
+				<MarkdownEditor bind:value={awardNarrative} inputName="narrative" />
 			</div>
 			<div class="mb-6">
 				<label

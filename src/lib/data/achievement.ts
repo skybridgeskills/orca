@@ -1,15 +1,15 @@
 import * as m from '$lib/i18n/messages';
 import { error } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
-import {
+import type {
 	Achievement,
 	AchievementClaim,
 	ClaimEndorsement,
 	Identifier,
 	Organization,
-	Prisma,
 	User
 } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 import { validateEmailAddress } from '$lib/utils/email';
