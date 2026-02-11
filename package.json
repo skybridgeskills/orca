@@ -1,6 +1,7 @@
 {
 	"name": "orca",
 	"version": "0.0.1",
+	"packageManager": "pnpm@10.29.2",
 	"scripts": {
 		"dev": "vite dev --host 0.0.0.0",
 		"debug-dev": "vavite-loader vite dev --m debug-dev --host 0.0.0.0",
@@ -8,16 +9,16 @@
 		"preview": "vite preview",
 		"check": "svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./jsconfig.json --watch",
-		"test": "dotenv -e .env.test -- npx playwright test",
+		"test": "dotenv -e .env.test -- pnpm exec playwright test",
 		"test:unit": "vitest --run",
 		"lint": "prettier --check --plugin-search-dir=. . && eslint .",
 		"format": "prettier --write --plugin-search-dir=. .",
 		"migrate:dev": "prisma migrate dev --schema src/prisma/schema.prisma",
 		"generate": "prisma generate --schema src/prisma/schema.prisma",
-		"createAdmin": "npx tsx src/scripts/createAdmin.ts",
-		"createOrganization": "npx tsx src/scripts/createOrganization.ts",
+		"createAdmin": "pnpm exec tsx src/scripts/createAdmin.ts",
+		"createOrganization": "pnpm exec tsx src/scripts/createOrganization.ts",
 		"createKeypair": "node src/scripts/createKeypair",
-		"createS3BucketLocalStack": "npx tsx src/scripts/createS3BucketLocalStack.ts"
+		"createS3BucketLocalStack": "pnpm exec tsx src/scripts/createS3BucketLocalStack.ts"
 	},
 	"devDependencies": {
 		"@digitalbazaar/ed25519-signature-2020": "^5.1.0",
