@@ -1,4 +1,4 @@
-import type { locales } from '$lib/i18n/runtime';
+import { baseLocale, type locales } from '$lib/i18n/runtime';
 
 type AvailableLanguageTag = typeof locales[number];
 
@@ -35,5 +35,5 @@ export function getLanguageForRequest(
 	}
 
 	// 3. Fallback to 'en-US'
-	return 'en-US';
+	return baseLocale;
 }
