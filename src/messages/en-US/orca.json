@@ -329,5 +329,19 @@
 	"next_arable_mule_zoom": "People who hold this achievement have the permission to create and edit achievements in this community.",
 	"sunny_watery_sparrow_jest": "This community is suspended or is experiencing technical problems. Please try again later.",
 	"swift_bold_eagle_announce": "{givenName} {familyName} claimed this badge",
-	"calm_steady_lynx_pause": "Unaccepted"
+	"calm_steady_lynx_pause": "Unaccepted",
+	"calm_steady_lynx_endorse": [
+		{
+			"declarations": ["input count", "local countPlural = count: plural"],
+			"selectors": ["countPlural"],
+			"match": {
+				"countPlural=one": "{count} endorsement",
+				"countPlural=other": "{count} endorsements"
+			}
+		}
+	],
+	"language_enUS": "English (US)",
+	"language_enAU": "English (AU)",
+	"language_fr": "Français",
+	"language_it": "Italiano"
 }

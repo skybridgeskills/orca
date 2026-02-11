@@ -329,5 +329,19 @@
 	"next_arable_mule_zoom": "Le persone che possiedono questo risultato hanno il permesso di creare e modificare i risultati in questa community.",
 	"sunny_watery_sparrow_jest": "Questa community è sospesa o sta riscontrando problemi tecnici. Si prega di riprovare più tardi.",
 	"swift_bold_eagle_announce": "{givenName} {familyName} ha richiesto questo badge",
-	"calm_steady_lynx_pause": "Non accettato"
+	"calm_steady_lynx_pause": "Non accettato",
+	"calm_steady_lynx_endorse": [
+		{
+			"declarations": ["input count", "local countPlural = count: plural"],
+			"selectors": ["countPlural"],
+			"match": {
+				"countPlural=one": "{count} approvazione",
+				"countPlural=other": "{count} approvazioni"
+			}
+		}
+	],
+	"language_enUS": "Inglese (USA)",
+	"language_enAU": "Inglese (Australia)",
+	"language_fr": "Francese",
+	"language_it": "Italiano"
 }

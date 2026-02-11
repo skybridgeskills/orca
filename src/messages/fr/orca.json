@@ -329,5 +329,19 @@
 	"next_arable_mule_zoom": "Les personnes qui détiennent cette réussite ont la permission de créer et de modifier des réussites dans cette communauté.",
 	"sunny_watery_sparrow_jest": "Cette communauté est suspendue ou rencontre des problèmes techniques. Veuillez réessayer ultérieurement.",
 	"swift_bold_eagle_announce": "{givenName} {familyName} a revendiqué ce badge",
-	"calm_steady_lynx_pause": "Non accepté"
+	"calm_steady_lynx_pause": "Non accepté",
+	"calm_steady_lynx_endorse": [
+		{
+			"declarations": ["input count", "local countPlural = count: plural"],
+			"selectors": ["countPlural"],
+			"match": {
+				"countPlural=one": "{count} approbation",
+				"countPlural=other": "{count} approbations"
+			}
+		}
+	],
+	"language_enUS": "Anglais (États-Unis)",
+	"language_enAU": "Anglais (Australie)",
+	"language_fr": "Français",
+	"language_it": "Italien"
 }
