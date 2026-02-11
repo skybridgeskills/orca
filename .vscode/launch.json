@@ -1,11 +1,11 @@
 {
 	"configurations": [
 		{
-			"name": "Debug via NPM",
+			"name": "Debug via pnpm",
 			"cwd": "${workspaceFolder}",
 			"request": "launch",
 			"runtimeArgs": ["run-script", "debug-dev"],
-			"runtimeExecutable": "npm",
+			"runtimeExecutable": "pnpm",
 			"runtimeVersion": "18",
 			"skipFiles": ["<node_internals>/**"],
 			"type": "node",
@@ -21,11 +21,11 @@
 			}
 		},
 		{
-			"name": "Launch via NPM",
+			"name": "Launch via pnpm",
 			"cwd": "${workspaceFolder}",
 			"request": "launch",
 			"runtimeArgs": ["run-script", "dev"],
-			"runtimeExecutable": "npm",
+			"runtimeExecutable": "pnpm",
 			"runtimeVersion": "18",
 			"skipFiles": ["<node_internals>/**"],
 			"type": "node",
