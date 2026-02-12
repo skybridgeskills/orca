@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/i18n/messages';
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { FileDrop } from 'svelte-droplet';
 	export let errorMessage: string | null = null;
@@ -56,9 +57,10 @@
 						/></svg
 					>
 					<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-						<span class="font-semibold">Click to upload</span> or drag and drop
+						<span class="font-semibold">{m.ok_firey_fireant_intend()}</span>
+						{m.still_flat_horse_assure()}
 					</p>
-					<p class="text-xs text-gray-500 dark:text-gray-400">SVG or PNG (MAX. 800x800px)</p>
+					<p class="text-xs text-gray-500 dark:text-gray-400">{m.white_fit_fox_zap()}</p>
 				</div>
 			{:else}
 				<div
@@ -72,13 +74,16 @@
 					/>
 					<div class="p-1">
 						<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-							<span class="font-semibold">Click to replace</span> or drag and drop
+							<span class="font-semibold">{m.front_real_peacock_endure()}</span>
+							{m.still_flat_horse_assure()}
 						</p>
-						<p class="text-xs text-gray-500 dark:text-gray-400">SVG or PNG (MAX. 800x800px)</p>
+						<p class="text-xs text-gray-500 dark:text-gray-400">{m.white_fit_fox_zap()}</p>
 					</div>
 
 					<div class="text-xs text-gray-500 dark:text-gray-400 absolute top-7 right-4">
-						<button on:click|stopPropagation={handleClearImage}>Clear</button>
+						<button on:click|stopPropagation={handleClearImage}
+							>{m.helpful_lost_angelfish_startle()}</button
+						>
 					</div>
 				</div>
 			{/if}
