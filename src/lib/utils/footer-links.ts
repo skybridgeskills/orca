@@ -1,4 +1,4 @@
-import { env } from '$env/static/public';
+import { env as dynamicEnv } from '$env/dynamic/public';
 
 type FooterLinkKey = 'privacy' | 'terms' | 'contact';
 
@@ -21,7 +21,11 @@ export function getFooterUrl(
 	defaultValue: string,
 	envOverride?: FooterEnv
 ): string {
-	const envSource = envOverride ?? env;
+	const envSource: FooterEnv = envOverride ?? {
+		PUBLIC_PRIVACY_URL: dynamicEnv.PUBLIC_PRIVACY_URL,
+		PUBLIC_TERMS_URL: dynamicEnv.PUBLIC_TERMS_URL,
+		PUBLIC_CONTACT_URL: dynamicEnv.PUBLIC_CONTACT_URL
+	};
 	const envVarMap: Record<FooterLinkKey, string | undefined> = {
 		privacy: envSource.PUBLIC_PRIVACY_URL,
 		terms: envSource.PUBLIC_TERMS_URL,
