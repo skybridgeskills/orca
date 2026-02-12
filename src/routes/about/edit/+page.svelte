@@ -14,6 +14,7 @@
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import { achievementsLoading, fetchAchievements } from '$lib/stores/achievementStore';
 	import { ensureLoaded } from '$lib/stores/common';
+	import { locales } from '$lib/i18n/runtime';
 
 	export const form: ActionData | undefined = undefined;
 	export let data: PageData;
@@ -26,6 +27,7 @@
 		logo: data.org.logo,
 		imageExtension: data.org.logo ? imageExtension(data.org.logo) : null,
 		tagline: data.org.json?.tagline,
+		defaultLanguage: data.org.json?.defaultLanguage || null,
 		editAchievementCapability: data.org.json?.permissions?.editAchievementCapability
 			?.requiresAchievement
 			? 'achievement'
@@ -40,6 +42,7 @@
 		primaryColor: null,
 		logo: null,
 		tagline: null,
+		defaultLanguage: null,
 		editAchievementCapability: null,
 		editAchievementRequires: null
 	};
@@ -189,6 +192,41 @@
 		{#if errors.tagline}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 				{errors.tagline}
 			</p>{/if}
+	</div>
+
+	<div class="mb-6" class:isError={errors.defaultLanguage}>
+		<label
+			for="orgEdit_defaultLanguage"
+			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+			>{m.steady_antsy_parrot_view()}</label
+		>
+		<select
+			id="orgEdit_defaultLanguage"
+			name="defaultLanguage"
+			bind:value={formData.defaultLanguage}
+			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+			on:blur={validate}
+		>
+			<option value="">{m.fancy_antsy_ray_gaze()}</option>
+			{#each locales as lang}
+				<option value={lang}>
+					{#if lang === 'en-US'}
+						{m.flat_known_oryx_view()}
+					{:else if lang === 'en-AU'}
+						{m.piquant_dry_kite_emerge()}
+					{:else if lang === 'fr'}
+						{m.male_clear_crossbill_file()}
+					{:else if lang === 'it'}
+						{m.dark_dry_cuckoo_soar()}
+					{:else}
+						{lang}
+					{/if}
+				</option>
+			{/each}
+		</select>
+		{#if errors.defaultLanguage}
+			<p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.defaultLanguage}</p>
+		{/if}
 	</div>
 
 	<div class="mb-6" class:isError={errors.primaryColor}>
