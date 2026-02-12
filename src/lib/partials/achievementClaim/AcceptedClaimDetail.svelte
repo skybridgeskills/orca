@@ -40,7 +40,7 @@
 	const sendToWallet = async () => {
 		if (existingBadgeClaim?.claimStatus != 'ACCEPTED') return;
 		if (!navigator.credentials) {
-			notifications.add(new Notification(m.chapi_noPolyfillError()));
+			notifications.add(new Notification(m.happy_antsy_kite_succeed()));
 			return;
 		}
 
@@ -61,34 +61,36 @@
 		};
 		const webCredential = new window.WebCredential(presentation.type, presentation);
 		const chapiResult = await navigator.credentials.store(webCredential);
-		if (chapiResult === null) notifications.add(new Notification(m.chapi_cancelFailError()));
+		if (chapiResult === null) notifications.add(new Notification(m.tired_fancy_deer_lead()));
 	};
 </script>
 
-<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.backpack_yourBadge()}</h1>
+<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
+	{m.swift_patchy_thrush_support()}
+</h1>
 
 <p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-	{m.achievement_youHaveClaimed_description()}
+	{m.patchy_silly_guppy_jump()}
 </p>
 
 <AchievementSummary {achievement} claim={existingBadgeClaim} />
 
 <div class="max-w-2xl flex justify-between items-center mt-6 border-t pt-5">
-	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.claim_statusUserAccepted()}</h2>
+	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.merry_true_termite_cook()}</h2>
 	<div>
 		{#if !showClaimForm}
 			<div class="flex gap-1">
 				{#if existingBadgeClaim?.claimStatus === 'ACCEPTED'}
 					<DownloadButton
 						sourceUrl="/claims/{existingBadgeClaim?.id}/download"
-						text={m.downloadCTA()}
+						text={m.swift_steady_falcon_download()}
 						submodule="secondary"
 						id="download-{existingBadgeClaim?.id}"
 						fileName="{achievement.name.split(' ').join('-')}-credential.json"
 					/>
 
 					<Button
-						text={m.claim_sendToWalletCTA()}
+						text={m.red_sleek_kite_relish()}
 						on:click={() => {
 							sendToWalletModalVisible = true;
 						}}
@@ -97,7 +99,7 @@
 				{/if}
 
 				<Button
-					text={m.claim_editCTA()}
+					text={m.swift_lower_mantis_delight()}
 					on:click={() => {
 						claimIntent = 'ACCEPTED';
 						showClaimForm = true;
@@ -106,7 +108,7 @@
 				/>
 				<Button
 					submodule="danger"
-					text={m.claim_rejectCTA()}
+					text={m.stout_weary_deer_link()}
 					on:click={() => {
 						claimIntent = 'REJECTED';
 						showClaimForm = true;
@@ -118,7 +120,7 @@
 </div>
 
 <p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-	{m.claim_statusUserAccepted_description({
+	{m.sunny_bright_goat_view({
 		createdOn: existingBadgeClaim?.createdOn?.toString() ?? ''
 	})}
 </p>
@@ -127,19 +129,19 @@
 
 {#if existingBadgeClaim?.claimStatus === 'ACCEPTED'}
 	<div class="max-w-2xl flex justify-between items-center mt-6 border-t border-b pt-5">
-		<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.claim_shareCTA()}</h2>
+		<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.early_fancy_boar_file()}</h2>
 		<div class="flex gap-1">
 			<Button
 				class="text-xs"
 				submodule="secondary"
-				text={m.share_copyUrl()}
+				text={m.lucky_tired_mole_ask()}
 				on:click={(e) => {
 					if (!existingBadgeClaim || !achievement || !navigator.clipboard) {
 						return;
 					}
 					const url = `${PUBLIC_HTTP_PROTOCOL}://${achievement.organization.domain}/ob2/a/${existingBadgeClaim.id}`;
 					navigator.clipboard.writeText(url);
-					console.log(m.claim_shareUrlCopied() + url);
+					console.log(m.dense_cool_owl_nurture() + url);
 					e.preventDefault();
 					e.stopPropagation();
 				}}
@@ -147,7 +149,7 @@
 			<Button
 				class="text-xs"
 				submodule="secondary"
-				text={m.qrCode()}
+				text={m.sharp_quiet_panther_qr()}
 				on:click={() => {
 					showQRShareModal = true;
 				}}
@@ -157,10 +159,7 @@
 				target={`linkedin-${achievement.id}`}
 				rel="noopener noreferrer"
 				class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-none"
-				><img
-					src="/linkedin-add-to-profile-button.png"
-					alt={m.linkedin_addToProfileButton_label()}
-				/></a
+				><img src="/linkedin-add-to-profile-button.png" alt={m.every_watery_kite_view()} /></a
 			>
 		</div>
 	</div>
@@ -168,7 +167,7 @@
 
 <Modal
 	visible={showClaimForm}
-	title={m.claim_editCTA()}
+	title={m.swift_lower_mantis_delight()}
 	on:close={() => {
 		showClaimForm = false;
 	}}
@@ -187,13 +186,13 @@
 
 <Modal
 	visible={sendToWalletModalVisible}
-	title={m.claim_sendToWalletCTA()}
+	title={m.red_sleek_kite_relish()}
 	on:close={() => {
 		sendToWalletModalVisible = false;
 	}}
 	actions={[
 		{
-			label: m.claim_sendToWalletCTA(),
+			label: m.red_sleek_kite_relish(),
 			onClick: () => {
 				sendToWallet();
 				sendToWalletModalVisible = false;
@@ -204,10 +203,10 @@
 	]}
 >
 	<p class="text-center text-gray-500 dark:text-gray-400">
-		{m.chapi_description()}
+		{m.deft_bad_mouse_scold()}
 		<a href="https://chapi.io/" class="font-bold underline hover:no-underline" target="_blank"
 			>Credential Handler API (CHAPI)</a
-		>. {m.chapi_walletSignupCTA_description()}
+		>. {m.wide_smooth_mantis_intend()}
 		<a href="https://learncard.app" class="underline hover:no-underline font-bold" target="_blank"
 			>LearnCard</a
 		>.
@@ -216,17 +215,17 @@
 
 <Modal
 	visible={showQRShareModal}
-	title={m.share_qrCode_heading()}
+	title={m.happy_bright_mole_spill()}
 	on:close={() => {
 		showQRShareModal = false;
 	}}
 	actions={[]}
 >
 	<p class="text-sm text-gray-500 dark:text-gray-400">
-		{m.share_qrCode_description()}
+		{m.mad_merry_kite_support()}
 	</p>
 	<QRCode
 		url={`${PUBLIC_HTTP_PROTOCOL}://${achievement.organization.domain}/ob2/a/${existingBadgeClaim?.id}`}
-		alt={m.share_qrCodeImageAltText()}
+		alt={m.plane_light_fish_view()}
 	/>
 </Modal>

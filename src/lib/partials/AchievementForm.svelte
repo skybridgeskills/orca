@@ -12,12 +12,11 @@
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import {
-		achievements,
 		achievementsLoading,
 		fetchAchievements,
 		upsertAchievement
 	} from '$lib/stores/achievementStore';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { ensureLoaded } from '$lib/stores/common';
 	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
@@ -116,7 +115,7 @@
 						result.data?.code ?? 'none'
 					)
 				)
-					errors[result.data?.code as keyof typeof errors] = m.requirement_statusInvalid();
+					errors[result.data?.code as keyof typeof errors] = m.great_late_sparrow_fry();
 				break;
 			case 'success':
 				//read the upload url and put the image data to it.
@@ -172,7 +171,8 @@
 			<div class:isError={errors.image}>
 				<label
 					for="achievementEdit_image"
-					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.image()}</label
+					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
+					>{m.vivid_dark_pug_file()}</label
 				>
 				<ImageFileDrop
 					bind:currentValue={formData.image}
@@ -192,7 +192,7 @@
 				<label
 					for="achievementEdit_name"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
-					>{m.achievement_name()}</label
+					>{m.grand_true_lynx_whisper()}</label
 				>
 				<input
 					type="text"
@@ -214,7 +214,7 @@
 				<label
 					for="achievementEdit_description"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
-					>{m.description()}</label
+					>{m.kind_mellow_pug_enchant()}</label
 				>
 				<textarea
 					id="achievementEdit_description"
@@ -235,7 +235,7 @@
 				<label
 					for="achievementEdit_category"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
-					>{m.category()}</label
+					>{m.serious_gentle_boar_nurture()}</label
 				>
 				<select
 					id="achievementEdit_category"
@@ -243,7 +243,7 @@
 					bind:value={formData.category}
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 				>
-					<option value="uncategorized">- {m.uncategorized()} -</option>
+					<option value="uncategorized">- {m.light_early_owl_shrine()} -</option>
 					{#each categories as category (category.id)}
 						<option value={category.id}>{category.name}</option>
 					{/each}
@@ -260,7 +260,11 @@
 	<div class="max-w-4xl space-y-6">
 		<!-- Criteria -->
 
-		<Heading title={m.criteria()} description={m.criteria_description()} level="h3" />
+		<Heading
+			title={m.lower_piquant_lemur_grin()}
+			description={m.pink_crazy_robin_gaze()}
+			level="h3"
+		/>
 		<div class="mb-6" class:isError={errors.criteriaNarrative}>
 			<MarkdownEditor bind:value={formData.criteriaNarrative} inputName="criteriaNarrative" />
 
@@ -275,7 +279,7 @@
 			<label
 				for="achievementEdit_url"
 				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.criteria_url()}</label
+				>{m.deft_stout_panther_nurture()}</label
 			>
 			<input
 				type="text"
@@ -295,21 +299,21 @@
 			<div class="flex flex-col gap-3">
 				<!-- Claim Settings -->
 				<div class:isError={errors.claimRequires}>
-					<FormFieldLabel for="claimable">{m.claimConfiguration_allow()}</FormFieldLabel>
+					<FormFieldLabel for="claimable">{m.bright_swift_eagle_allow()}</FormFieldLabel>
 					<input type="hidden" name="claimable" bind:value={formData.claimable} />
 					<div class="space-y-2">
 						<RadioOption
 							bind:selectedOption={formData.claimableSelectedOption}
 							value="off"
 							name="claimableSelectedOption"
-							label={m.achievement_awardByInvitation()}
+							label={m.each_funny_eagle_pause()}
 							id="achievementEdit_claimable_off"
 						/>
 						<RadioOption
 							bind:selectedOption={formData.claimableSelectedOption}
 							value="public"
 							name="claimableSelectedOption"
-							label={m.achievement_openClaimable_description()}
+							label={m.sharp_fluffy_mantis_delight()}
 							id="achievementEdit_claimableSelectedOption_public"
 						/>
 						<RadioOption
@@ -329,8 +333,8 @@
 									formData.claimRequires = e.detail;
 								}}
 								disabled={formData.claimableSelectedOption != 'badge'}
-								label={m.claimConfiguration_requiredAchievement()}
-								description={m.claimConfiguration_requiredAchievement_description()}
+								label={m.quick_clear_owl_required()}
+								description={m.sharp_clear_fox_requireddesc()}
 								achievementFilter={(a) => a.id != achievementId}
 								inputId="achievementEdit_claimRequires"
 								inputName="claimRequires"
@@ -370,8 +374,7 @@
 				/>
 
 				<div class:isError={errors.reviewRequires}>
-					<FormFieldLabel for="config_reviewOption"
-						>{m.achievementConfig_reviewRequiresLabel()}</FormFieldLabel
+					<FormFieldLabel for="config_reviewOption">{m.firm_clear_fox_reviewlabel()}</FormFieldLabel
 					>
 					<div class="space-y-2">
 						<RadioOption
@@ -394,7 +397,7 @@
 							name="config_reviewable"
 							id="achievementEdit_reviewOption_badge"
 						>
-							<span class="inline">{m.achievementConfig_reviewRequiresLabelSpecific()}</span>
+							<span class="inline">{m.quick_safe_deer_reviewspec()}</span>
 							<AchievementSelect
 								badgeId={formData.reviewRequires}
 								on:unselected={() => {
@@ -409,8 +412,8 @@
 									formData.reviewRequires = e.detail;
 								}}
 								disabled={formData.reviewableSelectedOption != 'badge'}
-								label={m.claimConfiguration_requiredAchievement()}
-								description={m.claimConfiguration_requiredAchievement_description()}
+								label={m.quick_clear_owl_required()}
+								description={m.sharp_clear_fox_requireddesc()}
 								inputId="achievementEdit_reviewRequires"
 								inputName="reviewRequires"
 								errorMessage={errors.reviewRequires}
@@ -447,7 +450,7 @@
 							for="achievementEdit_reviewsRequired"
 							disabled={formData.reviewableSelectedOption != 'badge'}
 						>
-							{m.claimConfiguration_reviewsRequired()}
+							{m.firm_steady_boar_reviews()}
 						</FormFieldLabel>
 						<input
 							type="number"
@@ -476,7 +479,7 @@
 				<!-- Invite Settings -->
 				<div class:isError={errors.inviteRequires}>
 					<FormFieldLabel for="capabilities_inviteRequires"
-						>{m.achievementConfig_inviteRequiresLabel()}</FormFieldLabel
+						>{m.sharp_quiet_panther_invitelabel()}</FormFieldLabel
 					>
 					<div class="space-y-2">
 						<RadioOption
@@ -492,7 +495,7 @@
 							name="config_invitable"
 							id="achievementEdit_inviteOption_badge"
 						>
-							<span class="inline">{m.achievementConfig_requirementHoldersOf()}</span>
+							<span class="inline">{m.warm_tangy_deer_holders()}</span>
 							<AchievementSelect
 								badgeId={formData.capabilities_inviteRequires}
 								on:unselected={() => {
@@ -525,7 +528,7 @@
 											}`}
 											tabindex={formData.capabilities_inviteRequires == 'badge' ? 0 : -1}
 										>
-											{m.chooseCTA()}
+											{m.bright_swift_eagle_choose()}
 										</button>
 									{/if}
 								</span>
@@ -652,12 +655,12 @@
 			<button
 				type="submit"
 				class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-				>{m.submitCTA()}</button
+				>{m.bold_swift_eagle_submit()}</button
 			>
 			<a
 				href="/achievements"
 				class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
-				>{m.cancelCTA()}</a
+				>{m.calm_steady_lynx_cancel()}</a
 			>
 		</div>
 	</div>

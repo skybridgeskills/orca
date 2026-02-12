@@ -77,7 +77,7 @@ export const load = async ({ locals, params }) => {
 export const actions: Actions = {
 	default: async ({ locals, request, params }) => {
 		if (!locals.session?.user?.id) {
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 		}
 
 		const hasPermission = await canEditAchievements({
@@ -92,7 +92,7 @@ export const actions: Actions = {
 		});
 
 		if (!hasPermission) {
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 		}
 
 		const requestData = await request.formData();
@@ -100,7 +100,7 @@ export const actions: Actions = {
 		const imageKey = requestData.get('imageExtension')
 			? `achievement-${params.id}/${uuidv4().slice(-8)}-raw-image.${requestData.get(
 					'imageExtension'
-			  )}`
+				)}`
 			: null;
 
 		const formData = {
@@ -172,7 +172,7 @@ export const actions: Actions = {
 			} catch (e) {
 				return fail(400, {
 					code: 'inviteRequires',
-					message: m.claimConfiguration_relatedAchievementNotFoundError()
+					message: m.swift_steady_falcon_notfound()
 				});
 			}
 		}
@@ -219,11 +219,11 @@ export const actions: Actions = {
 				if (e.code == 'P2025') {
 					return fail(400, {
 						code: 'claimRequires',
-						message: m.claimConfiguration_relatedAchievementNotFoundError()
+						message: m.swift_steady_falcon_notfound()
 					});
 				}
 			}
-			throw error(500, m.claimConfiguration_unexpectedSaveError());
+			throw error(500, m.fresh_bright_sparrow_saveerror());
 		}
 
 		const updated = await prisma.achievement.update({

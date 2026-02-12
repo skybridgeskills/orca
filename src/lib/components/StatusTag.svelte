@@ -15,10 +15,10 @@
 		UNDER_REVIEW: 'border-r-orange-500 dark:border-r-orange-600'
 	};
 	const statusText = {
-		ACCEPTED: m.status_accepted(),
-		REJECTED: m.status_rejected(),
-		UNACCEPTED: m.status_invited(),
-		UNDER_REVIEW: m.status_underReview()
+		ACCEPTED: m.bright_swift_eagle_soar(),
+		REJECTED: m.sharp_clear_fox_deny(),
+		UNACCEPTED: m.clear_clear_turtle_cook(),
+		UNDER_REVIEW: m.mad_fancy_penguin_read()
 	};
 
 	$: calculatedStatus =

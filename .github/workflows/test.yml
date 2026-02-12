@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/krypton'
+          node-version: 'lts/iron'
 
       - name: Enable Corepack
         run: corepack enable

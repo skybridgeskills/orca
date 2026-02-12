@@ -12,7 +12,7 @@
 	export let items: Array<Item>;
 </script>
 
-<nav class="flex" aria-label={m.breadcrumb()}>
+<nav class="flex" aria-label={m.top_fresh_scallop_ascend()}>
 	<ol class="inline-flex items-center space-x-1 md:space-x-3 mb-4">
 		{#each items as item, i}
 			{#if i !== 0}

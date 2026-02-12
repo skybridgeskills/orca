@@ -25,7 +25,7 @@ export const load: PageServerLoad = ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const imageUpdated = requestData.get('imageEdited') === 'true';
@@ -46,8 +46,9 @@ export const actions: Actions = {
 			if (err instanceof ValidationError) throw error(400, err.message);
 		}
 
-		// Get the tagline and permissions from the form data
+		// Get the tagline, defaultLanguage, and permissions from the form data
 		const tagline = stripTags(requestData.get('tagline')?.toString() || '');
+		const defaultLanguage = requestData.get('defaultLanguage')?.toString();
 		const editAchievementCapability = requestData.get('editAchievementCapability')?.toString();
 		const editAchievementRequires = requestData.get('editAchievementRequires')?.toString();
 
@@ -58,10 +59,11 @@ export const actions: Actions = {
 		// Extract and preserve orgStatus (cannot be modified by users)
 		const currentOrgStatus = getOrgStatus(jsonData);
 
-		// Update the json object with the new tagline and permissions
+		// Update the json object with the new tagline, defaultLanguage, and permissions
 		const updatedJson: App.OrganizationConfig = {
 			...jsonData,
 			tagline: tagline,
+			defaultLanguage: defaultLanguage || undefined,
 			orgStatus: currentOrgStatus // Explicitly preserve orgStatus
 		};
 

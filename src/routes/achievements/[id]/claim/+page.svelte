@@ -22,10 +22,10 @@
 	let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
 
 	const breadcrumbItems = [
-		{ text: m.home(), href: '/' },
-		{ text: m.achievement_other(), href: '/achievements' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name, href: `../${data.achievement.id}` },
-		{ text: m.claimCTA() }
+		{ text: m.bold_swift_eagle_claim() }
 	];
 </script>
 
@@ -46,26 +46,26 @@
 	<AchievementSummary achievement={data.achievement} />
 	<div class="max-w-2xl mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
-			{m.claimConfiguration_userNotMeetRequirement_heading()}
+			{m.quick_clear_owl_notmeet()}
 		</h2>
 
 		<Alert level="warning">
-			{m.claimConfiguration_claimRequiresSummary()}
+			{m.sharp_quiet_panther_requires()}
 			<a
 				href={`/achievements/${config?.claimRequiresId}`}
 				class="font-bold underline hover:no-underline">{config?.claimRequires?.name}</a
-			>. {m.claimConfiguration_userNotMeetsRequirement()}
+			>. {m.sharp_clear_fox_notmeets()}
 		</Alert>
 	</div>
 {:else if !config?.claimable && config?.json?.capabilities?.inviteRequires}
 	<div class="max-w-2xl">
-		<Alert level="error" message={m.achievementConfig_inviteRequiredGeneric()} />
+		<Alert level="error" message={m.swift_steady_falcon_invitereq()} />
 	</div>
 {:else}
 	<div class="max-w-2xl">
 		<Alert
 			level="error"
-			message={`${m.claimConfiguration_claimDisabled()} ${m.claimConfiguration_adminOnly_description()}`}
+			message={`${m.firm_clear_fox_disabled()} ${m.calm_steady_lynx_adminonly()}`}
 		/>
 	</div>
 {/if}

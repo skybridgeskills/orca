@@ -153,7 +153,7 @@
 			<Pagination
 				paging={{
 					page,
-					count: category == 'AchievementClaim' ? totalCount : inviteCount ?? 0,
+					count: category == 'AchievementClaim' ? totalCount : (inviteCount ?? 0),
 					pageSize,
 					action: getData
 				}}
@@ -165,10 +165,10 @@
 					class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
 				>
 					<tr>
-						<th scope="col" class="px-6 py-3"> {m.member()} </th>
-						<th scope="col" class="px-6 py-3"> {m.status()} </th>
-						<th scope="col" class="px-6 py-3"> {m.endorsement_other()} </th>
-						<th scope="col" class="px-6 py-3"> {m.action_other()} </th>
+						<th scope="col" class="px-6 py-3"> {m.elegant_house_ray_describe()} </th>
+						<th scope="col" class="px-6 py-3"> {m.weary_serious_marten_change()} </th>
+						<th scope="col" class="px-6 py-3"> {m.early_calm_cuckoo_cook()} </th>
+						<th scope="col" class="px-6 py-3"> {m.stout_teary_hound_support()} </th>
 					</tr>
 				</thead>
 				<tbody>
@@ -182,7 +182,7 @@
 									<a href={`/claims/${memberClaim.id}`} class="hover:underline">
 										{memberClaim.user?.givenName}
 										{memberClaim.user?.familyName}
-										{#if session?.user?.id == memberClaim.user.id}({m.me()}){/if}
+										{#if session?.user?.id == memberClaim.user.id}({m.red_aqua_mule_jest()}){/if}
 									</a>
 								</th>
 								<td class="px-6 py-4">
@@ -198,7 +198,7 @@
 								<td class="px-6 py-4">
 									{#if session?.user?.id}
 										<a href={`/claims/${memberClaim.id}`}>
-											<Button text={m.view()} />
+											<Button text={m.happy_next_robin_clasp()} />
 										</a>
 									{/if}
 								</td>
@@ -208,7 +208,7 @@
 					{#if !totalCount}
 						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 w-full">
 							<td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-								{m.achievement_badgesClaimed_noneAvailable()}
+								{m.flat_home_sparrow_support()}
 							</td>
 						</tr>
 					{/if}
@@ -224,7 +224,7 @@
 						<th scope="col" class="px-6 py-3"> {m.tiny_stout_turtle_ask()} </th>
 						<th scope="col" class="px-6 py-3"> {m.sleek_true_oryx_spin()} </th>
 						<th scope="col" class="px-6 py-3"> {m.bad_bold_shrimp_express()} </th>
-						<th scope="col" class="px-6 py-3"> {m.action_other()} </th>
+						<th scope="col" class="px-6 py-3"> {m.stout_teary_hound_support()} </th>
 					</tr>
 				</thead>
 				<tbody>
@@ -243,7 +243,7 @@
 										{invite.creator?.familyName ?? ''}
 									</a>
 								{/if}
-								{#if session?.user?.id == invite.creatorId}({m.me()}){/if}
+								{#if session?.user?.id == invite.creatorId}({m.red_aqua_mule_jest()}){/if}
 								{#if !invite.creator}N/A{/if}
 							</td>
 							<td class="px-6 py-4">
@@ -282,12 +282,12 @@
 	on:close={closeDeleteModal}
 	actions={[
 		{
-			label: m.cancelCTA(),
+			label: m.calm_steady_lynx_cancel(),
 			submodule: 'secondary',
 			onClick: closeDeleteModal
 		},
 		{
-			label: m.deleteCTA(),
+			label: m.firm_steady_boar_delete(),
 			submodule: 'danger',
 			onClick: deleteInvite
 		}

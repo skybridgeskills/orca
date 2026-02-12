@@ -38,7 +38,7 @@
 		title: data.claim.achievement.name,
 		description: data.claim.achievement.description,
 		image: derivedImageUrl,
-		imageAlt: m.achievementImageAltText({ name: data.claim.achievement.name })
+		imageAlt: m.firm_steady_boar_imagealt({ name: data.claim.achievement.name })
 	}}
 />
 

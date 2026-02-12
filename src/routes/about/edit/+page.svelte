@@ -14,6 +14,7 @@
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import { achievementsLoading, fetchAchievements } from '$lib/stores/achievementStore';
 	import { ensureLoaded } from '$lib/stores/common';
+	import { locales } from '$lib/i18n/runtime';
 
 	export const form: ActionData | undefined = undefined;
 	export let data: PageData;
@@ -26,6 +27,7 @@
 		logo: data.org.logo,
 		imageExtension: data.org.logo ? imageExtension(data.org.logo) : null,
 		tagline: data.org.json?.tagline,
+		defaultLanguage: data.org.json?.defaultLanguage || null,
 		editAchievementCapability: data.org.json?.permissions?.editAchievementCapability
 			?.requiresAchievement
 			? 'achievement'
@@ -40,6 +42,7 @@
 		primaryColor: null,
 		logo: null,
 		tagline: null,
+		defaultLanguage: null,
 		editAchievementCapability: null,
 		editAchievementRequires: null
 	};
@@ -53,7 +56,6 @@
 			})
 			.catch((err: yup.ValidationError) => {
 				errors = { ...noErrors };
-				console.log(errors);
 				err.inner.map((err) => {
 					if (err.path) {
 						errors[err.path] = err.message;
@@ -114,16 +116,17 @@
 	});
 </script>
 
-<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.org_editCTA()}</h1>
+<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.alert_shy_owl_march()}</h1>
 <p class="my-4 text-sm text-gray-500 dark:text-gray-400">
-	{m.org_edit_description()}
+	{m.sad_mellow_fox_ascend()}
 </p>
 
 <form method="POST" class="max-w-2xl" on:submit|preventDefault|stopPropagation={handleSubmit}>
 	<div class="mb-6" class:isError={errors.name}>
 		<label
 			for="orgEdit_name"
-			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{m.org_name()}</label
+			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+			>{m.sad_petty_boar_approve()}</label
 		>
 		<input
 			type="text"
@@ -140,7 +143,7 @@
 		<label
 			for="orgEdit_description"
 			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
-			>{m.description()}</label
+			>{m.kind_mellow_pug_enchant()}</label
 		>
 		<textarea
 			id="orgEdit_description"
@@ -156,7 +159,7 @@
 	</div>
 	<div class="mb-6" class:isError={errors.url}>
 		<label for="orgEdit_url" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-			>{m.url()}</label
+			>{m.best_fancy_rabbit_shrine()}</label
 		>
 		<input
 			type="text"
@@ -190,11 +193,46 @@
 			</p>{/if}
 	</div>
 
+	<div class="mb-6" class:isError={errors.defaultLanguage}>
+		<label
+			for="orgEdit_defaultLanguage"
+			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+			>{m.steady_antsy_parrot_view()}</label
+		>
+		<select
+			id="orgEdit_defaultLanguage"
+			name="defaultLanguage"
+			bind:value={formData.defaultLanguage}
+			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+			on:blur={validate}
+		>
+			<option value="">{m.calm_swift_eagle_rest()}</option>
+			{#each locales as lang}
+				<option value={lang}>
+					{#if lang === 'en-US'}
+						{m.flat_known_oryx_view()}
+					{:else if lang === 'en-AU'}
+						{m.piquant_dry_kite_emerge()}
+					{:else if lang === 'fr'}
+						{m.male_clear_crossbill_file()}
+					{:else if lang === 'it'}
+						{m.dark_dry_cuckoo_soar()}
+					{:else}
+						{lang}
+					{/if}
+				</option>
+			{/each}
+		</select>
+		{#if errors.defaultLanguage}
+			<p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.defaultLanguage}</p>
+		{/if}
+	</div>
+
 	<div class="mb-6" class:isError={errors.primaryColor}>
 		<label
 			for="orgEdit_primaryColor"
 			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-			>{m.org_primaryColor()}</label
+			>{m.lower_happy_thrush_drip()}</label
 		>
 		<input
 			type="color"
@@ -216,7 +254,8 @@
 		<div class:isError={errors.logo}>
 			<label
 				for="achievementEdit_image"
-				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.image()}</label
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
+				>{m.vivid_dark_pug_file()}</label
 			>
 			<ImageFileDrop
 				bind:currentValue={formData.logo}
@@ -309,12 +348,12 @@
 		<button
 			type="submit"
 			class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-			>{m.submitCTA()}</button
+			>{m.bold_swift_eagle_submit()}</button
 		>
 		<a
 			href="/about"
 			class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
-			>{m.cancelCTA()}</a
+			>{m.calm_steady_lynx_cancel()}</a
 		>
 	</div>
 </form>

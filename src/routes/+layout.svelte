@@ -1,14 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import { MetaTags } from 'svelte-meta-tags';
-
-	import { page } from '$app/stores';
 	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
-	import {
-		achievements,
-		achievementsLoading,
-		fetchAchievements
-	} from '$lib/stores/achievementStore';
 	import { onMount } from 'svelte';
 	import { session, sessionStatus } from '$lib/stores/sessionStore';
 	import { notifications } from '$lib/stores/notificationStore';
@@ -16,12 +9,12 @@
 	import Nav from '$lib/components/Nav.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import type { PageData } from './$types';
-	import { languageTag, setLanguageTag } from '$lib/i18n/runtime';
+	import { setLocale } from '$lib/i18n/runtime';
 	import { LoadingStatus } from '$lib/stores/common';
 
 	export let data: PageData;
 	preferredTheme.initialize(data.cookieTheme || 'light');
-	setLanguageTag(data.locale);
+	setLocale(data.locale);
 
 	onMount(() => {
 		preferredTheme.initialize(data.cookieTheme || 'light'); // reinitialize but with the ability to set document.cookie
@@ -72,22 +65,24 @@
 					class="flex flex-wrap items-center mb-6 text-sm text-gray-500 sm:mb-0 dark:text-gray-400"
 				>
 					<li>
-						<a href="/" class="mr-4 hover:underline md:mr-6">{m.home()}</a>
+						<a href="/" class="mr-4 hover:underline md:mr-6">{m.each_fluffy_fox_view()}</a>
 					</li>
 					<li>
-						<a href="/privacy" class="mr-4 hover:underline md:mr-6">{m.privacyPolicy()}</a>
+						<a href="/privacy" class="mr-4 hover:underline md:mr-6">{m.warm_tangy_deer_privacy()}</a
+						>
 					</li>
 					<li>
-						<a href="/terms" class="mr-4 hover:underline md:mr-6">{m.termsOfService()}</a>
+						<a href="/terms" class="mr-4 hover:underline md:mr-6">{m.gentle_brave_falcon_terms()}</a
+						>
 					</li>
 					<li>
-						<a href="/contact" class="hover:underline">{m.contactCTA()}</a>
+						<a href="/contact" class="hover:underline">{m.calm_steady_lynx_contact()}</a>
 					</li>
 				</ul>
 			</div>
 			<hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
 			<span class="block text-sm text-gray-500 sm:text-center dark:text-gray-400"
-				>{data.org.json?.tagline || m.tagline()}</span
+				>{data.org.json?.tagline || m.legal_factual_lamb_jump()}</span
 			>
 		</div>
 	</footer>

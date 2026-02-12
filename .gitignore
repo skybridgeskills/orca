@@ -20,3 +20,4 @@ src/**/*.js.map
 
 # Local development notes
 docs/plans
+docs/libraries

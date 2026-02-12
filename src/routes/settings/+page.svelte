@@ -33,7 +33,8 @@
 	<div class="mb-6" class:isError={errors.givenName}>
 		<label
 			for="settings_givenName"
-			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{m.givenName()}</label
+			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+			>{m.bright_swift_eagle_given()}</label
 		>
 		<input
 			type="text"
@@ -52,7 +53,7 @@
 		<label
 			for="settings_familyName"
 			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-			>{m.familyName()}</label
+			>{m.calm_steady_lynx_family()}</label
 		>
 		<input
 			type="text"
@@ -129,6 +130,6 @@
 			{#if errors.name}<p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.name}</p>{/if}
 		</div>
 
-		<Button buttonType="submit" submodule="primary">{m.saveCTA()}</Button>
+		<Button buttonType="submit" submodule="primary">{m.quick_safe_deer_save()}</Button>
 	</div>
 </form>

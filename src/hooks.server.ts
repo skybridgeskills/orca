@@ -2,12 +2,10 @@ import * as m from '$lib/i18n/messages';
 import { error, type Handle, type RequestEvent } from '@sveltejs/kit';
 import cookie from 'cookie';
 import { prisma } from './prisma/client';
-import {
-	setLanguageTag,
-	availableLanguageTags,
-	type AvailableLanguageTag
-} from '$lib/i18n/runtime';
+import { setLocale, locales } from '$lib/i18n/runtime';
+import { paraglideMiddleware } from '$lib/i18n/server';
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
+import { getLanguageForRequest } from '$lib/utils/language-selection';
 
 export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
 	return orgJson.orgStatus ?? 'ENABLED';
@@ -16,13 +14,13 @@ export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => 
 export const getOrganizationFromRequest = async function (event: RequestEvent) {
 	const domain = event.url.host || '';
 
-	let orgs = await prisma.organization.findMany({
+	const orgs = await prisma.organization.findMany({
 		where: {
 			domain: DEFAULT_ORG_ENABLED === 'true' ? { in: [domain, DEFAULT_ORG_DOMAIN ?? ''] } : domain
 		}
 	});
 	if (orgs.length == 0) {
-		throw error(404, m.organization_notFoundError());
+		throw error(404, m.warm_top_parrot_drip());
 	}
 
 	const org = orgs.find((org) => org.domain === domain) || orgs[0];
@@ -78,33 +76,49 @@ const getAuthHeaderTokenValue = function (authHeader: string | null) {
 	return parts[1];
 };
 
-export const handle: Handle = async function ({ event, resolve }) {
-	event.locals.org = await getOrganizationFromRequest(event);
+export const handle: Handle = ({ event, resolve }) =>
+	paraglideMiddleware(event.request, async ({ request: localizedRequest }) => {
+		event.request = localizedRequest;
 
-	const cookies = cookie.parse(event.request.headers.get('cookie') || '');
-	const sessionId =
-		cookies.sessionId ?? getAuthHeaderTokenValue(event.request.headers.get('Authorization'));
-	if (sessionId) {
-		event.locals.session = await getSession(sessionId, event.locals.org.id);
-	}
-	event.locals.locale = availableLanguageTags.includes(cookies.locale as AvailableLanguageTag)
-		? (cookies.locale as AvailableLanguageTag)
-		: 'en-US';
-	setLanguageTag(event.locals.locale);
-	const theme = ['dark', 'light'].includes(cookies.theme) ? cookies.theme : 'default';
+		event.locals.org = await getOrganizationFromRequest(event);
 
-	const response = await resolve(event);
+		const cookies = cookie.parse(event.request.headers.get('cookie') || '');
+		const sessionId =
+			cookies.sessionId ?? getAuthHeaderTokenValue(event.request.headers.get('Authorization'));
+		if (sessionId) {
+			event.locals.session = await getSession(sessionId, event.locals.org.id);
+		}
 
-	if (!cookies.theme)
-		response.headers.append(
-			'set-cookie',
-			`theme=${theme};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
-		);
-	if (!cookies.locale)
-		response.headers.append(
-			'set-cookie',
-			`locale=${event.locals.locale};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
-		);
+		// Determine language using our selection logic (cookie → org default → en-US)
+		const cookieLanguage = cookies.locale;
+		const orgJson: App.OrganizationConfig =
+			typeof event.locals.org.json === 'string'
+				? JSON.parse(event.locals.org.json)
+				: event.locals.org.json || {};
+		const orgDefaultLanguage = orgJson.defaultLanguage;
+		const selectedLanguage = getLanguageForRequest(cookieLanguage, orgDefaultLanguage, locales);
 
-	return response;
-};
+		// Use the selected language
+		event.locals.locale = selectedLanguage;
+		setLocale(event.locals.locale, { reload: false });
+		const theme = ['dark', 'light'].includes(cookies.theme) ? cookies.theme : 'default';
+
+		const response = await resolve(event, {
+			transformPageChunk: ({ html }) => {
+				return html.replace('%lang%', selectedLanguage);
+			}
+		});
+
+		if (!cookies.theme)
+			response.headers.append(
+				'set-cookie',
+				`theme=${theme};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
+			);
+		if (!cookies.locale)
+			response.headers.append(
+				'set-cookie',
+				`locale=${selectedLanguage};path=/;expires=Fri, 31 Dec 2099 23:59:59 GMT`
+			);
+
+		return response;
+	});

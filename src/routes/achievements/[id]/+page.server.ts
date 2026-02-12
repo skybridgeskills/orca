@@ -66,7 +66,7 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 						select: { endorsements: true }
 					}
 				}
-		  })
+			})
 		: [];
 
 	let outstandingInvites: (ClaimEndorsement & { creator: User | null })[] = [];
@@ -101,7 +101,7 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 export const actions: Actions = {
 	delete: async ({ locals, params }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 
 		// TODO: require confirmation for delete
 		// TODO: ensure can't delete non-org achievement

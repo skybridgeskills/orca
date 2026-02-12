@@ -20,7 +20,7 @@ vi.mock('../../../../../src/lib/server/media', () => ({
 }));
 
 vi.mock('dotenv', async () => {
-	const actual = await vi.importActual('dotenv') as Record<string, string | undefined>;
+	const actual = (await vi.importActual('dotenv')) as Record<string, string | undefined>;
 	return {
 		...actual,
 		default: {

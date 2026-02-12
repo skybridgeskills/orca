@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
 		if (!locals.session?.user?.id) {
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 		}
 
 		const hasPermission = await canEditAchievements({
@@ -71,7 +71,7 @@ export const actions: Actions = {
 		});
 
 		if (!hasPermission) {
-			throw error(403, m.error_unauthorized());
+			throw error(403, m.lower_home_cow_view());
 		}
 
 		const newIdentifier = uuidv4();
@@ -117,7 +117,7 @@ export const actions: Actions = {
 			} catch (e) {
 				return fail(400, {
 					code: 'inviteRequires',
-					message: m.claimConfiguration_relatedAchievementNotFoundError()
+					message: m.swift_steady_falcon_notfound()
 				});
 			}
 		}
@@ -168,7 +168,7 @@ export const actions: Actions = {
 				}
 			});
 			if (!inviteRequiresAchievement) {
-				throw error(400, m.inviteRequires_notFound());
+				throw error(400, m.sharp_quiet_panther_invitereq());
 			}
 		}
 

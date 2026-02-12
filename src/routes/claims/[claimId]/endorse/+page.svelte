@@ -28,13 +28,13 @@
 	}
 
 	const breadcrumbItems = [
-		{ text: m.home(), href: '/' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: data.achievement.name, href: `/achievements/${data.achievement.id}` },
 		{
 			text: `${data.claim.user.givenName} ${data.claim.user.familyName}`,
 			href: `../${data.claim.id}`
 		},
-		{ text: m.endorseFormCTA() }
+		{ text: m.warm_tangy_deer_endorseform() }
 	];
 </script>
 
@@ -43,24 +43,24 @@
 {#if form}
 	<!-- Result of form submission: a new Endorsement or a previous one-->
 	<h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-		{m.awardedBadge()}
+		{m.warm_tangy_deer_awarded()}
 	</h3>
 
 	<AchievementSummary achievement={data.achievement} />
 
 	{#if form.status?.created === false}
-		<Alert message={m.endorseForm_alreadyRecommendedError()} level="warning" />
+		<Alert message={m.sharp_clear_fox_alreadyrec()} level="warning" />
 	{/if}
 
 	{#if form.endorsement}
 		<div class="mb-4">
 			<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-				<span class="font-bold">{m.status_created()}:</span>
+				<span class="font-bold">{m.sharp_silly_hound_dart()}:</span>
 				{form.endorsement?.createdAt}
 			</p>
 			{#if endorsementJson?.narrative}
 				<p class="font-bold max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-					{m.narrative()}:
+					{m.fancy_flat_kite_relish()}:
 				</p>
 				<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 					<MarkdownRender value={endorsementJson.narrative} />
@@ -68,7 +68,7 @@
 			{/if}
 			{#if endorsementJson?.id}
 				<p>
-					<span class="font-bold">{m.evidenceURL()}:</span>
+					<span class="font-bold">{m.calm_steady_lynx_evidence()}:</span>
 					<a href={endorsementJson.id} class="text-blue-700 text-underline hover:no-underline">
 						{endorsementJson.id}
 					</a>
@@ -80,9 +80,11 @@
 	<a href="../{data.claim.id}"><Button text="Done" /></a>
 {:else}
 	<!-- Submission form -->
-	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.endorseFormCTA()}</h1>
+	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
+		{m.warm_tangy_deer_endorseform()}
+	</h1>
 	<p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
-		{m.endorseForm_description({
+		{m.calm_steady_lynx_endorsedesc({
 			givenName: data.claim.user.givenName ?? '',
 			familyName: data.claim.user.familyName ?? ''
 		})}
@@ -103,10 +105,10 @@
 	<form method="POST" class="max-w-2xl mt-4">
 		<div class="mb-6">
 			<p class="mb-3 text-sm text-gray-500 dark:text-gray-400">
-				{m.endorseForm_narrative_description()}
+				{m.bright_happy_sparrow_narrdesc()}
 			</p>
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.achievement_narrative()}</label
+				>{m.patchy_crazy_marten_march()}</label
 			>
 			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative} />
 			<MarkdownEditor inputName="narrative" bind:value={endorsementNarrative} />
@@ -115,7 +117,7 @@
 			<label
 				for="evidenceUrl"
 				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.evidenceURL()}</label
+				>{m.calm_steady_lynx_evidence()}</label
 			>
 			<input
 				type="text"
@@ -128,8 +130,10 @@
 		</div>
 
 		<div class="inline-flex items-center">
-			<Button buttonType="submit" text="Submit" />
-			<a href="../{data.claim.id}"><Button submodule="secondary" text={m.cancelCTA()} /></a>
+			<Button buttonType="submit" text={m.bold_swift_eagle_submit()} />
+			<a href="../{data.claim.id}"
+				><Button submodule="secondary" text={m.calm_steady_lynx_cancel()} /></a
+			>
 		</div>
 	</form>
 {/if}

@@ -56,7 +56,7 @@
 						const loginData = await loginResult.json();
 						sessionId = loginData.sessionId;
 					} else {
-						errorMessage = m.authentication_couldNotLogIn();
+						errorMessage = m.plane_sad_guppy_support();
 					}
 				}
 			} else if (result.type === 'success' && result.data?.session) {
@@ -101,7 +101,10 @@
 	{#if register || (!sessionId && Date.now() < ($inviteCreatedAt?.getTime() ?? 0) + 86400000)}
 		<!-- Step 3: User needs to fill out the rest of the registration form. -->
 		<!-- Or a user goes directly here if they have a fresh (less than 1 day old) invite -->
-		<Heading title={m.logInCTA()} description={m.loginInviteCTA_description()} />
+		<Heading
+			title={m.bright_swift_eagle_login()}
+			description={m.gentle_brave_falcon_logininvdesc()}
+		/>
 		<form
 			id="registerForm"
 			method="POST"
@@ -131,7 +134,7 @@
 					for="register_givenName"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>
-					{m.givenName()}
+					{m.bright_swift_eagle_given()}
 				</label>
 				<input
 					type="text"
@@ -148,7 +151,7 @@
 					for="register_familyName"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>
-					{m.familyName()}
+					{m.calm_steady_lynx_family()}
 				</label>
 				<input
 					type="text"
@@ -171,16 +174,16 @@
 						for="register_agreeTerms"
 						class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 					>
-						{m.tos_agreementCTA_description()}
+						{m.bright_sea_sparrow_work()}
 					</label>
 				</div>
 			</div>
 
-			<Button buttonType="submit" text={m.submitCTA()} />
+			<Button buttonType="submit" text={m.bold_swift_eagle_submit()} />
 		</form>
 	{:else if sessionId}
 		<!-- Step 2: Verify control of email to activate session -->
-		<Heading title={m.logInCTA()} description={m.login_checkEmailCTA_description()} />
+		<Heading title={m.bright_swift_eagle_login()} description={m.tired_soft_goat_cherish()} />
 		<form id="verifyForm" method="POST" action="?/verify" use:enhance={verifyHandler}>
 			<input type="hidden" id="inviteId" name="inviteId" bind:value={$inviteId} />
 			<div class="mt-7">
@@ -188,7 +191,7 @@
 					for="verificationCode"
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>
-					{m.verificationCode()}
+					{m.quick_safe_deer_verify()}
 				</label>
 				<input
 					type="number"
@@ -211,18 +214,21 @@
 				{/if}
 			</div>
 			<div class="mt-5">
-				<Button buttonType="submit" text={m.submitCTA()} />
+				<Button buttonType="submit" text={m.bold_swift_eagle_submit()} />
 			</div>
 		</form>
 	{:else}
 		<!-- Step 1: Enter email to login -->
 
 		{#if !$inviteId}
-			<Heading title={m.logInCTA()} description={m.loginCTA_description()} />
+			<Heading
+				title={m.bright_swift_eagle_login()}
+				description={m.fresh_bright_sparrow_logindesc()}
+			/>
 		{:else}
-			<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.loginInviteCTA()}</h1>
+			<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.warm_tangy_deer_logininvite()}</h1>
 			<p class="my-4 text-sm text-gray-500 dark:text-gray-400">
-				{m.inviteJoinCTA_description({ name: data.org.name })}
+				{m.quick_clear_owl_invitejoin({ name: data.org.name })}
 			</p>
 		{/if}
 		<form id="loginForm" method="POST" action="?/login" use:enhance={loginHandler}>
@@ -231,7 +237,7 @@
 			{/if}
 			<div class="mt-7">
 				<label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-					>{m.yourEmail()}</label
+					>{m.firm_clear_fox_email()}</label
 				>
 				<input
 					type="email"
@@ -249,7 +255,7 @@
 				{/if}
 			</div>
 			<div class="mt-5">
-				<Button id="loginFormSubmit" buttonType="submit" text={m.login_sendCodeCTA()} />
+				<Button id="loginFormSubmit" buttonType="submit" text={m.early_next_seahorse_change()} />
 			</div>
 		</form>
 	{/if}

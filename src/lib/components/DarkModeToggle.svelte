@@ -17,7 +17,7 @@
 	{:else}
 		<div class="icon text-gray-500"><Icon src={WiNightClear} size="32" color="currentColor" /></div>
 	{/if}
-	<span class="sr-only">{m.themeCTA_description()}</span>
+	<span class="sr-only">{m.swift_steady_falcon_themedesc()}</span>
 </button>
 
 <style>

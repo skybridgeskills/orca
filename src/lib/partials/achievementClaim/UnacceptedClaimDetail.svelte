@@ -14,16 +14,16 @@
 	let showClaimForm = false;
 </script>
 
-<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.claim_claimBadgeCTA()}</h1>
+<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.sharp_sea_panther_scold()}</h1>
 
 <p class="max-w-2xl mt-4 text-sm text-gray-500 dark:text-gray-400">
-	{m.claim_statusInvited_description()}
+	{m.ok_bold_oryx_drip()}
 </p>
 
 <AchievementSummary {achievement} />
 
 <div class="max-w-2xl flex justify-between items-center mt-4">
-	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.claim_statusInvited()}</h2>
+	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.early_deft_pug_cherish()}</h2>
 	<div class="flex justify">
 		{#if !showClaimForm}
 			<Button
@@ -45,7 +45,7 @@
 	</div>
 </div>
 <p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-	{m.claim_statusInvitedFull_description({
+	{m.grand_steady_panther_relish({
 		createdOn: existingBadgeClaim?.createdOn.toString() ?? ''
 	})}
 </p>

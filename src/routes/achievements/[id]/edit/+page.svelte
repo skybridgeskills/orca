@@ -28,17 +28,17 @@
 	};
 
 	let breadcrumbItems = [
-		{ text: m.home(), href: '/' },
-		{ text: m.achievement_other(), href: '/achievements' },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name }
 	];
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
 
-<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.achievement_editCTA()}</h1>
+<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.smooth_merry_ostrich_startle()}</h1>
 <p class="my-4 text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
-	{m.achievement_edit_description()}
+	{m.ok_direct_kite_gaze()}
 </p>
 
 <AchievementForm achievementId={data.achievement.id} initialData={formData} {categories} />

@@ -42,8 +42,8 @@
 		disableIcons: ['taskList']
 	});
 	const labels = {
-		writeTab: m.writeCTA(),
-		previewTab: m.previewCTA()
+		writeTab: m.firm_clear_fox_write(),
+		previewTab: m.sharp_quiet_panther_preview()
 	};
 </script>
 

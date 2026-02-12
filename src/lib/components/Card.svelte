@@ -15,7 +15,7 @@
 	<div class="w-full h-full">
 		<slot>
 			<h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-				{m.contentMissing()}
+				{m.swift_steady_falcon_missing()}
 			</h3>
 		</slot>
 	</div>

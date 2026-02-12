@@ -27,6 +27,7 @@ declare namespace App {
 
 	type OrganizationConfig = import('@prisma/client').Prisma.JsonObject & {
 		tagline?: string;
+		defaultLanguage?: (typeof import('$lib/i18n/runtime').locales)[number];
 		orgStatus?: OrgStatus;
 		permissions?: {
 			editAchievementCapability?: {
@@ -43,7 +44,7 @@ declare namespace App {
 		org: Organization;
 		token: string;
 		session: SessionData?;
-		locale: import('$lib/i18n/runtime').AvailableLanguageTag;
+		locale: (typeof import('$lib/i18n/runtime').locales)[number];
 	}
 	interface PageData {
 		org: Organization;

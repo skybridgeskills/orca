@@ -100,15 +100,15 @@
 						!mobileMenuExpanded ? 'max-md:hidden' : ''
 					} container mx-auto flex flex-col p-4 mt-0 rounded-lg border border-gray-100 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 bg-white dark:bg-gray-800 md:dark:bg-gray-800 dark:border-gray-700`}
 				>
-					<NavItem href="/achievements" title={m.achievement_other()} />
-					<NavItem href="/about" title={m.about()} on:click on:keypress />
+					<NavItem href="/achievements" title={m.antsy_grand_rabbit_gaze()} />
+					<NavItem href="/about" title={m.mellow_elegant_parrot_ask()} on:click on:keypress />
 					{#if !$session?.id}
 						<!-- No user is logged in, but they might try to log in -->
 						<li>
 							<a
 								href="/login"
 								class="block py-2 pr-4 pl-3 leading-8 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-								>{m.logInCTA()}</a
+								>{m.bright_swift_eagle_login()}</a
 							>
 						</li>
 						<li>
@@ -119,8 +119,8 @@
 						</li>
 					{:else}
 						<!-- For authenticated users -->
-						<NavItem href="/backpack" title={m.backpack()} on:click on:keypress />
-						<NavItem href="/members" title={m.member_other()} on:click on:keypress />
+						<NavItem href="/backpack" title={m.bold_petty_dog_march()} on:click on:keypress />
+						<NavItem href="/members" title={m.steady_plane_cuckoo_fry()} on:click on:keypress />
 						<li class="hidden md:block">
 							<IconButton
 								id="profile-menu-button"
@@ -128,7 +128,7 @@
 								size="24"
 								on:click={toggleDropdownExpanded}
 								on:keypress={toggleDropdownExpanded}
-								text={m.profile()}
+								text={m.dull_cuddly_jackdaw_intend()}
 							/>
 
 							<!-- Popup menu -->
@@ -146,14 +146,14 @@
 										<a
 											href="/members/{$session?.user?.id}"
 											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-											>{m.profile()}</a
+											>{m.dull_cuddly_jackdaw_intend()}</a
 										>
 									</li>
 									<li>
 										<a
 											href="/settings"
 											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-											>{m.setting_other()}</a
+											>{m.piquant_weary_okapi_enchant()}</a
 										>
 									</li>
 								</ul>
@@ -164,7 +164,7 @@
 										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 									>
 										<button type="submit" class="text-sm text-gray-700 dark:text-gray-400"
-											>{m.logOutCTA()}</button
+											>{m.calm_steady_lynx_logout()}</button
 										>
 									</form>
 								</div>
@@ -176,8 +176,12 @@
 								</li>
 							</PopupMenu>
 						</li>
-						<NavItem href="/members/{$session?.user?.id}" title={m.profile()} class="md:hidden" />
-						<NavItem href="/settings" title={m.setting_other()} class="md:hidden" />
+						<NavItem
+							href="/members/{$session?.user?.id}"
+							title={m.dull_cuddly_jackdaw_intend()}
+							class="md:hidden"
+						/>
+						<NavItem href="/settings" title={m.piquant_weary_okapi_enchant()} class="md:hidden" />
 						<li class="md:hidden">
 							<DarkModeToggle on:click on:keypress />
 						</li>
@@ -191,7 +195,7 @@
 								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 							>
 								<button type="submit" class="text-md text-gray-700 dark:text-gray-400"
-									>{m.logOutCTA()}</button
+									>{m.calm_steady_lynx_logout()}</button
 								>
 							</form>
 						</li>

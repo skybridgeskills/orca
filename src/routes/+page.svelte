@@ -14,7 +14,7 @@
 <Heading title={data.org.name} description={data.org.description} />
 
 {#if data.highlightedAchievements.length}
-	<h2 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.mostAwardedAchievements()}</h2>
+	<h2 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.swift_steady_falcon_mostawarded()}</h2>
 
 	<ul class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
 		{#each data.highlightedAchievements as achievement}
@@ -24,7 +24,7 @@
 						<img
 							src={imageUrl(achievement.image)}
 							class=""
-							alt={m.achievementImageAltText({ name: achievement.name })}
+							alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
 						/>
 					{:else}
 						<div class="text-gray-400 dark:text-gray-700">
@@ -39,7 +39,7 @@
 					</h3>
 				</a>
 				<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-					{m.achievement_awardCountSummary({ count: achievement._count.achievementClaims })}
+					{m.grand_quick_thrush_fry({ count: achievement._count.achievementClaims })}
 				</p>
 
 				<div slot="actions">
@@ -47,7 +47,7 @@
 						href="/achievements/{achievement.id}"
 						class="align-bottom inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 					>
-						{m.view()}
+						{m.happy_next_robin_clasp()}
 						<RightArrow />
 					</a>
 				</div>
@@ -55,15 +55,15 @@
 		{/each}
 	</ul>
 	<p class="my-4 text-sm text-gray-500 dark:text-gray-400 text-center">
-		{m.seeCTA()}
-		<a href="/achievements" class="underline hover:no-underline">{m.achievements_all()}</a>.
+		{m.bright_swift_eagle_see()}
+		<a href="/achievements" class="underline hover:no-underline">{m.happy_dry_shrimp_feel()}</a>.
 	</p>
 {:else}
-	<EmptyStateZone title={m.award_noneYet()}>
+	<EmptyStateZone title={m.weird_small_oryx_tickle()}>
 		<Ribbon slot="image" />
 		<p slot="description">
-			{m.seeCTA()}
-			<a href="/achievements" class="underline hover:no-underline">{m.achievements_all()}</a>.
+			{m.bright_swift_eagle_see()}
+			<a href="/achievements" class="underline hover:no-underline">{m.happy_dry_shrimp_feel()}</a>.
 		</p>
 	</EmptyStateZone>
 {/if}

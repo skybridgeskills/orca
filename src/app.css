@@ -12,34 +12,42 @@
 }
 
 @layer components {
-	.markdown-preview, .carta-renderer {
+	.markdown-preview,
+	.carta-renderer {
 		@apply text-gray-700;
 	}
 
-	.carta-renderer ul, .markdown-preview ul {
+	.carta-renderer ul,
+	.markdown-preview ul {
 		@apply space-y-1 max-w-md list-disc list-inside;
 	}
 
-	.carta-renderer ol, .markdown-preview ol {
+	.carta-renderer ol,
+	.markdown-preview ol {
 		@apply space-y-1 max-w-md list-decimal list-inside;
 	}
 
-	.carta-renderer a, .markdown-preview a {
+	.carta-renderer a,
+	.markdown-preview a {
 		@apply underline hover:text-gray-900;
 	}
 
-	.dark .markdown-preview, .dark .carta-renderer {
+	.dark .markdown-preview,
+	.dark .carta-renderer {
 		@apply text-gray-200;
 	}
 
-	.dark .markdown-preview a, .dark .carta-renderer a {
+	.dark .markdown-preview a,
+	.dark .carta-renderer a {
 		@apply hover:text-gray-100;
 	}
 
-	.markdown-preview p, .carta-renderer p {
+	.markdown-preview p,
+	.carta-renderer p {
 		display: block;
 	}
-	.markdown-preview p, .carta-renderer p:not(:first-child) {
+	.markdown-preview p,
+	.carta-renderer p:not(:first-child) {
 		margin: 0.75em 0;
 	}
 }

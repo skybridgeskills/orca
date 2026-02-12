@@ -8,7 +8,7 @@
 <div>
 	{#if item.narrative}
 		<blockquote class="markdown-preview max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-			<span class="font-bold">{m.narrative()}:</span>
+			<span class="font-bold">{m.fancy_flat_kite_relish()}:</span>
 			{#if item.narrative}
 				<MarkdownRender value={item.narrative} />
 			{/if}

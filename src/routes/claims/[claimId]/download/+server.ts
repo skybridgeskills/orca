@@ -9,7 +9,7 @@ import { Prisma } from '@prisma/client';
 import { isCredentialCacheExired } from '$lib/credentials/credentialHelper';
 
 export const POST = async ({ locals, params }: RequestEvent) => {
-	if (!locals.session?.user?.id) throw error(404, m.claim_notFoundError());
+	if (!locals.session?.user?.id) throw error(404, m.best_sharp_lamb_enchant());
 
 	const claim = await prisma.achievementClaim.findUnique({
 		where: { id: params.claimId },
@@ -24,7 +24,7 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 
 	// User can only download their own badges
 	if (!claim || claim?.organizationId != locals.org.id || claim?.userId != locals.session.user?.id)
-		throw error(404, m.claim_notFoundError());
+		throw error(404, m.best_sharp_lamb_enchant());
 
 	// const config = achievement.achievementConfig;
 	// const claimEvidence = claim.json as App.EvidenceItem;

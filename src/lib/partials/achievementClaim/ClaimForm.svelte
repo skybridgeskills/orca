@@ -44,7 +44,7 @@
 					body: formData
 				});
 				if (response.status != 200) {
-					throw error(400, m.claim_couldNotObtainInvitationError());
+					throw error(400, m.factual_petty_marten_startle());
 				} else {
 					const responseData = deserialize(await response.text());
 					if (responseData && typeof responseData === 'object' && 'data' in responseData) {
@@ -120,7 +120,7 @@
 			<label
 				for="identifier"
 				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.claim_yourPreferredEmail()}</label
+				>{m.flat_weary_pug_describe()}</label
 			>
 			{#if userIdentifiers.length}
 				<select
@@ -149,16 +149,16 @@
 
 		<div class="mb-6">
 			<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-				{m.claimForm_narrative_description()}
+				{m.firm_clear_fox_narrdesc()}
 			</p>
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.achievement_narrative()}</label
+				>{m.patchy_crazy_marten_march()}</label
 			>
 			<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 				{#if achievement.criteriaNarrative}
 					<MarkdownRender value={achievement.criteriaNarrative} />
 				{:else}
-					{m.claimForm_narrativeInstructions()}
+					{m.bright_swift_eagle_narrinst()}
 				{/if}
 			</p>
 			<MarkdownEditor bind:value={$claimNarrative} inputName="narrative" />
@@ -167,7 +167,7 @@
 			<label
 				for="evidenceUrl"
 				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-				>{m.evidenceURL()}</label
+				>{m.calm_steady_lynx_evidence()}</label
 			>
 			<input
 				type="text"
@@ -180,23 +180,23 @@
 		</div>
 	{:else if claimIntent == 'REJECTED'}
 		<h3 class="mb-2 mt-8 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-			{m.invitation_rejectConfirm()}
+			{m.antsy_fresh_mantis_fry()}
 		</h3>
 		<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-			{m.invitation_rejectConfirm_description()}
+			{m.cuddly_upper_deer_support()}
 		</p>
 	{/if}
 	<div class="flex gap-1">
 		<Button
 			submodule="primary"
 			buttonType="submit"
-			text={m.submitCTA()}
+			text={m.bold_swift_eagle_submit()}
 			id="claimFormSubmitButton"
 		/>
 		<Button
 			submodule="secondary"
 			buttonType="button"
-			text={m.cancelCTA()}
+			text={m.calm_steady_lynx_cancel()}
 			on:click={handleCancel}
 		/>
 	</div>
