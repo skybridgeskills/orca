@@ -49,7 +49,7 @@
 	achievementHref={`/achievements/${achievement.id}/claim`}
 	achievement={{
 		...achievement,
-		name: claim.claimStatus == 'ACCEPTED' ? m.weary_bold_myna_buy() : m.status_rejected(),
+		name: claim.claimStatus == 'ACCEPTED' ? m.weary_bold_myna_buy() : m.sharp_clear_fox_deny(),
 		description: ''
 	}}
 >

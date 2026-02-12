@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "vite dev --host 0.0.0.0",
 		"debug-dev": "vavite-loader vite dev --m debug-dev --host 0.0.0.0",
-		"build": "vite build",
+		"build": "pnpm generate && vite build",
 		"preview": "vite preview",
 		"check": "svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./jsconfig.json --watch",

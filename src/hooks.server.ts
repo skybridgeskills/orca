@@ -77,7 +77,7 @@ const getAuthHeaderTokenValue = function (authHeader: string | null) {
 };
 
 export const handle: Handle = ({ event, resolve }) =>
-	paraglideMiddleware(event.request, async ({ request: localizedRequest, locale }) => {
+	paraglideMiddleware(event.request, async ({ request: localizedRequest }) => {
 		event.request = localizedRequest;
 
 		event.locals.org = await getOrganizationFromRequest(event);
