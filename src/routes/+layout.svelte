@@ -11,6 +11,7 @@
 	import type { PageData } from './$types';
 	import { setLocale } from '$lib/i18n/runtime';
 	import { LoadingStatus } from '$lib/stores/common';
+	import { getFooterUrl } from '$lib/utils/footer-links';
 
 	export let data: PageData;
 	preferredTheme.initialize(data.cookieTheme || 'light');
@@ -68,15 +69,15 @@
 						<a href="/" class="mr-4 hover:underline md:mr-6">{m.each_fluffy_fox_view()}</a>
 					</li>
 					<li>
-						<a href="/privacy" class="mr-4 hover:underline md:mr-6">{m.warm_tangy_deer_privacy()}</a
+						<a href={getFooterUrl('privacy', '/privacy')} class="mr-4 hover:underline md:mr-6">{m.warm_tangy_deer_privacy()}</a
 						>
 					</li>
 					<li>
-						<a href="/terms" class="mr-4 hover:underline md:mr-6">{m.gentle_brave_falcon_terms()}</a
+						<a href={getFooterUrl('terms', '/terms')} class="mr-4 hover:underline md:mr-6">{m.gentle_brave_falcon_terms()}</a
 						>
 					</li>
 					<li>
-						<a href="/contact" class="hover:underline">{m.calm_steady_lynx_contact()}</a>
+						<a href={getFooterUrl('contact', '/contact')} class="hover:underline">{m.calm_steady_lynx_contact()}</a>
 					</li>
 				</ul>
 			</div>

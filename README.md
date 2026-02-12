@@ -67,6 +67,7 @@ Customize Environment file with `.env`. Initialize your environment file by copy
 
 - Populate `DATABASE_URL`.
 - Ensure that `PUBLIC_HTTP_PROTOCOL="http"` or `="https"` to ensure absolute URLs are properly generated.
+- Optionally configure footer links (`PUBLIC_PRIVACY_URL`, `PUBLIC_TERMS_URL`, `PUBLIC_CONTACT_URL`) - defaults to `/privacy`, `/terms`, `/contact` if not set. Supports both relative paths and absolute URLs.
 
 Migrate database: `pnpm run migrate:dev`
 
