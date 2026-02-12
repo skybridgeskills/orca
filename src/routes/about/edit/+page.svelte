@@ -56,7 +56,6 @@
 			})
 			.catch((err: yup.ValidationError) => {
 				errors = { ...noErrors };
-				console.log(errors);
 				err.inner.map((err) => {
 					if (err.path) {
 						errors[err.path] = err.message;
