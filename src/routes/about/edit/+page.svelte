@@ -207,7 +207,7 @@
 			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 			on:blur={validate}
 		>
-			<option value="">{m.fancy_antsy_ray_gaze()}</option>
+			<option value="">{m.calm_swift_eagle_rest()}</option>
 			{#each locales as lang}
 				<option value={lang}>
 					{#if lang === 'en-US'}
