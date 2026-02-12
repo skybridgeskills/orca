@@ -144,9 +144,6 @@
 		target={`linkedin-${achievement.id}`}
 		rel="noopener noreferrer"
 		class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-none"
-		><img
-			src="/linkedin-add-to-profile-button.png"
-			alt={m.every_watery_kite_view()}
-		/></a
+		><img src="/linkedin-add-to-profile-button.png" alt={m.every_watery_kite_view()} /></a
 	>
 </Modal>

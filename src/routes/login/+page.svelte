@@ -101,7 +101,10 @@
 	{#if register || (!sessionId && Date.now() < ($inviteCreatedAt?.getTime() ?? 0) + 86400000)}
 		<!-- Step 3: User needs to fill out the rest of the registration form. -->
 		<!-- Or a user goes directly here if they have a fresh (less than 1 day old) invite -->
-		<Heading title={m.bright_swift_eagle_login()} description={m.gentle_brave_falcon_logininvdesc()} />
+		<Heading
+			title={m.bright_swift_eagle_login()}
+			description={m.gentle_brave_falcon_logininvdesc()}
+		/>
 		<form
 			id="registerForm"
 			method="POST"
@@ -218,7 +221,10 @@
 		<!-- Step 1: Enter email to login -->
 
 		{#if !$inviteId}
-			<Heading title={m.bright_swift_eagle_login()} description={m.fresh_bright_sparrow_logindesc()} />
+			<Heading
+				title={m.bright_swift_eagle_login()}
+				description={m.fresh_bright_sparrow_logindesc()}
+			/>
 		{:else}
 			<h1 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.warm_tangy_deer_logininvite()}</h1>
 			<p class="my-4 text-sm text-gray-500 dark:text-gray-400">

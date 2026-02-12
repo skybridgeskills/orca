@@ -100,7 +100,7 @@ export const actions: Actions = {
 		const imageKey = requestData.get('imageExtension')
 			? `achievement-${params.id}/${uuidv4().slice(-8)}-raw-image.${requestData.get(
 					'imageExtension'
-			  )}`
+				)}`
 			: null;
 
 		const formData = {

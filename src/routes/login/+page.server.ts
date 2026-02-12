@@ -88,7 +88,10 @@ export const actions: Actions = {
 			text: m.alert_soft_honeybadger_lead({ code })
 		});
 		if (!emailResult.success) {
-			throw error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
+			throw error(
+				500,
+				m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
+			);
 		}
 
 		cookies.set('sessionId', session.id, {
@@ -263,7 +266,7 @@ export const actions: Actions = {
 									}
 								]
 							}
-					  })
+						})
 			},
 			include: {
 				sessions: true
@@ -317,7 +320,7 @@ export const actions: Actions = {
 			location: currentInvite
 				? `/achievements/${currentInvite.achievementId}/claim?i=${
 						currentInvite.id
-				  }&e=${encodeURIComponent(currentInvite.inviteeEmail ?? '')}`
+					}&e=${encodeURIComponent(currentInvite.inviteeEmail ?? '')}`
 				: '/'
 		};
 	}

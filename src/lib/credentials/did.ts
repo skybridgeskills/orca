@@ -45,7 +45,10 @@ export class DID {
 }
 
 export class CredentialSubjectDID extends DID {
-	constructor(public organization: Organization, public user: User) {
+	constructor(
+		public organization: Organization,
+		public user: User
+	) {
 		super(DID_METHODS.WEB, organization.domain, `u/${Buffer.from(user.id).toString('base64url')}`);
 	}
 }
@@ -57,7 +60,10 @@ export class OrganizationDID extends DID {
 }
 
 export class KeyDID extends DID {
-	constructor(public organization: Organization, public key: SigningKey) {
+	constructor(
+		public organization: Organization,
+		public key: SigningKey
+	) {
 		super(DID_METHODS.WEB, organization.domain, '', '', 'key-0');
 	}
 }

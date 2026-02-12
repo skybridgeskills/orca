@@ -107,7 +107,10 @@
 	</h1>
 	<div class="inline-flex items-center">
 		{#if inviteCapability}
-			<Button href={`/achievements/${data.achievement.id}/award`} text={m.bright_happy_sparrow_award()} />
+			<Button
+				href={`/achievements/${data.achievement.id}/award`}
+				text={m.bright_happy_sparrow_award()}
+			/>
 		{/if}
 
 		{#if data.editAchievementCapability}
@@ -142,7 +145,7 @@
 				href={invite
 					? `/achievements/${invite.achievementId}/claim?i=${invite.id}&e=${encodeURIComponent(
 							invite.inviteeEmail
-					  )}`
+						)}`
 					: `/achievements/${data.achievement.id}/claim`}
 				text={m.bold_swift_eagle_claim()}
 				submodule="primary"
@@ -208,7 +211,7 @@
 						href={invite
 							? `/achievements/${data.achievement.id}/claim?i=${invite?.id}&e=${encodeURIComponent(
 									invite?.inviteeEmail
-							  )}`
+								)}`
 							: `/achievements/${data.achievement.id}/claim`}
 					>
 						<span class="sr-only">{m.bold_swift_eagle_claim()}</span>

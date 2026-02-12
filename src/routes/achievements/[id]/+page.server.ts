@@ -66,7 +66,7 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 						select: { endorsements: true }
 					}
 				}
-		  })
+			})
 		: [];
 
 	let outstandingInvites: (ClaimEndorsement & { creator: User | null })[] = [];

@@ -19,7 +19,10 @@
 	};
 </script>
 
-<Heading level="h1" title={`${m.fresh_bright_sparrow_earned()}: ${existingBadgeClaim.achievement.name}`} />
+<Heading
+	level="h1"
+	title={`${m.fresh_bright_sparrow_earned()}: ${existingBadgeClaim.achievement.name}`}
+/>
 
 {#if existingBadgeClaim.claimStatus !== 'REJECTED'}
 	<AchievementSummary achievement={existingBadgeClaim.achievement} claim={existingBadgeClaim} />

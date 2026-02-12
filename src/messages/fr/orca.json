@@ -74,13 +74,8 @@
 	"calm_steady_lynx_pause": "Non accepté",
 	"calm_steady_lynx_endorse": [
 		{
-			"declarations": [
-				"input count",
-				"local countPlural = count: plural"
-			],
-			"selectors": [
-				"countPlural"
-			],
+			"declarations": ["input count", "local countPlural = count: plural"],
+			"selectors": ["countPlural"],
 			"match": {
 				"countPlural=one": "{count} approbation",
 				"countPlural=other": "{count} approbations"

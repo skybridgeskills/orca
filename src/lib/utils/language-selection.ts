@@ -1,6 +1,6 @@
 import { baseLocale, type locales } from '$lib/i18n/runtime';
 
-type AvailableLanguageTag = typeof locales[number];
+type AvailableLanguageTag = (typeof locales)[number];
 
 /**
  * Determines which language to use for a request based on cookie value,

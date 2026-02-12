@@ -60,7 +60,11 @@
 		<Button href="/achievements/create" text={m.fresh_bright_sparrow_create()} />
 	{/if}
 	{#if data.editCategoriesCapability}
-		<Button href="/achievements/categories" text={m.tired_elegant_jackdaw_jump()} submodule="secondary" />
+		<Button
+			href="/achievements/categories"
+			text={m.tired_elegant_jackdaw_jump()}
+			submodule="secondary"
+		/>
 	{/if}
 </div>
 
@@ -71,10 +75,7 @@
 	<Alert level="warning" message={m.petty_wet_marten_zoom()} />
 {/if}
 {#if $achievementsLoading == LoadingStatus.Complete && !$achievements?.length}
-	<EmptyStateZone
-		title={m.tidy_sunny_seahorse_relish()}
-		description={m.flat_sleek_mole_ascend()}
-	/>
+	<EmptyStateZone title={m.tidy_sunny_seahorse_relish()} description={m.flat_sleek_mole_ascend()} />
 {/if}
 {#each [...$achievementCategories, U] as category (category.id)}
 	{#if categoryAchievements[category.id]?.length}

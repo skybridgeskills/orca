@@ -18,7 +18,8 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		include: { user: true }
 	});
 
-	if (!claim || claim.organizationId != locals.org.id) throw error(404, m.best_sharp_lamb_enchant());
+	if (!claim || claim.organizationId != locals.org.id)
+		throw error(404, m.best_sharp_lamb_enchant());
 
 	const achievement = await getAchievement(claim.achievementId, locals.org.id);
 	const config = achievement.achievementConfig;

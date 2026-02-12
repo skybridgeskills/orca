@@ -153,7 +153,7 @@
 			<Pagination
 				paging={{
 					page,
-					count: category == 'AchievementClaim' ? totalCount : inviteCount ?? 0,
+					count: category == 'AchievementClaim' ? totalCount : (inviteCount ?? 0),
 					pageSize,
 					action: getData
 				}}

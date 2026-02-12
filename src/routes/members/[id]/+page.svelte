@@ -66,7 +66,9 @@
 {#if member._count.receivedAchievementClaims}
 	<h3 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
 		{member._count.receivedAchievementClaims}
-		{member._count.receivedAchievementClaims == 1 ? m.late_antsy_pug_grin() : m.soft_dense_boar_drip()}
+		{member._count.receivedAchievementClaims == 1
+			? m.late_antsy_pug_grin()
+			: m.soft_dense_boar_drip()}
 	</h3>
 	<Pagination
 		paging={{ ...calculatePageAndSize($page.url), count: member._count.receivedAchievementClaims }}

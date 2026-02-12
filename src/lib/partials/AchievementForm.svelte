@@ -171,7 +171,8 @@
 			<div class:isError={errors.image}>
 				<label
 					for="achievementEdit_image"
-					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.vivid_dark_pug_file()}</label
+					class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
+					>{m.vivid_dark_pug_file()}</label
 				>
 				<ImageFileDrop
 					bind:currentValue={formData.image}
@@ -259,7 +260,11 @@
 	<div class="max-w-4xl space-y-6">
 		<!-- Criteria -->
 
-		<Heading title={m.lower_piquant_lemur_grin()} description={m.pink_crazy_robin_gaze()} level="h3" />
+		<Heading
+			title={m.lower_piquant_lemur_grin()}
+			description={m.pink_crazy_robin_gaze()}
+			level="h3"
+		/>
 		<div class="mb-6" class:isError={errors.criteriaNarrative}>
 			<MarkdownEditor bind:value={formData.criteriaNarrative} inputName="criteriaNarrative" />
 
@@ -369,8 +374,7 @@
 				/>
 
 				<div class:isError={errors.reviewRequires}>
-					<FormFieldLabel for="config_reviewOption"
-						>{m.firm_clear_fox_reviewlabel()}</FormFieldLabel
+					<FormFieldLabel for="config_reviewOption">{m.firm_clear_fox_reviewlabel()}</FormFieldLabel
 					>
 					<div class="space-y-2">
 						<RadioOption

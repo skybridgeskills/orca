@@ -46,7 +46,10 @@
 
 	let currentShareIntent: (AchievementClaim & { achievement: Achievement }) | null = null;
 
-	const breadcrumbItems = [{ text: m.each_fluffy_fox_view(), href: '/' }, { text: m.bold_petty_dog_march() }];
+	const breadcrumbItems = [
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.bold_petty_dog_march() }
+	];
 
 	const handleShare = (claim: AchievementClaim & { achievement: Achievement }) => {
 		if (navigator.share) {
@@ -78,11 +81,7 @@
 
 <Breadcrumbs items={breadcrumbItems} />
 
-<Heading
-	title={m.merry_major_parrot_tap()}
-	level="h1"
-	description={m.warm_hard_bat_emerge()}
-/>
+<Heading title={m.merry_major_parrot_tap()} level="h1" description={m.warm_hard_bat_emerge()} />
 
 {#if [LoadingStatus.NotStarted, LoadingStatus.Loading].includes($backpackClaimsLoading)}
 	<LoadingSpinner />

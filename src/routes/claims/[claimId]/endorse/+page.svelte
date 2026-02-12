@@ -80,7 +80,9 @@
 	<a href="../{data.claim.id}"><Button text="Done" /></a>
 {:else}
 	<!-- Submission form -->
-	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.warm_tangy_deer_endorseform()}</h1>
+	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
+		{m.warm_tangy_deer_endorseform()}
+	</h1>
 	<p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
 		{m.calm_steady_lynx_endorsedesc({
 			givenName: data.claim.user.givenName ?? '',
@@ -129,7 +131,9 @@
 
 		<div class="inline-flex items-center">
 			<Button buttonType="submit" text={m.bold_swift_eagle_submit()} />
-			<a href="../{data.claim.id}"><Button submodule="secondary" text={m.calm_steady_lynx_cancel()} /></a>
+			<a href="../{data.claim.id}"
+				><Button submodule="secondary" text={m.calm_steady_lynx_cancel()} /></a
+			>
 		</div>
 	</form>
 {/if}

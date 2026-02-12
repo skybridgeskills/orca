@@ -109,7 +109,9 @@
 									name="update_categoryId"
 									bind:value={category.id}
 								/>
-								<label for="update_categoryName" class="sr-only">{m.moving_serious_parrot_emerge()}</label>
+								<label for="update_categoryName" class="sr-only"
+									>{m.moving_serious_parrot_emerge()}</label
+								>
 								<input
 									form="updateCategoryForm"
 									type="text"
@@ -169,7 +171,11 @@
 							<td class="py-4 px-6">
 								<ButtonGroup
 									buttons={[
-										{ text: m.sharp_clear_fox_edit(), onClick: () => handleEditClick(category), props: {} },
+										{
+											text: m.sharp_clear_fox_edit(),
+											onClick: () => handleEditClick(category),
+											props: {}
+										},
 										{
 											text: m.firm_steady_boar_delete(),
 											onClick: () => {
@@ -191,7 +197,9 @@
 						scope="row"
 						class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
 					>
-						<label for="create_categoryName" class="sr-only">{m.moving_serious_parrot_emerge()}</label>
+						<label for="create_categoryName" class="sr-only"
+							>{m.moving_serious_parrot_emerge()}</label
+						>
 						<input
 							form="createCategoryForm"
 							type="text"

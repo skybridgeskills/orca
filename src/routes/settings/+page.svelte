@@ -33,7 +33,8 @@
 	<div class="mb-6" class:isError={errors.givenName}>
 		<label
 			for="settings_givenName"
-			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{m.bright_swift_eagle_given()}</label
+			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+			>{m.bright_swift_eagle_given()}</label
 		>
 		<input
 			type="text"

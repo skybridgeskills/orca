@@ -94,7 +94,7 @@
 				>
 					{claimRequires.name}</a
 				>{#if userHoldsRequiredAchievement()}. {m.swift_steady_falcon_meets()}
-					{:else}
+				{:else}
 					{m.sharp_clear_fox_notmeets()}
 				{/if}
 			</span>

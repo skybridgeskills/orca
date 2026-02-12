@@ -68,10 +68,12 @@
 						<a href="/" class="mr-4 hover:underline md:mr-6">{m.each_fluffy_fox_view()}</a>
 					</li>
 					<li>
-						<a href="/privacy" class="mr-4 hover:underline md:mr-6">{m.warm_tangy_deer_privacy()}</a>
+						<a href="/privacy" class="mr-4 hover:underline md:mr-6">{m.warm_tangy_deer_privacy()}</a
+						>
 					</li>
 					<li>
-						<a href="/terms" class="mr-4 hover:underline md:mr-6">{m.gentle_brave_falcon_terms()}</a>
+						<a href="/terms" class="mr-4 hover:underline md:mr-6">{m.gentle_brave_falcon_terms()}</a
+						>
 					</li>
 					<li>
 						<a href="/contact" class="hover:underline">{m.calm_steady_lynx_contact()}</a>

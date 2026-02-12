@@ -123,7 +123,8 @@
 	<div class="mb-6" class:isError={errors.name}>
 		<label
 			for="orgEdit_name"
-			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{m.sad_petty_boar_approve()}</label
+			class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+			>{m.sad_petty_boar_approve()}</label
 		>
 		<input
 			type="text"
@@ -216,7 +217,8 @@
 		<div class:isError={errors.logo}>
 			<label
 				for="achievementEdit_image"
-				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">{m.vivid_dark_pug_file()}</label
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
+				>{m.vivid_dark_pug_file()}</label
 			>
 			<ImageFileDrop
 				bind:currentValue={formData.logo}

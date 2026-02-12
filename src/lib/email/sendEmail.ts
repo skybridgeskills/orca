@@ -15,7 +15,7 @@ export const transporter: nodemailer.Transporter =
 		? nodemailer.createTransport(mailgunTransport(mailgunAuth))
 		: nodemailer.createTransport({
 				jsonTransport: true
-		  });
+			});
 
 interface EmailResult {
 	success: boolean;

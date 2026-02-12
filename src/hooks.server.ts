@@ -2,13 +2,7 @@ import * as m from '$lib/i18n/messages';
 import { error, type Handle, type RequestEvent } from '@sveltejs/kit';
 import cookie from 'cookie';
 import { prisma } from './prisma/client';
-import {
-	setLocale,
-	locales,
-	baseLocale
-} from '$lib/i18n/runtime';
-
-type AvailableLanguageTag = typeof locales[number];
+import { setLocale, locales } from '$lib/i18n/runtime';
 import { paraglideMiddleware } from '$lib/i18n/server';
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 import { getLanguageForRequest } from '$lib/utils/language-selection';
@@ -20,7 +14,7 @@ export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => 
 export const getOrganizationFromRequest = async function (event: RequestEvent) {
 	const domain = event.url.host || '';
 
-	let orgs = await prisma.organization.findMany({
+	const orgs = await prisma.organization.findMany({
 		where: {
 			domain: DEFAULT_ORG_ENABLED === 'true' ? { in: [domain, DEFAULT_ORG_DOMAIN ?? ''] } : domain
 		}
@@ -102,11 +96,7 @@ export const handle: Handle = ({ event, resolve }) =>
 				? JSON.parse(event.locals.org.json)
 				: event.locals.org.json || {};
 		const orgDefaultLanguage = orgJson.defaultLanguage;
-		const selectedLanguage = getLanguageForRequest(
-			cookieLanguage,
-			orgDefaultLanguage,
-			locales
-		);
+		const selectedLanguage = getLanguageForRequest(cookieLanguage, orgDefaultLanguage, locales);
 
 		// Use the selected language
 		event.locals.locale = selectedLanguage;

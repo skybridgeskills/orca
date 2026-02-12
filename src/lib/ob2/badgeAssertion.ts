@@ -41,8 +41,9 @@ export const badgeAssertionFromAchievementClaim = (
 	if (!claim.validFrom || claim.validUntil) {
 		return null;
 	}
-	const identifier = claim.user.identifiers.find((identifier) => identifier.type === 'EMAIL')
-		?.identifier;
+	const identifier = claim.user.identifiers.find(
+		(identifier) => identifier.type === 'EMAIL'
+	)?.identifier;
 	if (!identifier) return null;
 
 	// the salt is 20 random base64 characters

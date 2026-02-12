@@ -176,7 +176,11 @@
 								</li>
 							</PopupMenu>
 						</li>
-						<NavItem href="/members/{$session?.user?.id}" title={m.dull_cuddly_jackdaw_intend()} class="md:hidden" />
+						<NavItem
+							href="/members/{$session?.user?.id}"
+							title={m.dull_cuddly_jackdaw_intend()}
+							class="md:hidden"
+						/>
 						<NavItem href="/settings" title={m.piquant_weary_okapi_enchant()} class="md:hidden" />
 						<li class="md:hidden">
 							<DarkModeToggle on:click on:keypress />

@@ -196,7 +196,7 @@ export const inviteToClaim = async ({
 					},
 					create: { ...data, claim: { connect: { id: claim.id } } },
 					update: {} // We don't replace previous invite content, maybe we should though.
-			  });
+				});
 
 		// Notify user of claim
 		const emailResult = await sendOrcaMail({
@@ -212,7 +212,10 @@ export const inviteToClaim = async ({
 			})
 		});
 		if (!emailResult.success) {
-			throw error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
+			throw error(
+				500,
+				m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
+			);
 		}
 
 		return {
@@ -255,7 +258,10 @@ export const inviteToClaim = async ({
 			})
 		});
 		if (!emailResult.success) {
-			throw error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
+			throw error(
+				500,
+				m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
+			);
 		}
 
 		// TODO: we can't actually tell whether created. Consider adopting a createdAt, updatedAt approach,

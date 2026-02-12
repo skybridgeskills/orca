@@ -65,7 +65,9 @@
 	};
 </script>
 
-<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.swift_patchy_thrush_support()}</h1>
+<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
+	{m.swift_patchy_thrush_support()}
+</h1>
 
 <p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 	{m.patchy_silly_guppy_jump()}
@@ -157,10 +159,7 @@
 				target={`linkedin-${achievement.id}`}
 				rel="noopener noreferrer"
 				class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-none"
-				><img
-					src="/linkedin-add-to-profile-button.png"
-					alt={m.every_watery_kite_view()}
-				/></a
+				><img src="/linkedin-add-to-profile-button.png" alt={m.every_watery_kite_view()} /></a
 			>
 		</div>
 	</div>

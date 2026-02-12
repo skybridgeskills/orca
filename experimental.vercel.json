@@ -1,7 +1,7 @@
 {
-    "functions": {
-        "**/*": {
-            "includeFiles": "**/node_modules/security-context/contexts/*"
-        }
-    }
+	"functions": {
+		"**/*": {
+			"includeFiles": "**/node_modules/security-context/contexts/*"
+		}
+	}
 }

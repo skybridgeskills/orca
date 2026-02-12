@@ -21,7 +21,7 @@ const fixTsconfig = () => {
 				delete config.compilerOptions.preserveValueImports;
 				fs.writeFileSync(tsconfigPath, JSON.stringify(config, null, '\t') + '\n');
 			}
-		} catch (e) {
+		} catch {
 			// Ignore errors
 		}
 	}
