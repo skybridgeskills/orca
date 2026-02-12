@@ -70,7 +70,13 @@
 		config = data.achievement.achievementConfig as App.AchievementConfig | null;
 		claim = data.relatedClaims.find((c) => data.achievement.id == c.achievementId);
 		userHoldsRequiredAchievement =
-			data.relatedClaims.filter((c) => c.achievementId == config?.claimRequiresId).length > 0;
+			data.relatedClaims.filter(
+				(c) =>
+					c.achievementId == config?.claimRequiresId &&
+					c.validFrom !== null &&
+					c.claimStatus === 'ACCEPTED' &&
+					(c.validUntil === null || new Date(c.validUntil) > new Date())
+			).length > 0;
 		inviteCapability =
 			isAdmin({ user: data.session?.user || undefined }) ||
 			(!!config?.json?.capabilities?.inviteRequires &&
