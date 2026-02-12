@@ -133,7 +133,7 @@
 			id="orgEdit_name"
 			name="name"
 			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-			placeholder="My Org"
+			placeholder={m.lime_placeholder_communityname_gecko()}
 			bind:value={formData.name}
 			required
 		/>
@@ -271,14 +271,14 @@
 
 	<!-- Permissions -->
 	<div class="mb-6">
-		<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Permissions</h3>
+		<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+			{m.pink_slow_warthog_fetch()}
+		</h3>
 		<p class="text-sm mb-2 text-gray-900">
-			You can authorize community members to perform some actions to manage the community.
+			{m.inclusive_loved_tortoise_clasp()}
 		</p>
 		<div class:isError={errors.editAchievementCapability}>
-			<FormFieldLabel for="editAchievementCapability"
-				>Who can create and edit achievements?</FormFieldLabel
-			>
+			<FormFieldLabel for="editAchievementCapability">{m.lime_true_toucan_blend()}</FormFieldLabel>
 			<input
 				type="hidden"
 				name="editAchievementCapability"
@@ -298,7 +298,7 @@
 					name="editAchievementCapability"
 					id="orgEdit_editAchievementCapability_achievement"
 				>
-					<span class="inline">Holders of this achievement:</span>
+					<span class="inline">{m.due_fit_guppy_surge()}</span>
 					<AchievementSelect
 						badgeId={formData.editAchievementRequires || ''}
 						on:unselected={() => {
@@ -309,8 +309,8 @@
 							formData.editAchievementRequires = e.detail;
 						}}
 						disabled={formData.editAchievementCapability != 'achievement'}
-						label="Select achievement"
-						description="Holders of this achievement will be able to create and edit achievements in the community."
+						label={m.fuzzy_nimble_squirrel_approve()}
+						description={m.deft_fluffy_cat_sprout()}
 						inputId="orgEdit_editAchievementRequires"
 						inputName="editAchievementRequires"
 						errorMessage={errors.editAchievementRequires || ''}
@@ -329,7 +329,7 @@
 									}`}
 									tabindex={formData.editAchievementCapability == 'achievement' ? 0 : -1}
 								>
-									Choose...
+									{m.bright_swift_eagle_choose()}
 								</button>
 							{/if}
 						</span>

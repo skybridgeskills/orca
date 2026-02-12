@@ -72,10 +72,7 @@
 		{/if}
 
 		{#if !form.selfClaim && form.created === false}
-			<Alert
-				message="You already recommended this person for this achievement. Previous data is shown below."
-				level="warning"
-			/>
+			<Alert message={m.trick_sad_dog_read()} level="warning" />
 		{/if}
 
 		{#if form.endorsement}
@@ -132,7 +129,7 @@
 					id="email"
 					name="email"
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-					placeholder="name@mycommunity.com"
+					placeholder={m.few_seemly_mare_propel()}
 					required
 				/>
 			</div>
