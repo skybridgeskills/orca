@@ -4,7 +4,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 
 import { getAchievement } from '$lib/data/achievement';
-import { getUserClaim } from '$lib/data/achievementClaim';
+import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
 
 const throwRedirect = (url: URL) => {
 	throw redirect(307, `${url}/public`);
@@ -43,7 +43,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	// have a claim.
 	const prerequisiteClaim =
 		!claim && config?.claimable && config?.claimRequiresId && locals.session?.user.id
-			? await getUserClaim(locals.session?.user.id, config?.claimRequiresId, locals.org.id)
+			? await getValidUserClaim(locals.session?.user.id, config?.claimRequiresId, locals.org.id)
 			: null;
 
 	return {

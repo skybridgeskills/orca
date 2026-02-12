@@ -1,16 +1,12 @@
 import * as m from '$lib/i18n/messages';
-import type { PageServerLoad, Actions } from './$types';
 import { error, redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import type { Prisma } from '@prisma/client';
 import { ClaimStatus, type Identifier } from '@prisma/client';
 import stripTags from '$lib/utils/stripTags';
-import { ValidationError } from 'yup';
-import { achievementFormSchema } from '$lib/data/achievementForm';
 import { getAchievement } from '$lib/data/achievement';
-import { getUserClaim } from '$lib/data/achievementClaim';
-import type { AchievementClaim, AchievementCredential, ClaimEndorsement } from '@prisma/client';
-import { inviteId } from '$lib/stores/activeClaimStore';
+import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
+import type { AchievementClaim, ClaimEndorsement } from '@prisma/client';
 
 export const load = async ({ locals, params, url }) => {
 	const inviteId = url.searchParams.get('i');
@@ -37,7 +33,7 @@ export const load = async ({ locals, params, url }) => {
 	// If they have it, they are eligible to claim this badge.
 	const requiredBadgeClaim =
 		config?.claimable && config?.claimRequiresId && locals.session?.user?.id
-			? await getUserClaim(locals.session?.user.id, config?.claimRequiresId, locals.org.id)
+			? await getValidUserClaim(locals.session?.user.id, config?.claimRequiresId, locals.org.id)
 			: null;
 
 	return {
@@ -54,7 +50,7 @@ export const load = async ({ locals, params, url }) => {
 
 export const actions = {
 	// The authenticated user claims a badge
-	claim: async ({ locals, cookies, request, params }) => {
+	claim: async ({ locals, request, params }) => {
 		if (!locals.session?.user) {
 			throw error(401, m.smooth_bad_goat_cook());
 		}
@@ -86,7 +82,7 @@ export const actions = {
 		// get required badge claim if the user needs one
 		const requiredBadgeClaim =
 			config?.claimRequiresId && locals.session?.user.id && !invite
-				? await getUserClaim(locals.session.user.id, config?.claimRequiresId, locals.org.id)
+				? await getValidUserClaim(locals.session.user.id, config?.claimRequiresId, locals.org.id)
 				: null;
 
 		if (config?.claimRequiresId && !requiredBadgeClaim && !invite)
@@ -95,7 +91,7 @@ export const actions = {
 				message: m.wide_patchy_marten_view()
 			});
 
-		let data: Prisma.AchievementClaimCreateInput = {
+		const data: Prisma.AchievementClaimCreateInput = {
 			organization: { connect: { id: locals.org.id } },
 			achievement: { connect: { id: params.id } },
 			user: { connect: { id: locals.session.user.id } },
@@ -167,7 +163,7 @@ export const actions = {
 		const claim = await prisma.achievementClaim.create({ data });
 
 		// Get rid of any outstanding invites that were self-invites or unauthenticated
-		const pruneSelfInvites = await prisma.claimEndorsement.deleteMany({
+		await prisma.claimEndorsement.deleteMany({
 			where: {
 				OR: [
 					{
@@ -194,7 +190,7 @@ export const actions = {
 
 		throw redirect(303, `/claims/${claim.id}`);
 	},
-	updateClaim: async ({ locals, cookies, request, params }) => {
+	updateClaim: async ({ locals, request, params }) => {
 		if (!locals.session?.user) throw error(401, m.smooth_bad_goat_cook());
 
 		const existingClaim = await getUserClaim(locals.session?.user?.id, params.id, locals.org.id);
@@ -268,7 +264,7 @@ export const actions = {
 		}
 
 		// Get rid of a self-invitation if exists
-		const pruneSelfInvites = await prisma.claimEndorsement.deleteMany({
+		await prisma.claimEndorsement.deleteMany({
 			where: {
 				OR: [
 					{
@@ -293,7 +289,7 @@ export const actions = {
 			}
 		});
 		// TODO remove: this is failsafe code. It probably won't find anything, because gap at claim time was fixed.
-		const existingEndorsements = await prisma.claimEndorsement.updateMany({
+		await prisma.claimEndorsement.updateMany({
 			where: {
 				inviteeEmail: {
 					in: locals.session?.user?.identifiers
