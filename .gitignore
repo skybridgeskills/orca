@@ -17,6 +17,7 @@ src/**/*.js.map
 /test-results/
 /playwright-report/
 /playwright/.cache/
+.vercel
 
 # Local development notes
 docs/plans

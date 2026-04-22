@@ -129,6 +129,41 @@ To create a production version of ORCA, use: `pnpm run build`. You can preview t
 
 > To deploy the app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment. The app is not suitable for `adapter-static`, as significant logic needs to run server-side, for security.
 
+### Vercel vs Node (adapters)
+
+GitHub Actions and the Docker image build use the default (no `VERCEL` in the environment), which selects `@sveltejs/adapter-node` and emits `build/index.js`. [Vercel](https://vercel.com/) sets `VERCEL=1` during its build, which switches `svelte.config.js` to `@sveltejs/adapter-vercel` and writes output under `.vercel/output`.
+
+To reproduce the Vercel bundle locally: `rm -rf build .svelte-kit .vercel && VERCEL=1 npm run build`. A Prisma step runs after the Vite build on that path; `DATABASE_URL` and `DATABASE_URL_DIRECT` must be in the **shell environment** (not only in `.env` on disk). For example: `set -a && . ./.env && set +a` (bash) before the command, or export those variables explicitly.
+
+## Docker
+
+Build the image locally (from the repository root):
+
+```sh
+docker build -t orca:dev .
+```
+
+The container needs a reachable PostgreSQL instance and a minimal set of environment variables. The entrypoint runs Prisma migrations using `DATABASE_URL_DIRECT`, then starts the SvelteKit Node server on port 3000. Example against Postgres on the host (macOS/Windows; use `host.docker.internal` in the URL):
+
+```sh
+docker run --rm -p 3000:3000 \
+  -e DATABASE_URL='postgresql://orcaadmin:password@host.docker.internal:5432/orca?schema=orca_public' \
+  -e DATABASE_URL_DIRECT='postgresql://orcaadmin:password@host.docker.internal:5432/orca?schema=orca_public' \
+  -e DATABASE_SERVERLESS=false \
+  -e PUBLIC_HTTP_PROTOCOL=http \
+  -e PUBLIC_MEDIA_DOMAIN=/media \
+  -e ORG_CONFIG_ENCRYPTION_KEY="$(node -e 'console.log(require(\"crypto\").randomBytes(32).toString(\"base64\"))')" \
+  orca:dev
+```
+
+Pre-built multi-arch images are published on [Docker Hub](https://hub.docker.com/r/skybridgeskills/orca) as `docker.io/skybridgeskills/orca:<git-sha>` and `docker.io/skybridgeskills/orca:latest` (manifest lists `linux/amd64` and `linux/arm64`).
+
+On every push, GitHub Actions runs `npm ci`, `npm run build`, and `npm run test:unit`. On pushes to `main` only, a second job builds the Docker image for both architectures and pushes the tags above.
+
+### Deployment prerequisites
+
+CI publishes to Docker Hub using the `skybridgeskills` org account. Add a repository secret named `DOCKERHUB_PAT` (a Docker Hub access token with push rights) in this repo’s **Settings → Secrets and variables → Actions** before the first push to `main` that should publish images—GitHub does not share secrets across repositories, so this must be set on the `orca` repo even if the same token is used elsewhere (for example, `dcc-transaction-service`).
+
 ## Documenting Dependency Types
 
 The `types` directory in this repository contains some test versions of type definition files for dependencies not yet submitted to DefinitelyTyped. These were generated with a command like `pnpm exec -p typescript tsc node_modules/jsonld-signatures/**/*.js --declaration --allowJs --emitDeclarationOnly --module system --moduleResolution node --outFile ./types/jsonldsignatures/index.d.ts` and then customized to fix the wrong module names that had been generated. See how to [test declaration files](https://github.com/DefinitelyTyped/DefinitelyTyped#testing) before submission to DefinitelyTyped.
