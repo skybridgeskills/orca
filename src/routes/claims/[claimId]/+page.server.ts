@@ -5,6 +5,7 @@ import { prisma } from '$lib/../prisma/client';
 
 import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim } from '$lib/data/achievementClaim';
+import { isExchangeEnabled } from '$lib/server/transactionService/config';
 
 const throwRedirect = (url: URL) => {
 	throw redirect(307, `${url}/public`);
@@ -52,6 +53,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		hasProvidedEndorsement,
 		endorsementCount,
 		user: locals.session?.user,
-		prerequisiteClaim
+		prerequisiteClaim,
+		exchangeEnabled: isExchangeEnabled(locals.org)
 	};
 };
