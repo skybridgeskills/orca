@@ -25,6 +25,7 @@
 		achievementConfig?: App.ConfigWithRelations;
 	};
 	export let existingBadgeClaim: AchievementClaim | null;
+	export let exchangeEnabled = false;
 
 	let showClaimForm = false;
 	let claimIntent: 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' =
@@ -81,21 +82,27 @@
 		{#if !showClaimForm}
 			<div class="flex gap-1">
 				{#if existingBadgeClaim?.claimStatus === 'ACCEPTED'}
-					<DownloadButton
-						sourceUrl="/claims/{existingBadgeClaim?.id}/download"
-						text={m.swift_steady_falcon_download()}
-						submodule="secondary"
-						id="download-{existingBadgeClaim?.id}"
-						fileName="{achievement.name.split(' ').join('-')}-credential.json"
-					/>
+					{#if !exchangeEnabled}
+						<DownloadButton
+							sourceUrl="/claims/{existingBadgeClaim?.id}/download"
+							text={m.downloadCTA()}
+							submodule="secondary"
+							id="download-{existingBadgeClaim?.id}"
+							fileName="{achievement.name.split(' ').join('-')}-credential.json"
+						/>
 
-					<Button
-						text={m.red_sleek_kite_relish()}
-						on:click={() => {
-							sendToWalletModalVisible = true;
-						}}
-						submodule="secondary"
-					/>
+						<Button
+							text={m.claim_sendToWalletCTA()}
+							on:click={() => {
+								sendToWalletModalVisible = true;
+							}}
+							submodule="secondary"
+						/>
+					{:else}
+						<span class="text-xs italic text-gray-500 dark:text-gray-400 self-center px-2">
+							Wallet handoff coming soon for this organization.
+						</span>
+					{/if}
 				{/if}
 
 				<Button
@@ -146,14 +153,16 @@
 					e.stopPropagation();
 				}}
 			/>
-			<Button
-				class="text-xs"
-				submodule="secondary"
-				text={m.sharp_quiet_panther_qr()}
-				on:click={() => {
-					showQRShareModal = true;
-				}}
-			/>
+			{#if !exchangeEnabled}
+				<Button
+					class="text-xs"
+					submodule="secondary"
+					text={m.qrCode()}
+					on:click={() => {
+						showQRShareModal = true;
+					}}
+				/>
+			{/if}
 			<a
 				href={linkedInShareUrl({ ...existingBadgeClaim, achievement }).toString()}
 				target={`linkedin-${achievement.id}`}
@@ -184,48 +193,50 @@
 	/>
 </Modal>
 
-<Modal
-	visible={sendToWalletModalVisible}
-	title={m.red_sleek_kite_relish()}
-	on:close={() => {
-		sendToWalletModalVisible = false;
-	}}
-	actions={[
-		{
-			label: m.red_sleek_kite_relish(),
-			onClick: () => {
-				sendToWallet();
-				sendToWalletModalVisible = false;
-			},
-			submodule: 'primary',
-			buttonType: 'button'
-		}
-	]}
->
-	<p class="text-center text-gray-500 dark:text-gray-400">
-		{m.deft_bad_mouse_scold()}
-		<a href="https://chapi.io/" class="font-bold underline hover:no-underline" target="_blank"
-			>Credential Handler API (CHAPI)</a
-		>. {m.wide_smooth_mantis_intend()}
-		<a href="https://learncard.app" class="underline hover:no-underline font-bold" target="_blank"
-			>LearnCard</a
-		>.
-	</p>
-</Modal>
+{#if !exchangeEnabled}
+	<Modal
+		visible={sendToWalletModalVisible}
+		title={m.claim_sendToWalletCTA()}
+		on:close={() => {
+			sendToWalletModalVisible = false;
+		}}
+		actions={[
+			{
+				label: m.claim_sendToWalletCTA(),
+				onClick: () => {
+					sendToWallet();
+					sendToWalletModalVisible = false;
+				},
+				submodule: 'primary',
+				buttonType: 'button'
+			}
+		]}
+	>
+		<p class="text-center text-gray-500 dark:text-gray-400">
+			{m.chapi_description()}
+			<a href="https://chapi.io/" class="font-bold underline hover:no-underline" target="_blank"
+				>Credential Handler API (CHAPI)</a
+			>. {m.chapi_walletSignupCTA_description()}
+			<a href="https://learncard.app" class="underline hover:no-underline font-bold" target="_blank"
+				>LearnCard</a
+			>.
+		</p>
+	</Modal>
 
-<Modal
-	visible={showQRShareModal}
-	title={m.happy_bright_mole_spill()}
-	on:close={() => {
-		showQRShareModal = false;
-	}}
-	actions={[]}
->
-	<p class="text-sm text-gray-500 dark:text-gray-400">
-		{m.mad_merry_kite_support()}
-	</p>
-	<QRCode
-		url={`${PUBLIC_HTTP_PROTOCOL}://${achievement.organization.domain}/ob2/a/${existingBadgeClaim?.id}`}
-		alt={m.plane_light_fish_view()}
-	/>
-</Modal>
+	<Modal
+		visible={showQRShareModal}
+		title={m.share_qrCode_heading()}
+		on:close={() => {
+			showQRShareModal = false;
+		}}
+		actions={[]}
+	>
+		<p class="text-sm text-gray-500 dark:text-gray-400">
+			{m.share_qrCode_description()}
+		</p>
+		<QRCode
+			url={`${PUBLIC_HTTP_PROTOCOL}://${achievement.organization.domain}/ob2/a/${existingBadgeClaim?.id}`}
+			alt={m.share_qrCodeImageAltText()}
+		/>
+	</Modal>
+{/if}
