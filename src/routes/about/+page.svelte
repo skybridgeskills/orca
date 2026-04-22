@@ -25,6 +25,14 @@
 	</h1>
 {/if}
 
+{#if ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(data.session?.user?.orgRole ?? '')}
+	<p class="max-w-2xl mt-3 text-sm">
+		<a class="text-blue-600 dark:text-blue-400 hover:underline" href="/about/settings/issuer">
+			Manage issuer settings
+		</a>
+	</p>
+{/if}
+
 <p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 	{data.org.description}
 </p>
