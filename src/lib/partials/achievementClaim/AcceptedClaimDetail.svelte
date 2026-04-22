@@ -12,6 +12,7 @@
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
 	import DownloadButton from '$lib/components/DownloadButton.svelte';
 	import AchievementClaimEvidence from '$lib/partials/achievementClaim/AchievementClaimEvidence.svelte';
+	import SendToWalletExchangeModal from '$lib/partials/achievementClaim/SendToWalletExchangeModal.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
@@ -33,6 +34,7 @@
 
 	let sendToWalletModalVisible = false;
 	let showQRShareModal = false;
+	let exchangeModalOpen = false;
 
 	onMount(async () => {
 		await window.credentialHandlerPolyfill.loadOnce();
@@ -97,9 +99,14 @@
 							submodule="secondary"
 						/>
 					{:else}
-						<span class="text-xs italic text-gray-500 dark:text-gray-400 self-center px-2">
-							Wallet handoff coming soon for this organization.
-						</span>
+						<Button
+							text={m.claim_sendToWalletCTA()}
+							submodule="primary"
+							on:click={() => {
+								exchangeModalOpen = true;
+							}}
+							disabled={exchangeModalOpen}
+						/>
 					{/if}
 				{/if}
 
@@ -240,4 +247,8 @@
 			alt={m.share_qrCodeImageAltText()}
 		/>
 	</Modal>
+{/if}
+
+{#if existingBadgeClaim?.id}
+	<SendToWalletExchangeModal bind:open={exchangeModalOpen} claimId={existingBadgeClaim.id} />
 {/if}
