@@ -1,0 +1,30 @@
+# Node + build artifacts
+node_modules
+build
+.svelte-kit
+dist
+package
+.vercel
+
+# Local dev / testing
+.env
+.env.*
+!.env.example
+dev-uploads
+test-results
+playwright-report
+playwright/.cache
+storybook-static
+
+# VCS + IDE
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+
+# Local plans (per orca .gitignore convention)
+docs/plans
+
+# CI files (not needed inside the runtime image)
+.github
