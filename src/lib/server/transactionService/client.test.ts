@@ -32,7 +32,10 @@ function baseOrg(): App.Organization {
 }
 
 function okResponse(body: unknown) {
-	return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+	return new Response(JSON.stringify(body), {
+		status: 200,
+		headers: { 'Content-Type': 'application/json' }
+	});
 }
 
 function errResponse(status: number, body: string) {

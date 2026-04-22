@@ -7,9 +7,7 @@ export function isExchangeAvailable(org: App.Organization): boolean {
 	}
 	const o = ts as Record<string, unknown>;
 	return (
-		isNonEmptyString(o.url) &&
-		isNonEmptyString(o.tenantName) &&
-		isNonEmptyString(o.encryptedApiKey)
+		isNonEmptyString(o.url) && isNonEmptyString(o.tenantName) && isNonEmptyString(o.encryptedApiKey)
 	);
 }
 

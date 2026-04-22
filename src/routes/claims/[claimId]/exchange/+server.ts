@@ -5,7 +5,10 @@ import type { RequestEvent } from './$types';
 import { prisma } from '$lib/../prisma/client';
 
 import { buildAchievementCredentialTemplate } from '$lib/credentials/credentialTemplate';
-import { createExchange, TransactionServiceUpstreamError } from '$lib/server/transactionService/client';
+import {
+	createExchange,
+	TransactionServiceUpstreamError
+} from '$lib/server/transactionService/client';
 import { isExchangeEnabled } from '$lib/server/transactionService/config';
 import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';

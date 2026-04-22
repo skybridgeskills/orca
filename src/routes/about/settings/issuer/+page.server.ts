@@ -114,8 +114,7 @@ export const actions: Actions = {
 		}
 
 		const current = readOrgJson(locals.org);
-		const existing: Partial<App.TransactionServiceOrgConfig> =
-			current.transactionService ?? {};
+		const existing: Partial<App.TransactionServiceOrgConfig> = current.transactionService ?? {};
 
 		const next: {
 			url: string;

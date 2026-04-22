@@ -12,9 +12,9 @@ import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 export const POST = async ({ locals, params }: RequestEvent) => {
 	if (!locals.session?.user?.id) throw error(404, m.best_sharp_lamb_enchant());
 
-	const orgConfig = (typeof locals.org?.json === 'object' && locals.org.json !== null
-		? locals.org.json
-		: {}) as App.OrganizationConfig;
+	const orgConfig = (
+		typeof locals.org?.json === 'object' && locals.org.json !== null ? locals.org.json : {}
+	) as App.OrganizationConfig;
 	if (orgConfig.issuer?.type === 'transactionService') {
 		throw error(
 			409,

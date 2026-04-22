@@ -13,8 +13,8 @@
 
 	const txAvailable = Boolean(
 		data.transactionService?.url &&
-			data.transactionService?.tenantName &&
-			data.transactionService?.apiKeyConfigured
+		data.transactionService?.tenantName &&
+		data.transactionService?.apiKeyConfigured
 	);
 
 	function initialIssuerValue(): string {
@@ -37,8 +37,9 @@
 	let revealApiKey = false;
 
 	$: issuerType = selectedIssuer === 'transactionService' ? 'transactionService' : 'signingKey';
-	$: issuerSigningKeyId =
-		selectedIssuer.startsWith('signingKey:') ? selectedIssuer.slice('signingKey:'.length) : '';
+	$: issuerSigningKeyId = selectedIssuer.startsWith('signingKey:')
+		? selectedIssuer.slice('signingKey:'.length)
+		: '';
 
 	function formatApiKeyDate(iso: string | null | undefined): string {
 		if (iso == null || iso === '') return '(last updated unknown)';

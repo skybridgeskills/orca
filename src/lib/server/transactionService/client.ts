@@ -68,7 +68,9 @@ export async function createExchange(
 		if (err instanceof BadOrgConfigBlobError || err instanceof IssuerMisconfiguredError) {
 			throw err;
 		}
-		throw new TransactionServiceUpstreamError('Failed to reach transaction service', { cause: err });
+		throw new TransactionServiceUpstreamError('Failed to reach transaction service', {
+			cause: err
+		});
 	}
 
 	if (!response.ok) {
@@ -78,10 +80,10 @@ export async function createExchange(
 		} catch {
 			// best effort
 		}
-		throw new TransactionServiceUpstreamError(
-			`Transaction service returned ${response.status}`,
-			{ status: response.status, cause: bodyText }
-		);
+		throw new TransactionServiceUpstreamError(`Transaction service returned ${response.status}`, {
+			status: response.status,
+			cause: bodyText
+		});
 	}
 
 	const data = (await response.json()) as Record<string, unknown>;
@@ -114,9 +116,11 @@ function readOrgJson(org: App.Organization): App.OrganizationConfig | null {
 	return j as App.OrganizationConfig;
 }
 
-function readTransactionServiceConfig(
-	org: App.Organization
-): { url: string; tenantName: string; encryptedApiKey: string } {
+function readTransactionServiceConfig(org: App.Organization): {
+	url: string;
+	tenantName: string;
+	encryptedApiKey: string;
+} {
 	const config = readOrgJson(org);
 	const ts = config?.transactionService;
 	if (!ts) {
