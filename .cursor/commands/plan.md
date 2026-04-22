@@ -166,22 +166,21 @@ Every phase file (whether in single file or separate files) must include:
 
 - Needed tests as applicable (we want to test as we go)
 - Tests relevant to the phase should be run and pass
-- Run test commands from the repository root: `pnpm test:unit`
+- Run test commands from the repository root (e.g. `pnpm test:unit`)
 
 ### Build and Validation
 
-- All code should compile (run build commands from the repository root: `pnpm build`)
+- All code should compile (i.e. run build commands `pnpm build` from the repository root)
 - Any warnings that aren't unused code (that will be used later) should be fixed
 - Tests relevant to the phase should be run and pass
-- Run type checking: `pnpm check`
 
 ### Commits
 
-- Commit changes between phases
+- Do not commit changes between phases, but suggest a commit message at the end of each phase in case the user wants to commit.
 - Use [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>(<scope>): <description>`
-- Choose scopes from ORCA structure (e.g., `orca`, `root`, or feature-based: `achievement`, `claim`, `auth`, `i18n`)
-- Example: `feat(achievement): add claim review workflow` or `chore(root): update dependencies`
-- For phase commits, use format: `<type>(<scope>): <plan-name> - phase <N>: <phase-title>`
+- Choose scopes from the code structure or area of focus (e.g., `workflows`, `exchanges`, `lint`)
+- Example: `feat(exchanges): add interaction url support` or `chore(root): bump pnpm to 10.18.0`
+- For phase commits, suggest something like the format: `<type>(<scope>): <plan-name> - phase: <phase-title>`
 
 ## Implementation
 
@@ -191,11 +190,10 @@ For each phase:
 
 1. Read the phase requirements
 2. Implement the changes
-3. Ensure code compiles (run `pnpm build` from the repository root)
+3. Ensure code compiles (run build commands from the repository root)
 4. Fix warnings (except unused code that will be used in later phases)
-5. Run relevant tests and ensure they pass (run `pnpm test:unit` from the repository root)
-6. Run type checking (run `pnpm check` from the repository root)
-7. Commit with message: `<type>(<scope>): <plan-name> - phase <N>: <phase-title>`
+5. Run relevant tests and ensure they pass
+6. Suggest a possible commit message: `<type>(<scope>): <plan-name> - phase <N>: <phase-title>`
 
 ### Final Phase
 
@@ -203,11 +201,11 @@ The final phase should be a cleanup phase:
 
 - Remove any temporary code, TODOs, debug prints, etc.
 - Fix all warnings
-- Ensure all tests pass (run `pnpm test:unit` from the repository root)
+- Ensure all tests pass (run test commands)
 - Ensure all code is clean and readable
-- Run `pnpm check && pnpm build && pnpm test:unit` from the repository root to ensure everything passes
+- Run `./validate.sh` from the repository root to ensure everything passes
 
-Then commit the changes with a message like `docs(plans): complete plan <name>`. Include details of the
+Then suggest a final commit message like `feat(<scope>) <plan name>`. Include brief details of the
 effect of the plan in the commit message (but not the implementation details).
 
 ## Success Criteria
