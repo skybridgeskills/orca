@@ -10,6 +10,7 @@ Features:
 - Peer endorsements, and qualified reviews by users who hold configurable reviewer badge
 - Internationalization (i18n) with supported locales `en-US`, `en-AU`, and `fr`.
 - Digital credentials wallet integration with CHAPI.
+- Optional wallet handoff via the [DCC Transaction Service](https://github.com/digitalcredentials/transaction-service) (per-organization opt-in). See `docs/plans/2026-04-21-transaction-service-exchanges/00-overview.md` for the design.
 
 Roadmap:
 

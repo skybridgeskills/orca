@@ -65,6 +65,9 @@
 	$: if (open) startExchange();
 	$: if (!open) abortController?.abort();
 
+	// TODO(polling): see Q10 — once the transaction service exposes exchange status,
+	// poll while in `ready` to surface "credential delivered" or "expired" feedback.
+
 	$: modalActions = buildActions(state);
 
 	function buildActions(s: State) {
