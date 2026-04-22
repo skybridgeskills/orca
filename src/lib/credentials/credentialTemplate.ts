@@ -58,7 +58,9 @@ export function buildAchievementCredentialTemplate(
 	} as App.OpenBadgeCredential;
 
 	const salt = `${uuidv4()}`;
-	const recipientEmail = claim.user.identifiers.find((i) => i.type === IdentifierType.EMAIL)?.identifier;
+	const recipientEmail = claim.user.identifiers.find(
+		(i) => i.type === IdentifierType.EMAIL
+	)?.identifier;
 	const identityObject = {
 		type: 'IdentityObject',
 		hashed: true,

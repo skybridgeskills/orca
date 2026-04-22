@@ -93,7 +93,8 @@
 
 	function userMessage(s: { kind: 'error'; status: number; message: string }): string {
 		if (s.status === 502) return "We couldn't reach the issuer service. Please try again.";
-		if (s.status === 409 || s.status === 503) return 'Issuer is misconfigured. Contact your administrator.';
+		if (s.status === 409 || s.status === 503)
+			return 'Issuer is misconfigured. Contact your administrator.';
 		return "We couldn't start the wallet handoff. Please try again.";
 	}
 </script>

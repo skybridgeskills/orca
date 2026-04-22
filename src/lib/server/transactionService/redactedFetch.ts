@@ -6,10 +6,7 @@
  * returned unchanged so callers can parse JSON themselves. **Do not swap this for raw
  * `fetch` in covered code paths** or credentials may be echoed into logs.
  */
-async function redactedFetch(
-	input: RequestInfo | URL,
-	init?: RequestInit
-): Promise<Response> {
+async function redactedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
 	const url = resolveRequestUrl(input);
 	const headerKeys = collectHeaderKeyNames(init);
 

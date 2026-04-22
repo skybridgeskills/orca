@@ -20,9 +20,7 @@ vi.mock('$lib/server/transactionService/config', () => ({
 }));
 
 vi.mock('$lib/../prisma/client', () => ({
-	prisma: {
-		achievementClaim: { findUnique: mockFindUnique }
-	}
+	prisma: { achievementClaim: { findUnique: mockFindUnique } }
 }));
 
 import { POST } from './+server';
@@ -54,26 +52,19 @@ function buildClaim(over: Record<string, unknown> = {}) {
 	};
 }
 
-function makeEvent(over: {
-	locals?: Partial<{
-		session: App.SessionData | null | undefined;
-		org: App.Organization;
-	}>;
-	params?: { claimId: string };
-} = {}) {
+function makeEvent(
+	over: {
+		locals?: Partial<{ session: App.SessionData | null | undefined; org: App.Organization }>;
+		params?: { claimId: string };
+	} = {}
+) {
 	return {
-		locals: {
-			org: ORG,
-			session: { user: { id: 'user-1' } } as App.SessionData,
-			...over.locals
-		},
+		locals: { org: ORG, session: { user: { id: 'user-1' } } as App.SessionData, ...over.locals },
 		params: { claimId: 'claim-1', ...over.params }
 	} as Parameters<typeof POST>[0];
 }
 
-function isKitError(
-	e: unknown
-): e is { status: number; body: { message: string } } {
+function isKitError(e: unknown): e is { status: number; body: { message: string } } {
 	return (
 		typeof e === 'object' &&
 		e !== null &&
@@ -147,7 +138,11 @@ describe('POST /claims/[claimId]/exchange', () => {
 
 	it('returns 404 when the claim belongs to a different org', async () => {
 		mockFindUnique.mockResolvedValue(
-			buildClaim({ organizationId: 'other-org', userId: 'user-1', claimStatus: ClaimStatus.ACCEPTED })
+			buildClaim({
+				organizationId: 'other-org',
+				userId: 'user-1',
+				claimStatus: ClaimStatus.ACCEPTED
+			})
 		);
 		try {
 			await POST(makeEvent());
@@ -162,7 +157,11 @@ describe('POST /claims/[claimId]/exchange', () => {
 
 	it('returns 404 when the claim belongs to a different user', async () => {
 		mockFindUnique.mockResolvedValue(
-			buildClaim({ userId: 'other-user', organizationId: 'org-1', claimStatus: ClaimStatus.ACCEPTED })
+			buildClaim({
+				userId: 'other-user',
+				organizationId: 'org-1',
+				claimStatus: ClaimStatus.ACCEPTED
+			})
 		);
 		try {
 			await POST(makeEvent());

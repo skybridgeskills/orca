@@ -19,9 +19,7 @@ describe('setIssuerSchema', () => {
 	});
 
 	it('rejects invalid type', async () => {
-		await expect(
-			setIssuerSchema.validate({ type: 'foo', signingKeyId: 'x' })
-		).rejects.toBeTruthy();
+		await expect(setIssuerSchema.validate({ type: 'foo', signingKeyId: 'x' })).rejects.toBeTruthy();
 	});
 });
 
@@ -34,7 +32,10 @@ describe('setTransactionServiceSchema', () => {
 
 	it('rejects missing url', async () => {
 		await expect(
-			setTransactionServiceSchema.validate({ tenantName: 'a' } as { url?: string; tenantName: string })
+			setTransactionServiceSchema.validate({ tenantName: 'a' } as {
+				url?: string;
+				tenantName: string;
+			})
 		).rejects.toBeTruthy();
 	});
 
