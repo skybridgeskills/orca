@@ -62,7 +62,10 @@ export default defineConfig(({ mode }) => {
 			devSourcemap: true
 		},
 		test: {
-			include: ['**/tests/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
+			include: [
+				'**/tests/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+				'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
+			]
 		},
 		plugins,
 		server: {
