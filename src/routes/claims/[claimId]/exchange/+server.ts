@@ -11,7 +11,7 @@ import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 
 export const POST = async ({ locals, params }: RequestEvent) => {
-	if (!locals.session?.user?.id) throw error(404, m.claim_notFoundError());
+	if (!locals.session?.user?.id) throw error(404, m.best_sharp_lamb_enchant());
 
 	if (!isExchangeEnabled(locals.org)) {
 		throw error(409, 'This organization is not configured for wallet exchange.');
@@ -31,7 +31,7 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 		claim.userId !== locals.session.user.id ||
 		claim.claimStatus !== 'ACCEPTED'
 	) {
-		throw error(404, m.claim_notFoundError());
+		throw error(404, m.best_sharp_lamb_enchant());
 	}
 
 	const template = buildAchievementCredentialTemplate(claim, locals.org as Organization, {

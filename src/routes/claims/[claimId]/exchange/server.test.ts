@@ -110,7 +110,7 @@ describe('POST /claims/[claimId]/exchange', () => {
 			expect(isKitError(e)).toBe(true);
 			if (isKitError(e)) {
 				expect(e.status).toBe(404);
-				expect(e.body.message).toBe(m.claim_notFoundError());
+				expect(e.body.message).toBe(m.best_sharp_lamb_enchant());
 			}
 		}
 		expect(mockFindUnique).not.toHaveBeenCalled();
@@ -140,7 +140,7 @@ describe('POST /claims/[claimId]/exchange', () => {
 			expect(isKitError(e)).toBe(true);
 			if (isKitError(e)) {
 				expect(e.status).toBe(404);
-				expect(e.body.message).toBe(m.claim_notFoundError());
+				expect(e.body.message).toBe(m.best_sharp_lamb_enchant());
 			}
 		}
 	});
