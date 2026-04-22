@@ -3,7 +3,6 @@
 	"version": "0.0.1",
 	"packageManager": "pnpm@10.29.2",
 	"scripts": {
-		"postinstall": "prisma generate --schema src/prisma/schema.prisma",
 		"dev": "vite dev --host 0.0.0.0",
 		"debug-dev": "vavite-loader vite dev --m debug-dev --host 0.0.0.0",
 		"build": "pnpm generate && vite build",
