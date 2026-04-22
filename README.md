@@ -133,11 +133,11 @@ To create a production version of ORCA, use: `pnpm run build`. You can preview t
 
 GitHub Actions and the Docker image build use the default (no `VERCEL` in the environment), which selects `@sveltejs/adapter-node` and emits `build/index.js`. [Vercel](https://vercel.com/) sets `VERCEL=1` during its build, which switches `svelte.config.js` to `@sveltejs/adapter-vercel` and writes output under `.vercel/output`.
 
-To reproduce the Vercel bundle locally: `rm -rf build .svelte-kit .vercel && VERCEL=1 npm run build`. A Prisma step runs after the Vite build on that path; `DATABASE_URL` and `DATABASE_URL_DIRECT` must be in the **shell environment** (not only in `.env` on disk). For example: `set -a && . ./.env && set +a` (bash) before the command, or export those variables explicitly.
+To reproduce the Vercel bundle locally: `rm -rf build .svelte-kit .vercel && VERCEL=1 pnpm run build`. A Prisma step runs after the Vite build on that path; `DATABASE_URL` and `DATABASE_URL_DIRECT` must be in the **shell environment** (not only in `.env` on disk). For example: `set -a && . ./.env && set +a` (bash) before the command, or export those variables explicitly.
 
 ## Docker
 
-Build the image locally (from the repository root):
+The image is based on `node:20-alpine` and uses `pnpm@10.29.2` (activated via Corepack inside the build) for dependency installation and the build. Build it locally from the repository root:
 
 ```sh
 docker build -t orca:dev .
@@ -158,7 +158,7 @@ docker run --rm -p 3000:3000 \
 
 Pre-built multi-arch images are published on [Docker Hub](https://hub.docker.com/r/skybridgeskills/orca) as `docker.io/skybridgeskills/orca:<git-sha>` and `docker.io/skybridgeskills/orca:latest` (manifest lists `linux/amd64` and `linux/arm64`).
 
-On every push, GitHub Actions runs `npm ci`, `npm run build`, and `npm run test:unit`. On pushes to `main` only, a second job builds the Docker image for both architectures and pushes the tags above.
+The `CI` workflow (`.github/workflows/test.yml`) runs on every pull request to `main` and on every push to `main`: it installs dependencies with `pnpm install --frozen-lockfile`, generates the Prisma client, and runs `pnpm test:unit`. On pushes to `main` only, a second `docker-build-push` job builds the Docker image for both architectures and pushes the tags above.
 
 ### Deployment prerequisites
 

@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -7,10 +7,18 @@ WORKDIR /app
 # entrypoint runs (see PoC Phase 3 for the volume wiring).
 RUN mkdir -p /app/dev-uploads
 
-COPY . .
+# Activate the pnpm version pinned in package.json's `packageManager` field
+# via Corepack. `--activate` makes the shim available on PATH.
+RUN corepack enable && corepack prepare pnpm@10.29.2 --activate
 
-# postinstall in package.json runs `prisma generate` here.
-RUN npm ci
+# Install dependencies first to maximise Docker layer cache reuse on
+# source-only changes. `pnpm install --frozen-lockfile` requires the
+# lockfile and manifest to match exactly.
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Bring in the rest of the application source.
+COPY . .
 
 # Build-time `$env/static/*` (no `.env` in context); matches `.env.example` / PoC defaults.
 ENV PUBLIC_HTTP_PROTOCOL=http \
@@ -28,7 +36,9 @@ ENV PUBLIC_HTTP_PROTOCOL=http \
     S3_USE_LOCALSTACK=false \
     S3_URL=http://127.0.0.1:4566
 
-RUN npm run build
+# `pnpm run build` is `pnpm generate && vite build`, so this also produces
+# the Prisma client at build time.
+RUN pnpm run build
 
 EXPOSE 3000
 
