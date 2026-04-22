@@ -11,7 +11,7 @@
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { browser } from '$app/environment';
 
-	export let org: App.Organization;
+	export let org: App.SanitizedOrganization;
 	let mobileMenuExpanded = false;
 	const closeMobileMenu = () => {
 		mobileMenuExpanded = false;
