@@ -23,16 +23,46 @@ declare namespace App {
 		valid: boolean;
 	}
 
-	type OrganizationConfig = import('@prisma/client').Prisma.JsonObject & {
+	type TransactionServiceOrgConfig = {
+		url: string;
+		tenantName: string;
+		encryptedApiKey: string; // "v1:base64(iv ‖ tag ‖ ciphertext)"
+		apiKeyUpdatedAt: string;
+	};
+
+	type IssuerSelection =
+		| { type: 'signingKey'; signingKeyId: string }
+		| { type: 'transactionService' };
+
+	type OrganizationConfigCommon = {
 		tagline?: string;
 		permissions?: {
 			editAchievementCapability?: {
 				requiresAchievement: string | null;
 			};
 		};
+		issuer?: IssuerSelection;
 	};
+
+	type OrganizationConfig = import('@prisma/client').Prisma.JsonObject &
+		OrganizationConfigCommon & {
+			transactionService?: TransactionServiceOrgConfig;
+		};
 	type Organization = import('@prisma/client').Organization & {
 		json: OrganizationConfig;
+	};
+
+	type SanitizedTransactionServiceConfig = Omit<TransactionServiceOrgConfig, 'encryptedApiKey'> & {
+		apiKeyConfigured: boolean;
+	};
+
+	type SanitizedOrganizationConfig = import('@prisma/client').Prisma.JsonObject &
+		OrganizationConfigCommon & {
+			transactionService?: SanitizedTransactionServiceConfig;
+		};
+
+	type SanitizedOrganization = Omit<Organization, 'json'> & {
+		json: SanitizedOrganizationConfig;
 	};
 
 	interface Locals {
@@ -43,7 +73,7 @@ declare namespace App {
 		locale: import('$lib/i18n/runtime').AvailableLanguageTag;
 	}
 	interface PageData {
-		org: Organization;
+		org: SanitizedOrganization;
 	}
 	interface Error {
 		message: string;
