@@ -53,6 +53,7 @@
 		<AcceptedClaimDetail
 			achievement={{ ...data.achievement, organization: data.org, category: null }}
 			existingBadgeClaim={data.claim}
+			exchangeEnabled={data.exchangeEnabled}
 		/>
 	{:else if data.claim.claimStatus == 'REJECTED'}
 		<RejectedClaimDetail achievement={data.achievement} existingBadgeClaim={data.claim} />
