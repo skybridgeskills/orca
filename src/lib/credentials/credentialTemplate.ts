@@ -41,8 +41,8 @@ export function buildAchievementCredentialTemplate(
 
 	const credentialTemplate = {
 		'@context': [
-			'https://www.w3.org/2018/credentials/v1',
-			'https://purl.imsglobal.org/spec/ob/v3p0/context.json' // TODO -> 3.0.1... 3.0.2 soon
+			'https://www.w3.org/ns/credentials/v2',
+			'https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json'
 		],
 		id: `urn:uuid:${claim.id}`,
 		type: ['VerifiableCredential', 'OpenBadgeCredential'],

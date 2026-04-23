@@ -146,7 +146,7 @@ declare namespace App {
 				image?: string;
 			};
 		};
-		issuanceDate: string;
+		validFrom: string;
 		issuer: {
 			id: string;
 			type: string;
