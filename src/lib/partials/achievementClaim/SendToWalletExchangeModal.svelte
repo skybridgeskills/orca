@@ -131,24 +131,28 @@
 				Scan the QR with your wallet device, or click the button to open on this device. This link
 				expires in about 10 minutes.
 			</p>
-			{#if options.length > 1}
-				<div class="my-3 mx-auto inline-block text-left">
-					<label for="protocol-select" class="block text-sm text-gray-700 dark:text-gray-300">
-						{m.cool_clear_lynx_choose()}
-					</label>
-					<select
-						id="protocol-select"
-						bind:value={selectedProtocol}
-						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-					>
-						{#each options as o}
-							<option value={o.value}>{protocolOptionLabel(o.messageKey)}</option>
-						{/each}
-					</select>
+			<div
+				class="my-6 flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-center sm:gap-8"
+			>
+				{#if options.length > 1}
+					<div class="text-left space-y-2 w-full sm:w-auto sm:min-w-[14rem]">
+						<label for="protocol-select" class="block text-sm text-gray-700 dark:text-gray-300">
+							{m.cool_clear_lynx_choose()}
+						</label>
+						<select
+							id="protocol-select"
+							bind:value={selectedProtocol}
+							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						>
+							{#each options as o}
+								<option value={o.value}>{protocolOptionLabel(o.messageKey)}</option>
+							{/each}
+						</select>
+					</div>
+				{/if}
+				<div class="shrink-0">
+					<QRCode url={activeOption.url} alt="Wallet handoff QR code" />
 				</div>
-			{/if}
-			<div class="mx-auto my-4 inline-block">
-				<QRCode url={activeOption.url} alt="Wallet handoff QR code" />
 			</div>
 			<p class="my-4">
 				<a
