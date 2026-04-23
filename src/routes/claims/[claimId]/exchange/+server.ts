@@ -43,7 +43,8 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 
 	try {
 		const exchange = await createExchange(locals.org, { vc: template });
-		return json(exchange);
+		const exchangeBody = await json(exchange);
+		return exchangeBody;
 	} catch (err) {
 		if (err instanceof IssuerMisconfiguredError) {
 			throw error(409, 'Issuer is misconfigured.');

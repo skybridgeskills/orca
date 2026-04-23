@@ -87,22 +87,26 @@ export async function createExchange(
 	}
 
 	const data = (await response.json()) as Record<string, unknown>;
-	const rawId = data.id;
-	if (typeof rawId !== 'string' || rawId.length === 0) {
-		throw new TransactionServiceUpstreamError('Missing exchange id in response', {
-			status: response.status
-		});
-	}
-	if (!('protocols' in data) || data.protocols === undefined) {
-		throw new TransactionServiceUpstreamError('Missing protocols in response', { status: 200 });
-	}
-	const protocols = data.protocols;
+
+	// TODO: Later we will implement polling, and the transaction service will need to return
+	// the relevent exchange iD.
+	// const rawId = data.id;
+	// if (typeof rawId !== 'string' || rawId.length === 0) {
+	// 	throw new TransactionServiceUpstreamError('Missing exchange id in response', {
+	// 		status: response.status
+	// 	});
+	// }
+	// if (!('protocols' in data) || data.protocols === undefined) {
+	// 	throw new TransactionServiceUpstreamError('Missing protocols in response', { status: 200 });
+	// }
+	const protocols = data as TransactionServiceExchange['protocols'];
 	if (protocols === null || typeof protocols !== 'object' || Array.isArray(protocols)) {
 		throw new TransactionServiceUpstreamError('Missing protocols in response', { status: 200 });
 	}
 
 	return {
-		exchangeId: rawId,
+		// exchangeId: rawId,
+		exchangeId: 'TODO',
 		protocols: protocols as TransactionServiceExchange['protocols'],
 		expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString()
 	};

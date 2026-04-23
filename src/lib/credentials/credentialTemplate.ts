@@ -53,7 +53,7 @@ export function buildAchievementCredentialTemplate(
 			email: organization.email,
 			description: organization.description
 		},
-		issuanceDate: claim.validFrom?.toISOString() ?? new Date().toISOString(),
+		validFrom: claim.validFrom?.toISOString() ?? new Date().toISOString(),
 		credentialSubject
 	} as App.OpenBadgeCredential;
 
