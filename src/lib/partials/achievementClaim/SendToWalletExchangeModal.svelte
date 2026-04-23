@@ -2,6 +2,12 @@
 	import { createEventDispatcher } from 'svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
+	import * as m from '$lib/i18n/messages';
+	import {
+		buildProtocolOptions,
+		type ExchangeProtocolMessageKey,
+		type ExchangeProtocolValue
+	} from './exchangeProtocolOptions';
 
 	export let open = false;
 	export let claimId: string;
@@ -21,6 +27,13 @@
 	const dispatch = createEventDispatcher();
 	let state: State = { kind: 'loading' };
 	let abortController: AbortController | null = null;
+	let selectedProtocol: ExchangeProtocolValue = 'iu';
+	$: options = state.kind === 'ready' ? buildProtocolOptions(state.data.protocols) : [];
+	$: activeOption = options.find((o) => o.value === selectedProtocol) ?? options[0];
+
+	function protocolOptionLabel(key: ExchangeProtocolMessageKey): string {
+		return (m as unknown as Record<string, () => string>)[key]();
+	}
 
 	function close() {
 		abortController?.abort();
@@ -33,6 +46,7 @@
 		abortController?.abort();
 		abortController = new AbortController();
 		state = { kind: 'loading' };
+		selectedProtocol = 'iu';
 		try {
 			const res = await fetch(`/claims/${claimId}/exchange`, {
 				method: 'POST',
@@ -117,13 +131,29 @@
 				Scan the QR with your wallet device, or click the button to open on this device. This link
 				expires in about 10 minutes.
 			</p>
+			{#if options.length > 1}
+				<div class="my-3 mx-auto inline-block text-left">
+					<label for="protocol-select" class="block text-sm text-gray-700 dark:text-gray-300">
+						{m.cool_clear_lynx_choose()}
+					</label>
+					<select
+						id="protocol-select"
+						bind:value={selectedProtocol}
+						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+					>
+						{#each options as o}
+							<option value={o.value}>{protocolOptionLabel(o.messageKey)}</option>
+						{/each}
+					</select>
+				</div>
+			{/if}
 			<div class="mx-auto my-4 inline-block">
-				<QRCode url={state.data.protocols.iu} alt="Wallet handoff QR code" />
+				<QRCode url={activeOption.url} alt="Wallet handoff QR code" />
 			</div>
 			<p class="my-4">
 				<a
 					class="inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-					href={state.data.protocols.iu}
+					href={activeOption.url}
 					target="_blank"
 					rel="noopener noreferrer"
 				>

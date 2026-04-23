@@ -60,11 +60,11 @@ test('achievement claim to credential', async () => {
 	expect(credentialResult.issuer.email).toEqual(testOrganization.email);
 	expect(credentialResult.issuer.description).toEqual(testOrganization.description);
 	expect(credentialResult['@context']).toEqual([
-		'https://www.w3.org/2018/credentials/v1',
-		'https://purl.imsglobal.org/spec/ob/v3p0/context.json',
+		'https://www.w3.org/ns/credentials/v2',
+		'https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json',
 		'https://w3id.org/security/suites/ed25519-2020/v1'
 	]);
-	expect(credentialResult.issuanceDate).toEqual(testAchievementClaim.validFrom?.toISOString());
+	expect(credentialResult.validFrom).toEqual(testAchievementClaim.validFrom?.toISOString());
 	expect(credentialResult.credentialSubject).toBeDefined();
 	expect(credentialResult.credentialSubject.id).toEqual(
 		new CredentialSubjectDID(testOrganization, testUser).didString()

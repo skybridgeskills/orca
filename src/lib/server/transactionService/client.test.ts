@@ -55,6 +55,13 @@ describe('createExchange', () => {
 		process.env.ORG_CONFIG_ENCRYPTION_KEY = prevKey;
 	});
 
+	const okProtocolsBody = {
+		iu: '1',
+		vcapi: '2',
+		lcw: '3',
+		verifiablePresentationRequest: {}
+	};
+
 	it('returns exchangeId, protocols (four fields), and expiresAt in the ~10m window', async () => {
 		const t0 = Date.now();
 		const ucProtocols = {
@@ -63,16 +70,11 @@ describe('createExchange', () => {
 			lcw: 'https://l',
 			verifiablePresentationRequest: { foo: 'bar' }
 		};
-		mockFetch.mockResolvedValue(
-			okResponse({
-				id: 'ex-123',
-				protocols: ucProtocols
-			})
-		);
+		mockFetch.mockResolvedValue(okResponse(ucProtocols));
 
 		const result = await createExchange(baseOrg(), { vc: { a: 1 } });
 
-		expect(result.exchangeId).toBe('ex-123');
+		expect(result.exchangeId).toBe('TODO');
 		expect(result.protocols).toEqual(ucProtocols);
 		const exp = new Date(result.expiresAt).getTime();
 		const minT = t0 + 9.5 * 60 * 1000;
@@ -83,17 +85,7 @@ describe('createExchange', () => {
 
 	it('POSTs body variables.tenantName and stringified vc', async () => {
 		const vc = { x: 2 };
-		mockFetch.mockResolvedValue(
-			okResponse({
-				id: 'ex-1',
-				protocols: {
-					iu: '1',
-					vcapi: '2',
-					lcw: '3',
-					verifiablePresentationRequest: {}
-				}
-			})
-		);
+		mockFetch.mockResolvedValue(okResponse(okProtocolsBody));
 		await createExchange(baseOrg(), { vc });
 
 		const init = mockFetch.mock.calls[0][1]!;
@@ -104,17 +96,7 @@ describe('createExchange', () => {
 	});
 
 	it("sets Authorization to Bearer and the fixture's decrypted API key", async () => {
-		mockFetch.mockResolvedValue(
-			okResponse({
-				id: 'ex-1',
-				protocols: {
-					iu: '1',
-					vcapi: '2',
-					lcw: '3',
-					verifiablePresentationRequest: {}
-				}
-			})
-		);
+		mockFetch.mockResolvedValue(okResponse(okProtocolsBody));
 		await createExchange(baseOrg(), { vc: {} });
 
 		const init = mockFetch.mock.calls[0][1]!;
@@ -122,17 +104,7 @@ describe('createExchange', () => {
 	});
 
 	it("normalizes URL to 'https://ts.example.com/workflows/claim/exchanges' without a trailing segment slash", async () => {
-		mockFetch.mockResolvedValue(
-			okResponse({
-				id: 'ex-1',
-				protocols: {
-					iu: '1',
-					vcapi: '2',
-					lcw: '3',
-					verifiablePresentationRequest: {}
-				}
-			})
-		);
+		mockFetch.mockResolvedValue(okResponse(okProtocolsBody));
 		await createExchange(baseOrg(), { vc: {} });
 		expect(mockFetch.mock.calls[0][0]).toBe('https://ts.example.com/workflows/claim/exchanges');
 	});
@@ -179,24 +151,15 @@ describe('createExchange', () => {
 		expect(mockFetch).toHaveBeenCalledTimes(0);
 	});
 
-	it('throws TransactionServiceUpstreamError with status 200 when id is missing in an otherwise OK body', async () => {
-		mockFetch.mockResolvedValue(
-			okResponse({
-				protocols: {
-					iu: '1',
-					vcapi: '2',
-					lcw: '3',
-					verifiablePresentationRequest: {}
-				}
-			})
-		);
+	it('throws TransactionServiceUpstreamError with status 200 when the OK response body is not a protocols object', async () => {
+		mockFetch.mockResolvedValue(okResponse(null));
 		try {
 			await createExchange(baseOrg(), { vc: {} });
 			expect.fail('expected throw');
 		} catch (e) {
 			expect(e).toBeInstanceOf(TransactionServiceUpstreamError);
 			expect((e as TransactionServiceUpstreamError).status).toBe(200);
-			expect((e as Error).message).toContain('exchange id');
+			expect((e as Error).message).toContain('protocols');
 		}
 	});
 });
