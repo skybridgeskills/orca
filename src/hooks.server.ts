@@ -76,8 +76,13 @@ const getAuthHeaderTokenValue = function (authHeader: string | null) {
 	return parts[1];
 };
 
-export const handle: Handle = ({ event, resolve }) =>
-	paraglideMiddleware(event.request, async ({ request: localizedRequest }) => {
+export const handle: Handle = ({ event, resolve }) => {
+	// Short-circuit for healthcheck - no org validation needed
+	if (event.url.pathname === '/healthz') {
+		return resolve(event);
+	}
+
+	return paraglideMiddleware(event.request, async ({ request: localizedRequest }) => {
 		event.request = localizedRequest;
 
 		event.locals.org = await getOrganizationFromRequest(event);
@@ -122,3 +127,4 @@ export const handle: Handle = ({ event, resolve }) =>
 
 		return response;
 	});
+};
