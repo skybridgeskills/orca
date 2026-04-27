@@ -24,6 +24,9 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build-time `$env/static/*` (no `.env` in context); matches `.env.example` / PoC defaults.
+# Values are placeholders only — SvelteKit (adapter-node) resolves these
+# names from process.env at runtime, so `docker-compose` `env_file:`
+# values from `.env.orca` take precedence when the container starts.
 ENV PUBLIC_HTTP_PROTOCOL=http \
     PUBLIC_MEDIA_DOMAIN=/media \
     USE_SECURE_COOKIES=false \
@@ -32,6 +35,11 @@ ENV PUBLIC_HTTP_PROTOCOL=http \
     MAILGUN_API_KEY=none \
     MAILGUN_DOMAIN=local \
     MAILGUN_HOST=api.mailgun.net \
+    SMTP_HOST= \
+    SMTP_PORT=587 \
+    SMTP_SECURE=false \
+    SMTP_USER= \
+    SMTP_PASSWORD= \
     AWS_ACCESS_KEY_ID=test \
     AWS_SECRET_ACCESS_KEY=secret \
     S3_REGION=us-west-1 \
