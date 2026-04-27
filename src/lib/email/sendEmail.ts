@@ -1,35 +1,28 @@
 import * as nodemailer from 'nodemailer';
 import mailgunTransport from 'nodemailer-mailgun-transport';
-import {
-	MAILGUN_API_KEY,
-	MAILGUN_DOMAIN,
-	MAILGUN_HOST,
-	SMTP_HOST,
-	SMTP_PORT,
-	SMTP_USER,
-	SMTP_PASSWORD,
-	SMTP_SECURE
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 const mailgunAuth = {
 	auth: {
-		api_key: MAILGUN_API_KEY || '',
-		domain: MAILGUN_DOMAIN
+		api_key: env.MAILGUN_API_KEY || '',
+		domain: env.MAILGUN_DOMAIN
 	},
-	host: MAILGUN_HOST || 'api.eu.mailgun.net'
+	host: env.MAILGUN_HOST || 'api.eu.mailgun.net'
 };
 
 function createOrcaTransport(): nodemailer.Transporter {
-	if (MAILGUN_API_KEY && MAILGUN_API_KEY !== 'none') {
+	if (env.MAILGUN_API_KEY && env.MAILGUN_API_KEY !== 'none') {
 		return nodemailer.createTransport(mailgunTransport(mailgunAuth));
 	}
 
-	if (SMTP_HOST) {
-		const port = SMTP_PORT ? Number(SMTP_PORT) : 587;
-		const secure = SMTP_SECURE === 'true';
-		const auth = SMTP_USER ? { user: SMTP_USER, pass: SMTP_PASSWORD || '' } : undefined;
+	if (env.SMTP_HOST) {
+		const port = env.SMTP_PORT ? Number(env.SMTP_PORT) : 587;
+		const secure = env.SMTP_SECURE === 'true';
+		const auth = env.SMTP_USER
+			? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD || '' }
+			: undefined;
 		return nodemailer.createTransport({
-			host: SMTP_HOST,
+			host: env.SMTP_HOST,
 			port,
 			secure,
 			auth
@@ -52,7 +45,7 @@ interface EmailResult {
 export const sendOrcaMail = (mailOptions: nodemailer.SendMailOptions) => {
 	return new Promise<EmailResult>((resolve, reject) => {
 		transporter.sendMail(mailOptions, (err: Error | null, info: any) => {
-			if (MAILGUN_API_KEY == 'none') {
+			if (env.MAILGUN_API_KEY == 'none') {
 				console.log(info?.message);
 			}
 			if (err) {

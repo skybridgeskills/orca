@@ -23,23 +23,16 @@ RUN pnpm install --frozen-lockfile
 # Bring in the rest of the application source.
 COPY . .
 
-# Build-time `$env/static/*` (no `.env` in context); matches `.env.example` / PoC defaults.
-# Values are placeholders only — SvelteKit (adapter-node) resolves these
-# names from process.env at runtime, so `docker-compose` `env_file:`
-# values from `.env.orca` take precedence when the container starts.
+# Build-time `$env/static/private` placeholders for names still imported
+# from that module (see src). Email (MAILGUN_*, SMTP_*) and similar
+# server config is read via `$env/dynamic/private` at runtime from
+# `process.env` — do not duplicate here. Runtime values come from
+# compose `env_file:` or the host environment.
 ENV PUBLIC_HTTP_PROTOCOL=http \
     PUBLIC_MEDIA_DOMAIN=/media \
     USE_SECURE_COOKIES=false \
     DEFAULT_ORG_ENABLED=false \
     DEFAULT_ORG_DOMAIN=localhost \
-    MAILGUN_API_KEY=none \
-    MAILGUN_DOMAIN=local \
-    MAILGUN_HOST=api.mailgun.net \
-    SMTP_HOST= \
-    SMTP_PORT=587 \
-    SMTP_SECURE=false \
-    SMTP_USER= \
-    SMTP_PASSWORD= \
     AWS_ACCESS_KEY_ID=test \
     AWS_SECRET_ACCESS_KEY=secret \
     S3_REGION=us-west-1 \
