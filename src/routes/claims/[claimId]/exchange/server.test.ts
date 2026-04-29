@@ -81,11 +81,11 @@ describe('POST /claims/[claimId]/exchange', () => {
 		mockIsExchangeEnabled.mockReturnValue(true);
 		mockFindUnique.mockResolvedValue(buildClaim());
 		mockCreateExchange.mockResolvedValue({
-			exchangeId: 'ex-1',
+			exchangeId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 			protocols: {
-				iu: 'https://iu.example',
-				vcapi: 'https://v',
-				lcw: 'https://l',
+				iu: 'https://host.example/interactions/a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+				vcapi: 'https://host.example/workflows/claim/exchanges/a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+				lcw: 'https://lcw.app/request?vcapi=...',
 				verifiablePresentationRequest: {}
 			},
 			expiresAt: '2099-01-01T00:00:00.000Z'
@@ -193,7 +193,7 @@ describe('POST /claims/[claimId]/exchange', () => {
 		const res = (await POST(makeEvent())) as Response;
 		expect(res.ok).toBe(true);
 		const body = (await res.json()) as { exchangeId: string; protocols: { iu: string } };
-		expect(body.exchangeId).toBe('ex-1');
+		expect(body.exchangeId).toBe('a1b2c3d4-e5f6-7890-abcd-ef1234567890');
 		expect(mockCreateExchange).toHaveBeenCalledTimes(1);
 		const vcArg = mockCreateExchange.mock.calls[0][1].vc as {
 			credentialSubject: Record<string, unknown>;

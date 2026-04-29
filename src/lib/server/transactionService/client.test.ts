@@ -56,25 +56,25 @@ describe('createExchange', () => {
 	});
 
 	const okProtocolsBody = {
-		iu: '1',
-		vcapi: '2',
-		lcw: '3',
+		iu: 'https://host.example/interactions/ex-abc-123',
+		vcapi: 'https://host.example/workflows/claim/exchanges/ex-abc-123',
+		lcw: 'https://lcw.app/request?vcapi=https://host.example/workflows/claim/exchanges/ex-abc-123',
 		verifiablePresentationRequest: {}
 	};
 
-	it('returns exchangeId, protocols (four fields), and expiresAt in the ~10m window', async () => {
+	it('returns exchangeId parsed from iu, protocols (four fields), and expiresAt in the ~10m window', async () => {
 		const t0 = Date.now();
 		const ucProtocols = {
-			iu: 'https://i',
-			vcapi: 'https://v',
-			lcw: 'https://l',
+			iu: 'https://host.example/interactions/my-exchange-id',
+			vcapi: 'https://host.example/workflows/claim/exchanges/my-exchange-id',
+			lcw: 'https://lcw.app/request?vcapi=...',
 			verifiablePresentationRequest: { foo: 'bar' }
 		};
 		mockFetch.mockResolvedValue(okResponse(ucProtocols));
 
 		const result = await createExchange(baseOrg(), { vc: { a: 1 } });
 
-		expect(result.exchangeId).toBe('TODO');
+		expect(result.exchangeId).toBe('my-exchange-id');
 		expect(result.protocols).toEqual(ucProtocols);
 		const exp = new Date(result.expiresAt).getTime();
 		const minT = t0 + 9.5 * 60 * 1000;
@@ -95,18 +95,44 @@ describe('createExchange', () => {
 		});
 	});
 
-	it("sets Authorization to Bearer and the fixture's decrypted API key", async () => {
+	it('sets Authorization to Basic with base64-encoded tenantName:apiKey', async () => {
 		mockFetch.mockResolvedValue(okResponse(okProtocolsBody));
 		await createExchange(baseOrg(), { vc: {} });
 
 		const init = mockFetch.mock.calls[0][1]!;
-		expect((init.headers as Record<string, string>).Authorization).toBe('Bearer plaintext-api-key');
+		const expectedCredentials = Buffer.from('my-tenant:plaintext-api-key').toString('base64');
+		expect((init.headers as Record<string, string>).Authorization).toBe(
+			`Basic ${expectedCredentials}`
+		);
 	});
 
 	it("normalizes URL to 'https://ts.example.com/workflows/claim/exchanges' without a trailing segment slash", async () => {
 		mockFetch.mockResolvedValue(okResponse(okProtocolsBody));
 		await createExchange(baseOrg(), { vc: {} });
 		expect(mockFetch.mock.calls[0][0]).toBe('https://ts.example.com/workflows/claim/exchanges');
+	});
+
+	it('prefers a direct id field over parsing the iu URL', async () => {
+		mockFetch.mockResolvedValue(
+			okResponse({ id: 'direct-id', ...okProtocolsBody })
+		);
+		const result = await createExchange(baseOrg(), { vc: {} });
+		expect(result.exchangeId).toBe('direct-id');
+		expect(result.protocols.iu).toBe(okProtocolsBody.iu);
+	});
+
+	it('handles a future nested protocols shape with top-level id', async () => {
+		mockFetch.mockResolvedValue(
+			okResponse({
+				id: 'nested-id',
+				sequence: 0,
+				state: 'pending',
+				protocols: okProtocolsBody
+			})
+		);
+		const result = await createExchange(baseOrg(), { vc: {} });
+		expect(result.exchangeId).toBe('nested-id');
+		expect(result.protocols).toEqual(okProtocolsBody);
 	});
 
 	it('throws TransactionServiceUpstreamError with status on non-2xx', async () => {
