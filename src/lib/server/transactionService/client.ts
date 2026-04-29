@@ -55,7 +55,7 @@ export async function createExchange(
 		response = await redactedFetch(url, {
 			method: 'POST',
 			headers: {
-				Authorization: `Bearer ${apiKey}`,
+				Authorization: `Basic ${Buffer.from(`${transactionService.tenantName}:${apiKey}`).toString('base64')}`,
 				'Content-Type': 'application/json',
 				Accept: 'application/json'
 			},
@@ -87,27 +87,15 @@ export async function createExchange(
 	}
 
 	const data = (await response.json()) as Record<string, unknown>;
-
-	// TODO: Later we will implement polling, and the transaction service will need to return
-	// the relevent exchange iD.
-	// const rawId = data.id;
-	// if (typeof rawId !== 'string' || rawId.length === 0) {
-	// 	throw new TransactionServiceUpstreamError('Missing exchange id in response', {
-	// 		status: response.status
-	// 	});
-	// }
-	// if (!('protocols' in data) || data.protocols === undefined) {
-	// 	throw new TransactionServiceUpstreamError('Missing protocols in response', { status: 200 });
-	// }
-	const protocols = data as TransactionServiceExchange['protocols'];
-	if (protocols === null || typeof protocols !== 'object' || Array.isArray(protocols)) {
+	if (data === null || typeof data !== 'object' || Array.isArray(data)) {
 		throw new TransactionServiceUpstreamError('Missing protocols in response', { status: 200 });
 	}
+	const exchangeId = extractExchangeId(data);
+	const protocols = extractProtocols(data);
 
 	return {
-		// exchangeId: rawId,
-		exchangeId: 'TODO',
-		protocols: protocols as TransactionServiceExchange['protocols'],
+		exchangeId,
+		protocols,
 		expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString()
 	};
 }
@@ -137,4 +125,46 @@ function readTransactionServiceConfig(org: App.Organization): {
 		tenantName: ts.tenantName,
 		encryptedApiKey: ts.encryptedApiKey
 	};
+}
+
+/**
+ * Extract the exchange ID from the upstream response. Prefers a direct `id` field (for
+ * when the transaction service returns exchange detail fields). Falls back to parsing the
+ * last path segment of the `iu` interaction URL.
+ */
+function extractExchangeId(data: Record<string, unknown>): string {
+	if (typeof data.id === 'string' && data.id.length > 0) {
+		return data.id;
+	}
+	const protocols =
+		typeof data.protocols === 'object' && data.protocols !== null && !Array.isArray(data.protocols)
+			? (data.protocols as Record<string, unknown>)
+			: data;
+	if (typeof protocols.iu === 'string') {
+		try {
+			const lastSegment = new URL(protocols.iu).pathname.split('/').filter(Boolean).pop();
+			if (lastSegment) return lastSegment;
+		} catch {
+			// invalid URL — fall through to error
+		}
+	}
+	throw new TransactionServiceUpstreamError('Could not determine exchangeId from response', {
+		status: 200
+	});
+}
+
+/**
+ * Extract the protocols object from the upstream response. Handles both the current flat
+ * shape (`{ iu, vcapi, lcw, verifiablePresentationRequest }`) and a future nested shape
+ * (`{ protocols: { iu, ... } }`).
+ */
+function extractProtocols(data: Record<string, unknown>): TransactionServiceExchange['protocols'] {
+	const raw =
+		typeof data.protocols === 'object' && data.protocols !== null && !Array.isArray(data.protocols)
+			? (data.protocols as Record<string, unknown>)
+			: data;
+	if (typeof raw.iu !== 'string') {
+		throw new TransactionServiceUpstreamError('Missing protocols in response', { status: 200 });
+	}
+	return raw as TransactionServiceExchange['protocols'];
 }
