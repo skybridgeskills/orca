@@ -3,16 +3,11 @@
 	import { quintOut } from 'svelte/easing';
 	export let open: boolean = false;
 	export let title: string = '';
-	let rotation: string = 'rotate(-90)';
+	$: rotation = open ? '' : 'rotate(-90)';
 
 	function handleClick(e: MouseEvent) {
 		e.preventDefault();
 		open = !open;
-		if (rotation == '') {
-			rotation = 'rotate(-90)';
-		} else {
-			rotation = '';
-		}
 	}
 </script>
 
