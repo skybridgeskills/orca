@@ -1,9 +1,13 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import type { ActionData, PageData } from './$types';
+	import type { PageData } from './$types';
 	import AchievementForm from '$lib/partials/AchievementForm.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import { imageExtension } from '$lib/utils/imageUrl';
+	import type { Achievement } from '@prisma/client';
+	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
+
+	const alignmentsFromJson = (json: Achievement['json']) => alignmentRowsFromAchievementJson(json);
 
 	// export let form: ActionData;
 	export let data: PageData;
@@ -24,7 +28,8 @@
 		reviewRequires: data.achievement.achievementConfig?.reviewRequiresId,
 		capabilities_inviteRequires:
 			data.achievement.achievementConfig?.json?.capabilities?.inviteRequires || '',
-		claimTemplate: data.achievement.achievementConfig?.json?.claimTemplate || ''
+		claimTemplate: data.achievement.achievementConfig?.json?.claimTemplate || '',
+		alignments: alignmentsFromJson(data.achievement.json)
 	};
 
 	let breadcrumbItems = [

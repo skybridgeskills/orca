@@ -113,9 +113,7 @@ describe('createExchange', () => {
 	});
 
 	it('prefers a direct id field over parsing the iu URL', async () => {
-		mockFetch.mockResolvedValue(
-			okResponse({ id: 'direct-id', ...okProtocolsBody })
-		);
+		mockFetch.mockResolvedValue(okResponse({ id: 'direct-id', ...okProtocolsBody }));
 		const result = await createExchange(baseOrg(), { vc: {} });
 		expect(result.exchangeId).toBe('direct-id');
 		expect(result.protocols.iu).toBe(okProtocolsBody.iu);

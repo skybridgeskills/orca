@@ -12,7 +12,8 @@
 		description: '',
 		criteriaId: '',
 		criteriaNarrative: '',
-		category: 'uncategorized'
+		category: 'uncategorized',
+		alignments: []
 	};
 </script>
 

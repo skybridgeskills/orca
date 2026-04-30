@@ -1,4 +1,5 @@
 import type { Achievement, Organization } from '@prisma/client';
+import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
 import { OB2_CONTEXT_URL, OB_VERSION_DESCRIPTORS, type OB_VERSION } from './constants';
 import { issuerFromOrganization, type OB2Issuer } from './issuer';
 import { staticImageUrlForAchievement } from '$lib/utils/imageUrl';
@@ -13,6 +14,14 @@ interface OB2Criteria {
 	narrative?: string;
 }
 
+interface OB2Alignment {
+	type: 'Alignment';
+	targetUrl: string;
+	targetName: string;
+	targetDescription?: string;
+	targetCode?: string;
+}
+
 export interface OB2BadgeClass {
 	'@context'?: typeof OB2_CONTEXT_URL;
 	type: 'BadgeClass';
@@ -23,6 +32,7 @@ export interface OB2BadgeClass {
 	criteria: OB2Criteria;
 	issuer: string | OB2Issuer;
 	related: Array<{ type: Array<string>; id: string; version: OB_VERSION }>;
+	alignment?: OB2Alignment[];
 }
 
 export const badgeClassFromAchievement = (
@@ -30,6 +40,17 @@ export const badgeClassFromAchievement = (
 	embedContext = true
 ): OB2BadgeClass => {
 	const baseDomain = `${PUBLIC_HTTP_PROTOCOL}://${achievement.organization.domain}`;
+
+	// Convert stored alignments to OB2 format
+	const storedAlignments = alignmentRowsFromAchievementJson(achievement.json);
+	const ob2Alignments: OB2Alignment[] = storedAlignments.map((alignment) => ({
+		type: 'Alignment',
+		targetUrl: alignment.targetUrl,
+		targetName: alignment.targetName,
+		...(alignment.targetDescription ? { targetDescription: alignment.targetDescription } : {}),
+		...(alignment.targetCode ? { targetCode: alignment.targetCode } : {})
+	}));
+
 	return {
 		...(embedContext ? { '@context': OB2_CONTEXT_URL } : null),
 		type: 'BadgeClass',
@@ -50,6 +71,7 @@ export const badgeClassFromAchievement = (
 				id: `${baseDomain}/a/${achievement.id}`,
 				version: OB_VERSION_DESCRIPTORS.v3p0
 			}
-		]
+		],
+		...(ob2Alignments.length > 0 ? { alignment: ob2Alignments } : {})
 	};
 };

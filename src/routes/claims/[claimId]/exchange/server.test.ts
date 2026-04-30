@@ -84,7 +84,8 @@ describe('POST /claims/[claimId]/exchange', () => {
 			exchangeId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 			protocols: {
 				iu: 'https://host.example/interactions/a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-				vcapi: 'https://host.example/workflows/claim/exchanges/a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+				vcapi:
+					'https://host.example/workflows/claim/exchanges/a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 				lcw: 'https://lcw.app/request?vcapi=...',
 				verifiablePresentationRequest: {}
 			},

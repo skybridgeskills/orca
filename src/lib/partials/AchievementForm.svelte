@@ -21,12 +21,15 @@
 	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import CollapsiblePane from '$lib/components/CollapsiblePane.svelte';
+	import AlignmentInput from '$lib/components/forms/AlignmentInput.svelte';
+	import type { Alignment } from '$lib/data/alignment';
 
 	export let categories: Array<AchievementCategory>;
 	export let initialData;
 	export let achievementId = '';
 	let formData = {
 		...initialData,
+		alignments: initialData.alignments || [],
 		// claim template toggle: enabled when there is an initial template
 		claimTemplate_enabled: !!initialData.claimTemplate,
 		claimable: initialData.claimable ? 'on' : 'off',
@@ -56,7 +59,8 @@
 		reviewsRequired: '',
 		reviewRequires: '',
 		inviteRequires: '',
-		claimTemplate: ''
+		claimTemplate: '',
+		alignments: ''
 	};
 	let errors = { ...noErrors };
 
@@ -141,6 +145,21 @@
 				console.error(result.error);
 		}
 	};
+
+	function addAlignment() {
+		const next: Alignment = { targetUrl: '', targetName: '' };
+		formData.alignments = [...formData.alignments, next];
+	}
+
+	function removeAlignment(index: number) {
+		formData.alignments = formData.alignments.filter(
+			(_alignment: Alignment, i: number) => i !== index
+		);
+	}
+
+	function hasAlignments(): boolean {
+		return formData.alignments.length > 0;
+	}
 
 	onMount(async () => {
 		await ensureLoaded(achievementsLoading, fetchAchievements);
@@ -648,6 +667,60 @@
 					value={!!formData.claimTemplate_enabled ? 'on' : 'off'}
 				/>
 				<input type="hidden" name="claimTemplate" value={formData.claimTemplate} />
+			</div>
+		</CollapsiblePane>
+		<CollapsiblePane title={m.soft_bold_moose_climb()} open={hasAlignments()}>
+			<div class="flex flex-col gap-3">
+				<p class="text-sm text-gray-600 dark:text-gray-400">
+					{m.quiet_wise_heron_glide()}
+				</p>
+
+				{#if formData.alignments.length === 0}
+					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
+						{m.gentle_clear_fox_stare()}
+					</p>
+				{:else}
+					{#each formData.alignments as alignment, index (index)}
+						<AlignmentInput {alignment} {index} onRemove={() => removeAlignment(index)} />
+					{/each}
+				{/if}
+
+				<button
+					type="button"
+					on:click={addAlignment}
+					class="mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
+				>
+					+ {m.calm_brave_bear_rise()}
+				</button>
+			</div>
+
+			<div slot="button-extra">
+				{#if hasAlignments()}
+					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
+						{m.swift_noble_deer_leap({ count: formData.alignments.length })}
+					</p>
+				{/if}
+			</div>
+
+			<div slot="when-closed">
+				{#each formData.alignments as alignment, index (index)}
+					<input type="hidden" name="alignment[{index}].targetUrl" value={alignment.targetUrl} />
+					<input type="hidden" name="alignment[{index}].targetName" value={alignment.targetName} />
+					{#if alignment.targetDescription}
+						<input
+							type="hidden"
+							name="alignment[{index}].targetDescription"
+							value={alignment.targetDescription}
+						/>
+					{/if}
+					{#if alignment.targetCode}
+						<input
+							type="hidden"
+							name="alignment[{index}].targetCode"
+							value={alignment.targetCode}
+						/>
+					{/if}
+				{/each}
 			</div>
 		</CollapsiblePane>
 		<!-- Submit/Cancel -->
