@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import { ValidationError } from 'yup';
 import { achievementFormSchema } from '$lib/data/achievementForm';
 import { prisma } from '$lib/../prisma/client';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import type { PageServerLoad } from './$types';
 //import { getUploadUrl } from '$lib/server/media';
 import stripTags from '$lib/utils/stripTags';
@@ -14,8 +14,45 @@ import { connect } from 'http2';
 import { getUploadUrl } from '$lib/server/media';
 import { getAchievement } from '$lib/data/achievement';
 import { canEditAchievements } from '$lib/server/permissions';
+import type { Alignment } from '$lib/data/alignment';
 
 dotenv.config();
+
+function parseAlignmentsFromFormData(formData: FormData): Alignment[] {
+	const alignments: Alignment[] = [];
+	let index = 0;
+
+	while (formData.has(`alignment[${index}].targetUrl`)) {
+		const targetUrl = formData.get(`alignment[${index}].targetUrl`)?.toString().trim();
+		const targetName = formData.get(`alignment[${index}].targetName`)?.toString().trim();
+		const targetDescription = formData
+			.get(`alignment[${index}].targetDescription`)
+			?.toString()
+			.trim();
+		const targetCode = formData.get(`alignment[${index}].targetCode`)?.toString().trim();
+
+		if (targetUrl && targetName) {
+			const alignment: Alignment = {
+				targetUrl: stripTags(targetUrl),
+				targetName: stripTags(targetName)
+			};
+
+			if (targetDescription) {
+				alignment.targetDescription = stripTags(targetDescription);
+			}
+
+			if (targetCode) {
+				alignment.targetCode = stripTags(targetCode);
+			}
+
+			alignments.push(alignment);
+		}
+
+		index++;
+	}
+
+	return alignments;
+}
 
 export const load: PageServerLoad = async ({ locals }) => {
 	// redirect user if logged out or doesn't have permission to create achievements
@@ -76,6 +113,7 @@ export const actions: Actions = {
 
 		const newIdentifier = uuidv4();
 		const requestData = await request.formData();
+		const rawAlignments = parseAlignmentsFromFormData(requestData);
 		const imageKey = requestData.get('imageExtension')
 			? `achievement-${newIdentifier}/raw-image.${requestData.get('imageExtension')}`
 			: null;
@@ -99,7 +137,8 @@ export const actions: Actions = {
 			reviewableSelectedOption: requestData.get('reviewableSelectedOption')?.toString() || 'none',
 			capabilities_inviteRequires:
 				requestData.get('capabilities_inviteRequires')?.toString() || null,
-			claimTemplate: claimTemplate_enabled ? rawClaimTemplate : ''
+			claimTemplate: claimTemplate_enabled ? rawClaimTemplate : '',
+			alignments: rawAlignments
 		};
 
 		try {
@@ -131,7 +170,9 @@ export const actions: Actions = {
 			criteriaId: formData.criteriaId,
 			criteriaNarrative: formData.criteriaNarrative,
 			image: imageKey,
-			json: {},
+			json: (formData.alignments.length > 0
+				? { alignment: formData.alignments }
+				: {}) as unknown as Prisma.InputJsonObject,
 			category:
 				formData.category != 'uncategorized' ? { connect: { id: formData.category } } : undefined,
 			achievementConfig: {

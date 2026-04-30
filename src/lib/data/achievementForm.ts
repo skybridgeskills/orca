@@ -1,5 +1,6 @@
 import * as yup from 'yup';
 import * as m from '$lib/i18n/messages';
+import { alignmentsArraySchema } from './alignment';
 
 const emptyNulled = (value: string | null) => (value === '' ? null : value);
 
@@ -19,7 +20,9 @@ export const achievementFormSchema = yup
 		reviewableSelectedOption: yup.string().oneOf(['none', 'admin', 'badge']),
 		inviteSelectedOption: yup.string().oneOf(['none', 'badge']),
 
-		capabilities_inviteRequires: yup.string().nullable().transform(emptyNulled).uuid()
+		capabilities_inviteRequires: yup.string().nullable().transform(emptyNulled).uuid(),
+
+		alignments: alignmentsArraySchema.optional().default([])
 	})
 	.test(
 		'claimRequires',

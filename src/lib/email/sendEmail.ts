@@ -18,9 +18,7 @@ function createOrcaTransport(): nodemailer.Transporter {
 	if (env.SMTP_HOST) {
 		const port = env.SMTP_PORT ? Number(env.SMTP_PORT) : 587;
 		const secure = env.SMTP_SECURE === 'true';
-		const auth = env.SMTP_USER
-			? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD || '' }
-			: undefined;
+		const auth = env.SMTP_USER ? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD || '' } : undefined;
 		return nodemailer.createTransport({
 			host: env.SMTP_HOST,
 			port,

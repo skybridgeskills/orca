@@ -2,6 +2,7 @@ import { createHash } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import type { Achievement, AchievementClaim, Identifier, Organization, User } from '@prisma/client';
 import { IdentifierType } from '@prisma/client';
+import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
 import { CredentialSubjectDID, OrganizationDID } from '$lib/credentials/did';
 
 /**
@@ -19,6 +20,16 @@ export function buildAchievementCredentialTemplate(
 	const generatedSubjectDid = new CredentialSubjectDID(organization, claim.user);
 	const organizationDid = new OrganizationDID(organization);
 
+	// OB2/OB3 Alignment uses `targetUrl`; internal storage maps `targetUrl` (see legacy readers in alignment.ts).
+	const storedAlignments = alignmentRowsFromAchievementJson(claim.achievement.json);
+	const credentialAlignments = storedAlignments.map((alignment) => ({
+		type: 'Alignment' as const,
+		targetUrl: alignment.targetUrl,
+		targetName: alignment.targetName,
+		...(alignment.targetDescription ? { targetDescription: alignment.targetDescription } : {}),
+		...(alignment.targetCode ? { targetCode: alignment.targetCode } : {})
+	}));
+
 	const achievementSubject = {
 		type: 'AchievementSubject' as const,
 		achievement: {
@@ -28,7 +39,8 @@ export function buildAchievementCredentialTemplate(
 				narrative: claim.achievement.criteriaNarrative || ''
 			},
 			description: claim.achievement.description,
-			name: claim.achievement.name
+			name: claim.achievement.name,
+			...(credentialAlignments.length > 0 ? { alignment: credentialAlignments } : {})
 		}
 	};
 

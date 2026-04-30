@@ -11,6 +11,43 @@ import { getUploadUrl } from '$lib/server/media';
 import { v4 as uuidv4 } from 'uuid';
 import { getAchievement } from '$lib/data/achievement';
 import { canEditAchievements } from '$lib/server/permissions';
+import type { Alignment } from '$lib/data/alignment';
+
+function parseAlignmentsFromFormData(formData: FormData): Alignment[] {
+	const alignments: Alignment[] = [];
+	let index = 0;
+
+	while (formData.has(`alignment[${index}].targetUrl`)) {
+		const targetUrl = formData.get(`alignment[${index}].targetUrl`)?.toString().trim();
+		const targetName = formData.get(`alignment[${index}].targetName`)?.toString().trim();
+		const targetDescription = formData
+			.get(`alignment[${index}].targetDescription`)
+			?.toString()
+			.trim();
+		const targetCode = formData.get(`alignment[${index}].targetCode`)?.toString().trim();
+
+		if (targetUrl && targetName) {
+			const alignment: Alignment = {
+				targetUrl: stripTags(targetUrl),
+				targetName: stripTags(targetName)
+			};
+
+			if (targetDescription) {
+				alignment.targetDescription = stripTags(targetDescription);
+			}
+
+			if (targetCode) {
+				alignment.targetCode = stripTags(targetCode);
+			}
+
+			alignments.push(alignment);
+		}
+
+		index++;
+	}
+
+	return alignments;
+}
 
 interface AchievementConfigForm {
 	claimable: boolean;
@@ -96,6 +133,20 @@ export const actions: Actions = {
 		}
 
 		const requestData = await request.formData();
+		const rawAlignments = parseAlignmentsFromFormData(requestData);
+		const existingAchievementRow = await prisma.achievement.findFirst({
+			where: {
+				id: params.id,
+				organizationId: locals.org.id
+			},
+			select: { json: true }
+		});
+		const achievementJsonBaseline =
+			existingAchievementRow?.json != null &&
+			typeof existingAchievementRow.json === 'object' &&
+			!Array.isArray(existingAchievementRow.json)
+				? (existingAchievementRow.json as Prisma.JsonObject)
+				: {};
 		const imageUpdated = requestData.get('imageEdited') === 'true';
 		const imageKey = requestData.get('imageExtension')
 			? `achievement-${params.id}/${uuidv4().slice(-8)}-raw-image.${requestData.get(
@@ -120,7 +171,8 @@ export const actions: Actions = {
 			claimRequires: requestData.get('claimRequires')?.toString(),
 			reviewRequires: requestData.get('reviewRequires')?.toString(),
 			reviewsRequired: parseInt(requestData.get('reviewsRequired')?.toString() || '') || 0,
-			reviewableSelectedOption: requestData.get('reviewableSelectedOption')?.toString() || 'none'
+			reviewableSelectedOption: requestData.get('reviewableSelectedOption')?.toString() || 'none',
+			alignments: rawAlignments
 		};
 
 		// read claim template enabled flag and claimTemplate value
@@ -128,6 +180,14 @@ export const actions: Actions = {
 			(requestData.get('claimTemplate_enabled')?.toString() || 'off') === 'on';
 		const rawClaimTemplate = stripTags(requestData.get('claimTemplate')?.toString() || '');
 		const claimTemplate = claimTemplate_enabled ? rawClaimTemplate : '';
+		const mergedAchievementJson = { ...achievementJsonBaseline } as Record<string, unknown>;
+		delete mergedAchievementJson.alignments;
+		if (formData.alignments.length > 0) {
+			mergedAchievementJson.alignment = formData.alignments;
+		} else {
+			delete mergedAchievementJson.alignment;
+		}
+
 		const achievementData = {
 			name: formData.name,
 			description: formData.description,
@@ -137,7 +197,8 @@ export const actions: Actions = {
 			category:
 				formData.category != 'uncategorized'
 					? { connect: { id: formData.category } }
-					: { disconnect: true }
+					: { disconnect: true },
+			json: mergedAchievementJson as unknown as Prisma.InputJsonObject
 		};
 
 		let configData: AchievementConfigForm = {

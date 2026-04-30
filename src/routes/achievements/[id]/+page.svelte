@@ -17,6 +17,7 @@
 	import { isAdmin } from '$lib/permissions/isAdmin';
 	import ClaimSummaryCard from '$lib/components/achievement/ClaimSummaryCard.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import type {
 		Achievement,
@@ -50,6 +51,9 @@
 	dayjs.extend(relativeTime);
 
 	export let data: PageData;
+
+	$: alignments = alignmentRowsFromAchievementJson(data.achievement.json);
+	$: hasAlignments = alignments.length > 0;
 	let showDeleteModal = false;
 	let showShareModal = false;
 
@@ -299,6 +303,47 @@
 <div class="my-4 max-w-2xl">
 	<AchievementCriteria achievement={data.achievement} />
 </div>
+
+<!-- Alignments -->
+{#if hasAlignments}
+	<div class="my-4 max-w-2xl">
+		<Heading
+			title={m.grand_steady_bison_walk()}
+			level="h3"
+			description={m.wide_quiet_beaver_build()}
+		/>
+		<div class="mt-4 space-y-4">
+			{#each alignments as alignment}
+				<div
+					class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800"
+				>
+					<div class="flex flex-col gap-2">
+						<a
+							href={alignment.targetUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+						>
+							{alignment.targetName}
+						</a>
+						{#if alignment.targetCode}
+							<span class="text-sm text-gray-600 dark:text-gray-400">
+							{m.tiny_neat_hare_skip()}: <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded"
+									>{alignment.targetCode}</code
+								>
+							</span>
+						{/if}
+						{#if alignment.targetDescription}
+							<p class="text-sm text-gray-700 dark:text-gray-300">
+								{alignment.targetDescription}
+							</p>
+						{/if}
+					</div>
+				</div>
+			{/each}
+		</div>
+	</div>
+{/if}
 
 <!-- Existing community claims -->
 <Heading
