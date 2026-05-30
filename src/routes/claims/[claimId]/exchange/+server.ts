@@ -14,10 +14,10 @@ import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 
 export const POST = async ({ locals, params }: RequestEvent) => {
-	if (!locals.session?.user?.id) throw error(404, m.best_sharp_lamb_enchant());
+	if (!locals.session?.user?.id) error(404, m.best_sharp_lamb_enchant());
 
 	if (!isExchangeEnabled(locals.org)) {
-		throw error(409, 'This organization is not configured for wallet exchange.');
+		error(409, 'This organization is not configured for wallet exchange.');
 	}
 
 	const claim = await prisma.achievementClaim.findUnique({
@@ -34,7 +34,7 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 		claim.userId !== locals.session.user.id ||
 		claim.claimStatus !== 'ACCEPTED'
 	) {
-		throw error(404, m.best_sharp_lamb_enchant());
+		error(404, m.best_sharp_lamb_enchant());
 	}
 
 	const template = buildAchievementCredentialTemplate(claim, locals.org as Organization, {
@@ -47,15 +47,15 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 		return exchangeBody;
 	} catch (err) {
 		if (err instanceof IssuerMisconfiguredError) {
-			throw error(409, 'Issuer is misconfigured.');
+			error(409, 'Issuer is misconfigured.');
 		}
 		if (err instanceof BadOrgConfigBlobError) {
-			throw error(503, 'Issuer is misconfigured.');
+			error(503, 'Issuer is misconfigured.');
 		}
 		if (err instanceof TransactionServiceUpstreamError) {
-			throw error(502, "We couldn't reach the issuer service.");
+			error(502, "We couldn't reach the issuer service.");
 		}
 		console.error('Unexpected error creating exchange', err);
-		throw error(500, 'Unexpected error.');
+		error(500, 'Unexpected error.');
 	}
 };

@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	// redirect user if logged in
 	if (locals.session) {
-		throw redirect(302, nextPath ?? '/');
+		redirect(302, nextPath ?? '/');
 	}
 
 	const inviteId = url.searchParams.get('i');
@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 		// If invite is not found, doesn't match email, or is already claimed: Error
 		if (!invite || inviteeEmail != invite?.inviteeEmail || invite?.claimId)
-			throw error(404, m.curly_male_rabbit_lead());
+			error(404, m.curly_male_rabbit_lead());
 	}
 
 	return {
@@ -47,7 +47,7 @@ export const actions: Actions = {
 		const requestData = await request.formData();
 		const email = stripTags(requestData.get('email')?.toString());
 		const inviteId = stripTags(requestData.get('inviteId')?.toString());
-		if (!email || !email.toString().includes('@')) throw error(400, m.each_pink_fish_grin());
+		if (!email || !email.toString().includes('@')) error(400, m.each_pink_fish_grin());
 
 		// Validate org and ensure user exists
 		let userIdentifier = await prisma.identifier.findFirst({
@@ -65,9 +65,9 @@ export const actions: Actions = {
 		let outstandingInvite: ClaimEndorsement | null = null;
 		if (inviteId) {
 			outstandingInvite = await prisma.claimEndorsement.findUnique({ where: { id: inviteId } });
-			if (!outstandingInvite) throw error(400, m.dark_deft_cow_march());
+			if (!outstandingInvite) error(400, m.dark_deft_cow_march());
 		} else if (!userIdentifier) {
-			throw error(400, m.dark_deft_cow_march());
+			error(400, m.dark_deft_cow_march());
 		}
 
 		const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -88,10 +88,7 @@ export const actions: Actions = {
 			text: m.alert_soft_honeybadger_lead({ code })
 		});
 		if (!emailResult.success) {
-			throw error(
-				500,
-				m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
-			);
+			error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
 		}
 
 		cookies.set('sessionId', session.id, {
@@ -119,7 +116,7 @@ export const actions: Actions = {
 		const sessionId = cookies.get('sessionId');
 		const nextPath = requestData.get('nextPath')?.toString();
 
-		if (!vcode) throw error(400, m.funny_serious_mouse_nurture());
+		if (!vcode) error(400, m.funny_serious_mouse_nurture());
 		// Validate sessionid and ensure code matches
 		// TODO: use unique indexed query for session somehow
 		// TODO: prevent brute force guessing
@@ -135,7 +132,7 @@ export const actions: Actions = {
 				invite: true
 			}
 		});
-		if (!session) throw error(401, m.alert_tired_ray_march());
+		if (!session) error(401, m.alert_tired_ray_march());
 
 		// Advance user to next step in invite claim: user account creation.
 		if (!session.userId && session.invite?.inviteeEmail) return { success: true, register: true };
@@ -191,8 +188,8 @@ export const actions: Actions = {
 		const familyName = stripTags(requestData.get('familyName')?.toString()) || '';
 		const agreeTerms = stripTags(requestData.get('agreeTerms')?.toString()) || 'no';
 
-		if (!vcode && !inviteId) throw error(400, m.alert_tired_ray_march());
-		if (agreeTerms == 'no') throw error(400, m.brave_weary_ostrich_visit());
+		if (!vcode && !inviteId) error(400, m.alert_tired_ray_march());
+		if (agreeTerms == 'no') error(400, m.brave_weary_ostrich_visit());
 
 		let session;
 		let currentInvite;
@@ -210,7 +207,7 @@ export const actions: Actions = {
 				Date.now() > currentInvite.createdAt.getTime() + INVITE_SESSION_VALIDITY_MS
 			) {
 				// User will be required to login by email if their invite is stale.
-				throw error(401, { message: m.quick_clear_owl_unauth(), code: 'invite_expired' });
+				error(401, { message: m.quick_clear_owl_unauth(), code: 'invite_expired' });
 			}
 		}
 
@@ -229,14 +226,13 @@ export const actions: Actions = {
 				}
 			});
 
-			if (!session) throw error(401, m.alert_tired_ray_march());
+			if (!session) error(401, m.alert_tired_ray_march());
 
-			if (session.userId || !session.invite?.inviteeEmail)
-				throw error(401, m.kind_cuddly_bat_clasp());
+			if (session.userId || !session.invite?.inviteeEmail) error(401, m.kind_cuddly_bat_clasp());
 		}
 
 		const userEmail = currentInvite?.inviteeEmail ?? session?.invite?.inviteeEmail;
-		if (!userEmail) throw error(400, m.kind_cuddly_bat_clasp());
+		if (!userEmail) error(400, m.kind_cuddly_bat_clasp());
 
 		const user = await prisma.user.create({
 			data: {

@@ -67,7 +67,7 @@ interface AchievementConfigForm {
 export const load = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't have permission to edit achievements
 	if (!locals.session?.user?.id) {
-		throw redirect(302, `/achievements/${params.id}`);
+		redirect(302, `/achievements/${params.id}`);
 	}
 
 	const hasPermission = await canEditAchievements({
@@ -82,7 +82,7 @@ export const load = async ({ locals, params }) => {
 	});
 
 	if (!hasPermission) {
-		throw redirect(302, `/achievements/${params.id}`);
+		redirect(302, `/achievements/${params.id}`);
 	}
 
 	const achievement = (await prisma.achievement.findFirstOrThrow({
@@ -114,7 +114,7 @@ export const load = async ({ locals, params }) => {
 export const actions: Actions = {
 	default: async ({ locals, request, params }) => {
 		if (!locals.session?.user?.id) {
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 		}
 
 		const hasPermission = await canEditAchievements({
@@ -129,7 +129,7 @@ export const actions: Actions = {
 		});
 
 		if (!hasPermission) {
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 		}
 
 		const requestData = await request.formData();
@@ -284,7 +284,7 @@ export const actions: Actions = {
 					});
 				}
 			}
-			throw error(500, m.fresh_bright_sparrow_saveerror());
+			error(500, m.fresh_bright_sparrow_saveerror());
 		}
 
 		const updated = await prisma.achievement.update({

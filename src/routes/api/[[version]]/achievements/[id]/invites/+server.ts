@@ -6,7 +6,7 @@ import { calculatePageAndSize } from '$lib/utils/pagination';
 
 export const GET = async ({ url, params, locals }: RequestEvent) => {
 	if (!locals.session?.user) {
-		throw error(401, 'Unauthorized');
+		error(401, 'Unauthorized');
 	}
 
 	const achievementId = params.id;

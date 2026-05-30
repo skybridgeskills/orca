@@ -2,7 +2,7 @@
 	import * as m from '$lib/i18n/messages';
 	import StatusTag from '$lib/components/StatusTag.svelte';
 
-	import FaSolidTrash from 'svelte-icons-pack/fa/FaSolidTrash.js';
+	import { FaSolidTrash } from 'svelte-icons-pack/fa';
 	import Button from '$lib/components/Button.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Tabs from '$lib/components/Tabs.svelte';

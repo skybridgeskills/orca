@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Icon from 'svelte-icons-pack/Icon.svelte';
+	import { Icon } from 'svelte-icons-pack';
 	export let src: any;
 	export let id: string;
 	export let size = '32';

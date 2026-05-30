@@ -57,7 +57,7 @@ function parseAlignmentsFromFormData(formData: FormData): Alignment[] {
 export const load: PageServerLoad = async ({ locals }) => {
 	// redirect user if logged out or doesn't have permission to create achievements
 	if (!locals.session?.user?.id) {
-		throw redirect(302, '/achievements');
+		redirect(302, '/achievements');
 	}
 
 	const hasPermission = await canEditAchievements({
@@ -72,7 +72,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	});
 
 	if (!hasPermission) {
-		throw redirect(302, '/achievements');
+		redirect(302, '/achievements');
 	}
 
 	const categories = await prisma.achievementCategory.findMany({
@@ -93,7 +93,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
 		if (!locals.session?.user?.id) {
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 		}
 
 		const hasPermission = await canEditAchievements({
@@ -108,7 +108,7 @@ export const actions: Actions = {
 		});
 
 		if (!hasPermission) {
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 		}
 
 		const newIdentifier = uuidv4();
@@ -144,7 +144,7 @@ export const actions: Actions = {
 		try {
 			await achievementFormSchema.validate(formData);
 		} catch (err) {
-			if (err instanceof ValidationError) throw error(400, err.message);
+			if (err instanceof ValidationError) error(400, err.message);
 		}
 
 		if (formData.capabilities_inviteRequires) {
@@ -209,7 +209,7 @@ export const actions: Actions = {
 				}
 			});
 			if (!inviteRequiresAchievement) {
-				throw error(400, m.sharp_quiet_panther_invitereq());
+				error(400, m.sharp_quiet_panther_invitereq());
 			}
 		}
 

@@ -6,12 +6,12 @@ import { calculatePageAndSize } from '$lib/utils/pagination';
 
 export const GET = async ({ url, params, locals }: RequestEvent) => {
 	if (!locals.session) {
-		throw error(401, 'Unauthorized');
+		error(401, 'Unauthorized');
 	}
 
 	const achievementId = url.searchParams.get('achievementId');
 	if (!achievementId) {
-		throw error(400, 'Missing achievementId query parameter');
+		error(400, 'Missing achievementId query parameter');
 	}
 
 	const editAchievementCapability = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(

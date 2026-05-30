@@ -16,5 +16,5 @@ export const GET = async ({ params }: RequestEvent) => {
 		? imageUrl(achievement.image)
 		: imageUrl('/default-ach-image.png');
 
-	throw redirect(307, imageLocation);
+	redirect(307, imageLocation);
 };

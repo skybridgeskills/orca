@@ -8,10 +8,10 @@
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import type { PageData } from './$types';
-	import Icon from 'svelte-icons-pack/Icon.svelte';
-	import FaSolidEnvelopeOpenText from 'svelte-icons-pack/fa/FaSolidEnvelopeOpenText.js';
-	import FaSolidInfoCircle from 'svelte-icons-pack/fa/FaSolidInfoCircle.js';
-	import FaTrashAlt from 'svelte-icons-pack/fa/FaTrashAlt.js';
+	import { Icon } from 'svelte-icons-pack';
+	import { FaSolidEnvelopeOpenText } from 'svelte-icons-pack/fa';
+	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
+	import { FaSolidTrash as FaTrashAlt } from 'svelte-icons-pack/fa';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { isAdmin } from '$lib/permissions/isAdmin';
@@ -328,7 +328,8 @@
 						</a>
 						{#if alignment.targetCode}
 							<span class="text-sm text-gray-600 dark:text-gray-400">
-							{m.tiny_neat_hare_skip()}: <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded"
+								{m.tiny_neat_hare_skip()}:
+								<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded"
 									>{alignment.targetCode}</code
 								>
 							</span>

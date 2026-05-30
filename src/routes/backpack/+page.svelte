@@ -1,9 +1,9 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import { page } from '$app/stores';
-	import Icon from 'svelte-icons-pack/Icon.svelte';
-	import FaShareSquare from 'svelte-icons-pack/fa/FaShareSquare.js';
-	import FaSolidInfoCircle from 'svelte-icons-pack/fa/FaSolidInfoCircle.js';
+	import { Icon } from 'svelte-icons-pack';
+	import { FaShareFromSquare as FaShareSquare } from 'svelte-icons-pack/fa';
+	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime.js';
 	import Alert from '$lib/components/Alert.svelte';

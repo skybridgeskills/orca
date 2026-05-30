@@ -9,7 +9,7 @@ const ALLOWED_ROLES = ['GENERAL_ADMIN', 'CONTENT_ADMIN'];
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!ALLOWED_ROLES.includes(locals.session?.user?.orgRole ?? 'none')) {
-		throw redirect(302, '/about');
+		redirect(302, '/about');
 	}
 
 	const jsonData = readOrgJson(locals.org);
@@ -200,6 +200,6 @@ function readOrgJson(org: App.Organization): App.OrganizationConfig {
 
 function assertAdmin(locals: App.Locals) {
 	if (!ALLOWED_ROLES.includes(locals.session?.user?.orgRole ?? 'none')) {
-		throw error(403, 'Forbidden');
+		error(403, 'Forbidden');
 	}
 }

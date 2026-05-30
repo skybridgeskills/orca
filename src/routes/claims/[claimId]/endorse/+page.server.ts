@@ -8,7 +8,7 @@ import { getValidUserClaim } from '$lib/data/achievementClaim';
 
 export const load = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't hold org admin role
-	if (!locals.session?.user?.id) throw redirect(303, '/login');
+	if (!locals.session?.user?.id) redirect(303, '/login');
 
 	const claim = await prisma.achievementClaim.findUniqueOrThrow({
 		where: { id: params.claimId },
@@ -32,7 +32,7 @@ export const actions: Actions = {
 	default: async ({ locals, request, params }) => {
 		// Award a badge to a user by id (DID) or email identifier, but generate no user claim for it
 		if (!locals.session?.user) {
-			throw error(401, m.quick_happy_kite_zoom());
+			error(401, m.quick_happy_kite_zoom());
 		}
 
 		const requestData = await request.formData();
@@ -61,7 +61,7 @@ export const actions: Actions = {
 		});
 
 		const inviteeEmail = claim.user.identifiers.filter((i) => i.type == 'EMAIL')[0]?.identifier;
-		if (!inviteeEmail) throw error(400, m.curly_tired_guppy_link());
+		if (!inviteeEmail) error(400, m.curly_tired_guppy_link());
 
 		const created = true;
 		// If there is a member, ensure that there is an AchievementClaim

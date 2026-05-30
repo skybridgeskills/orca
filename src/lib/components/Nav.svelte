@@ -3,11 +3,11 @@
 	import DarkModeToggle from './DarkModeToggle.svelte';
 	import LanguageSelector from './LanguageSelector.svelte';
 	import PopupMenu from './PopupMenu.svelte';
-	import FaUserCircle from 'svelte-icons-pack/fa/FaUserCircle.js';
+	import { FaCircleUser as FaUserCircle } from 'svelte-icons-pack/fa';
 	import IconButton from './IconButton.svelte';
 	import NavItem from './NavItem.svelte';
 	import { session } from '$lib/stores/sessionStore';
-	import { SvelteComponent, onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, type SvelteComponent } from 'svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { browser } from '$app/environment';
 
@@ -89,8 +89,13 @@
 				</div>
 			</div>
 
-			<button
+			<!-- Mobile-menu container: closes the menu when its empty space is
+			     activated. Must not be a <button> — it wraps interactive nav
+			     controls (links, LanguageSelector/DarkModeToggle buttons), which
+			     is invalid HTML and breaks hydration under Svelte 5. -->
+			<div
 				class="w-full md:block md:w-auto px-2 sm:px-4 py-0 bg-gray-100 md:bg-transparent dark:bg-gray-900 md:dark:bg-transparent"
+				role="presentation"
 				on:keypress={closeMobileMenu}
 				on:click={closeMobileMenu}
 				id="navbar-default"
@@ -201,7 +206,7 @@
 						</li>
 					{/if}
 				</ul>
-			</button>
+			</div>
 		</div>
 	</div>
 </nav>

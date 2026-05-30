@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import Icon from 'svelte-icons-pack/Icon.svelte';
-	import WiNightClear from 'svelte-icons-pack/wi/WiNightClear.js';
-	import WiHorizonAlt from 'svelte-icons-pack/wi/WiHorizonAlt.js';
+	import { Icon } from 'svelte-icons-pack';
+	import { WiWiNightClear as WiNightClear } from 'svelte-icons-pack/wi';
+	import { WiWiHorizonAlt as WiHorizonAlt } from 'svelte-icons-pack/wi';
 	import { preferredTheme } from '../stores/interfacePrefsStore';
 </script>
 

@@ -20,7 +20,7 @@ export const getOrganizationFromRequest = async function (event: RequestEvent) {
 		}
 	});
 	if (orgs.length == 0) {
-		throw error(404, m.warm_top_parrot_drip());
+		error(404, m.warm_top_parrot_drip());
 	}
 
 	const org = orgs.find((org) => org.domain === domain) || orgs[0];
@@ -31,9 +31,9 @@ export const getOrganizationFromRequest = async function (event: RequestEvent) {
 	const orgStatus = getOrgStatus(orgJson);
 
 	if (orgStatus === 'SUSPENDED') {
-		throw error(503, m.sunny_watery_sparrow_jest());
+		error(503, m.sunny_watery_sparrow_jest());
 	} else if (orgStatus === 'PENDING') {
-		throw error(
+		error(
 			403,
 			'This community is not yet activated. Please try again later. If you are the administrator, please check your email for activation instructions.'
 		);

@@ -44,7 +44,7 @@
 					body: formData
 				});
 				if (response.status != 200) {
-					throw error(400, m.factual_petty_marten_startle());
+					error(400, m.factual_petty_marten_startle());
 				} else {
 					const responseData = deserialize(await response.text());
 					if (responseData && typeof responseData === 'object' && 'data' in responseData) {

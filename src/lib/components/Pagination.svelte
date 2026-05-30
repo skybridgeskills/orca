@@ -2,9 +2,9 @@
 	import * as m from '$lib/i18n/messages';
 	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
 	import Button from './Button.svelte';
-	import Icon from 'svelte-icons-pack';
-	import FiChevronLeft from 'svelte-icons-pack/fi/FiChevronLeft.js';
-	import FiChevronRight from 'svelte-icons-pack/fi/FiChevronRight.js';
+	import { Icon } from 'svelte-icons-pack';
+	import { FiChevronLeft } from 'svelte-icons-pack/fi';
+	import { FiChevronRight } from 'svelte-icons-pack/fi';
 
 	export let paging: {
 		count: number;

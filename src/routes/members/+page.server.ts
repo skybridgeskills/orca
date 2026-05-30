@@ -5,7 +5,7 @@ import { calculatePageAndSize } from '$lib/utils/pagination';
 
 export const load: PageServerLoad = async ({ url, locals, params }) => {
 	// redirect user if logged out
-	if (!locals.session?.user) throw redirect(302, `/`);
+	if (!locals.session?.user) redirect(302, `/`);
 
 	const { page, pageSize } = calculatePageAndSize(url);
 
@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ url, locals, params }) => {
 		]
 	});
 
-	const count = prisma.user.count({
+	const count = await prisma.user.count({
 		where: {
 			organizationId: locals.org.id
 		}

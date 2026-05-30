@@ -10,13 +10,13 @@ import { isCredentialCacheExired } from '$lib/credentials/credentialHelper';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 
 export const POST = async ({ locals, params }: RequestEvent) => {
-	if (!locals.session?.user?.id) throw error(404, m.best_sharp_lamb_enchant());
+	if (!locals.session?.user?.id) error(404, m.best_sharp_lamb_enchant());
 
 	const orgConfig = (
 		typeof locals.org?.json === 'object' && locals.org.json !== null ? locals.org.json : {}
 	) as App.OrganizationConfig;
 	if (orgConfig.issuer?.type === 'transactionService') {
-		throw error(
+		error(
 			409,
 			'This organization is configured for wallet exchange. Use POST /claims/[id]/exchange.'
 		);
@@ -35,7 +35,7 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 
 	// User can only download their own badges
 	if (!claim || claim?.organizationId != locals.org.id || claim?.userId != locals.session.user?.id)
-		throw error(404, m.best_sharp_lamb_enchant());
+		error(404, m.best_sharp_lamb_enchant());
 
 	// const config = achievement.achievementConfig;
 	// const claimEvidence = claim.json as App.EvidenceItem;
@@ -49,7 +49,7 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 			signedCredential = await achievementClaimToCredential(claim, locals.org);
 		} catch (err) {
 			if (err instanceof IssuerMisconfiguredError) {
-				throw error(
+				error(
 					503,
 					'Issuer signing key is no longer available. An administrator must update issuer settings.'
 				);

@@ -6,7 +6,7 @@ import { apiResponse } from '$lib/utils/api';
 export const DELETE = async ({ params, locals }) => {
 	// Authentication check
 	if (!locals.session?.user) {
-		throw error(401, m.lower_home_cow_view());
+		error(401, m.lower_home_cow_view());
 	}
 
 	const { id: achievementId, inviteId } = params;
@@ -26,12 +26,12 @@ export const DELETE = async ({ params, locals }) => {
 	});
 
 	if (!invite) {
-		throw error(404, m.lucky_alert_penguin_fry());
+		error(404, m.lucky_alert_penguin_fry());
 	}
 
 	// Authorization check - only creator or admin can delete
 	if (invite.creatorId !== userId && !isAdmin) {
-		throw error(403, m.red_teary_eagle_drip());
+		error(403, m.red_teary_eagle_drip());
 	}
 
 	// Delete the invite

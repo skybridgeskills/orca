@@ -3,8 +3,7 @@
 	import sanitizeHtml from 'sanitize-html';
 
 	import { Carta, CartaEditor } from 'carta-md';
-	import 'carta-md/light.css';
-	// import 'carta-md/dark.css';
+	import 'carta-md/default.css';
 	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
 
 	export let value: string;
@@ -54,7 +53,7 @@
 	class:opacity-50={disabled}
 	class:pointer-events-none={disabled}
 >
-	<CartaEditor {carta} {labels} bind:value theme="default" mode="tabs" />
+	<CartaEditor {carta} userLabels={labels} bind:value theme="default" mode="tabs" />
 	{#if inputName}
 		<input type="hidden" bind:value name={inputName} />
 	{/if}

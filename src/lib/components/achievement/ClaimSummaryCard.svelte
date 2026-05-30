@@ -2,10 +2,10 @@
 	import * as m from '$lib/i18n/messages';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime.js';
-	import Icon from 'svelte-icons-pack/Icon.svelte';
-	import FaShareSquare from 'svelte-icons-pack/fa/FaShareSquare.js';
-	import FaSolidInfoCircle from 'svelte-icons-pack/fa/FaSolidInfoCircle.js';
-	import BiSolidNoEntry from 'svelte-icons-pack/bi/BiSolidNoEntry.js';
+	import { Icon } from 'svelte-icons-pack';
+	import { FaShareFromSquare as FaShareSquare } from 'svelte-icons-pack/fa';
+	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
+	import { BiSolidNoEntry } from 'svelte-icons-pack/bi';
 	import AchievementSummary from './AchievementSummary.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import type { Achievement, AchievementClaim, ClaimStatus, Organization } from '@prisma/client';

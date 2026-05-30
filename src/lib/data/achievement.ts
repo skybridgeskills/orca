@@ -71,13 +71,13 @@ export const inviteToClaim = async ({
 	};
 
 	if (!inviteeEmail) {
-		throw error(400, {
+		error(400, {
 			code: 'recipientEmail',
 			message: m.sharp_ok_jackdaw_cook()
 		});
 	}
 	if (!validateEmailAddress(inviteeEmail)) {
-		throw error(400, m.sunny_grand_lemur_race());
+		error(400, m.sunny_grand_lemur_race());
 	}
 
 	const achievement = await getAchievement(achievementId, org.id);
@@ -120,12 +120,12 @@ export const inviteToClaim = async ({
 		};
 	} else if (!session?.user?.id) {
 		// Not an open claim achievement, and not authenticated.
-		throw error(403, m.tiny_dark_ostrich_jump());
+		error(403, m.tiny_dark_ostrich_jump());
 	}
 
 	if (!isAdmin({ user: session?.user }) && !achievementConfig?.json?.capabilities?.inviteRequires) {
 		// NON ADMIN USERS for a badge that is only inviteable by admins
-		throw error(403, m.patchy_aqua_turtle_support());
+		error(403, m.patchy_aqua_turtle_support());
 	}
 
 	if (
@@ -140,7 +140,7 @@ export const inviteToClaim = async ({
 			}
 		});
 		if (!inviteQualificationClaim || inviteQualificationClaim.validFrom === null) {
-			throw error(403, m.tense_raw_cuckoo_dart());
+			error(403, m.tense_raw_cuckoo_dart());
 		}
 	}
 
@@ -212,10 +212,7 @@ export const inviteToClaim = async ({
 			})
 		});
 		if (!emailResult.success) {
-			throw error(
-				500,
-				m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
-			);
+			error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
 		}
 
 		return {
@@ -258,10 +255,7 @@ export const inviteToClaim = async ({
 			})
 		});
 		if (!emailResult.success) {
-			throw error(
-				500,
-				m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
-			);
+			error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
 		}
 
 		// TODO: we can't actually tell whether created. Consider adopting a createdAt, updatedAt approach,

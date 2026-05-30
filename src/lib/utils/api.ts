@@ -89,5 +89,5 @@ const v1MetaWithRequestedCounts = async (
  */
 export const apiResponse: ApiFunction<Partial<{ id: string }>> = async ({ params, data, meta }) => {
 	if (params.version === 'v1') return json(await v1({ data, meta }));
-	throw error(500, 'Unsupported API version');
+	error(500, 'Unsupported API version');
 };

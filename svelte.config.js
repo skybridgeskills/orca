@@ -1,6 +1,6 @@
 import nodeAdapter from '@sveltejs/adapter-node';
 import vercelAdapter from '@sveltejs/adapter-vercel';
-import preprocess from 'svelte-preprocess';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 // Vercel auto-injects VERCEL=1; every other build context (Docker,
 // local, GH Actions) falls through to adapter-node.
@@ -10,7 +10,7 @@ const adapter = process.env.VERCEL ? vercelAdapter({ runtime: 'nodejs20.x' }) : 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: { adapter },
-	preprocess: preprocess({ sourceMap: true })
+	preprocess: vitePreprocess()
 };
 
 export default config;

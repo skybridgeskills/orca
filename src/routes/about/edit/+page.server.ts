@@ -19,13 +19,13 @@ const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
 export const load: PageServerLoad = ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		throw redirect(302, '/');
+		redirect(302, '/');
 };
 
 export const actions: Actions = {
 	default: async ({ locals, cookies, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const imageUpdated = requestData.get('imageEdited') === 'true';
@@ -43,7 +43,7 @@ export const actions: Actions = {
 		try {
 			await formSchema.validate(formData);
 		} catch (err) {
-			if (err instanceof ValidationError) throw error(400, err.message);
+			if (err instanceof ValidationError) error(400, err.message);
 		}
 
 		// Get the tagline, defaultLanguage, and permissions from the form data
@@ -63,7 +63,7 @@ export const actions: Actions = {
 		const updatedJson: App.OrganizationConfig = {
 			...jsonData,
 			tagline: tagline,
-			defaultLanguage: defaultLanguage || undefined,
+			defaultLanguage: (defaultLanguage || undefined) as App.OrganizationConfig['defaultLanguage'],
 			orgStatus: currentOrgStatus // Explicitly preserve orgStatus
 		};
 
@@ -78,7 +78,7 @@ export const actions: Actions = {
 			});
 
 			if (!achievement) {
-				throw error(400, 'Selected achievement does not exist in this organization');
+				error(400, 'Selected achievement does not exist in this organization');
 			}
 
 			updatedJson.permissions = {

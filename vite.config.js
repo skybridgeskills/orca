@@ -1,7 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { nodeLoaderPlugin } from '@vavite/node-loader/plugin';
 import basicSsl from '@vitejs/plugin-basic-ssl';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import * as dotenv from 'dotenv';
 import fs from 'fs';
@@ -62,6 +62,7 @@ export default defineConfig(({ mode }) => {
 			devSourcemap: true
 		},
 		test: {
+			environment: 'node',
 			include: [
 				'**/tests/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
 				'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'

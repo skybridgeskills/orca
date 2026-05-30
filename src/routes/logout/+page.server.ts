@@ -6,7 +6,7 @@ import { USE_SECURE_COOKIES } from '$env/static/private';
 export const load: PageServerLoad = async () => {
 	// we only use this endpoint for the api
 	// and don't need to see the page
-	throw redirect(302, '/');
+	redirect(302, '/');
 };
 
 export const actions: Actions = {
@@ -32,6 +32,6 @@ export const actions: Actions = {
 		}
 
 		// redirect the user
-		throw redirect(302, '/login');
+		redirect(302, '/login');
 	}
 };
