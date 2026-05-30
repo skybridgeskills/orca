@@ -14,11 +14,19 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 		json: {
 			id: data.evidenceUrl,
 			narrative: data.narrative
-		}
+		},
+		emailIfNew: data.emailIfNew ?? false
 	};
 
 	const actionResult = await inviteToClaim(claimData);
 	const endorsement = actionResult.data.endorsement;
+	const endorsementRecord = endorsement as
+		| {
+				id?: string;
+				claimId?: string | null;
+				claim?: { id?: string };
+		  }
+		| undefined;
 
 	return await apiResponse({
 		params,
@@ -28,7 +36,14 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			getTotalCount: async () => 1,
 			page: 1,
 			pageSize: 1,
-			includeCount: false
+			includeCount: false,
+			award: {
+				created: actionResult.data.created,
+				invited: actionResult.data.invited,
+				claimId: endorsementRecord?.claimId ?? endorsementRecord?.claim?.id ?? null,
+				endorsementId:
+					endorsementRecord?.id && endorsementRecord.id !== '' ? endorsementRecord.id : null
+			}
 		}
 	});
 };

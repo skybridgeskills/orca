@@ -328,7 +328,8 @@
 						</a>
 						{#if alignment.targetCode}
 							<span class="text-sm text-gray-600 dark:text-gray-400">
-							{m.tiny_neat_hare_skip()}: <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded"
+								{m.tiny_neat_hare_skip()}:
+								<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded"
 									>{alignment.targetCode}</code
 								>
 							</span>

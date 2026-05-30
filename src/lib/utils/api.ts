@@ -2,11 +2,19 @@ import { arrayOf } from '$lib/utils/arrayOf';
 import type { PaginationData } from './pagination';
 import { error, json } from '@sveltejs/kit';
 
+export type ApiAwardMeta = {
+	created: boolean;
+	invited: boolean;
+	claimId?: string | null;
+	endorsementId?: string | null;
+};
+
 type ApiMetaInput = PaginationData & {
 	type: string;
 	totalCount?: number;
 	totalPages?: number;
 	getTotalCount?: () => Promise<number>;
+	award?: ApiAwardMeta;
 };
 type ApiInput<T> = {
 	data: T | T[];
@@ -22,6 +30,7 @@ interface V1ApiMeta {
 	pageSize: number;
 	totalPages?: number;
 	totalCount?: number;
+	award?: ApiAwardMeta;
 }
 type V1ApiEnvelope<T> = {
 	data: T[];
@@ -50,10 +59,11 @@ const v1MetaWithRequestedCounts = async (
 	currentResultCount: number,
 	meta: ApiMetaInput
 ): Promise<V1ApiMeta> => {
-	const base = {
+	const base: V1ApiMeta = {
 		type: meta.type,
 		page: meta.page,
-		pageSize: meta.pageSize
+		pageSize: meta.pageSize,
+		...(meta.award !== undefined ? { award: meta.award } : {})
 	};
 	if (!meta.includeCount) return base;
 
