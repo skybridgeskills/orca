@@ -1,4 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
 import { nodeLoaderPlugin } from '@vavite/node-loader/plugin';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import { defineConfig } from 'vitest/config';
@@ -40,6 +41,7 @@ const fixTsconfigPlugin = () => ({
 
 export default defineConfig(({ mode }) => {
 	let plugins = [
+		tailwindcss(),
 		sveltekit(),
 		fixTsconfigPlugin(),
 		paraglideVitePlugin({

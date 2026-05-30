@@ -8,7 +8,7 @@
 	export let buttons: Array<ButtonConfig>;
 </script>
 
-<div class="inline-flex rounded-md shadow-sm button-group" role="group">
+<div class="inline-flex rounded-md shadow-xs button-group" role="group">
 	{#each buttons as button}
 		<button
 			{...button.props}
@@ -21,6 +21,8 @@
 </div>
 
 <style lang="postcss">
+	@reference '../../app.css';
+
 	.button-group > :first-child {
 		@apply rounded-l-lg;
 	}

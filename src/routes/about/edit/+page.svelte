@@ -347,18 +347,20 @@
 	<div class="flex items-center lg:order-2">
 		<button
 			type="submit"
-			class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+			class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 			>{m.bold_swift_eagle_submit()}</button
 		>
 		<a
 			href="/about"
-			class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
+			class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-hidden dark:focus:ring-gray-800"
 			>{m.calm_steady_lynx_cancel()}</a
 		>
 	</div>
 </form>
 
 <style lang="postcss">
+	@reference '../../../app.css';
+
 	.isError label {
 		@apply text-red-700;
 	}
@@ -367,7 +369,7 @@
 	}
 
 	.isError input {
-		@apply bg-red-50 border-red-500 text-red-900 placeholder-red-700;
+		@apply bg-red-50 border-red-500 text-red-900 placeholder:text-red-700;
 	}
 	.isError input:focus {
 		@apply border-red-500;

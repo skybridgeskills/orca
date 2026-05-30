@@ -213,7 +213,7 @@
 			}).toString()}
 			target={`linkedin-${currentShareIntent.achievement.id}`}
 			rel="noopener noreferrer"
-			class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-none"
+			class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-hidden"
 			><img src="/linkedin-add-to-profile-button.png" alt="LinkedIn Add to Profile button" /></a
 		>{/if}
 </Modal>

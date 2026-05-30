@@ -166,7 +166,7 @@
 
 {#if category !== undefined}
 	<span
-		class="bg-gray-100 text-gray-800 text-md font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
+		class="bg-gray-100 text-gray-800 text-md font-medium mr-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-gray-300"
 		>{m.serious_gentle_boar_nurture()}: {category.name}</span
 	>
 {/if}
@@ -329,7 +329,7 @@
 						{#if alignment.targetCode}
 							<span class="text-sm text-gray-600 dark:text-gray-400">
 								{m.tiny_neat_hare_skip()}:
-								<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded"
+								<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded-sm"
 									>{alignment.targetCode}</code
 								>
 							</span>

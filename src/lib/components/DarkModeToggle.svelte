@@ -9,7 +9,7 @@
 <button
 	id="darkmode-toggle"
 	type="button"
-	class="ml-2 y-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-600 rounded-lg text-sm"
+	class="ml-2 y-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-600 rounded-lg text-sm"
 	on:click={preferredTheme.toggleDarkMode}
 >
 	{#if $preferredTheme == 'light'}

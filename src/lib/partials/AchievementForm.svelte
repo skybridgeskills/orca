@@ -184,7 +184,7 @@
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>
-	<div class="flex flex-col sm:flex-row gap-4 flex-grow max-w-4xl">
+	<div class="flex flex-col sm:flex-row gap-4 grow max-w-4xl">
 		<!-- Image -->
 		<div class="sm:w-5/12">
 			<div class:isError={errors.image}>
@@ -624,7 +624,7 @@
 								}`}
 							>
 								<div
-									class={`absolute top-[2px] start-[2px] bg-white border rounded-full h-5 w-5 transition-all ${
+									class={`absolute top-[2px] inset-s-[2px] bg-white border rounded-full h-5 w-5 transition-all ${
 										formData.claimTemplate_enabled
 											? 'translate-x-5 border-white'
 											: 'border-gray-300'
@@ -727,12 +727,12 @@
 		<div class="flex items-center lg:order-2 mt-6">
 			<button
 				type="submit"
-				class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+				class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 				>{m.bold_swift_eagle_submit()}</button
 			>
 			<a
 				href="/achievements"
-				class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
+				class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-hidden dark:focus:ring-gray-800"
 				>{m.calm_steady_lynx_cancel()}</a
 			>
 		</div>
@@ -740,6 +740,8 @@
 </form>
 
 <style lang="postcss" global>
+	@reference '../../app.css';
+
 	.isError label {
 		@apply text-red-700;
 	}
@@ -748,7 +750,7 @@
 	}
 
 	.isError input {
-		@apply bg-red-50 border-red-500 text-red-900 placeholder-red-300;
+		@apply bg-red-50 border-red-500 text-red-900 placeholder:text-red-300;
 	}
 	.isError input:focus {
 		@apply border-red-500;

@@ -135,7 +135,7 @@
 				class="my-6 flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-center sm:gap-8"
 			>
 				{#if options.length > 1}
-					<div class="text-left space-y-2 w-full sm:w-auto sm:min-w-[14rem]">
+					<div class="text-left space-y-2 w-full sm:w-auto sm:min-w-56">
 						<label for="protocol-select" class="block text-sm text-gray-700 dark:text-gray-300">
 							{m.cool_clear_lynx_choose()}
 						</label>
@@ -156,7 +156,7 @@
 			</div>
 			<p class="my-4">
 				<a
-					class="inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+					class="inline-block rounded-sm bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
 					href={activeOption.url}
 					target="_blank"
 					rel="noopener noreferrer"

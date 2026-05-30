@@ -51,14 +51,14 @@
 		class:hidden={!visible}
 		class:visible
 		transition:fade
-		class="modaldialog fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-modal h-full bg-black bg-opacity-80"
+		class="modaldialog fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto inset-0 h-modal h-full bg-black/80"
 	>
 		<div class="relative w-full h-full max-w-2xl mx-auto">
-			<div class="relative bg-white dark:bg-gray-900 rounded-lg shadow">
+			<div class="relative bg-white dark:bg-gray-900 rounded-lg shadow-sm">
 				<!-- Modal header -->
 				<div class="flex items-start justify-between p-4 border-b rounded-t">
 					<slot name="heading"
-						><h4 class="text-xl sm:text-2xl text-gray-800 dark:text-white !mt-0">{title}</h4></slot
+						><h4 class="text-xl sm:text-2xl text-gray-800 dark:text-white mt-0!">{title}</h4></slot
 					>
 					<button
 						on:click={handleClose}

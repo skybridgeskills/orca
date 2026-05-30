@@ -19,6 +19,7 @@ export default ts.config(
 			// lint scope equivalent to the previous baseline.
 			'.svelte-kit/**',
 			'.vercel/**',
+			'storybook-static/**',
 			'package/**',
 			'dev-uploads/**',
 			'.env',

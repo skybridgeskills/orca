@@ -174,17 +174,17 @@
 		$accent: #1f6feb;
 	} */
 	#app-wrapper .carta-input {
-		background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+		background-color: rgb(249 250 251 / 1);
 	}
 	#app-wrapper.dark .carta-renderer {
-		background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+		background-color: rgb(17 24 39 / 1);
 	}
 	#app-wrapper.dark .carta-editor {
 		border: 1px solid #2b3138;
 		border-radius: 0.5rem;
 	}
 	#app-wrapper.dark .carta-input {
-		background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+		background-color: rgb(55 65 81 / 1);
 	}
 	#app-wrapper.dark .carta:focus-within {
 		outline: 2px solid #1f6feb;

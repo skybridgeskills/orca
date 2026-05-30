@@ -40,7 +40,7 @@
 	});
 </script>
 
-<nav class="bg-white border-gray-200 rounded dark:bg-gray-800">
+<nav class="bg-white border-gray-200 rounded-sm dark:bg-gray-800">
 	{#if org.primaryColor}
 		<div class="w-full h-2" style="background-color: {org.primaryColor}" />
 	{/if}
@@ -64,7 +64,7 @@
 					</a>
 					<button
 						type="button"
-						class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+						class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
 						aria-controls="navbar-default"
 						aria-expanded={mobileMenuExpanded}
 						on:click={() => {
@@ -112,7 +112,7 @@
 						<li>
 							<a
 								href="/login"
-								class="block py-2 pr-4 pl-3 leading-8 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+								class="block py-2 pr-4 pl-3 leading-8 text-gray-700 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
 								>{m.bright_swift_eagle_login()}</a
 							>
 						</li>

@@ -19,7 +19,7 @@
 	/>
 	<label
 		for={id}
-		class={`flex-grow ms-2 text-sm font-medium ${
+		class={`grow ms-2 text-sm font-medium ${
 			disabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-gray-300'
 		}`}
 	>

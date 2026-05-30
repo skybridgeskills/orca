@@ -126,7 +126,7 @@
 >
 	<FormFieldLabel for="achievementSelect_searchInput" text={description} />
 	<div class="relative text-gray-900 dark:text-white">
-		<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+		<div class="absolute inset-y-0 inset-s-0 flex items-center ps-3 pointer-events-none">
 			<Icon src={FiSearch} size="16" color="currentColor" />
 		</div>
 		<input

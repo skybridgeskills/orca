@@ -5,7 +5,7 @@
 	export let buttonId: string;
 	export let hidden = false;
 	export let baseClass =
-		'z-10 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600';
+		'z-10 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600';
 	let popperInstance: Instance | null = null;
 
 	onMount(() => {

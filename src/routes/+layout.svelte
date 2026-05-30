@@ -59,7 +59,7 @@
 		</section>
 	</main>
 
-	<footer class="app-footer p-4 bg-white shadow md:px-6 md:py-8 dark:bg-gray-800">
+	<footer class="app-footer p-4 bg-white shadow-sm md:px-6 md:py-8 dark:bg-gray-800">
 		<div class="max-w-7xl mx-auto">
 			<div class="sm:flex sm:items-end sm:justify-between">
 				<ul
@@ -94,6 +94,8 @@
 </div>
 
 <style lang="postcss" global>
+	@reference '../app.css';
+
 	html,
 	body {
 		height: 100%;

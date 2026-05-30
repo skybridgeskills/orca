@@ -14,7 +14,7 @@
 <div>
 	<button on:click={(e) => handleClick(e)} tabindex="0">
 		<span
-			class="inline-flex items-center pr-2.5 py-0.5 rounded me-2 text-slate-600 dark:text-slate-500"
+			class="inline-flex items-center pr-2.5 py-0.5 rounded-sm me-2 text-slate-600 dark:text-slate-500"
 		>
 			<svg
 				version="1.1"
