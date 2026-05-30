@@ -117,6 +117,15 @@
 			description={m.sharp_quiet_panther_awarddesc()}
 		/>
 
+		<p class="mb-4 text-sm">
+			<a
+				href="/achievements/{data.achievement.id}/award/bulk"
+				class="text-blue-700 hover:underline"
+			>
+				{m.warm_calm_otter_bulk()}
+			</a>
+		</p>
+
 		<AchievementSummary achievement={data.achievement} />
 
 		<form method="POST" class="mt-4">
