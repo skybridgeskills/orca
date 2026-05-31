@@ -11,7 +11,7 @@
 		disabled?: boolean;
 	}
 
-	let { value = $bindable(), inputName, disabled = false }: Props = $props();
+	let { value = $bindable(''), inputName, disabled = false }: Props = $props();
 
 	const carta = new Carta({
 		sanitizer: (dirty?: string): string => {

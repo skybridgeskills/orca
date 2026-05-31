@@ -21,7 +21,8 @@
 	{onkeypress}
 >
 	<div class="icon text-gray-500 grid place-items-center">
-		<Icon {src} {size} color="currentColor" /> <span class="sr-only">{text}</span>
+		{#if src}<Icon {src} {size} color="currentColor" />{/if}
+		<span class="sr-only">{text}</span>
 	</div>
 </button>
 

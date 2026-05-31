@@ -11,7 +11,7 @@
 	let { href, title, class: klass = '', onclick }: Props = $props();
 </script>
 
-{#if $page.url.pathname == href}
+{#if $page?.url?.pathname == href}
 	<li class={klass}>
 		<a
 			{href}

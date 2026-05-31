@@ -19,9 +19,9 @@
 
 	let { paging }: Props = $props();
 
-	const count = $derived(paging.count);
-	const page = $derived(paging.page);
-	const pageSize = $derived(paging.pageSize);
+	const count = $derived(paging?.count);
+	const page = $derived(paging?.page);
+	const pageSize = $derived(paging?.pageSize);
 	const maxPage = $derived(Math.ceil(count / pageSize));
 	const pages = $derived(Array.from({ length: maxPage }, (_, i) => i + 1));
 
