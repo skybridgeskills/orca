@@ -1,12 +1,13 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import { page } from '$app/stores';
+	import { resolve } from '$app/paths';
 	import { deserialize } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { achievementFormSchema } from '$lib/data/achievementForm';
 	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
 	import type * as yup from 'yup';
-	import type { Achievement, AchievementCategory, AchievementConfig } from '@prisma/client';
+	import type { AchievementCategory } from '@prisma/client';
 	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
@@ -24,11 +25,45 @@
 	import AlignmentInput from '$lib/components/forms/AlignmentInput.svelte';
 	import type { Alignment } from '$lib/data/alignment';
 
-	export let categories: Array<AchievementCategory>;
-	export let initialData;
-	export let achievementId = '';
-	let formData = {
+	// TODO Clean up the initialData type
+	interface InitialData {
+		name?: string;
+		description?: string;
+		criteriaId?: string | null;
+		criteriaNarrative?: string | null;
+		category?: string;
+		image?: string | null;
+		imageExtension?: string | null;
+		claimable?: boolean | string;
+		claimRequires?: string | null;
+		reviewsRequired?: number;
+		reviewRequires?: string | null;
+		inviteRequires?: string | null;
+		capabilities_inviteRequires?: string | null;
+		claimTemplate?: string | null;
+		alignments?: Array<Alignment>;
+	}
+
+	interface Props {
+		categories: Array<AchievementCategory>;
+		initialData: InitialData;
+		achievementId?: string;
+	}
+
+	let { categories, initialData, achievementId = '' }: Props = $props();
+
+	let formData = $state({
 		...initialData,
+		image: initialData.image ?? null,
+		imageExtension: initialData.imageExtension ?? null,
+		criteriaId: initialData.criteriaId ?? '',
+		criteriaNarrative: initialData.criteriaNarrative ?? '',
+		reviewsRequired: initialData.reviewsRequired ?? 0,
+		claimRequires: initialData.claimRequires ?? null,
+		reviewRequires: initialData.reviewRequires ?? null,
+		inviteRequires: initialData.inviteRequires ?? null,
+		capabilities_inviteRequires: initialData.capabilities_inviteRequires ?? null,
+		claimTemplate: initialData.claimTemplate ?? '',
 		alignments: initialData.alignments || [],
 		// claim template toggle: enabled when there is an initial template
 		claimTemplate_enabled: !!initialData.claimTemplate,
@@ -44,7 +79,7 @@
 				: 'admin'
 			: 'none',
 		inviteSelectedOption: initialData.capabilities_inviteRequires ? 'badge' : 'none'
-	};
+	});
 
 	let noErrors = {
 		name: '',
@@ -62,7 +97,7 @@
 		claimTemplate: '',
 		alignments: ''
 	};
-	let errors = { ...noErrors };
+	let errors = $state({ ...noErrors });
 
 	const validate = () => {
 		achievementFormSchema
@@ -71,19 +106,17 @@
 				errors = { ...noErrors };
 			})
 			.catch((err: yup.ValidationError) => {
-				errors = { ...noErrors };
+				const next = { ...noErrors };
 				err.inner.map((err) => {
 					const errPath = err.path || err.type;
-					if (errPath) errors[errPath as keyof typeof errors] = err.message;
-
-					// assign it to itself to trigger a reactivity update
-					errors = errors;
-
-					const firstErrorEl = document?.querySelector(
-						'.isError input, .isError select, .isError textarea'
-					) as HTMLInputElement;
-					if (firstErrorEl?.focus) firstErrorEl.focus();
+					if (errPath) next[errPath as keyof typeof next] = err.message;
 				});
+				errors = { ...next };
+
+				const firstErrorEl = document?.querySelector(
+					'.isError input, .isError select, .isError textarea'
+				) as HTMLInputElement;
+				if (firstErrorEl?.focus) firstErrorEl.focus();
 			});
 	};
 
@@ -136,10 +169,10 @@
 				}
 
 				upsertAchievement(result.data?.achievement);
-				goto(`/achievements/${result.data?.achievement.id}`);
+				goto(resolve(`/achievements/${result.data?.achievement.id}`));
 				break;
 			case 'redirect':
-				goto(result.location);
+				goto(resolve(result.location));
 				break;
 			case 'error':
 				console.error(result.error);
@@ -165,7 +198,15 @@
 		await ensureLoaded(achievementsLoading, fetchAchievements);
 	});
 
-	$: {
+	// State-coupling between the radio selections and the numeric/hidden form
+	// fields they drive. The source values (`reviewableSelectedOption`,
+	// `claimableSelectedOption`) are mutated through `bind:selectedOption` on the
+	// RadioOption child (a `$bindable` with no change-callback) and through the
+	// invoker buttons, so there is no single handler to fold this into without
+	// refactoring the form's logic. Kept as a single `$effect` to preserve the
+	// original `$:` behavior exactly. TODO(svelte5): revisit if RadioOption gains
+	// an onchange callback so this can move into handlers.
+	$effect(() => {
 		if (formData.reviewableSelectedOption == 'none' && formData.reviewsRequired > 0) {
 			formData.reviewsRequired = 0;
 		} else if (formData.reviewableSelectedOption == 'badge' && formData.reviewsRequired == 0) {
@@ -180,10 +221,10 @@
 		} else {
 			formData.claimable = 'on';
 		}
-	}
+	});
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
+<form onsubmit={handleSubmit}>
 	<div class="flex flex-col sm:flex-row gap-4 grow max-w-4xl">
 		<!-- Image -->
 		<div class="sm:w-5/12">
@@ -307,7 +348,7 @@
 				class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 				placeholder="https://example.com/criteria"
 				bind:value={formData.criteriaId}
-				on:blur={validate}
+				onblur={validate}
 			/>
 			{#if errors.criteriaId}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 					{errors.criteriaId}
@@ -363,7 +404,8 @@
 									<span class="inline">
 										{#if !formData.claimRequires}
 											<button
-												on:click|preventDefault={() => {
+												onclick={(e) => {
+													e.preventDefault();
 													formData.claimable = 'on';
 													handler();
 												}}
@@ -443,7 +485,8 @@
 									<span class="inline">
 										{#if !formData.reviewRequires}
 											<button
-												on:click|preventDefault={() => {
+												onclick={(e) => {
+													e.preventDefault();
 													formData.reviewableSelectedOption = 'badge';
 													handler();
 												}}
@@ -488,7 +531,7 @@
 							} dark:focus:ring-blue-500 dark:focus:border-blue-500`}
 							placeholder=""
 							bind:value={formData.reviewsRequired}
-							on:blur={validate}
+							onblur={validate}
 							disabled={formData.reviewableSelectedOption != 'badge'}
 						/>
 						{#if errors.reviewsRequired}
@@ -541,7 +584,8 @@
 									<span class="inline">
 										{#if !formData.capabilities_inviteRequires}
 											<button
-												on:click|preventDefault={() => {
+												onclick={(e) => {
+													e.preventDefault();
 													formData.inviteSelectedOption = 'badge';
 													handler();
 												}}
@@ -674,7 +718,7 @@
 				<input
 					type="hidden"
 					name="claimTemplate_enabled"
-					value={!!formData.claimTemplate_enabled ? 'on' : 'off'}
+					value={formData.claimTemplate_enabled ? 'on' : 'off'}
 				/>
 				<input type="hidden" name="claimTemplate" value={formData.claimTemplate} />
 			{/snippet}
@@ -697,7 +741,7 @@
 
 				<button
 					type="button"
-					on:click={addAlignment}
+					onclick={addAlignment}
 					class="mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
 				>
 					+ {m.calm_brave_bear_rise()}
@@ -743,7 +787,7 @@
 				>{m.bold_swift_eagle_submit()}</button
 			>
 			<a
-				href="/achievements"
+				href={resolve('/achievements')}
 				class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-hidden dark:focus:ring-gray-800"
 				>{m.calm_steady_lynx_cancel()}</a
 			>
