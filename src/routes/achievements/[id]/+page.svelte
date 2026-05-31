@@ -133,7 +133,7 @@
 		{#if isAdmin({ user: data.session?.user || undefined })}
 			<Button
 				submodule="danger"
-				on:click={() => {
+				onclick={() => {
 					showDeleteModal = true;
 				}}
 			>
@@ -146,7 +146,7 @@
 		<Button
 			text={m.happy_sparse_lemur_clasp()}
 			submodule="secondary"
-			on:click={() => {
+			onclick={() => {
 				showShareModal = true;
 			}}
 		/>
@@ -197,7 +197,7 @@
 		<AchievementSummary
 			achievement={{ ...data.achievement, name: m.frail_weary_rabbit_nurture(), description: '' }}
 		>
-			<div slot="moredescription">
+			{#snippet moredescription()}
 				<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
 					{m.kind_dry_panther_bask()}
 					{#if invite}
@@ -208,13 +208,13 @@
 						})}
 					{/if}
 				</p>
-			</div>
-			<div slot="image">
+			{/snippet}
+			{#snippet image()}
 				<div class="text-blue-600 dark:text-blue-700 w-10">
 					<Icon src={FaSolidEnvelopeOpenText} size="40" color="currentColor" />
 				</div>
-			</div>
-			<div slot="actions">
+			{/snippet}
+			{#snippet actions()}
 				<div class="p-2 flex flex-row space-x-3">
 					<a
 						class="text-gray-600 w-4 h-4 cursor-pointer"
@@ -228,7 +228,7 @@
 						<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
 					</a>
 				</div>
-			</div>
+			{/snippet}
 		</AchievementSummary>
 	{/if}
 </div>
@@ -378,7 +378,7 @@
 <Modal
 	visible={showDeleteModal}
 	title={m.stout_sad_bat_spur()}
-	on:close={() => {
+	onclose={() => {
 		showDeleteModal = false;
 	}}
 	actions={[
@@ -413,7 +413,7 @@
 <Modal
 	visible={showShareModal}
 	title={m.happy_sparse_lemur_clasp()}
-	on:close={() => {
+	onclose={() => {
 		showShareModal = false;
 	}}
 	actions={[

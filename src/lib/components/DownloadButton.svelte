@@ -1,16 +1,27 @@
 <script lang="ts">
 	import Button from './Button.svelte';
 
-	export let text: string = '';
-	export let sourceUrl: string = '';
-	export let fileName: string | null = null;
+	interface Props {
+		class?: string;
+		text?: string;
+		sourceUrl?: string;
+		fileName?: string | null;
+		id?: string;
+		buttonType?: 'button' | 'submit';
+		moreProps?: object;
+		submodule?: App.ButtonRole;
+	}
 
-	let klass = '';
-	export { klass as class };
-	export let id: string = '';
-	export let buttonType: 'button' | 'submit' = 'button';
-	export let moreProps: Object = {};
-	export let submodule: App.ButtonRole = 'primary';
+	let {
+		class: klass = '',
+		text = '',
+		sourceUrl = '',
+		fileName = null,
+		id = '',
+		buttonType = 'button',
+		moreProps = {},
+		submodule = 'primary'
+	}: Props = $props();
 
 	const download = async () => {
 		const response = await fetch(sourceUrl, { method: 'POST', body: '' });
@@ -27,6 +38,5 @@
 	};
 </script>
 
-<Button {id} {buttonType} {submodule} {...moreProps} on:click={download} class={klass}
-	>{text}</Button
+<Button {id} {buttonType} {submodule} {...moreProps} onclick={download} class={klass}>{text}</Button
 >

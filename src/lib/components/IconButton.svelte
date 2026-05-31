@@ -1,17 +1,24 @@
 <script lang="ts">
-	import { Icon } from 'svelte-icons-pack';
-	export let src: any;
-	export let id: string;
-	export let size = '32';
-	export let text = '';
+	import { Icon, type IconType } from 'svelte-icons-pack';
+
+	interface Props {
+		src: IconType;
+		id: string;
+		size?: string;
+		text?: string;
+		onclick?: (e: MouseEvent) => void;
+		onkeypress?: (e: KeyboardEvent) => void;
+	}
+
+	let { src, id, size = '32', text = '', onclick, onkeypress }: Props = $props();
 </script>
 
 <button
 	{id}
 	type="button"
 	class="ml-2 y-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm"
-	on:click
-	on:keypress
+	{onclick}
+	{onkeypress}
 >
 	<div class="icon text-gray-500 grid place-items-center">
 		<Icon {src} {size} color="currentColor" /> <span class="sr-only">{text}</span>

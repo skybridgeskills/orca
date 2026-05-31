@@ -2,9 +2,18 @@
 	import * as m from '$lib/i18n/messages';
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { FileDrop } from 'svelte-droplet';
-	export let errorMessage: string | null = null;
-	export let currentValue: string | null;
-	export let imageExtension: string | null;
+
+	interface Props {
+		errorMessage?: string | null;
+		currentValue: string | null;
+		imageExtension: string | null;
+	}
+
+	let {
+		errorMessage = $bindable(null),
+		currentValue = $bindable(),
+		imageExtension = $bindable()
+	}: Props = $props();
 
 	const handleFiles = (files: File[]) => {
 		// There will only be one file
@@ -81,8 +90,12 @@
 					</div>
 
 					<div class="text-xs text-gray-500 dark:text-gray-400 absolute top-7 right-4">
-						<button on:click|stopPropagation={handleClearImage}
-							>{m.helpful_lost_angelfish_startle()}</button
+						<button
+							type="button"
+							onclick={(e) => {
+								e.stopPropagation();
+								handleClearImage();
+							}}>{m.helpful_lost_angelfish_startle()}</button
 						>
 					</div>
 				</div>

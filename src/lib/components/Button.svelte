@@ -1,19 +1,31 @@
 <script lang="ts">
-	import RightArrow from '$lib/illustrations/RightArrow.svelte';
-	import { createEventDispatcher } from 'svelte';
-	let klass = '';
-	export { klass as class };
-	export let text: string = '';
-	export let href: string = '';
-	export let id: string = '';
-	export let disabled = false;
-	export let buttonType: 'button' | 'submit' = 'button';
-	export let moreProps: Object = {};
-	export let submodule: App.ButtonRole = 'primary';
+	interface Props {
+		class?: string;
+		text?: string;
+		href?: string;
+		id?: string;
+		disabled?: boolean;
+		buttonType?: 'button' | 'submit';
+		moreProps?: object;
+		submodule?: App.ButtonRole;
+		onclick?: (e: MouseEvent | KeyboardEvent) => void;
+		children?: import('svelte').Snippet;
+	}
 
-	const dispatch = createEventDispatcher();
+	let {
+		class: klass = '',
+		text = '',
+		href = '',
+		id = '',
+		disabled = false,
+		buttonType = 'button',
+		moreProps = {},
+		submodule = 'primary',
+		onclick,
+		children
+	}: Props = $props();
 
-	let defaultClasses = `flex items-center mr-3 focus:outline-hidden focus:ring-4 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${klass}`;
+	const defaultClasses = `flex items-center mr-3 focus:outline-hidden focus:ring-4 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${klass}`;
 	const submoduleClassList = {
 		primary: `${defaultClasses} text-white bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 focus:ring-blue-300 dark:focus:ring-blue-800`,
 		secondary: `${defaultClasses} bg-white text-gray-600 border dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 focus:ring-blue-300 dark:focus:ring-blue-800`,
@@ -25,9 +37,9 @@
 		danger: `${defaultClasses} bg-red-400 cursor-not-allowed`
 	};
 
-	const handleClick = () => {
+	const handleClick = (e: MouseEvent | KeyboardEvent) => {
 		if (!disabled) {
-			dispatch('click');
+			onclick?.(e);
 		}
 	};
 </script>
@@ -39,20 +51,20 @@
 		{...moreProps}
 		class={disabled ? disabledClassList[submodule] : submoduleClassList[submodule]}
 	>
-		<slot>{text}</slot>
+		{#if children}{@render children()}{:else}{text}{/if}
 	</a>
 {:else}
 	<button
 		{id}
 		type={buttonType}
 		{...moreProps}
-		on:click={handleClick}
-		on:keypress={(e) => {
-			if (e.key == 'Enter' || e.key == ' ') handleClick();
+		onclick={handleClick}
+		onkeypress={(e) => {
+			if (e.key == 'Enter' || e.key == ' ') handleClick(e);
 		}}
 		class={disabled ? disabledClassList[submodule] : submoduleClassList[submodule]}
 		{disabled}
 	>
-		<slot>{text}</slot>
+		{#if children}{@render children()}{:else}{text}{/if}
 	</button>
 {/if}

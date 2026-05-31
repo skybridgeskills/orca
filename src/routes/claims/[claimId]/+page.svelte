@@ -82,9 +82,11 @@
 				familyName: data.claim.user.familyName ?? ''
 			})}
 		>
-			<span slot="actions" class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400"
-				>{data.claim.createdOn.toDateString()}</span
-			>
+			{#snippet actions()}
+				<span class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400"
+					>{data.claim.createdOn.toDateString()}</span
+				>
+			{/snippet}
 		</ActionHeading>
 
 		<EvidenceItem item={evidenceItem(data.claim)} />
@@ -112,13 +114,16 @@
 
 <div class="max-w-2xl mt-2">
 	<ActionHeading text={m.calm_steady_lynx_endorse({ count: data.endorsementCount })}>
-		<span slot="actions">
-			{#if data.hasProvidedEndorsement}
-				<a href={`${data.claim.id}/endorse`}><Button text={m.antsy_slow_robin_persuade()} /></a>
-			{:else if data.session?.user?.id != data.claim.userId}
-				<a href={`${data.claim.id}/endorse`}><Button text={m.bright_gentle_cheetah_shrine()} /></a>
-			{/if}
-		</span>
+		{#snippet actions()}
+			<span>
+				{#if data.hasProvidedEndorsement}
+					<a href={`${data.claim.id}/endorse`}><Button text={m.antsy_slow_robin_persuade()} /></a>
+				{:else if data.session?.user?.id != data.claim.userId}
+					<a href={`${data.claim.id}/endorse`}><Button text={m.bright_gentle_cheetah_shrine()} /></a
+					>
+				{/if}
+			</span>
+		{/snippet}
 	</ActionHeading>
 
 	{#if data.claim.validFrom && !data.achievement.achievementConfig?.reviewsRequired}

@@ -4,11 +4,14 @@
 
 	import { Carta, CartaEditor } from 'carta-md';
 	import 'carta-md/default.css';
-	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
 
-	export let value: string;
-	export let inputName: string | undefined;
-	export let disabled: boolean = false;
+	interface Props {
+		value: string;
+		inputName?: string;
+		disabled?: boolean;
+	}
+
+	let { value = $bindable(), inputName, disabled = false }: Props = $props();
 
 	const carta = new Carta({
 		sanitizer: (dirty?: string): string => {
@@ -47,8 +50,13 @@
 </script>
 
 <div
-	on:click|stopPropagation|preventDefault
-	on:keypress|stopPropagation
+	onclick={(e) => {
+		e.stopPropagation();
+		e.preventDefault();
+	}}
+	onkeypress={(e) => {
+		e.stopPropagation();
+	}}
 	role="none"
 	class:opacity-50={disabled}
 	class:pointer-events-none={disabled}

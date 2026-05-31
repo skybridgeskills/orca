@@ -3,14 +3,18 @@
 	import type { Alignment } from '$lib/data/alignment';
 	import FormFieldLabel from './FormFieldLabel.svelte';
 
-	export let alignment: Alignment;
-	export let onRemove: () => void;
-	export let index: number;
+	interface Props {
+		alignment: Alignment;
+		onRemove: () => void;
+		index: number;
+	}
 
-	$: targetUrlInputId = `alignment_${index}_targetUrl`;
-	$: targetNameInputId = `alignment_${index}_targetName`;
-	$: targetDescriptionInputId = `alignment_${index}_targetDescription`;
-	$: targetCodeInputId = `alignment_${index}_targetCode`;
+	let { alignment = $bindable(), onRemove, index }: Props = $props();
+
+	const targetUrlInputId = $derived(`alignment_${index}_targetUrl`);
+	const targetNameInputId = $derived(`alignment_${index}_targetName`);
+	const targetDescriptionInputId = $derived(`alignment_${index}_targetDescription`);
+	const targetCodeInputId = $derived(`alignment_${index}_targetCode`);
 </script>
 
 <div
@@ -22,7 +26,7 @@
 		</h4>
 		<button
 			type="button"
-			on:click={onRemove}
+			onclick={onRemove}
 			class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium underline-offset-2 hover:underline"
 		>
 			{m.bold_true_wolf_part()}

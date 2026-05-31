@@ -104,7 +104,7 @@
 			<Button
 				text={m.equal_petty_panther_file()}
 				submodule="secondary"
-				on:click={() => {
+				onclick={() => {
 					form = null;
 				}}
 			/>

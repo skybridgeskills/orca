@@ -2,11 +2,14 @@
 	import * as m from '$lib/i18n/messages';
 	import type { ClaimStatus } from '@prisma/client';
 
-	export let status: ClaimStatus;
-	let calculatedStatus: ClaimStatus | 'UNDER_REVIEW';
-	export let validFrom: Date | null = null;
-	export let validUntil: Date | null = null;
-	export let absolute = false;
+	interface Props {
+		status: ClaimStatus;
+		validFrom?: Date | null;
+		validUntil?: Date | null;
+		absolute?: boolean;
+	}
+
+	let { status, validFrom = null, validUntil = null, absolute = false }: Props = $props();
 
 	const statusColor = {
 		ACCEPTED: 'border-r-lime-500 dark:border-r-lime-600',
@@ -21,10 +24,11 @@
 		UNDER_REVIEW: m.mad_fancy_penguin_read()
 	};
 
-	$: calculatedStatus =
+	const calculatedStatus: ClaimStatus | 'UNDER_REVIEW' = $derived(
 		(validFrom && !validUntil) || (validFrom && validUntil && new Date() > validUntil)
 			? status
-			: 'UNDER_REVIEW';
+			: 'UNDER_REVIEW'
+	);
 </script>
 
 {#if status}

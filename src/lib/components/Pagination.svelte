@@ -6,15 +6,24 @@
 	import { FiChevronLeft } from 'svelte-icons-pack/fi';
 	import { FiChevronRight } from 'svelte-icons-pack/fi';
 
-	export let paging: {
+	interface Paging {
 		count: number;
 		page: number;
 		pageSize: number;
 		action?: (p: number) => Promise<void> | void;
-	};
-	$: ({ count, page, pageSize } = paging);
-	$: maxPage = Math.ceil(count / pageSize);
-	$: pages = Array.from({ length: maxPage }, (_, i) => i + 1);
+	}
+
+	interface Props {
+		paging: Paging;
+	}
+
+	let { paging }: Props = $props();
+
+	const count = $derived(paging.count);
+	const page = $derived(paging.page);
+	const pageSize = $derived(paging.pageSize);
+	const maxPage = $derived(Math.ceil(count / pageSize));
+	const pages = $derived(Array.from({ length: maxPage }, (_, i) => i + 1));
 
 	const defaultPagingAction = (page: number) => {
 		const target = `?${PAGE_QUERY_PARAM}=${page}`;
@@ -23,7 +32,7 @@
 			pageSize != MAX_PAGE_SIZE ? `${target}&${PAGE_SIZE_QUERY_PARAM}=${pageSize}` : target;
 	};
 
-	const action = paging.action || defaultPagingAction;
+	const action = $derived(paging.action || defaultPagingAction);
 </script>
 
 {#if count > 0 && maxPage > 1}
@@ -34,7 +43,7 @@
 		<span>
 			{#if page > 1 && maxPage > 1}
 				<span class="inline-block text-blue-500">
-					<Button on:click={() => action(page - 1)} submodule="secondary"
+					<Button onclick={() => action(page - 1)} submodule="secondary"
 						><Icon src={FiChevronLeft} size="16" /></Button
 					>
 				</span>
@@ -44,16 +53,13 @@
 					{#if p == page}
 						<span class="mr-2">{p}</span>
 					{:else}
-						<button
-							class="mr-2 underline hover:no-underline"
-							on:click|preventDefault={() => action(p)}>{p}</button
-						>
+						<button class="mr-2 underline hover:no-underline" onclick={() => action(p)}>{p}</button>
 					{/if}
 				</span>
 			{/each}
 			{#if page < maxPage && maxPage > 1}
 				<span class="inline-block text-blue-500">
-					<Button on:click={() => action(page + 1)} submodule="secondary"
+					<Button onclick={() => action(page + 1)} submodule="secondary"
 						><Icon src={FiChevronRight} size="16" /></Button
 					>
 				</span>

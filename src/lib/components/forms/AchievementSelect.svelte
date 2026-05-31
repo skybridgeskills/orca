@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 	import {
 		achievements,
 		achievementsLoading,
@@ -16,30 +16,52 @@
 	import FormFieldHelperText from './FormFieldHelperText.svelte';
 	import { ensureLoaded } from '$lib/stores/common';
 
-	export let badgeId = '';
-	export let disabled = false;
-	export let errorMessage: string;
-	export let label = 'Select achievement';
-	export let description = '';
-	export let inputId = 'achievementSelect_generic';
-	export let inputName = inputId;
-	export let achievementFilter: (a: Achievement) => boolean = (a) => true;
-	let searchModalOpen = false;
-	let searchQuery = '';
-	let achievement: Achievement | undefined;
+	interface Props {
+		badgeId?: string | null;
+		disabled?: boolean;
+		errorMessage?: string;
+		label?: string;
+		description?: string;
+		inputId?: string;
+		inputName?: string;
+		achievementFilter?: (a: Achievement) => boolean;
+		onselected?: (badgeId: string) => void;
+		onunselected?: () => void;
+		invoker?: Snippet<[() => void]>;
+		selectedSummary?: Snippet;
+	}
+
+	let {
+		badgeId = '',
+		disabled = false,
+		errorMessage = '',
+		label = 'Select achievement',
+		description = '',
+		inputId = 'achievementSelect_generic',
+		inputName = inputId,
+		achievementFilter = () => true,
+		onselected,
+		onunselected,
+		invoker,
+		selectedSummary
+	}: Props = $props();
+
+	let searchModalOpen = $state(false);
+	let searchQuery = $state('');
+	let achievement: Achievement | undefined = $state();
 
 	const tColor = 'text-gray-900 dark:text-gray-300 hover:no-underline'; // default text color
 	const dtColor = 'text-gray-400 dark:text-gray-600'; // Disabled text color
 
-	const dispatch = createEventDispatcher();
-
 	// First 3 search results
-	$: searchResults = searchQuery
-		? $achievements
-				.filter(achievementFilter)
-				.filter((a) => a.name.toLowerCase().includes(searchQuery.toLowerCase()))
-				.slice(0, 3)
-		: $achievements.filter(achievementFilter).slice(0, 3);
+	const searchResults = $derived(
+		searchQuery
+			? $achievements
+					.filter(achievementFilter)
+					.filter((a) => a.name.toLowerCase().includes(searchQuery.toLowerCase()))
+					.slice(0, 3)
+			: $achievements.filter(achievementFilter).slice(0, 3)
+	);
 
 	const handleOpenModal = () => {
 		if (!disabled) {
@@ -52,13 +74,15 @@
 		if (badgeId) {
 			achievement = $achievements.find((a) => a.id === badgeId);
 		}
-		if (!achievement) dispatch('unselected');
+		if (!achievement) onunselected?.();
 	});
 </script>
 
-<input type="hidden" id={inputId} name={inputName} bind:value={badgeId} />
+<input type="hidden" id={inputId} name={inputName} value={badgeId} />
 
-<slot name="invoker" handler={handleOpenModal}>
+{#if invoker}
+	{@render invoker(handleOpenModal)}
+{:else}
 	<FormFieldLabel for={inputId} {disabled} text={label} />
 	{#if errorMessage}
 		<p class="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -73,7 +97,7 @@
 	{#if !badgeId}
 		<Button
 			submodule="secondary"
-			on:click={() => {
+			onclick={() => {
 				searchModalOpen = true;
 			}}
 			{disabled}
@@ -81,44 +105,45 @@
 			{m.sparse_petty_fox_jest()}
 		</Button>
 	{/if}
-</slot>
+{/if}
 
-<slot name="selected-summary">
-	{#if !!badgeId && achievement != null}
-		<div class="pt-2">
-			<AchievementSummary {achievement} imageSize="16" linkAchievement={false} {disabled}>
-				<div slot="actions">
-					<button
-						type="button"
-						class="text-sm pb-2 pr-2 ${disabled ? dtColor : tColor} underline"
-						on:click={() => {
-							searchModalOpen = true;
-						}}
-						{disabled}
-					>
-						{m.quick_safe_deer_change()}
-					</button>
-					<button
-						type="button"
-						class="text-sm pb-2 pr-2 ${disabled ? dtColor : tColor} underline"
-						on:click|preventDefault={() => {
-							dispatch('unselected');
-							achievement = undefined;
-						}}
-						{disabled}
-					>
-						{m.firm_clear_fox_remove()}
-					</button>
-				</div>
-			</AchievementSummary>
-		</div>
-	{/if}
-</slot>
+{#if selectedSummary}
+	{@render selectedSummary()}
+{:else if !!badgeId && achievement != null}
+	<div class="pt-2">
+		<AchievementSummary {achievement} imageSize="16" linkAchievement={false} {disabled}>
+			{#snippet actions()}
+				<button
+					type="button"
+					class="text-sm pb-2 pr-2 ${disabled ? dtColor : tColor} underline"
+					onclick={() => {
+						searchModalOpen = true;
+					}}
+					{disabled}
+				>
+					{m.quick_safe_deer_change()}
+				</button>
+				<button
+					type="button"
+					class="text-sm pb-2 pr-2 ${disabled ? dtColor : tColor} underline"
+					onclick={(e) => {
+						e.preventDefault();
+						onunselected?.();
+						achievement = undefined;
+					}}
+					{disabled}
+				>
+					{m.firm_clear_fox_remove()}
+				</button>
+			{/snippet}
+		</AchievementSummary>
+	</div>
+{/if}
 
 <Modal
 	visible={searchModalOpen}
 	title={label}
-	on:close={() => {
+	onclose={() => {
 		searchModalOpen = false;
 		searchQuery = '';
 	}}
@@ -148,20 +173,21 @@
 						imageSize="16"
 						linkAchievement={false}
 						isClickable={true}
-						on:click={() => {
-							dispatch('selected', a.id);
+						onclick={() => {
+							onselected?.(a.id);
 							searchModalOpen = false;
 							searchQuery = '';
 							achievement = a;
 						}}
 					>
-						<div slot="actions">
+						{#snippet actions()}
 							<div class="pb-2 pr-2">
 								<button
 									type="button"
 									class="text-sm text-gray-900 dark:text-white underline hover:no-underline"
-									on:click|preventDefault={() => {
-										dispatch('selected', a.id);
+									onclick={(e) => {
+										e.preventDefault();
+										onselected?.(a.id);
 										searchModalOpen = false;
 										searchQuery = '';
 										achievement = a;
@@ -170,7 +196,7 @@
 									Select
 								</button>
 							</div>
-						</div>
+						{/snippet}
 					</AchievementSummary>
 				</li>
 			{/each}

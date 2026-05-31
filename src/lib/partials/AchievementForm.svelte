@@ -344,12 +344,12 @@
 							<span class="inline">{m.tired_top_fish_bask()}</span>
 							<AchievementSelect
 								badgeId={formData.claimRequires}
-								on:unselected={() => {
+								onunselected={() => {
 									formData.claimable = 'off';
 									formData.claimRequires = null;
 								}}
-								on:selected={(e) => {
-									formData.claimRequires = e.detail;
+								onselected={(id) => {
+									formData.claimRequires = id;
 								}}
 								disabled={formData.claimableSelectedOption != 'badge'}
 								label={m.quick_clear_owl_required()}
@@ -359,24 +359,26 @@
 								inputName="claimRequires"
 								errorMessage={errors.claimRequires}
 							>
-								<span slot="invoker" class="inline" let:handler>
-									{#if !formData.claimRequires}
-										<button
-											on:click|preventDefault={() => {
-												formData.claimable = 'on';
-												handler();
-											}}
-											class={`font-medium${
-												formData.claimable == 'on'
-													? ' underline hover:no-underline'
-													: 'text-gray-700 dark:text-gray-500 cursor-auto'
-											}`}
-											tabindex={formData.claimable == 'on' ? 0 : -1}
-										>
-											Choose...
-										</button>
-									{/if}
-								</span>
+								{#snippet invoker(handler)}
+									<span class="inline">
+										{#if !formData.claimRequires}
+											<button
+												on:click|preventDefault={() => {
+													formData.claimable = 'on';
+													handler();
+												}}
+												class={`font-medium${
+													formData.claimable == 'on'
+														? ' underline hover:no-underline'
+														: 'text-gray-700 dark:text-gray-500 cursor-auto'
+												}`}
+												tabindex={formData.claimable == 'on' ? 0 : -1}
+											>
+												Choose...
+											</button>
+										{/if}
+									</span>
+								{/snippet}
 							</AchievementSelect>
 						</RadioOption>
 					</div>
@@ -419,7 +421,7 @@
 							<span class="inline">{m.quick_safe_deer_reviewspec()}</span>
 							<AchievementSelect
 								badgeId={formData.reviewRequires}
-								on:unselected={() => {
+								onunselected={() => {
 									if (formData.reviewableSelectedOption == 'badge') {
 										// only unselect if something a badge selected
 										// not "admin"
@@ -427,8 +429,8 @@
 									}
 									formData.reviewRequires = null;
 								}}
-								on:selected={(e) => {
-									formData.reviewRequires = e.detail;
+								onselected={(id) => {
+									formData.reviewRequires = id;
 								}}
 								disabled={formData.reviewableSelectedOption != 'badge'}
 								label={m.quick_clear_owl_required()}
@@ -437,24 +439,26 @@
 								inputName="reviewRequires"
 								errorMessage={errors.reviewRequires}
 							>
-								<span slot="invoker" class="inline" let:handler>
-									{#if !formData.reviewRequires}
-										<button
-											on:click|preventDefault={() => {
-												formData.reviewableSelectedOption = 'badge';
-												handler();
-											}}
-											class={`font-medium${
-												formData.reviewableSelectedOption == 'badge'
-													? ' underline hover:no-underline'
-													: 'text-gray-700 dark:text-gray-500 cursor-auto'
-											}`}
-											tabindex={formData.reviewableSelectedOption == 'badge' ? 0 : -1}
-										>
-											{m.every_flat_lamb_favor()}
-										</button>
-									{/if}
-								</span>
+								{#snippet invoker(handler)}
+									<span class="inline">
+										{#if !formData.reviewRequires}
+											<button
+												on:click|preventDefault={() => {
+													formData.reviewableSelectedOption = 'badge';
+													handler();
+												}}
+												class={`font-medium${
+													formData.reviewableSelectedOption == 'badge'
+														? ' underline hover:no-underline'
+														: 'text-gray-700 dark:text-gray-500 cursor-auto'
+												}`}
+												tabindex={formData.reviewableSelectedOption == 'badge' ? 0 : -1}
+											>
+												{m.every_flat_lamb_favor()}
+											</button>
+										{/if}
+									</span>
+								{/snippet}
 							</AchievementSelect>
 						</RadioOption>
 						{#if errors.reviewRequires}
@@ -517,13 +521,13 @@
 							<span class="inline">{m.warm_tangy_deer_holders()}</span>
 							<AchievementSelect
 								badgeId={formData.capabilities_inviteRequires}
-								on:unselected={() => {
+								onunselected={() => {
 									formData.inviteSelectedOption = 'none';
 									formData.capabilities_inviteRequires = null;
 									errors.inviteRequires = '';
 								}}
-								on:selected={(e) => {
-									formData.capabilities_inviteRequires = e.detail;
+								onselected={(id) => {
+									formData.capabilities_inviteRequires = id;
 									errors.inviteRequires = '';
 								}}
 								disabled={formData.inviteSelectedOption != 'badge'}
@@ -533,24 +537,26 @@
 								inputName="capabilities_inviteRequires"
 								errorMessage={errors.inviteRequires}
 							>
-								<span slot="invoker" class="inline" let:handler>
-									{#if !formData.capabilities_inviteRequires}
-										<button
-											on:click|preventDefault={() => {
-												formData.inviteSelectedOption = 'badge';
-												handler();
-											}}
-											class={`font-medium${
-												formData.capabilities_inviteRequires == 'badge'
-													? ' underline hover:no-underline'
-													: 'text-gray-700 dark:text-gray-500 cursor-auto'
-											}`}
-											tabindex={formData.capabilities_inviteRequires == 'badge' ? 0 : -1}
-										>
-											{m.bright_swift_eagle_choose()}
-										</button>
-									{/if}
-								</span>
+								{#snippet invoker(handler)}
+									<span class="inline">
+										{#if !formData.capabilities_inviteRequires}
+											<button
+												on:click|preventDefault={() => {
+													formData.inviteSelectedOption = 'badge';
+													handler();
+												}}
+												class={`font-medium${
+													formData.capabilities_inviteRequires == 'badge'
+														? ' underline hover:no-underline'
+														: 'text-gray-700 dark:text-gray-500 cursor-auto'
+												}`}
+												tabindex={formData.capabilities_inviteRequires == 'badge' ? 0 : -1}
+											>
+												{m.bright_swift_eagle_choose()}
+											</button>
+										{/if}
+									</span>
+								{/snippet}
 							</AchievementSelect>
 						</RadioOption>
 
@@ -562,15 +568,17 @@
 					</div>
 				</div>
 			</div>
-			<div slot="button-extra">
-				{#if formData.claimableSelectedOption != 'off' || formData.reviewableSelectedOption != 'none' || formData.inviteSelectedOption != 'none'}
-					<!-- IF any of the claim and review settings are not default -->
-					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
-						{m.sparse_happy_kite_march()}
-					</p>
-				{/if}
-			</div>
-			<div slot="when-closed">
+			{#snippet buttonExtra()}
+				<div>
+					{#if formData.claimableSelectedOption != 'off' || formData.reviewableSelectedOption != 'none' || formData.inviteSelectedOption != 'none'}
+						<!-- IF any of the claim and review settings are not default -->
+						<p class="text-sm text-gray-500 dark:text-gray-400 italic">
+							{m.sparse_happy_kite_march()}
+						</p>
+					{/if}
+				</div>
+			{/snippet}
+			{#snippet whenClosed()}
 				<input type="hidden" name="claimable" value={formData.claimable} />
 				<input
 					type="hidden"
@@ -598,7 +606,7 @@
 					name="capabilities_inviteRequires"
 					bind:value={formData.capabilities_inviteRequires}
 				/>
-			</div>
+			{/snippet}
 		</CollapsiblePane>
 		<CollapsiblePane title={m.weary_legal_crossbill_approve()}>
 			<div class="flex flex-col gap-3">
@@ -653,21 +661,23 @@
 					</div>
 				</div>
 			</div>
-			<div slot="button-extra">
-				{#if formData.claimTemplate_enabled}
-					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
-						{m.early_house_bat_climb()}
-					</p>
-				{/if}
-			</div>
-			<div slot="when-closed">
+			{#snippet buttonExtra()}
+				<div>
+					{#if formData.claimTemplate_enabled}
+						<p class="text-sm text-gray-500 dark:text-gray-400 italic">
+							{m.early_house_bat_climb()}
+						</p>
+					{/if}
+				</div>
+			{/snippet}
+			{#snippet whenClosed()}
 				<input
 					type="hidden"
 					name="claimTemplate_enabled"
 					value={!!formData.claimTemplate_enabled ? 'on' : 'off'}
 				/>
 				<input type="hidden" name="claimTemplate" value={formData.claimTemplate} />
-			</div>
+			{/snippet}
 		</CollapsiblePane>
 		<CollapsiblePane title={m.soft_bold_moose_climb()} open={hasAlignments()}>
 			<div class="flex flex-col gap-3">
@@ -694,15 +704,17 @@
 				</button>
 			</div>
 
-			<div slot="button-extra">
-				{#if hasAlignments()}
-					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
-						{m.swift_noble_deer_leap({ count: formData.alignments.length })}
-					</p>
-				{/if}
-			</div>
+			{#snippet buttonExtra()}
+				<div>
+					{#if hasAlignments()}
+						<p class="text-sm text-gray-500 dark:text-gray-400 italic">
+							{m.swift_noble_deer_leap({ count: formData.alignments.length })}
+						</p>
+					{/if}
+				</div>
+			{/snippet}
 
-			<div slot="when-closed">
+			{#snippet whenClosed()}
 				{#each formData.alignments as alignment, index (index)}
 					<input type="hidden" name="alignment[{index}].targetUrl" value={alignment.targetUrl} />
 					<input type="hidden" name="alignment[{index}].targetName" value={alignment.targetName} />
@@ -721,7 +733,7 @@
 						/>
 					{/if}
 				{/each}
-			</div>
+			{/snippet}
 		</CollapsiblePane>
 		<!-- Submit/Cancel -->
 		<div class="flex items-center lg:order-2 mt-6">

@@ -21,18 +21,27 @@
 		};
 	};
 
-	export let pageSize: number = MAX_PAGE_SIZE;
-	export let page: number = 1;
-	export let totalCount: number;
-	export let enableInvites: boolean = false;
+	interface Props {
+		pageSize?: number;
+		page?: number;
+		totalCount: number;
+		enableInvites?: boolean;
+	}
 
-	let claims: AchievementClaimTableData[] = [];
-	let outstandingInvites: (ClaimEndorsement & { creator: User })[] = [];
-	let inviteCount: number | undefined = undefined;
-	let category: 'AchievementClaim' | 'ClaimEndorsement' = 'AchievementClaim';
-	let loading = true;
-	let deleteModalVisible = false;
-	let inviteToDelete: (ClaimEndorsement & { creator: User }) | null = null;
+	let {
+		pageSize = $bindable(MAX_PAGE_SIZE),
+		page = $bindable(1),
+		totalCount,
+		enableInvites = false
+	}: Props = $props();
+
+	let claims: AchievementClaimTableData[] = $state([]);
+	let outstandingInvites: (ClaimEndorsement & { creator: User })[] = $state([]);
+	let inviteCount: number | undefined = $state(undefined);
+	let category: 'AchievementClaim' | 'ClaimEndorsement' = $state('AchievementClaim');
+	let loading = $state(true);
+	let deleteModalVisible = $state(false);
+	let inviteToDelete: (ClaimEndorsement & { creator: User }) | null = $state(null);
 
 	const session: App.SessionData | undefined = getContext('session');
 	const achievementId: string = getContext('achievementId');
@@ -256,7 +265,7 @@
 										src={FaSolidTrash}
 										text={m.wide_acidic_racoon_read()}
 										size="16"
-										on:click={() => showDeleteModal(invite)}
+										onclick={() => showDeleteModal(invite)}
 									/>
 								{/if}
 							</td>
@@ -279,7 +288,7 @@
 <Modal
 	visible={deleteModalVisible}
 	title={m.calm_weird_robin_startle()}
-	on:close={closeDeleteModal}
+	onclose={closeDeleteModal}
 	actions={[
 		{
 			label: m.calm_steady_lynx_cancel(),

@@ -40,7 +40,7 @@
 					message={n.message}
 					dismissable={n.dismissable}
 					level={n.level}
-					on:close={() => {
+					onclose={() => {
 						notifications.dismiss(n.id);
 					}}
 				>

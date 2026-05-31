@@ -118,7 +118,7 @@
 	id="send-to-wallet-exchange-modal"
 	title="Send to wallet"
 	actions={modalActions}
-	on:close={close}
+	onclose={close}
 >
 	<div aria-live="polite" class="text-center text-sm text-gray-700 dark:text-gray-300">
 		{#if state.kind === 'loading'}

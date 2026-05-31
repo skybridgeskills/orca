@@ -29,14 +29,14 @@
 			<Button
 				text={m.known_such_scallop_gaze()}
 				submodule="danger"
-				on:click={() => {
+				onclick={() => {
 					claimIntent = 'REJECTED';
 					showClaimForm = true;
 				}}
 			/>
 			<Button
 				text={m.proof_funny_dog_pat()}
-				on:click={() => {
+				onclick={() => {
 					claimIntent = 'ACCEPTED';
 					showClaimForm = true;
 				}}

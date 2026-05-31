@@ -1,14 +1,18 @@
 <script lang="ts">
 	import QRCodeLib from 'qrcode';
 
-	/** Payload URL encoded in the QR; regenerates whenever this changes. */
-	export let url = '';
-	export let alt = '';
+	interface Props {
+		/** Payload URL encoded in the QR; regenerates whenever this changes. */
+		url?: string;
+		alt?: string;
+	}
+
+	let { url = '', alt = '' }: Props = $props();
 
 	const qrSizePx = 200;
 
-	let dataUri = '';
-	let isGenerating = false;
+	let dataUri = $state('');
+	let isGenerating = $state(false);
 	/** Guards against stale async completions when `url` changes quickly. */
 	let requestSeq = 0;
 
@@ -36,7 +40,12 @@
 		}
 	}
 
-	$: regenerate(url);
+	// Side-effect: regenerate the QR image whenever `url` changes. This is a real
+	// external async side-effect (qrcode lib call + sequence-guarded writes), not
+	// state mirroring, so $effect is the correct replacement for the legacy `$:`.
+	$effect(() => {
+		regenerate(url);
+	});
 </script>
 
 <div

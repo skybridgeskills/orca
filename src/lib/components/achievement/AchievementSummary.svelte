@@ -5,25 +5,44 @@
 	import StatusTag from '$lib/components/StatusTag.svelte';
 	import type { Achievement, AchievementClaim } from '@prisma/client';
 	import { imageUrl } from '$lib/utils/imageUrl';
-	import { createEventDispatcher } from 'svelte';
+	import type { Snippet } from 'svelte';
 
-	export let achievement: Achievement;
-	export let linkAchievement = true;
-	export let achievementHref = '';
-	export let claim: AchievementClaim | null = null;
-	export let href = '';
-	export let imageSize: '16' | '32' = '32'; // Tailwind width https://tailwindcss.com/docs/width
-	export let isClickable = false;
-	export let disabled = false;
+	interface Props {
+		achievement: Achievement;
+		linkAchievement?: boolean;
+		achievementHref?: string;
+		claim?: AchievementClaim | null;
+		href?: string;
+		imageSize?: '16' | '32'; // Tailwind width https://tailwindcss.com/docs/width
+		isClickable?: boolean;
+		disabled?: boolean;
+		onclick?: () => void;
+		image?: Snippet;
+		moredescription?: Snippet;
+		actions?: Snippet;
+	}
 
-	const dispatcher = createEventDispatcher();
+	let {
+		achievement,
+		linkAchievement = true,
+		achievementHref = '',
+		claim = null,
+		href = '',
+		imageSize = '32',
+		isClickable = false,
+		disabled = false,
+		onclick,
+		image,
+		moredescription,
+		actions
+	}: Props = $props();
 </script>
 
 <svelte:element
-	this={!!href ? 'a' : 'section'}
+	this={href ? 'a' : 'section'}
 	href={href || undefined}
-	on:click={() => {
-		if (isClickable) dispatcher('click');
+	onclick={() => {
+		if (isClickable) onclick?.();
 	}}
 	role={isClickable ? 'button' : 'listitem'}
 	tabindex="-1"
@@ -43,26 +62,24 @@
 
 	<div class="flex flex-col sm:flex-row gap-4">
 		<!-- Image -->
-		<slot name="image">
-			{#if achievement.image}
-				<img
-					src={imageUrl(achievement.image)}
-					class="object-scale-down"
-					class:w-32={imageSize === '32'}
-					class:w-16={imageSize === '16'}
-					class:opacity-50={disabled}
-					alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
-				/>
-			{:else}
-				<div
-					class={`text-gray-400 dark:text-gray-700`}
-					class:w-32={imageSize === '32'}
-					class:w-16={imageSize === '16'}
-				>
-					<Ribbon />
-				</div>
-			{/if}
-		</slot>
+		{#if image}{@render image()}{:else if achievement.image}
+			<img
+				src={imageUrl(achievement.image)}
+				class="object-scale-down"
+				class:w-32={imageSize === '32'}
+				class:w-16={imageSize === '16'}
+				class:opacity-50={disabled}
+				alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
+			/>
+		{:else}
+			<div
+				class={`text-gray-400 dark:text-gray-700`}
+				class:w-32={imageSize === '32'}
+				class:w-16={imageSize === '16'}
+			>
+				<Ribbon />
+			</div>
+		{/if}
 		<div>
 			<!-- Name -->
 
@@ -90,10 +107,10 @@
 					{achievement.description}
 				</p>
 			{/if}
-			<slot name="moredescription" />
+			{@render moredescription?.()}
 		</div>
 	</div>
 	<div class="absolute bottom-0 right-2">
-		<slot name="actions" />
+		{@render actions?.()}
 	</div>
 </svelte:element>

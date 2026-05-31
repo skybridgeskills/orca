@@ -1,0 +1,59 @@
+<script lang="ts" module>
+	import { defineMeta } from '@storybook/addon-svelte-csf';
+
+	import Card from './Card.svelte';
+
+	const { Story } = defineMeta({
+		title: 'components/Card',
+		component: Card,
+		tags: ['autodocs']
+	});
+</script>
+
+<Story name="Default">
+	<ul class="p-4">
+		<Card>
+			<h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+				Card title
+			</h3>
+			<p class="text-sm text-gray-600 dark:text-gray-400">
+				A basic card rendering its default children.
+			</p>
+		</Card>
+	</ul>
+</Story>
+
+<Story name="With actions">
+	<ul class="p-4">
+		<Card>
+			<h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+				Card with actions
+			</h3>
+			<p class="text-sm text-gray-600 dark:text-gray-400">
+				The actions snippet renders at the foot.
+			</p>
+			{#snippet actions()}
+				<a href="#" class="text-sm font-medium text-blue-700 hover:underline">Learn more</a>
+			{/snippet}
+		</Card>
+	</ul>
+</Story>
+
+<Story name="Hover effect (link)">
+	<ul class="p-4">
+		<Card href="#" hoverEffect>
+			<h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+				Clickable card
+			</h3>
+			<p class="text-sm text-gray-600 dark:text-gray-400">
+				Renders as an anchor with a hover shadow.
+			</p>
+		</Card>
+	</ul>
+</Story>
+
+<Story name="Empty (fallback)">
+	<ul class="p-4">
+		<Card />
+	</ul>
+</Story>

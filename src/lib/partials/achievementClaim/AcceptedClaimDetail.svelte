@@ -95,7 +95,7 @@
 
 						<Button
 							text={m.red_sleek_kite_relish()}
-							on:click={() => {
+							onclick={() => {
 								sendToWalletModalVisible = true;
 							}}
 							submodule="secondary"
@@ -104,7 +104,7 @@
 						<Button
 							text={m.red_sleek_kite_relish()}
 							submodule="primary"
-							on:click={() => {
+							onclick={() => {
 								exchangeModalOpen = true;
 							}}
 							disabled={exchangeModalOpen}
@@ -114,7 +114,7 @@
 
 				<Button
 					text={m.swift_lower_mantis_delight()}
-					on:click={() => {
+					onclick={() => {
 						claimIntent = 'ACCEPTED';
 						showClaimForm = true;
 					}}
@@ -123,7 +123,7 @@
 				<Button
 					submodule="danger"
 					text={m.stout_weary_deer_link()}
-					on:click={() => {
+					onclick={() => {
 						claimIntent = 'REJECTED';
 						showClaimForm = true;
 					}}
@@ -149,7 +149,7 @@
 				class="text-xs"
 				submodule="secondary"
 				text={m.lucky_tired_mole_ask()}
-				on:click={(e) => {
+				onclick={(e) => {
 					if (!existingBadgeClaim || !achievement || !navigator.clipboard) {
 						return;
 					}
@@ -165,7 +165,7 @@
 					class="text-xs"
 					submodule="secondary"
 					text={m.sharp_quiet_panther_qr()}
-					on:click={() => {
+					onclick={() => {
 						showQRShareModal = true;
 					}}
 				/>
@@ -184,7 +184,7 @@
 <Modal
 	visible={showClaimForm}
 	title={m.swift_lower_mantis_delight()}
-	on:close={() => {
+	onclose={() => {
 		showClaimForm = false;
 	}}
 	actions={[]}
@@ -204,7 +204,7 @@
 	<Modal
 		visible={sendToWalletModalVisible}
 		title={m.red_sleek_kite_relish()}
-		on:close={() => {
+		onclose={() => {
 			sendToWalletModalVisible = false;
 		}}
 		actions={[
@@ -233,7 +233,7 @@
 	<Modal
 		visible={showQRShareModal}
 		title={m.happy_bright_mole_spill()}
-		on:close={() => {
+		onclose={() => {
 			showQRShareModal = false;
 		}}
 		actions={[]}

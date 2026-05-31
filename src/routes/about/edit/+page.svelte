@@ -301,12 +301,12 @@
 					<span class="inline">{m.due_fit_guppy_surge()}</span>
 					<AchievementSelect
 						badgeId={formData.editAchievementRequires || ''}
-						on:unselected={() => {
+						onunselected={() => {
 							formData.editAchievementCapability = 'admin';
 							formData.editAchievementRequires = null;
 						}}
-						on:selected={(e) => {
-							formData.editAchievementRequires = e.detail;
+						onselected={(id) => {
+							formData.editAchievementRequires = id;
 						}}
 						disabled={formData.editAchievementCapability != 'achievement'}
 						label={m.fuzzy_nimble_squirrel_approve()}
@@ -315,24 +315,26 @@
 						inputName="editAchievementRequires"
 						errorMessage={errors.editAchievementRequires || ''}
 					>
-						<span slot="invoker" class="inline" let:handler>
-							{#if !formData.editAchievementRequires}
-								<button
-									on:click|preventDefault={() => {
-										formData.editAchievementCapability = 'achievement';
-										handler();
-									}}
-									class={`font-medium${
-										formData.editAchievementCapability == 'achievement'
-											? ' underline hover:no-underline'
-											: 'text-gray-700 dark:text-gray-500 cursor-auto'
-									}`}
-									tabindex={formData.editAchievementCapability == 'achievement' ? 0 : -1}
-								>
-									{m.bright_swift_eagle_choose()}
-								</button>
-							{/if}
-						</span>
+						{#snippet invoker(handler)}
+							<span class="inline">
+								{#if !formData.editAchievementRequires}
+									<button
+										on:click|preventDefault={() => {
+											formData.editAchievementCapability = 'achievement';
+											handler();
+										}}
+										class={`font-medium${
+											formData.editAchievementCapability == 'achievement'
+												? ' underline hover:no-underline'
+												: 'text-gray-700 dark:text-gray-500 cursor-auto'
+										}`}
+										tabindex={formData.editAchievementCapability == 'achievement' ? 0 : -1}
+									>
+										{m.bright_swift_eagle_choose()}
+									</button>
+								{/if}
+							</span>
+						{/snippet}
 					</AchievementSelect>
 				</RadioOption>
 			</div>

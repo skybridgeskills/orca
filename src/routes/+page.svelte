@@ -42,7 +42,7 @@
 					{m.grand_quick_thrush_fry({ count: achievement._count.achievementClaims })}
 				</p>
 
-				<div slot="actions">
+				{#snippet actions()}
 					<a
 						href="/achievements/{achievement.id}"
 						class="align-bottom inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -50,7 +50,7 @@
 						{m.happy_next_robin_clasp()}
 						<RightArrow />
 					</a>
-				</div>
+				{/snippet}
 			</Card>
 		{/each}
 	</ul>
@@ -60,10 +60,15 @@
 	</p>
 {:else}
 	<EmptyStateZone title={m.weird_small_oryx_tickle()}>
-		<Ribbon slot="image" />
-		<p slot="description">
-			{m.bright_swift_eagle_see()}
-			<a href="/achievements" class="underline hover:no-underline">{m.happy_dry_shrimp_feel()}</a>.
-		</p>
+		{#snippet image()}
+			<Ribbon />
+		{/snippet}
+		{#snippet descriptionSnippet()}
+			<p>
+				{m.bright_swift_eagle_see()}
+				<a href="/achievements" class="underline hover:no-underline">{m.happy_dry_shrimp_feel()}</a
+				>.
+			</p>
+		{/snippet}
 	</EmptyStateZone>
 {/if}

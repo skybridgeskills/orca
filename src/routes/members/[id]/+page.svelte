@@ -31,7 +31,7 @@
 			<Button
 				text={m.happy_sparse_lemur_clasp()}
 				submodule="secondary"
-				on:click={() => {
+				onclick={() => {
 					showShareModal = true;
 				}}
 			/>
@@ -111,7 +111,7 @@
 	<Modal
 		visible={showShareModal}
 		title={m.happy_sparse_lemur_clasp()}
-		on:close={() => {
+		onclose={() => {
 			showShareModal = false;
 		}}
 		actions={[

@@ -16,11 +16,15 @@
 
 	dayjs.extend(relativeTime);
 
-	export let claim: AchievementClaim;
-	export let achievement: Achievement;
-	export let org: Organization;
+	interface Props {
+		claim: AchievementClaim;
+		achievement: Achievement;
+		org: Organization;
+	}
 
-	let showModal = false;
+	let { claim, achievement, org }: Props = $props();
+
+	let showModal = $state(false);
 
 	const handleShare = () => {
 		if (navigator.share) {
@@ -53,64 +57,70 @@
 		description: ''
 	}}
 >
-	<div slot="moredescription">
-		{#if claim.claimStatus === 'ACCEPTED'}
-			<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
-				{m.equal_active_parrot_march()}
-				{dayjs(claim.createdOn).fromNow()}
-			</p>
-		{:else}
-			<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
-				{m.piquant_curly_mantis_tickle()}
-			</p>
-		{/if}
-	</div>
+	{#snippet moredescription()}
+		<div>
+			{#if claim.claimStatus === 'ACCEPTED'}
+				<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
+					{m.equal_active_parrot_march()}
+					{dayjs(claim.createdOn).fromNow()}
+				</p>
+			{:else}
+				<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
+					{m.piquant_curly_mantis_tickle()}
+				</p>
+			{/if}
+		</div>
+	{/snippet}
 
-	<div slot="image">
-		{#if claim.claimStatus == 'ACCEPTED'}
-			<div class="text-green-700 dark:text-green-600 w-10">
-				<Ribbon />
-			</div>
-		{:else if claim.claimStatus == 'REJECTED'}
-			<div class="w-10 text-orange-700 dark:text-orange-600">
-				<Icon src={BiSolidNoEntry} size="40" color="currentColor" />
-			</div>
-		{/if}
-	</div>
-	<div slot="actions">
-		{#if claim.claimStatus === 'ACCEPTED' && claim.validFrom}
-			<div class="p-2 flex flex-row space-x-3">
-				<a
-					class="icon text-gray-600 w-4 h-4 cursor-pointer"
-					tabindex="0"
-					href={`/claims/${claim.id}`}
-				>
-					<span class="sr-only">{m.happy_next_robin_clasp()}</span>
-					<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
-				</a>
-				<button
-					class="icon text-gray-600 w-4 h-4 cursor-pointer"
-					tabindex="0"
-					on:click={() => {
-						handleShare();
-					}}
-					on:keypress={() => {
-						handleShare();
-					}}
-				>
-					<span class="sr-only">{m.happy_sparse_lemur_clasp()}</span>
-					<Icon src={FaShareSquare} size="20" color="currentColor" />
-				</button>
-			</div>
-		{/if}
-	</div>
+	{#snippet image()}
+		<div>
+			{#if claim.claimStatus == 'ACCEPTED'}
+				<div class="text-green-700 dark:text-green-600 w-10">
+					<Ribbon />
+				</div>
+			{:else if claim.claimStatus == 'REJECTED'}
+				<div class="w-10 text-orange-700 dark:text-orange-600">
+					<Icon src={BiSolidNoEntry} size="40" color="currentColor" />
+				</div>
+			{/if}
+		</div>
+	{/snippet}
+	{#snippet actions()}
+		<div>
+			{#if claim.claimStatus === 'ACCEPTED' && claim.validFrom}
+				<div class="p-2 flex flex-row space-x-3">
+					<a
+						class="icon text-gray-600 w-4 h-4 cursor-pointer"
+						tabindex="0"
+						href={`/claims/${claim.id}`}
+					>
+						<span class="sr-only">{m.happy_next_robin_clasp()}</span>
+						<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
+					</a>
+					<button
+						class="icon text-gray-600 w-4 h-4 cursor-pointer"
+						tabindex="0"
+						onclick={() => {
+							handleShare();
+						}}
+						onkeypress={() => {
+							handleShare();
+						}}
+					>
+						<span class="sr-only">{m.happy_sparse_lemur_clasp()}</span>
+						<Icon src={FaShareSquare} size="20" color="currentColor" />
+					</button>
+				</div>
+			{/if}
+		</div>
+	{/snippet}
 </AchievementSummary>
 
 <Modal
 	id="share-modal"
 	title="Share your {achievement.name} badge"
 	visible={showModal}
-	on:close={() => {
+	onclose={() => {
 		showModal = false;
 	}}
 	actions={[]}
@@ -125,10 +135,10 @@
 		>
 		<button
 			class="rounded-none rounded-r bg-gray-50 p-2 mr-3 border border-gray-300 text-gray-700 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm cursor-pointer"
-			on:click={() => {
+			onclick={() => {
 				handleCopyToClipboard();
 			}}
-			on:keypress={() => {
+			onkeypress={() => {
 				handleCopyToClipboard();
 			}}
 		>

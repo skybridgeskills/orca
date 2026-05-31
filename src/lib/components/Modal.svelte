@@ -2,37 +2,50 @@
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import Button from '$lib/components/Button.svelte';
-	import { createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
-
-	export let visible = false;
-	export let id = 'modalDialog';
-	export let title = 'Modal Dialog';
-	let element: HTMLElement | null;
-
-	const handleClose = () => {
-		dispatch('close');
-	};
 
 	interface Action {
 		label: string;
 		submodule?: App.ButtonRole;
 		buttonType?: 'button' | 'submit';
-		onClick: (() => void) | ((e: CustomEvent<any>) => void);
+		onClick: (e: MouseEvent | KeyboardEvent) => void;
 	}
-	export let actions: Action[] = [
-		{
-			label: 'Close',
-			buttonType: 'button',
-			submodule: 'primary',
-			onClick: handleClose
-		}
-	];
+
+	interface Props {
+		visible?: boolean;
+		id?: string;
+		title?: string;
+		actions?: Action[];
+		onclose?: () => void;
+		heading?: import('svelte').Snippet;
+		children?: import('svelte').Snippet;
+	}
+
+	const handleClose = () => {
+		onclose?.();
+	};
+
+	let {
+		visible = false,
+		id = 'modalDialog',
+		title = 'Modal Dialog',
+		onclose,
+		actions = [
+			{
+				label: 'Close',
+				buttonType: 'button',
+				submodule: 'primary',
+				onClick: handleClose
+			}
+		],
+		heading,
+		children
+	}: Props = $props();
+
+	let element: HTMLElement | null;
 
 	onMount(() => {
 		element = document.getElementById(id);
-		element?.addEventListener('transitionend', (e) => {
+		element?.addEventListener('transitionend', () => {
 			if (element && visible) element.focus();
 		});
 		element?.addEventListener('focusout', (e) => {
@@ -57,11 +70,13 @@
 			<div class="relative bg-white dark:bg-gray-900 rounded-lg shadow-sm">
 				<!-- Modal header -->
 				<div class="flex items-start justify-between p-4 border-b rounded-t">
-					<slot name="heading"
-						><h4 class="text-xl sm:text-2xl text-gray-800 dark:text-white mt-0!">{title}</h4></slot
-					>
+					{#if heading}{@render heading()}{:else}<h4
+							class="text-xl sm:text-2xl text-gray-800 dark:text-white mt-0!"
+						>
+							{title}
+						</h4>{/if}
 					<button
-						on:click={handleClose}
+						onclick={handleClose}
 						type="button"
 						class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
 						data-modal-toggle="defaultModal"
@@ -83,7 +98,7 @@
 				</div>
 				<!-- Modal body -->
 				<div class="p-6 space-y-6">
-					<slot />
+					{@render children?.()}
 				</div>
 				<!-- Modal footer -->
 				{#if actions.length > 0}
@@ -92,7 +107,7 @@
 							<Button
 								submodule={action.submodule}
 								buttonType={action.buttonType}
-								on:click={action.onClick}>{action.label}</Button
+								onclick={action.onClick}>{action.label}</Button
 							>
 						{/each}
 					</div>

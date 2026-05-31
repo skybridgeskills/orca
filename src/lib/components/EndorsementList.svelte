@@ -15,15 +15,21 @@
 
 	const claimId = getContext('claimId');
 
-	export let data: {
-		pageSize: number;
-		page: number;
-		total: number;
-	};
+	interface Props {
+		data: {
+			pageSize: number;
+			page: number;
+			total: number;
+		};
+	}
 
-	let endorsements: EndorsementTableData[] = [];
+	let { data }: Props = $props();
 
-	$: ({ pageSize, page, total } = data);
+	let page = $state(data.page);
+	let pageSize = $state(data.pageSize);
+	let total = $state(data.total);
+
+	let endorsements: EndorsementTableData[] = $state([]);
 
 	const getFetchUrl = (pageToFetch: number) => {
 		return `/endorsements?claimId=${claimId}&${PAGE_QUERY_PARAM}=${pageToFetch}&${PAGE_SIZE_QUERY_PARAM}=${pageSize}`;
@@ -47,15 +53,17 @@
 		{#each endorsements as endorsement (endorsement.id)}
 			<Card maxWidth="max-w-2xl mb-3">
 				<ActionHeading>
-					<span slot="heading" class="dark:text-gray-400">
-						{#if endorsement.creator?.givenName || endorsement.creator?.familyName}
-							{endorsement.creator?.givenName || ''}
-							{endorsement.creator?.familyName || ''}
-						{/if}
-					</span>
-					<span slot="actions" class="dark:text-gray-400"
-						>{new Date(endorsement.createdAt).toDateString()}</span
-					>
+					{#snippet heading()}
+						<span class="dark:text-gray-400">
+							{#if endorsement.creator?.givenName || endorsement.creator?.familyName}
+								{endorsement.creator?.givenName || ''}
+								{endorsement.creator?.familyName || ''}
+							{/if}
+						</span>
+					{/snippet}
+					{#snippet actions()}
+						<span class="dark:text-gray-400">{new Date(endorsement.createdAt).toDateString()}</span>
+					{/snippet}
 				</ActionHeading>
 
 				<EvidenceItem item={evidenceItem(endorsement)} />

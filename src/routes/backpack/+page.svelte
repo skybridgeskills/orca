@@ -123,13 +123,13 @@
 					href={`/claims/${claim.id}`}
 					linkAchievement={false}
 				>
-					<div slot="moredescription">
+					{#snippet moredescription()}
 						<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
 							{m.equal_active_parrot_march()}
 							{dayjs(claim.createdOn).fromNow()}
 						</p>
-					</div>
-					<div slot="actions">
+					{/snippet}
+					{#snippet actions()}
 						{#if claim.claimStatus === 'ACCEPTED' && claim.validFrom}
 							<div class="p-2 flex flex-row space-x-3">
 								<a
@@ -159,19 +159,23 @@
 								</button>
 							</div>
 						{/if}
-					</div>
+					{/snippet}
 				</AchievementSummary>
 			</div>
 		{/if}
 	{:else}
 		<EmptyStateZone title="You haven't claimed any badges yet.">
-			<Backpack slot="image" />
-			<p slot="description">
-				{m.male_serious_pug_link()}
-				<br /><a href="/achievements" class="font-bold underline hover:no-underline"
-					>{m.arable_aqua_deer_scribe()}</a
-				>.
-			</p>
+			{#snippet image()}
+				<Backpack />
+			{/snippet}
+			{#snippet descriptionSnippet()}
+				<p>
+					{m.male_serious_pug_link()}
+					<br /><a href="/achievements" class="font-bold underline hover:no-underline"
+						>{m.arable_aqua_deer_scribe()}</a
+					>.
+				</p>
+			{/snippet}
 		</EmptyStateZone>
 	{/each}
 {/if}
@@ -180,7 +184,7 @@
 	id="share-modal"
 	title="Share your {currentShareIntent?.achievement.name} badge"
 	visible={!!currentShareIntent}
-	on:close={() => {
+	onclose={() => {
 		currentShareIntent = null;
 	}}
 	actions={[]}

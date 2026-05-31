@@ -197,7 +197,7 @@
 			submodule="secondary"
 			buttonType="button"
 			text={m.calm_steady_lynx_cancel()}
-			on:click={handleCancel}
+			onclick={handleCancel}
 		/>
 	</div>
 </form>
