@@ -2,7 +2,12 @@
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	import * as m from '$lib/i18n/messages';
 	import type { Achievement, AchievementClaim, AchievementCredential } from '@prisma/client';
-	export let claim: AchievementClaim | null;
+
+	interface Props {
+		claim: AchievementClaim | null;
+	}
+
+	let { claim }: Props = $props();
 
 	const claimData = JSON.parse(claim?.json?.toString() || '{}') || {};
 </script>

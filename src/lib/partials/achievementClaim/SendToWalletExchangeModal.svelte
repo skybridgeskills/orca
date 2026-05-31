@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import * as m from '$lib/i18n/messages';
@@ -9,8 +8,13 @@
 		type ExchangeProtocolValue
 	} from './exchangeProtocolOptions';
 
-	export let open = false;
-	export let claimId: string;
+	interface Props {
+		open?: boolean;
+		claimId: string;
+		onclose?: () => void;
+	}
+
+	let { open = $bindable(false), claimId, onclose }: Props = $props();
 
 	type ExchangeProtocols = {
 		iu: string;
@@ -24,12 +28,13 @@
 		| { kind: 'ready'; data: ExchangeResponse }
 		| { kind: 'error'; status: number; message: string };
 
-	const dispatch = createEventDispatcher();
-	let state: State = { kind: 'loading' };
+	let exchangeState = $state<State>({ kind: 'loading' });
 	let abortController: AbortController | null = null;
-	let selectedProtocol: ExchangeProtocolValue = 'iu';
-	$: options = state.kind === 'ready' ? buildProtocolOptions(state.data.protocols) : [];
-	$: activeOption = options.find((o) => o.value === selectedProtocol) ?? options[0];
+	let selectedProtocol: ExchangeProtocolValue = $state('iu');
+	let options = $derived(
+		exchangeState.kind === 'ready' ? buildProtocolOptions(exchangeState.data.protocols) : []
+	);
+	let activeOption = $derived(options.find((o) => o.value === selectedProtocol) ?? options[0]);
 
 	function protocolOptionLabel(key: ExchangeProtocolMessageKey): string {
 		return (m as unknown as Record<string, () => string>)[key]();
@@ -39,13 +44,13 @@
 		abortController?.abort();
 		abortController = null;
 		open = false;
-		dispatch('close');
+		onclose?.();
 	}
 
 	async function startExchange() {
 		abortController?.abort();
 		abortController = new AbortController();
-		state = { kind: 'loading' };
+		exchangeState = { kind: 'loading' };
 		selectedProtocol = 'iu';
 		try {
 			const res = await fetch(`/claims/${claimId}/exchange`, {
@@ -60,29 +65,38 @@
 				} catch {
 					/* swallow */
 				}
-				state = { kind: 'error', status: res.status, message };
+				exchangeState = { kind: 'error', status: res.status, message };
 				return;
 			}
 			const data = (await res.json()) as ExchangeResponse;
 			const iu = data?.protocols?.iu;
 			if (typeof iu !== 'string' || !iu) {
-				state = { kind: 'error', status: 200, message: 'Missing interaction URL.' };
+				exchangeState = { kind: 'error', status: 200, message: 'Missing interaction URL.' };
 				return;
 			}
-			state = { kind: 'ready', data };
+			exchangeState = { kind: 'ready', data };
 		} catch (err) {
 			if ((err as Error)?.name === 'AbortError') return;
-			state = { kind: 'error', status: 0, message: 'Network error.' };
+			exchangeState = { kind: 'error', status: 0, message: 'Network error.' };
 		}
 	}
 
-	$: if (open) startExchange();
-	$: if (!open) abortController?.abort();
+	// Side-effect: drive the external wallet-exchange network request off the modal's
+	// open/closed state — initiate the exchange (async fetch) when opened, abort the
+	// in-flight request when closed. This is a genuine external side-effect reacting
+	// to the `open` prop, not state mirroring.
+	$effect(() => {
+		if (open) {
+			startExchange();
+		} else {
+			abortController?.abort();
+		}
+	});
 
 	// TODO(polling): see Q10 — once the transaction service exposes exchange status,
 	// poll while in `ready` to surface "credential delivered" or "expired" feedback.
 
-	$: modalActions = buildActions(state);
+	let modalActions = $derived(buildActions(exchangeState));
 
 	function buildActions(s: State) {
 		const closeAction = {
@@ -121,12 +135,12 @@
 	onclose={close}
 >
 	<div aria-live="polite" class="text-center text-sm text-gray-700 dark:text-gray-300">
-		{#if state.kind === 'loading'}
+		{#if exchangeState.kind === 'loading'}
 			<p class="my-4">Preparing your wallet handoff…</p>
 			<div
 				class="mx-auto my-4 h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
 			></div>
-		{:else if state.kind === 'ready'}
+		{:else if exchangeState.kind === 'ready'}
 			<p class="my-4">
 				Scan the QR with your wallet device, or click the button to open on this device. This link
 				expires in about 10 minutes.
@@ -165,7 +179,7 @@
 				</a>
 			</p>
 		{:else}
-			<p class="my-4">{userMessage(state)}</p>
+			<p class="my-4">{userMessage(exchangeState)}</p>
 		{/if}
 	</div>
 </Modal>

@@ -20,21 +20,26 @@
 	import { onMount } from 'svelte';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
 
-	export let achievement: Achievement & {
-		organization: Organization;
-		category: AchievementCategory | null;
-		achievementConfig?: App.ConfigWithRelations;
-	};
-	export let existingBadgeClaim: AchievementClaim | null;
-	export let exchangeEnabled = false;
+	interface Props {
+		achievement: Achievement & {
+			organization: Organization;
+			category: AchievementCategory | null;
+			achievementConfig?: App.ConfigWithRelations;
+		};
+		existingBadgeClaim: AchievementClaim | null;
+		exchangeEnabled?: boolean;
+	}
 
-	let showClaimForm = false;
-	let claimIntent: 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' =
-		existingBadgeClaim?.claimStatus || 'ACCEPTED';
+	let { achievement, existingBadgeClaim, exchangeEnabled = false }: Props = $props();
 
-	let sendToWalletModalVisible = false;
-	let showQRShareModal = false;
-	let exchangeModalOpen = false;
+	let showClaimForm = $state(false);
+	let claimIntent: 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' = $state(
+		existingBadgeClaim?.claimStatus || 'ACCEPTED'
+	);
+
+	let sendToWalletModalVisible = $state(false);
+	let showQRShareModal = $state(false);
+	let exchangeModalOpen = $state(false);
 
 	onMount(async () => {
 		await window.credentialHandlerPolyfill.loadOnce();
@@ -249,5 +254,11 @@
 {/if}
 
 {#if existingBadgeClaim?.id}
-	<SendToWalletExchangeModal bind:open={exchangeModalOpen} claimId={existingBadgeClaim.id} />
+	<SendToWalletExchangeModal
+		bind:open={exchangeModalOpen}
+		claimId={existingBadgeClaim.id}
+		onclose={() => {
+			exchangeModalOpen = false;
+		}}
+	/>
 {/if}

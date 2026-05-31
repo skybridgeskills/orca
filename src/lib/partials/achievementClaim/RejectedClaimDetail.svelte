@@ -6,12 +6,17 @@
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 
-	export let achievement: Achievement & {
-		category?: AchievementCategory | null;
-		achievementConfig?: App.ConfigWithRelations | null;
-	};
-	export let existingBadgeClaim: AchievementClaim | undefined;
-	let showClaimForm = false;
+	interface Props {
+		achievement: Achievement & {
+			category?: AchievementCategory | null;
+			achievementConfig?: App.ConfigWithRelations | null;
+		};
+		existingBadgeClaim: AchievementClaim | undefined;
+	}
+
+	let { achievement, existingBadgeClaim }: Props = $props();
+
+	let showClaimForm = $state(false);
 </script>
 
 <h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.petty_plane_marten_view()}</h1>
