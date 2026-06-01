@@ -8,12 +8,12 @@
 	import '../app.css';
 	import Nav from '$lib/components/Nav.svelte';
 	import Alert from '$lib/components/Alert.svelte';
-	import type { PageData } from './$types';
+	import type { LayoutProps } from './$types';
 	import { setLocale } from '$lib/i18n/runtime';
 	import { LoadingStatus } from '$lib/stores/common';
 	import { getFooterUrl } from '$lib/utils/footer-links';
 
-	export let data: PageData;
+	let { children, data }: LayoutProps = $props();
 	preferredTheme.initialize(data.cookieTheme || 'light');
 	setLocale(data.locale);
 
@@ -55,7 +55,7 @@
 	<main class="app-main bg-gray-100 dark:bg-gray-900">
 		<Nav org={data.org} />
 		<section class="max-w-7xl mx-auto py-4 px-4">
-			<slot />
+			{@render children()}
 		</section>
 	</main>
 

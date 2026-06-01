@@ -7,7 +7,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import { Icon } from 'svelte-icons-pack';
 	import { FaSolidEnvelopeOpenText } from 'svelte-icons-pack/fa';
 	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
@@ -50,12 +50,12 @@
 
 	dayjs.extend(relativeTime);
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
 
-	$: alignments = alignmentRowsFromAchievementJson(data.achievement.json);
-	$: hasAlignments = alignments.length > 0;
-	let showDeleteModal = false;
-	let showShareModal = false;
+	const alignments = $derived(alignmentRowsFromAchievementJson(data.achievement.json));
+	const hasAlignments = $derived(alignments.length > 0);
+	let showDeleteModal = $state(false);
+	let showShareModal = $state(false);
 
 	const breadcrumbItems = [
 		{ text: m.each_fluffy_fox_view(), href: '/' },
@@ -63,40 +63,39 @@
 		{ text: data.achievement.name }
 	];
 
-	let config: App.AchievementConfig | null = null;
-	let claim: AchievementClaim | undefined;
-	let category: AchievementCategory | undefined;
-	let userHoldsRequiredAchievement = false;
-	let inviteCapability = false;
-	let reviewRequires: Achievement | undefined;
-	let invite: (ClaimEndorsement & { creator: User | null }) | undefined;
-	$: {
-		config = data.achievement.achievementConfig as App.AchievementConfig | null;
-		claim = data.relatedClaims.find((c) => data.achievement.id == c.achievementId);
-		userHoldsRequiredAchievement =
-			data.relatedClaims.filter(
-				(c) =>
-					c.achievementId == config?.claimRequiresId &&
-					c.validFrom !== null &&
-					c.claimStatus === 'ACCEPTED' &&
-					(c.validUntil === null || new Date(c.validUntil) > new Date())
-			).length > 0;
-		inviteCapability =
-			isAdmin({ user: data.session?.user || undefined }) ||
+	let category: AchievementCategory | undefined = $state();
+
+	const config = $derived(data.achievement.achievementConfig as App.AchievementConfig | null);
+	const claim: AchievementClaim | undefined = $derived(
+		data.relatedClaims.find((c) => data.achievement.id == c.achievementId)
+	);
+	const userHoldsRequiredAchievement = $derived(
+		data.relatedClaims.filter(
+			(c) =>
+				c.achievementId == config?.claimRequiresId &&
+				c.validFrom !== null &&
+				c.claimStatus === 'ACCEPTED' &&
+				(c.validUntil === null || new Date(c.validUntil) > new Date())
+		).length > 0
+	);
+	const inviteCapability = $derived(
+		isAdmin({ user: data.session?.user || undefined }) ||
 			(!!config?.json?.capabilities?.inviteRequires &&
 				!!$backpackClaims.find(
 					(c) =>
 						c.achievementId == config?.json?.capabilities?.inviteRequires &&
 						c.validFrom &&
 						c.claimStatus == 'ACCEPTED'
-				));
-
-		reviewRequires = data.relatedAchievements
+				))
+	);
+	const reviewRequires: Achievement | undefined = $derived(
+		data.relatedAchievements
 			.filter((c) => data.achievement.achievementConfig?.reviewRequiresId == c.id)
-			.find(() => true);
-
-		invite = data.outstandingInvites.find((a) => true);
-	}
+			.find(() => true)
+	);
+	const invite: (ClaimEndorsement & { creator: User | null }) | undefined = $derived(
+		data.outstandingInvites.find((a) => true)
+	);
 
 	setContext('achievementId', data.achievement.id);
 	setContext('session', data.session);

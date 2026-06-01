@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
@@ -16,7 +16,7 @@
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 	import { page } from '$app/stores';
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
 
 	const levelByStatus: Record<string, App.NotificationLevel> = {
 		UNACCEPTED: 'warning',
@@ -32,7 +32,7 @@
 
 	setContext('claimId', data.claim.id);
 
-	$: translatedStatus = (() => {
+	const translatedStatus = $derived.by(() => {
 		switch (data.claim.claimStatus) {
 			case 'ACCEPTED':
 				return m.bright_swift_eagle_soar();
@@ -43,7 +43,7 @@
 			default:
 				return data.claim.claimStatus; // fallback to raw value
 		}
-	})();
+	});
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />

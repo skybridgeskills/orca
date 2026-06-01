@@ -1,11 +1,11 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
 	let achievement = data.credential.achievement;
 
 	let breadcrumbItems = [

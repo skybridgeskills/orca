@@ -8,14 +8,14 @@
 	import QRCode from '$lib/components/QRCode.svelte';
 	import Tag from '$lib/components/Tag.svelte';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	import Card from '$lib/components/Card.svelte';
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
-	export let data: PageData;
+	let { data }: PageProps = $props();
 	let member = data.member;
-	let showShareModal = false;
+	let showShareModal = $state(false);
 </script>
 
 <div class="max-w-2xl flex justify-between items-center mb-4">

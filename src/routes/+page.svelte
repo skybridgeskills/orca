@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import Card from '$lib/components/Card.svelte';
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import RightArrow from '$lib/illustrations/RightArrow.svelte';
@@ -8,7 +8,7 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
 </script>
 
 <Heading title={data.org.name} description={data.org.description} />

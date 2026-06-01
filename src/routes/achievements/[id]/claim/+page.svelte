@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import Alert from '$lib/components/Alert.svelte';
@@ -9,7 +9,7 @@
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
 	import { claimEmail, inviteId, inviteCreatedAt } from '$lib/stores/activeClaimStore';
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
 	const config = data.achievement.achievementConfig;
 
 	onMount(() => {

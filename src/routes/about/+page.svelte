@@ -1,9 +1,9 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import Button from '$lib/components/Button.svelte';
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
 </script>
 
 {#if data.session?.user?.orgRole === 'GENERAL_ADMIN'}

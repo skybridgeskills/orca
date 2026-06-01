@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import Button from '$lib/components/Button.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
@@ -24,7 +24,7 @@
 	import Alert from '$lib/components/Alert.svelte';
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
 	const U = {
 		id: 'uncategorized',
 		organizationId: data.org.id,
@@ -34,22 +34,24 @@
 
 	const categoryAchievements: {
 		[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;
-	} = {};
-	const mapCategories = () => {
+	} = $derived.by(() => {
+		const map: {
+			[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;
+		} = {};
 		[...$achievementCategories, U].map(
 			(c: AchievementCategory) =>
-				(categoryAchievements[c.id] = $achievements.filter(
+				(map[c.id] = $achievements.filter(
 					(a: Achievement) => a.categoryId == c.id || (!a.categoryId && c.id == 'uncategorized')
 				))
 		);
-	};
+		return map;
+	});
 
 	onMount(async () => {
 		await Promise.all([
 			ensureLoaded(achievementsLoading, fetchAchievements),
 			ensureLoaded(acLoading, fetchAchievementCategories)
 		]);
-		mapCategories();
 	});
 </script>
 

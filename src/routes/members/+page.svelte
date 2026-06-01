@@ -4,9 +4,9 @@
 	import Pagination from '$lib/components/Pagination.svelte';
 	import Tag from '$lib/components/Tag.svelte';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
 	let members = data.members;
 </script>
 
