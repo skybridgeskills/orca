@@ -93,13 +93,8 @@
 	</footer>
 </div>
 
-<style lang="postcss" global>
+<style lang="postcss">
 	@reference '../app.css';
-
-	html,
-	body {
-		height: 100%;
-	}
 
 	.app-wrapper {
 		min-height: 100%;

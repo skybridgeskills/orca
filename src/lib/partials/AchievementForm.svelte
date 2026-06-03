@@ -787,7 +787,7 @@
 				>{m.bold_swift_eagle_submit()}</button
 			>
 			<a
-				href={resolve('/achievements')}
+				href={resolve('/achievements', { replaceState: false })}
 				class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-hidden dark:focus:ring-gray-800"
 				>{m.calm_steady_lynx_cancel()}</a
 			>
@@ -795,14 +795,19 @@
 	</div>
 </form>
 
-<style lang="postcss" global>
+<style lang="postcss">
 	@reference '../../app.css';
 
 	.isError label {
 		@apply text-red-700;
 	}
-	.dark .isError label {
-		@apply text-red-500;
+	:global(.dark) {
+		.isError label {
+			@apply text-red-500;
+		}
+		.isError input {
+			@apply bg-red-100 border-red-400;
+		}
 	}
 
 	.isError input {
@@ -810,8 +815,5 @@
 	}
 	.isError input:focus {
 		@apply border-red-500;
-	}
-	.dark .isError input {
-		@apply bg-red-100 border-red-400;
 	}
 </style>
