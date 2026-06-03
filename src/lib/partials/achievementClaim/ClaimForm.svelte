@@ -16,7 +16,7 @@
 	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
-	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	interface Props {
 		existingBadgeClaim?: AchievementClaim | null;

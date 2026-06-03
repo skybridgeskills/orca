@@ -7,7 +7,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
-	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 
 	export let data: PageData;
 	export let form;

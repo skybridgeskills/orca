@@ -10,7 +10,7 @@
 	import type { AchievementCategory } from '@prisma/client';
 	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
 	import Heading from '$lib/components/Heading.svelte';
-	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import {
 		achievementsLoading,

@@ -8,7 +8,7 @@
 	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
 	import { evidenceItem } from '$lib/utils/evidenceItem';
 	import Button from '$lib/components/Button.svelte';
-	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 
 	export let data: PageData;
