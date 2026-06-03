@@ -168,6 +168,13 @@
 											>{m.piquant_weary_okapi_enchant()}</a
 										>
 									</li>
+									<li>
+										<a
+											href="/apps"
+											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+											>{m.breezy_amber_lynx_connect()}</a
+										>
+									</li>
 								</ul>
 								<div class="py-2">
 									<form
@@ -194,6 +201,7 @@
 							class="md:hidden"
 						/>
 						<NavItem href="/settings" title={m.piquant_weary_okapi_enchant()} class="md:hidden" />
+						<NavItem href="/apps" title={m.breezy_amber_lynx_connect()} class="md:hidden" />
 						<li class="md:hidden">
 							<DarkModeToggle />
 						</li>
