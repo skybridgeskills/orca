@@ -107,8 +107,8 @@ declare module 'jsonld-signatures/ProofSet' {
 			}
 		): Promise<{
 			verified: boolean;
-			results: any[];
-			error: any;
+			results: unknown[];
+			error: unknown;
 		}>;
 	}
 }
@@ -122,23 +122,25 @@ declare module 'jsonld-signatures/VerificationError' {
 		 * @param {Error|Error[]} errors
 		 */
 		constructor(errors: Error | Error[]);
-		errors: any[];
+		errors: unknown[];
 	}
 }
 declare module 'jsonld-signatures/constants' {
-	export const SECURITY_CONTEXT_URL: any;
-	export const SECURITY_CONTEXT_V1_URL: any;
-	export const SECURITY_CONTEXT_V2_URL: any;
+	export const SECURITY_CONTEXT_URL: unknown;
+	export const SECURITY_CONTEXT_V1_URL: unknown;
+	export const SECURITY_CONTEXT_V2_URL: unknown;
 	export const SECURITY_PROOF_URL: string;
 	export const SECURITY_SIGNATURE_URL: string;
 }
 declare module 'jsonld-signatures/contexts' {
-	const _exports: Map<any, any>;
+	const _exports: Map<unknown, unknown>;
 	export = _exports;
 }
 declare module 'jsonld-signatures/documentLoader' {
-	export function extendContextLoader(documentLoader: any): (url: any) => Function;
-	export function strictDocumentLoader(url: any): Function;
+	export function extendContextLoader(
+		documentLoader: unknown
+	): (url: unknown) => (...args: unknown[]) => unknown;
+	export function strictDocumentLoader(url: unknown): (...args: unknown[]) => unknown;
 }
 declare module 'jsonld-signatures' {
 	import VerificationError = require('jsonld-signatures/lib/VerificationError');
@@ -172,7 +174,7 @@ declare module 'jsonld-signatures' {
 	 * @returns {Promise<object>} Resolves with signed document.
 	 */
 	export function sign(
-		document: any,
+		document: unknown,
 		{
 			suite,
 			purpose,
@@ -185,7 +187,7 @@ declare module 'jsonld-signatures' {
 			documentLoader: (url: string) => Promise<RemoteDocument>;
 			addSuiteContext?: boolean;
 		}
-	): Promise<any>;
+	): Promise<unknown>;
 	/**
 	 * Verifies the linked data signature on the provided document.
 	 *
@@ -215,25 +217,25 @@ declare module 'jsonld-signatures' {
 	 *   containing all of the errors that occurred during the verification process.
 	 */
 	export function verify(
-		document: any,
+		document: unknown,
 		{
 			suite,
 			purpose,
 			documentLoader,
 			expansionMap
 		}?: {
-			suite: any;
+			suite: unknown;
 			purpose: ProofPurpose;
 			documentLoader?: (url: string) => Promise<RemoteDocument>;
 		}
 	): Promise<{
 		verified: boolean;
-		results: any[];
+		results: unknown[];
 		error: VerificationError;
 	}>;
 	export const suites: {
 		LinkedDataProof: {
-			new ({ type }?: { type: any }): import('jsonld-signatures/lib/suites/LinkedDataProof');
+			new ({ type }?: { type: unknown }): import('jsonld-signatures/lib/suites/LinkedDataProof');
 		};
 		LinkedDataSignature: {
 			new ({
@@ -261,8 +263,8 @@ declare module 'jsonld-signatures' {
 				maxTimestampDelta
 			}?: {
 				term?: string;
-				controller: any;
-				date: any;
+				controller: unknown;
+				date: unknown;
 				maxTimestampDelta?: number;
 			}): import('jsonld-signatures/lib/purposes/AssertionProofPurpose');
 		};
@@ -276,10 +278,10 @@ declare module 'jsonld-signatures' {
 				maxTimestampDelta
 			}?: {
 				term?: string;
-				controller: any;
-				challenge: any;
-				date: any;
-				domain: any;
+				controller: unknown;
+				challenge: unknown;
+				date: unknown;
+				domain: unknown;
 				maxTimestampDelta?: number;
 			}): import('jsonld-signatures/lib/purposes/AuthenticationProofPurpose');
 		};
@@ -301,8 +303,8 @@ declare module 'jsonld-signatures' {
 	};
 
 	// these are actually auto assigned to this object in the loading of the main file of the lib
-	export function extendContextLoader(documentLoader: any): (url: any) => Promise;
-	export function strictDocumentLoader(url: any): Promise;
+	export function extendContextLoader(documentLoader: unknown): (url: unknown) => Promise;
+	export function strictDocumentLoader(url: unknown): Promise;
 }
 declare module 'jsonld-signatures/purposes' {
 	export namespace purposes {
@@ -314,8 +316,8 @@ declare module 'jsonld-signatures/purposes' {
 				maxTimestampDelta
 			}?: {
 				term?: string;
-				controller: any;
-				date: any;
+				controller: unknown;
+				date: unknown;
 				maxTimestampDelta?: number;
 			}): import('jsonld-signatures/lib/purposes/AssertionProofPurpose');
 		};
@@ -329,10 +331,10 @@ declare module 'jsonld-signatures/purposes' {
 				maxTimestampDelta
 			}?: {
 				term?: string;
-				controller: any;
-				challenge: any;
-				date: any;
-				domain: any;
+				controller: unknown;
+				challenge: unknown;
+				date: unknown;
+				domain: unknown;
 				maxTimestampDelta?: number;
 			}): import('jsonld-signatures/lib/purposes/AuthenticationProofPurpose');
 		};
@@ -363,8 +365,8 @@ declare module 'jsonld-signatures/purposes/AssertionProofPurpose' {
 			maxTimestampDelta
 		}?: {
 			term?: string;
-			controller: any;
-			date: any;
+			controller: unknown;
+			date: unknown;
 			maxTimestampDelta?: number;
 		});
 	}
@@ -382,50 +384,50 @@ declare module 'jsonld-signatures/purposes/AuthenticationProofPurpose' {
 			maxTimestampDelta
 		}?: {
 			term?: string;
-			controller: any;
-			challenge: any;
-			date: any;
-			domain: any;
+			controller: unknown;
+			challenge: unknown;
+			date: unknown;
+			domain: unknown;
 			maxTimestampDelta?: number;
 		});
 		challenge: string;
-		domain: any;
+		domain: unknown;
 		validate(
-			proof: any,
+			proof: unknown,
 			{
 				verificationMethod,
 				documentLoader,
 				expansionMap
 			}: {
-				verificationMethod: any;
-				documentLoader: any;
-				expansionMap: any;
+				verificationMethod: unknown;
+				documentLoader: unknown;
+				expansionMap: unknown;
 			}
 		): Promise<{
 			valid: boolean;
-			error: any;
+			error: unknown;
 		}>;
 		update(
-			proof: any,
+			proof: unknown,
 			{
 				document,
 				suite,
 				documentLoader,
 				expansionMap
 			}: {
-				document: any;
-				suite: any;
-				documentLoader: any;
-				expansionMap: any;
+				document: unknown;
+				suite: unknown;
+				documentLoader: unknown;
+				expansionMap: unknown;
 			}
-		): Promise<any>;
+		): Promise<unknown>;
 	}
 	import ControllerProofPurpose = require('jsonld-signatures/lib/purposes/ControllerProofPurpose');
 }
 declare module 'jsonld-signatures/purposes/ControllerProofPurpose' {
 	export = ControllerProofPurpose;
 	class ControllerProofPurpose extends ProofPurpose {
-		controller: any;
+		controller: unknown;
 		_termDefinedByDIDContext: boolean;
 		/**
 		 * Validates the purpose of a proof. This method is called during
@@ -444,15 +446,15 @@ declare module 'jsonld-signatures/purposes/ControllerProofPurpose' {
 		 * @returns {Promise<{valid: boolean, error: Error}>}
 		 */
 		validate(
-			proof: any,
+			proof: unknown,
 			{
 				verificationMethod,
 				documentLoader,
 				expansionMap
 			}: {
-				verificationMethod: any;
-				documentLoader: any;
-				expansionMap: any;
+				verificationMethod: unknown;
+				documentLoader: unknown;
+				expansionMap: unknown;
 			}
 		): Promise<{
 			valid: boolean;
@@ -473,9 +475,9 @@ declare module 'jsonld-signatures/purposes/ProofPurpose' {
 		 *   the date on the signature can deviate from, defaults to `Infinity`.
 		 */
 		constructor({ term, date, maxTimestampDelta }?: string);
-		term: any;
+		term: unknown;
 		date: Date;
-		maxTimestampDelta: any;
+		maxTimestampDelta: unknown;
 		/**
 		 * Called to validate the purpose of a proof. This method is called during
 		 * proof verification, after the proof value has been checked against the
@@ -492,7 +494,7 @@ declare module 'jsonld-signatures/purposes/ProofPurpose' {
 			{
 				expansionMap
 			}: {
-				expansionMap: any;
+				expansionMap: unknown;
 			}
 		): Promise<object>;
 		/**
@@ -512,7 +514,7 @@ declare module 'jsonld-signatures/purposes/ProofPurpose' {
 			{
 				expansionMap
 			}: {
-				expansionMap: any;
+				expansionMap: unknown;
 			}
 		): Promise<object>;
 		/**
@@ -529,7 +531,7 @@ declare module 'jsonld-signatures/purposes/ProofPurpose' {
 			{
 				expansionMap
 			}: {
-				expansionMap: any;
+				expansionMap: unknown;
 			}
 		): Promise<boolean>;
 	}
@@ -557,7 +559,7 @@ declare module 'jsonld-signatures/sha256digest' {
 declare module 'jsonld-signatures/suites' {
 	export namespace suites {
 		const LinkedDataProof: {
-			new ({ type }?: { type: any }): import('jsonld-signatures/lib/suites/LinkedDataProof');
+			new ({ type }?: { type: unknown }): import('jsonld-signatures/lib/suites/LinkedDataProof');
 		};
 		const LinkedDataSignature: {
 			new ({
@@ -573,14 +575,14 @@ declare module 'jsonld-signatures/suites' {
 				contextUrl
 			}?: {
 				type: string;
-				proof?: any;
-				LDKeyClass: any;
+				proof?: unknown;
+				LDKeyClass: unknown;
 				date?: string | Date;
 				key?: import('jsonld-signatures/KeyObject');
 				signer?: { sign: Promise; id: string };
 				verifier?: { verify: Promise; id: string };
 				useNativeCanonize?: boolean;
-				canonizeOptions?: any;
+				canonizeOptions?: unknown;
 				contextUrl: string;
 			}): import('jsonld-signatures/lib/suites/LinkedDataSignature');
 		};
@@ -589,7 +591,7 @@ declare module 'jsonld-signatures/suites' {
 declare module 'jsonld-signatures/suites/LinkedDataProof' {
 	export = LinkedDataProof;
 	class LinkedDataProof {
-		constructor({ type }?: { type: any });
+		constructor({ type }?: { type: unknown });
 		type: string;
 		/**
 		 * @param {object} options - The options to use.
@@ -600,11 +602,11 @@ declare module 'jsonld-signatures/suites/LinkedDataProof' {
 		 *
 		 * @returns {Promise<object>} Resolves with the created proof object.
 		 */
-		createProof({}: {
+		createProof(options: {
 			document: object;
 			purpose: ProofPurpose;
-			documentLoader: Function;
-			expansionMap: Function;
+			documentLoader: (...args: unknown[]) => unknown;
+			expansionMap: (...args: unknown[]) => unknown;
 		}): Promise<object>;
 		/**
 		 * @param {object} options - The options to use.
@@ -616,12 +618,12 @@ declare module 'jsonld-signatures/suites/LinkedDataProof' {
 		 *
 		 * @returns {Promise<{object}>} Resolves with the verification result.
 		 */
-		verifyProof({}: {
+		verifyProof(options: {
 			proof: object;
 			document: object;
 			purpose: ProofPurpose;
-			documentLoader: Function;
-			expansionMap: Function;
+			documentLoader: (...args: unknown[]) => unknown;
+			expansionMap: (...args: unknown[]) => unknown;
 		}): Promise<{
 			object;
 		}>;
@@ -667,13 +669,13 @@ declare module 'jsonld-signatures/suites/LinkedDataSignature' {
 		 *   itself (when using a KMS, you never have access to the private key,
 		 *   and so should use the `signer` param instead).
 		 *
-		 * @param {{sign: Function, id: string}} [options.signer] - Signer object
+		 * @param {{sign: (...args: unknown[]) => unknown, id: string}} [options.signer] - Signer object
 		 *   that has two properties: an async `sign()` method, and an `id`. This is
 		 *   useful when interfacing with a KMS (since you don't get access to the
 		 *   private key and its `signer`, the KMS client gives you only the signer
 		 *   object to use).
 		 *
-		 * @param {{verify: Function, id: string}} [options.verifier] - Verifier
+		 * @param {{verify: (...args: unknown[]) => unknown, id: string}} [options.verifier] - Verifier
 		 *   object that has two properties: an async `verify()` method, and an `id`.
 		 *   Useful when working with a KMS-provided verifier.
 		 *
@@ -703,34 +705,34 @@ declare module 'jsonld-signatures/suites/LinkedDataSignature' {
 			contextUrl
 		}?: {
 			type: string;
-			proof?: any;
-			LDKeyClass: any;
+			proof?: unknown;
+			LDKeyClass: unknown;
 			date?: string | Date;
 			key?: import('jsonld-signatures/KeyObject');
 			signer?: { sign: Promise; id: string };
 			verifier?: { verify: Promise; id: string };
 			useNativeCanonize?: boolean;
-			canonizeOptions?: any;
+			canonizeOptions?: unknown;
 			contextUrl: string;
 		});
-		LDKeyClass: any;
-		contextUrl: any;
-		proof: any;
+		LDKeyClass: unknown;
+		contextUrl: unknown;
+		proof: unknown;
 		verificationMethod: string;
-		key: any;
+		key: unknown;
 		signer: {
-			sign: Function;
+			sign: (...args: unknown[]) => unknown;
 			id: string;
 		};
 		verifier: {
-			verify: Function;
+			verify: (...args: unknown[]) => unknown;
 			id: string;
 		};
-		canonizeOptions: any;
+		canonizeOptions: unknown;
 		date: Date;
-		useNativeCanonize: any;
+		useNativeCanonize: unknown;
 		_hashCache: {
-			document: any;
+			document: unknown;
 			hash: Promise<Uint8Array>;
 		};
 		/**
@@ -745,32 +747,32 @@ declare module 'jsonld-signatures/suites/LinkedDataSignature' {
 			expansionMap
 		}: {
 			proof: object;
-			expansionMap: Function;
+			expansionMap: (...args: unknown[]) => unknown;
 		}): Promise<object>;
 		canonize(
-			input: any,
+			input: unknown,
 			{
 				documentLoader,
 				expansionMap,
 				skipExpansion
 			}: {
-				documentLoader: any;
-				expansionMap: any;
-				skipExpansion: any;
+				documentLoader: unknown;
+				expansionMap: unknown;
+				skipExpansion: unknown;
 			}
-		): Promise<any>;
+		): Promise<unknown>;
 		canonizeProof(
-			proof: any,
+			proof: unknown,
 			{
 				document,
 				documentLoader,
 				expansionMap
 			}: {
-				document: any;
-				documentLoader: any;
-				expansionMap: any;
+				document: unknown;
+				documentLoader: unknown;
+				expansionMap: unknown;
 			}
-		): Promise<any>;
+		): Promise<unknown>;
 		/**
 		 * @param {object} options - The options to use.
 		 * @param {object} options.document - The document to be signed/verified.
@@ -788,8 +790,8 @@ declare module 'jsonld-signatures/suites/LinkedDataSignature' {
 		}: {
 			document: object;
 			proof: object;
-			documentLoader: Function;
-			expansionMap: Function;
+			documentLoader: (...args: unknown[]) => unknown;
+			expansionMap: (...args: unknown[]) => unknown;
 		}): Promise<{
 			Uint8Array;
 		}>;
@@ -798,7 +800,7 @@ declare module 'jsonld-signatures/suites/LinkedDataSignature' {
 		 * @param proof {object}
 		 * @param documentLoader {function}
 		 */
-		getVerificationMethod({ proof, documentLoader }: object): Promise<any>;
+		getVerificationMethod({ proof, documentLoader }: object): Promise<unknown>;
 		/**
 		 * @param verifyData {Uint8Array}.
 		 * @param document {object} to be signed.
@@ -849,7 +851,7 @@ declare module 'jsonld-signatures/util' {
 	 *
 	 * @return the date in W3C datetime format.
 	 */
-	export function w3cDate(date: any): string;
+	export function w3cDate(date: unknown): string;
 	/**
 	 * Concatenates two Uint8Arrays.
 	 *

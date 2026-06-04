@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import type { FullConfig } from '@playwright/test';
 import { prisma } from '../../../src/prisma/client.js';
 
 function _populate_process_env(): void {
@@ -8,7 +7,7 @@ function _populate_process_env(): void {
 	process.env.ORG_DOMAIN = `localhost:${process.env.SERVER_PORT}`;
 }
 
-export default async function (_config: FullConfig): Promise<() => Promise<void>> {
+export default async function (): Promise<() => Promise<void>> {
 	_populate_process_env();
 
 	const organization = await prisma.organization.create({

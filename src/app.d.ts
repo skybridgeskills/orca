@@ -171,6 +171,15 @@ interface Window {
 	};
 }
 
+declare module '$app/paths' {
+	/**
+	 * Fallback for resolve() when the argument is a string variable or TS
+	 * cannot distribute ResolveArgs over the large generated RouteId union.
+	 * String literals still prefer the generic overload (full route safety).
+	 */
+	export function resolve(pathname: string): string;
+}
+
 /**
  * It's possible to tell SvelteKit how to type objects inside your app by declaring the `App` namespace. By default, a new project will have a file called `src/app.d.ts` containing the following:
  *

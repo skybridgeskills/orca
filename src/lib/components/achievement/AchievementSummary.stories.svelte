@@ -44,7 +44,10 @@
 	<div class="p-4">
 		<AchievementSummary {achievement} linkAchievement={false}>
 			{#snippet actions()}
-				<a href="#" class="text-sm font-medium text-blue-700 hover:underline">View</a>
+				<!-- Demo action only (Storybook has nowhere to navigate); real usages
+				     render a route link here, e.g. <a href={resolve(`/achievements/${id}`)}>. -->
+				<button type="button" class="text-sm font-medium text-blue-700 hover:underline">View</button
+				>
 			{/snippet}
 		</AchievementSummary>
 	</div>

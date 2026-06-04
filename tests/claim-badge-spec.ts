@@ -1,18 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { prisma } from '../src/prisma/client.js';
-import type { Achievement, Organization } from '@prisma/client';
+import type { Achievement } from '@prisma/client';
 
-let currentOrgUrl = `http://${process.env.ORG_DOMAIN}`;
-let organization: Organization;
+const currentOrgUrl = `http://${process.env.ORG_DOMAIN}`;
 let achievement: Achievement;
 
 test.beforeAll(async () => {
-	organization = await prisma.organization.findUniqueOrThrow({
-		where: {
-			id: process.env.ORG_ID
-		}
-	});
-
 	achievement = await prisma.achievement.findUniqueOrThrow({
 		where: {
 			id: process.env.ACHIEVEMENT_ID

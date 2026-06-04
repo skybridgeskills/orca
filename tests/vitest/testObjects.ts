@@ -6,7 +6,6 @@ import type {
 	SigningKey,
 	User
 } from '@prisma/client';
-import { test } from 'vitest';
 
 export const testDate = new Date('2023-05-23');
 

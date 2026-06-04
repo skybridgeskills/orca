@@ -19,7 +19,7 @@
 
 	$: {
 		if (form && form.endorsement) {
-			const endorsement = form.endorsement as any;
+			const endorsement = form.endorsement as unknown;
 			if ('json' in endorsement && typeof endorsement.json === 'string') {
 				endorsementJson = JSON.parse(endorsement.json);
 			} else {

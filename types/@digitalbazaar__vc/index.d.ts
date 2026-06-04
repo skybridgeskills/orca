@@ -163,8 +163,8 @@ declare module '@digitalbazaar/vc' {
 	 * @param {string} [options.controller] - A controller.
 	 * @param {string} [options.domain] - A domain.
 	 *
-	 * @param {Function} [options.documentLoader] - A document loader.
-	 * @param {Function} [options.checkStatus] - Optional function for checking
+	 * @param {(...args: unknown[]) => unknown} [options.documentLoader] - A document loader.
+	 * @param {(...args: unknown[]) => unknown} [options.checkStatus] - Optional function for checking
 	 *   credential status if `credentialStatus` is present on the credential.
 	 * @param {string|Date} [options.now] - A string representing date time in
 	 *   ISO 8601 format or an instance of Date. Defaults to current date time.
@@ -175,12 +175,12 @@ declare module '@digitalbazaar/vc' {
 		presentation: VerifiablePresentation;
 		suite: LinkedDataSignature | LinkedDataSignature[];
 		unsignedPresentation?: boolean;
-		presentationPurpose?: any;
+		presentationPurpose?: unknown;
 		challenge?: string;
 		controller?: string;
 		domain?: string;
-		documentLoader?: Function;
-		checkStatus?: Function;
+		documentLoader?: (...args: unknown[]) => unknown;
+		checkStatus?: (...args: unknown[]) => unknown;
 		now?: string | Date;
 	}): Promise<VerifyPresentationResult>;
 	/**
@@ -203,8 +203,8 @@ declare module '@digitalbazaar/vc' {
 	 *
 	 * @param {CredentialIssuancePurpose} [options.purpose] - Optional
 	 *   proof purpose (a default one will be created if not passed in).
-	 * @param {Function} [options.documentLoader] - A document loader.
-	 * @param {Function} [options.checkStatus] - Optional function for checking
+	 * @param {(...args: unknown[]) => unknown} [options.documentLoader] - A document loader.
+	 * @param {(...args: unknown[]) => unknown} [options.checkStatus] - Optional function for checking
 	 *   credential status if `credentialStatus` is present on the credential.
 	 * @param {string|Date} [options.now] - A string representing date time in
 	 *   ISO 8601 format or an instance of Date. Defaults to current date time.
@@ -215,8 +215,8 @@ declare module '@digitalbazaar/vc' {
 		credential: object;
 		suite: LinkedDataSignature | LinkedDataSignature[];
 		purpose?: CredentialIssuancePurpose;
-		documentLoader?: Function;
-		checkStatus?: Function;
+		documentLoader?: (...args: unknown[]) => unknown;
+		checkStatus?: (...args: unknown[]) => unknown;
 		now?: string | Date;
 	}): Promise<VerifyCredentialResult>;
 	/**
@@ -264,7 +264,7 @@ declare module '@digitalbazaar/vc' {
 	 * @param {string} [options.domain] - A domain.
 	 * @param {string} options.challenge - A required challenge.
 	 *
-	 * @param {Function} [options.documentLoader] - A document loader.
+	 * @param {(...args: unknown[]) => unknown} [options.documentLoader] - A document loader.
 	 *
 	 * @returns {Promise<{VerifiablePresentation}>} A VerifiablePresentation with
 	 *   a proof.
@@ -275,7 +275,7 @@ declare module '@digitalbazaar/vc' {
 		purpose?: ProofPurpose;
 		domain?: string;
 		challenge: string;
-		documentLoader?: Function;
+		documentLoader?: (...args: unknown[]) => unknown;
 	}): Promise<{
 		VerifiablePresentation;
 	}>;
@@ -303,7 +303,7 @@ declare module '@digitalbazaar/vc' {
 		credential: object;
 		now?: string | Date;
 	}): void;
-	export const defaultDocumentLoader: any;
+	export const defaultDocumentLoader: unknown;
 	export { CredentialIssuancePurpose };
 	export const dateRegex: RegExp;
 	export type LinkedDataSignature = object;
@@ -317,7 +317,7 @@ declare module '@digitalbazaar/vc' {
 		 */
 		verified: boolean;
 		presentationResult: object;
-		credentialResults: any[];
+		credentialResults: unknown[];
 		error: object;
 	};
 	export type VerifyCredentialResult = {
@@ -326,16 +326,16 @@ declare module '@digitalbazaar/vc' {
 		 */
 		verified: boolean;
 		statusResult: object;
-		results: any[];
+		results: unknown[];
 		error: object;
 	};
 	import { CredentialIssuancePurpose } from '@digitalbazaar/vc/lib/CredentialIssuancePurpose.js';
 }
 
 declare module '@digitalbazaar/vc/documentLoader' {
-	export function documentLoader(url: any): Promise<{
-		contextUrl: any;
-		documentUrl: any;
-		document: any;
+	export function documentLoader(url: unknown): Promise<{
+		contextUrl: unknown;
+		documentUrl: unknown;
+		document: unknown;
 	}>;
 }

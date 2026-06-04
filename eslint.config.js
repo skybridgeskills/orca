@@ -19,6 +19,7 @@ export default ts.config(
 			// lint scope equivalent to the previous baseline.
 			'.svelte-kit/**',
 			'.vercel/**',
+			'src/lib/i18n/messages/**',
 			'storybook-static/**',
 			'package/**',
 			'dev-uploads/**',
@@ -55,6 +56,20 @@ export default ts.config(
 				extraFileExtensions: ['.svelte'],
 				svelteConfig
 			}
+		}
+	},
+	// CommonJS scripts use require()
+	{
+		files: ['scripts/**/*.cjs'],
+		rules: {
+			'@typescript-eslint/no-require-imports': 'off'
+		}
+	},
+	// Ambient .d.ts stubs mirror CJS require() for module augmentation
+	{
+		files: ['types/**/*.d.ts'],
+		rules: {
+			'@typescript-eslint/no-require-imports': 'off'
 		}
 	}
 );

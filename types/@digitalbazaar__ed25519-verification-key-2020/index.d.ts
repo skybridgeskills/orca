@@ -25,7 +25,7 @@ declare module '@digitalbazaar/ed25519-verification-key-2020/Ed25519Verification
 		 *
 		 * @returns {Ed25519VerificationKey2020} - 2020 suite instance.
 		 */
-		static fromEd25519VerificationKey2018({ keyPair }?: any): Ed25519VerificationKey2020;
+		static fromEd25519VerificationKey2018({ keyPair }?: unknown): Ed25519VerificationKey2020;
 		/**
 		 * Creates a key pair instance (public key only) from a JsonWebKey2020
 		 * object.
@@ -193,14 +193,14 @@ declare module '@digitalbazaar/ed25519-verification-key-2020/Ed25519Verification
 		 */
 		verifyFingerprint({ fingerprint }?: { fingerprint: string }): {
 			valid: boolean;
-			error: any;
+			error: unknown;
 		};
 		signer(): {
-			sign({ data }: { data: any }): Promise<Buffer>;
+			sign({ data }: { data: unknown }): Promise<Buffer>;
 			id: string;
 		};
 		verifier(): {
-			verify({ data, signature }: { data: any; signature: any }): Promise<boolean>;
+			verify({ data, signature }: { data: unknown; signature: unknown }): Promise<boolean>;
 			id: string;
 		};
 	}
@@ -249,11 +249,11 @@ declare module '@digitalbazaar/ed25519-verification-key-2020/ed25519' {
 		 *
 		 * @returns {object} The object with the public and private key material.
 		 */
-		function generateKeyPairFromSeed(seedBytes: Uint8Array): any;
-		function generateKeyPair(): Promise<any>;
-		function sign(privateKeyBytes: any, data: any): Promise<Buffer>;
-		function verify(publicKeyBytes: any, data: any, signature: any): Promise<boolean>;
-		function sha256digest({ data }: { data: any }): Promise<Buffer>;
+		function generateKeyPairFromSeed(seedBytes: Uint8Array): unknown;
+		function generateKeyPair(): Promise<unknown>;
+		function sign(privateKeyBytes: unknown, data: unknown): Promise<Buffer>;
+		function verify(publicKeyBytes: unknown, data: unknown, signature: unknown): Promise<boolean>;
+		function sha256digest({ data }: { data: unknown }): Promise<Buffer>;
 	}
 }
 
@@ -264,12 +264,12 @@ declare module '@digitalbazaar/ed25519-verification-key-2020/ed25519-browser' {
 			secretKey: Uint8Array;
 		}>;
 		export { generateKeyPairFromSeed };
-		export function sign(secretKey: any, data: any): Promise<Uint8Array>;
-		export function verify(publicKey: any, data: any, signature: any): Promise<boolean>;
-		export function sha256digest({ data }: { data: any }): Promise<ArrayBuffer>;
+		export function sign(secretKey: unknown, data: unknown): Promise<Uint8Array>;
+		export function verify(publicKey: unknown, data: unknown, signature: unknown): Promise<boolean>;
+		export function sha256digest({ data }: { data: unknown }): Promise<ArrayBuffer>;
 	}
 	export default _default;
-	function generateKeyPairFromSeed(seed: any): Promise<{
+	function generateKeyPairFromSeed(seed: unknown): Promise<{
 		publicKey: Uint8Array;
 		secretKey: Uint8Array;
 	}>;

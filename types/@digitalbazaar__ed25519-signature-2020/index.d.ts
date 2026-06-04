@@ -10,11 +10,11 @@ declare module '@digitalbazaar/ed25519-signature-2020/Ed25519Signature2020' {
 		 *   intended operation. Useful for when the application is managing keys
 		 *   itself (when using a KMS, you never have access to the private key,
 		 *   and so should use the `signer` param instead).
-		 * @param {Function} [options.signer] - Signer function that returns an
+		 * @param {(...args: unknown[]) => unknown} [options.signer] - Signer function that returns an
 		 *   object with an async sign() method. This is useful when interfacing
 		 *   with a KMS (since you don't get access to the private key and its
 		 *   `signer()`, the KMS client gives you only the signer function to use).
-		 * @param {Function} [options.verifier] - Verifier function that returns
+		 * @param {(...args: unknown[]) => unknown} [options.verifier] - Verifier function that returns
 		 *   an object with an async `verify()` method. Useful when working with a
 		 *   KMS-provided verifier function.
 		 *
@@ -39,8 +39,8 @@ declare module '@digitalbazaar/ed25519-signature-2020/Ed25519Signature2020' {
 			canonizeOptions
 		}?: {
 			key?: object;
-			signer?: Function;
-			verifier?: Function;
+			signer?: (...args: unknown[]) => unknown;
+			verifier?: (...args: unknown[]) => unknown;
 			proof?: object;
 			date?: string | Date;
 			useNativeCanonize?: boolean;
@@ -80,14 +80,18 @@ declare module '@digitalbazaar/ed25519-signature-2020/Ed25519Signature2020' {
 			verificationMethod: object;
 			proof: object;
 		}): Promise<boolean>;
-		assertVerificationMethod({ verificationMethod }: { verificationMethod: any }): Promise<void>;
+		assertVerificationMethod({
+			verificationMethod
+		}: {
+			verificationMethod: unknown;
+		}): Promise<void>;
 		getVerificationMethod({
 			proof,
 			documentLoader
 		}: {
-			proof: any;
-			documentLoader: any;
-		}): Promise<any>;
+			proof: unknown;
+			documentLoader: unknown;
+		}): Promise<unknown>;
 		matchProof({
 			proof,
 			document,
@@ -95,22 +99,22 @@ declare module '@digitalbazaar/ed25519-signature-2020/Ed25519Signature2020' {
 			documentLoader,
 			expansionMap
 		}: {
-			proof: any;
-			document: any;
-			purpose: any;
-			documentLoader: any;
-			expansionMap: any;
+			proof: unknown;
+			document: unknown;
+			purpose: unknown;
+			documentLoader: unknown;
+			expansionMap: unknown;
 		}): Promise<boolean>;
 	}
 	export namespace Ed25519Signature2020 {
 		export { SUITE_CONTEXT_URL as CONTEXT_URL };
-		export const CONTEXT: any;
+		export const CONTEXT: unknown;
 	}
-	const SUITE_CONTEXT_URL: any;
+	const SUITE_CONTEXT_URL: unknown;
 	export {};
 }
 declare module '@digitalbazaar/ed25519-signature-2020' {
 	import { Ed25519Signature2020 } from '@digitalbazaar/ed25519-signature-2020/Ed25519Signature2020';
 	export { Ed25519Signature2020 };
-	export const suiteContext: any;
+	export const suiteContext: unknown;
 }
