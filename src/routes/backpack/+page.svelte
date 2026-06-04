@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import { Icon } from 'svelte-icons-pack';
 	import { FaShareFromSquare as FaShareSquare } from 'svelte-icons-pack/fa';
@@ -13,7 +14,6 @@
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import Backpack from '$lib/illustrations/Backpack.svelte';
-	import RightArrow from '$lib/illustrations/RightArrow.svelte';
 	import type { Achievement, AchievementClaim } from '@prisma/client';
 	import Modal from '$lib/components/Modal.svelte';
 	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
@@ -47,7 +47,7 @@
 	let currentShareIntent: (AchievementClaim & { achievement: Achievement }) | null = null;
 
 	const breadcrumbItems = [
-		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
 		{ text: m.bold_petty_dog_march() }
 	];
 
@@ -86,14 +86,16 @@
 {#if [LoadingStatus.NotStarted, LoadingStatus.Loading].includes($backpackClaimsLoading)}
 	<LoadingSpinner />
 {/if}
-{#each data.outstandingInvites as invite}
+{#each data.outstandingInvites as invite (invite.id)}
 	<div class="my-2">
 		<Alert>
 			{m.kind_dry_panther_bask()}
 			<a
-				href={`/achievements/${invite.achievementId}/claim?i=${invite.id}&e=${encodeURIComponent(
-					invite.inviteeEmail
-				)}`}
+				href={resolve(
+					`/achievements/${invite.achievementId}/claim?i=${invite.id}&e=${encodeURIComponent(
+						invite.inviteeEmail
+					)}`
+				)}
 				class="font-bold underline hover:no-underline"
 				>{invite.achievement.name}
 			</a>
@@ -120,7 +122,7 @@
 					{claim}
 					{achievement}
 					isClickable={true}
-					href={`/claims/${claim.id}`}
+					href={resolve(`/claims/${claim.id}`)}
 					linkAchievement={false}
 				>
 					{#snippet moredescription()}
@@ -135,7 +137,7 @@
 								<a
 									class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
 									tabindex="0"
-									href={`/claims/${claim.id}`}
+									href={resolve(`/claims/${claim.id}`)}
 								>
 									<span class="sr-only">View details</span>
 									<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
@@ -171,7 +173,7 @@
 			{#snippet descriptionSnippet()}
 				<p>
 					{m.male_serious_pug_link()}
-					<br /><a href="/achievements" class="font-bold underline hover:no-underline"
+					<br /><a href={resolve('/achievements')} class="font-bold underline hover:no-underline"
 						>{m.arable_aqua_deer_scribe()}</a
 					>.
 				</p>
@@ -216,7 +218,7 @@
 				achievement: { ...currentShareIntent.achievement, organization: data.org }
 			}).toString()}
 			target={`linkedin-${currentShareIntent.achievement.id}`}
-			rel="noopener noreferrer"
+			rel="external noopener noreferrer"
 			class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-hidden"
 			><img src="/linkedin-add-to-profile-button.png" alt="LinkedIn Add to Profile button" /></a
 		>{/if}

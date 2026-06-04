@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import StatusTag from '$lib/components/StatusTag.svelte';
 
 	import { FaSolidTrash } from 'svelte-icons-pack/fa';
@@ -131,7 +132,7 @@
 			notifications.add(new Notification(m.frail_kind_mule_enchant(), true, 'success'));
 			// Refresh the data after successful deletion
 			getData(page);
-		} catch (err) {
+		} catch {
 			notifications.add(new Notification(m.bad_ok_jackdaw_link(), false, 'error'));
 		} finally {
 			closeDeleteModal();
@@ -188,7 +189,7 @@
 									scope="row"
 									class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
 								>
-									<a href={`/claims/${memberClaim.id}`} class="hover:underline">
+									<a href={resolve(`/claims/${memberClaim.id}`)} class="hover:underline">
 										{memberClaim.user?.givenName}
 										{memberClaim.user?.familyName}
 										{#if session?.user?.id == memberClaim.user.id}({m.red_aqua_mule_jest()}){/if}
@@ -206,7 +207,7 @@
 								</td>
 								<td class="px-6 py-4">
 									{#if session?.user?.id}
-										<a href={`/claims/${memberClaim.id}`}>
+										<a href={resolve(`/claims/${memberClaim.id}`)}>
 											<Button text={m.happy_next_robin_clasp()} />
 										</a>
 									{/if}
@@ -247,7 +248,7 @@
 							</th>
 							<td class="px-6 py-4">
 								{#if invite.creator}
-									<a href="/members/{invite.creatorId}" class="hover:underline">
+									<a href={resolve(`/members/${invite.creatorId}`)} class="hover:underline">
 										{invite.creator?.givenName ?? ''}
 										{invite.creator?.familyName ?? ''}
 									</a>

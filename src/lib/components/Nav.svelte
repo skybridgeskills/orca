@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import DarkModeToggle from './DarkModeToggle.svelte';
 	import LanguageSelector from './LanguageSelector.svelte';
 	import PopupMenu from './PopupMenu.svelte';
@@ -53,7 +54,7 @@
 			<div class="max-sm:container w-full md:w-auto max-md:mx-auto px-2 sm:px-4 py-2.5">
 				<div class="flex justify-between">
 					<a
-						href="/"
+						href={resolve('/')}
 						class="flex items-center md:items-start focus:ring-2 focus:ring-gray-200 rounded-lg dark:focus:ring-gray-600"
 					>
 						<img
@@ -115,7 +116,7 @@
 						<!-- No user is logged in, but they might try to log in -->
 						<li>
 							<a
-								href="/login"
+								href={resolve('/login')}
 								class="block py-2 pr-4 pl-3 leading-8 text-gray-700 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
 								>{m.bright_swift_eagle_login()}</a
 							>
@@ -156,21 +157,21 @@
 								>
 									<li>
 										<a
-											href="/members/{$session?.user?.id}"
+											href={resolve(`/members/${$session?.user?.id}`)}
 											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 											>{m.dull_cuddly_jackdaw_intend()}</a
 										>
 									</li>
 									<li>
 										<a
-											href="/settings"
+											href={resolve('/settings')}
 											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 											>{m.piquant_weary_okapi_enchant()}</a
 										>
 									</li>
 									<li>
 										<a
-											href="/apps"
+											href={resolve('/apps')}
 											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 											>{m.breezy_amber_lynx_connect()}</a
 										>

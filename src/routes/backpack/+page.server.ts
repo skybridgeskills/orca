@@ -1,12 +1,12 @@
 import * as dotenv from 'dotenv';
-import type { PageServerLoad, Actions } from './$types';
-import { error, redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import { calculatePageAndSize } from '$lib/utils/pagination';
 
 dotenv.config();
 
-export const load: PageServerLoad = async ({ url, locals, params }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
 	// redirect user if logged out
 	if (!locals.session?.user) redirect(302, `/`);
 

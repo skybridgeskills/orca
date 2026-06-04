@@ -1,9 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import Button from '$lib/components/Button.svelte';
-	import ButtonGroup from '$lib/components/ButtonGroup.svelte';
 	import Heading from '$lib/components/Heading.svelte';
-	import type { ActionData, PageData } from './$types';
+	import type { PageData } from './$types';
 	export let data: PageData;
 	const noErrors: { [key: string]: string | null } = {
 		givenName: null,
@@ -16,7 +15,7 @@
 		givenName: data.session?.user?.givenName ?? '',
 		familyName: data.session?.user?.familyName ?? '',
 		identifierVisibility:
-			data.session?.user?.identifiers.find((a) => true)?.visibility ?? 'COMMUNITY',
+			data.session?.user?.identifiers.find(() => true)?.visibility ?? 'COMMUNITY',
 		defaultVisibility: data.session?.user?.defaultVisibility ?? 'COMMUNITY'
 	};
 </script>
@@ -80,7 +79,7 @@
 					<th scope="col" class="py-3 px-6"> {m.clear_crazy_meerkat_nurture()} </th>
 				</tr>
 			</thead>
-			{#each data.session?.user?.identifiers ?? [] as identifier}
+			{#each data.session?.user?.identifiers ?? [] as identifier (identifier.id)}
 				<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
 					<th
 						scope="row"

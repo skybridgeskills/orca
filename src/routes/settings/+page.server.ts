@@ -4,13 +4,13 @@ import { prisma } from '../../prisma/client';
 import type { Visibility } from '@prisma/client';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
 	if (!locals.session?.user?.id) redirect(302, `/`);
 };
 
 export const actions: Actions = {
-	default: async ({ locals, cookies, request, params }) => {
+	default: async ({ locals, request }) => {
 		if (!locals.session?.user?.id) error(403, m.silly_top_marten_view());
 
 		const requestData = await request.formData();
@@ -33,7 +33,7 @@ export const actions: Actions = {
 			}
 		});
 
-		if (identifierVisibility !== user.identifiers.find((i) => true)?.visibility) {
+		if (identifierVisibility !== user.identifiers.find(() => true)?.visibility) {
 			await prisma.identifier.updateMany({
 				where: { userId: locals.session.user.id },
 				data: { visibility: identifierVisibility }

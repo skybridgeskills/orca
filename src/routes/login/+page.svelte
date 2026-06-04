@@ -1,17 +1,18 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import type { ActionData, PageData, SubmitFunction } from './$types';
 	import {
 		claimPending,
 		claimEmail,
-		claimId,
 		inviteId,
 		inviteCreatedAt
 	} from '$lib/stores/activeClaimStore';
 	import { onMount } from 'svelte';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { nextPath, session } from '$lib/stores/sessionStore';
 	import Heading from '$lib/components/Heading.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
@@ -42,7 +43,7 @@
 				errorMessage = result.error.message;
 				// TODO: specifically handle the case where the invite was stale
 				if (result.error.code === 'invite_expired') {
-					const formData = new URLSearchParams();
+					const formData = new SvelteURLSearchParams();
 					formData.append('inviteId', $inviteId);
 					formData.append('email', email);
 					const loginResult = await fetch('/login', {
@@ -62,7 +63,7 @@
 			} else if (result.type === 'success' && result.data?.session) {
 				const data = result.data;
 				$session = data.session as App.SessionData;
-				goto(data.location ?? $nextPath ?? '/');
+				goto(resolve(data.location ?? $nextPath ?? '/'));
 				$nextPath = undefined;
 				console.log('Processed nextPath and reset.');
 			}
@@ -78,7 +79,7 @@
 			} else if (result.type === 'success') {
 				$session = result.data?.session;
 
-				goto(result.data?.location);
+				goto(resolve(result.data?.location ?? '/'));
 				$nextPath = undefined;
 				console.log('Processed nextPath and reset.');
 			}

@@ -11,9 +11,13 @@
 	import type { LayoutProps } from './$types';
 	import { setLocale } from '$lib/i18n/runtime';
 	import { LoadingStatus } from '$lib/stores/common';
+	import { resolve } from '$app/paths';
 	import { getFooterUrl } from '$lib/utils/footer-links';
 
 	let { children, data }: LayoutProps = $props();
+	const privacyUrl = getFooterUrl('privacy', '/privacy');
+	const termsUrl = getFooterUrl('terms', '/terms');
+	const contactUrl = getFooterUrl('contact', '/contact');
 	preferredTheme.initialize(data.cookieTheme || 'light');
 	setLocale(data.locale);
 
@@ -68,22 +72,42 @@
 					class="flex flex-wrap items-center mb-6 text-sm text-gray-500 sm:mb-0 dark:text-gray-400"
 				>
 					<li>
-						<a href="/" class="mr-4 hover:underline md:mr-6">{m.each_fluffy_fox_view()}</a>
-					</li>
-					<li>
-						<a href={getFooterUrl('privacy', '/privacy')} class="mr-4 hover:underline md:mr-6"
-							>{m.warm_tangy_deer_privacy()}</a
+						<a href={resolve('/')} class="mr-4 hover:underline md:mr-6"
+							>{m.each_fluffy_fox_view()}</a
 						>
 					</li>
 					<li>
-						<a href={getFooterUrl('terms', '/terms')} class="mr-4 hover:underline md:mr-6"
-							>{m.gentle_brave_falcon_terms()}</a
-						>
+						{#if privacyUrl.startsWith('http')}
+							<a href={privacyUrl} rel="external" class="mr-4 hover:underline md:mr-6"
+								>{m.warm_tangy_deer_privacy()}</a
+							>
+						{:else}
+							<a href={resolve(privacyUrl)} class="mr-4 hover:underline md:mr-6"
+								>{m.warm_tangy_deer_privacy()}</a
+							>
+						{/if}
 					</li>
 					<li>
-						<a href={getFooterUrl('contact', '/contact')} class="hover:underline"
-							>{m.calm_steady_lynx_contact()}</a
-						>
+						{#if termsUrl.startsWith('http')}
+							<a href={termsUrl} rel="external" class="mr-4 hover:underline md:mr-6"
+								>{m.gentle_brave_falcon_terms()}</a
+							>
+						{:else}
+							<a href={resolve(termsUrl)} class="mr-4 hover:underline md:mr-6"
+								>{m.gentle_brave_falcon_terms()}</a
+							>
+						{/if}
+					</li>
+					<li>
+						{#if contactUrl.startsWith('http')}
+							<a href={contactUrl} rel="external" class="hover:underline"
+								>{m.calm_steady_lynx_contact()}</a
+							>
+						{:else}
+							<a href={resolve(contactUrl)} class="hover:underline"
+								>{m.calm_steady_lynx_contact()}</a
+							>
+						{/if}
 					</li>
 				</ul>
 			</div>

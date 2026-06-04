@@ -23,7 +23,7 @@ export const load: PageServerLoad = ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, cookies, request }) => {
+	default: async ({ locals, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
 			error(403, m.lower_home_cow_view());
 
@@ -32,7 +32,7 @@ export const actions: Actions = {
 		const imageKey = requestData.get('imageExtension')
 			? `org-${locals.org.id}/${uuidv4().slice(-8)}-raw-image.${requestData.get('imageExtension')}`
 			: null;
-		let formData = {
+		const formData = {
 			name: stripTags(requestData.get('name')?.toString()),
 			description: stripTags(requestData.get('description')?.toString()),
 			url: requestData.get('url')?.toString(),

@@ -14,7 +14,7 @@ const main = async () => {
 	const prisma = new PrismaClient();
 
 	const selectAnOrg = async (skipRecords = 0): Promise<OrgChoice> => {
-		let organizations = await prisma.organization.findMany({
+		const organizations = await prisma.organization.findMany({
 			take: 9,
 			skip: skipRecords,
 			select: {
@@ -22,7 +22,7 @@ const main = async () => {
 				id: true
 			}
 		});
-		let nextOrgs = await prisma.organization.findMany({
+		const nextOrgs = await prisma.organization.findMany({
 			take: 9,
 			skip: skipRecords + 9,
 			select: {
@@ -30,9 +30,9 @@ const main = async () => {
 				id: true
 			}
 		});
-		let choices: Array<OrgChoice> = [];
-		organizations.map((org, i) => {
-			let thisOrg = {
+		const choices: Array<OrgChoice> = [];
+		organizations.map((org) => {
+			const thisOrg = {
 				...org,
 				value: org.id
 			};
@@ -61,7 +61,7 @@ const main = async () => {
 		return choices.find((x) => x.value == userChoice.organization) || choices[0];
 	};
 
-	let selectedOrganization = await selectAnOrg();
+	const selectedOrganization = await selectAnOrg();
 	console.log(`You selected ${selectedOrganization.name} (${selectedOrganization.id})!`);
 
 	console.log(`Create an admin user for organization `);

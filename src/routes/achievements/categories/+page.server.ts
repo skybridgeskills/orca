@@ -5,7 +5,7 @@ import type { PageServerLoad, Actions } from './$types';
 import stripTags from '../../../lib/utils/stripTags';
 import parseIntData from '../../../lib/utils/parseIntData';
 
-export const load: PageServerLoad = ({ params, locals }) => {
+export const load: PageServerLoad = ({ locals }) => {
 	// Don't include edit controls if not an admin
 	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
 		redirect(302, `/achievements`);
@@ -38,7 +38,7 @@ export const actions: Actions = {
 		return { ...category, _count: { achievements: 0 } };
 	},
 
-	update: async ({ locals, cookies, request, params }) => {
+	update: async ({ locals, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
 			error(403, m.lower_home_cow_view());
 
@@ -48,7 +48,7 @@ export const actions: Actions = {
 		const categoryWeight = parseIntData(requestData.get('update_weight')?.toString() || '');
 
 		// Can only search by unique inputs on update, so verify first this category is in this org
-		const existingCategory = await prisma.achievementCategory.findFirstOrThrow({
+		await prisma.achievementCategory.findFirstOrThrow({
 			where: {
 				organizationId: locals.org.id,
 				id: categoryId
@@ -66,7 +66,7 @@ export const actions: Actions = {
 		return updatedCategory;
 	},
 
-	delete: async ({ locals, cookies, request, params }) => {
+	delete: async ({ locals, request }) => {
 		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
 			error(403, m.lower_home_cow_view());
 
@@ -74,7 +74,7 @@ export const actions: Actions = {
 		const categoryId = stripTags(requestData.get('delete_categoryId')?.toString()) || '';
 
 		// Can only search by unique inputs on update, so verify first this category is in this org
-		const existingCategory = await prisma.achievementCategory.findFirstOrThrow({
+		await prisma.achievementCategory.findFirstOrThrow({
 			where: {
 				organizationId: locals.org.id,
 				id: categoryId

@@ -48,7 +48,7 @@
 					>
 				</span>
 			{/if}
-			{#each pages as p}
+			{#each pages as p (p)}
 				<span class="inline-block text-gray-500 dark:text-gray-400 text-sm">
 					{#if p == page}
 						<span class="mr-2">{p}</span>

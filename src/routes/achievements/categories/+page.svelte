@@ -12,9 +12,6 @@
 		acLoading
 	} from '$lib/stores/achievementCategoryStore';
 	import { enhance } from '$app/forms';
-	import type { PageData } from './$types';
-	import { stringify } from 'uuid';
-	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import type { AchievementCategory } from '@prisma/client';
 	import { onMount } from 'svelte';

@@ -4,7 +4,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 
 import { getAchievement } from '$lib/data/achievement';
-import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
+import { getValidUserClaim } from '$lib/data/achievementClaim';
 import { isExchangeEnabled } from '$lib/server/transactionService/config';
 
 const throwRedirect = (url: URL) => {

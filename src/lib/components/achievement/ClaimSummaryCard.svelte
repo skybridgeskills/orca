@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime.js';
 	import { Icon } from 'svelte-icons-pack';
@@ -8,7 +9,7 @@
 	import { BiSolidNoEntry } from 'svelte-icons-pack/bi';
 	import AchievementSummary from './AchievementSummary.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import type { Achievement, AchievementClaim, ClaimStatus, Organization } from '@prisma/client';
+	import type { Achievement, AchievementClaim, Organization } from '@prisma/client';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
 	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
@@ -92,7 +93,7 @@
 					<a
 						class="icon text-gray-600 w-4 h-4 cursor-pointer"
 						tabindex="0"
-						href={`/claims/${claim.id}`}
+						href={resolve(`/claims/${claim.id}`)}
 					>
 						<span class="sr-only">{m.happy_next_robin_clasp()}</span>
 						<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
@@ -152,7 +153,7 @@
 			achievement: { ...achievement, organization: org }
 		}).toString()}
 		target={`linkedin-${achievement.id}`}
-		rel="noopener noreferrer"
+		rel="external noopener noreferrer"
 		class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-hidden"
 		><img src="/linkedin-add-to-profile-button.png" alt={m.every_watery_kite_view()} /></a
 	>

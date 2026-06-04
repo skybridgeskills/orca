@@ -45,7 +45,6 @@ export const fetchBackpackClaims = async (): Promise<LoadingStatus> => {
 };
 
 export const upsertBackpackClaim = async (claim: AchievementClaim) => {
-	const existing = getClaimById(claim.id);
 	backpackClaims.set([...get(backpackClaims).filter((c) => c.id !== claim.id), claim]);
 };
 

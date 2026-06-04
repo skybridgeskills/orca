@@ -16,6 +16,7 @@
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
 		<a
 			href={achievement.criteriaId}
+			rel="external"
 			class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
 			target={`achievement-criteria-${achievement.id}}`}>{achievement.criteriaId}</a
 		>

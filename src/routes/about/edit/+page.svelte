@@ -5,6 +5,7 @@
 	import { formSchema } from './schema';
 	import type * as yup from 'yup';
 	import { deserialize } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -67,8 +68,8 @@
 
 	const handleSubmit = async (e: SubmitEvent) => {
 		try {
-			const validationResults = await formSchema.validate(formData);
-		} catch (err) {
+			await formSchema.validate(formData);
+		} catch {
 			validate();
 		}
 		const formsData = new FormData(e.target as HTMLFormElement);
@@ -101,7 +102,7 @@
 				window.location.replace(`/about`); // force page reload so header gets updated
 				break;
 			case 'redirect':
-				goto(result.location);
+				goto(resolve(result.location));
 				break;
 			case 'error':
 				console.error(result.error);
@@ -207,7 +208,7 @@
 			on:blur={validate}
 		>
 			<option value="">{m.calm_swift_eagle_rest()}</option>
-			{#each locales as lang}
+			{#each locales as lang (lang)}
 				<option value={lang}>
 					{#if lang === 'en-US'}
 						{m.flat_known_oryx_view()}
@@ -353,7 +354,7 @@
 			>{m.bold_swift_eagle_submit()}</button
 		>
 		<a
-			href="/about"
+			href={resolve('/about')}
 			class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-hidden dark:focus:ring-gray-800"
 			>{m.calm_steady_lynx_cancel()}</a
 		>

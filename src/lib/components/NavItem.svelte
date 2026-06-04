@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 
 	interface Props {
@@ -9,12 +10,14 @@
 	}
 
 	let { href, title, class: klass = '', onclick }: Props = $props();
+
+	const resolvedHref = $derived(resolve(href));
 </script>
 
-{#if $page?.url?.pathname == href}
+{#if $page?.url?.pathname == resolvedHref}
 	<li class={klass}>
 		<a
-			{href}
+			href={resolve(href)}
 			{onclick}
 			onkeypress={onclick}
 			class="block py-2 pr-4 pl-3 leading-8 bg-transparent rounded-sm text-blue-700 md:p-0 dark:text-white"
@@ -26,7 +29,7 @@
 		<a
 			{onclick}
 			onkeypress={onclick}
-			{href}
+			href={resolve(href)}
 			class="block py-2 pr-4 pl-3 leading-8 text-gray-700 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
 			>{title}</a
 		>

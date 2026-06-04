@@ -3,7 +3,7 @@ import { prisma } from '$lib/../prisma/client';
 import type { RequestEvent } from './$types';
 import { calculatePageAndSize } from '$lib/utils/pagination';
 
-export const GET = async ({ url, params, locals }: RequestEvent) => {
+export const GET = async ({ url, locals }: RequestEvent) => {
 	const { page, pageSize } = calculatePageAndSize(url);
 
 	const claimId = url.searchParams.get('claimId');

@@ -1,11 +1,9 @@
-import { error } from '@sveltejs/kit';
 import * as dotenv from 'dotenv';
 import { prisma } from '../../../prisma/client';
 
 dotenv.config();
 
-export async function GET({ url, locals }) {
-	const requestUrl = new URL(new String(url).toString());
+export async function GET({ locals }) {
 	const did = `did:web:${locals.org.domain}`;
 
 	const signingKeys = await prisma.signingKey.findMany({
@@ -29,7 +27,7 @@ export async function GET({ url, locals }) {
 		};
 	});
 
-	let data = {
+	const data = {
 		'@context': [
 			'https://www.w3.org/ns/did/v1',
 			'https://w3id.org/security/suites/ed25519-2020/v1'

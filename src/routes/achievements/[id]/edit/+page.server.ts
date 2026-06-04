@@ -1,6 +1,6 @@
 import * as m from '$lib/i18n/messages';
 import type { Actions } from './$types';
-import { error, fail, json, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { prisma } from '../../../../prisma/client';
 import type { Achievement } from '@prisma/client';
 import { Prisma } from '@prisma/client';
@@ -201,7 +201,7 @@ export const actions: Actions = {
 			json: mergedAchievementJson as unknown as Prisma.InputJsonObject
 		};
 
-		let configData: AchievementConfigForm = {
+		const configData: AchievementConfigForm = {
 			claimable: formData.claimable == 'on',
 			organization: { connect: { id: locals.org.id } },
 			achievement: { connect: { id: params.id } },
@@ -226,11 +226,8 @@ export const actions: Actions = {
 
 		if (formData.capabilities_inviteRequires) {
 			try {
-				const relatedInviteRequiresAchievement = await getAchievement(
-					formData.capabilities_inviteRequires,
-					locals.org.id
-				);
-			} catch (e) {
+				await getAchievement(formData.capabilities_inviteRequires, locals.org.id);
+			} catch {
 				return fail(400, {
 					code: 'inviteRequires',
 					message: m.swift_steady_falcon_notfound()
@@ -263,8 +260,8 @@ export const actions: Actions = {
 			},
 			update: {
 				claimable: configData.claimable,
-				claimRequires: !!configData.claimRequires ? configData.claimRequires : { disconnect: true },
-				reviewRequires: !!configData.reviewRequires
+				claimRequires: configData.claimRequires ? configData.claimRequires : { disconnect: true },
+				reviewRequires: configData.reviewRequires
 					? configData.reviewRequires
 					: { disconnect: true },
 				reviewsRequired: configData.reviewsRequired,
@@ -274,7 +271,7 @@ export const actions: Actions = {
 		};
 		// TODO update records in a transaction
 		try {
-			const achievementConfig = await prisma.achievementConfig.upsert(upsertData);
+			await prisma.achievementConfig.upsert(upsertData);
 		} catch (e) {
 			if (e instanceof Prisma.PrismaClientKnownRequestError) {
 				if (e.code == 'P2025') {

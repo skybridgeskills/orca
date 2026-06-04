@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime.js';
@@ -58,8 +59,8 @@
 	let showShareModal = $state(false);
 
 	const breadcrumbItems = [
-		{ text: m.each_fluffy_fox_view(), href: '/' },
-		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
+		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
+		{ text: m.antsy_grand_rabbit_gaze(), href: resolve('/achievements') },
 		{ text: data.achievement.name }
 	];
 
@@ -94,7 +95,7 @@
 			.find(() => true)
 	);
 	const invite: (ClaimEndorsement & { creator: User | null }) | undefined = $derived(
-		data.outstandingInvites.find((a) => true)
+		data.outstandingInvites.find(() => true)
 	);
 
 	setContext('achievementId', data.achievement.id);
@@ -218,10 +219,12 @@
 					<a
 						class="text-gray-600 w-4 h-4 cursor-pointer"
 						href={invite
-							? `/achievements/${data.achievement.id}/claim?i=${invite?.id}&e=${encodeURIComponent(
-									invite?.inviteeEmail
-								)}`
-							: `/achievements/${data.achievement.id}/claim`}
+							? resolve(
+									`/achievements/${data.achievement.id}/claim?i=${invite?.id}&e=${encodeURIComponent(
+										invite?.inviteeEmail
+									)}`
+								)
+							: resolve(`/achievements/${data.achievement.id}/claim`)}
 					>
 						<span class="sr-only">{m.bold_swift_eagle_claim()}</span>
 						<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
@@ -245,8 +248,9 @@
 			{@const claimRequires = $achievements.find((a) => config?.claimRequiresId == a.id)}
 			{#if claimRequires}
 				{m.sharp_quiet_panther_requires()}
-				<a href={`/achievements/${claimRequires.id}`} class="font-bold underline hover:no-underline"
-					>{claimRequires.name}</a
+				<a
+					href={resolve(`/achievements/${claimRequires.id}`)}
+					class="font-bold underline hover:no-underline">{claimRequires.name}</a
 				>. {#if userHoldsRequiredAchievement}
 					{m.swift_steady_falcon_meets()}
 				{:else}
@@ -265,8 +269,9 @@
 			: undefined}
 		{#if inviteRequires}
 			{m.bright_happy_sparrow_invitedesc()}
-			<a href={`/achievements/${inviteRequires?.id}`} class="font-bold underline hover:no-underline"
-				>{inviteRequires?.name}</a
+			<a
+				href={resolve(`/achievements/${inviteRequires?.id}`)}
+				class="font-bold underline hover:no-underline">{inviteRequires?.name}</a
 			>.
 		{:else if !config?.claimable}
 			{m.calm_steady_lynx_adminonly()}
@@ -277,7 +282,7 @@
 				reviewsRequired: config?.reviewsRequired ?? 0
 			})}
 			<a
-				href={`/achievements/${reviewRequires?.id}`}
+				href={resolve(`/achievements/${reviewRequires?.id}`)}
 				class="font-bold underline hover:no-underline"
 			>
 				{reviewRequires.name}</a
@@ -312,7 +317,7 @@
 			description={m.wide_quiet_beaver_build()}
 		/>
 		<div class="mt-4 space-y-4">
-			{#each alignments as alignment}
+			{#each alignments as alignment (alignment.targetUrl)}
 				<div
 					class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800"
 				>
@@ -320,7 +325,7 @@
 						<a
 							href={alignment.targetUrl}
 							target="_blank"
-							rel="noopener noreferrer"
+							rel="external noopener noreferrer"
 							class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
 						>
 							{alignment.targetName}

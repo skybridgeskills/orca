@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -7,8 +8,7 @@
 		Achievement,
 		AchievementConfig,
 		AchievementCategory,
-		AchievementClaim,
-		ClaimStatus
+		AchievementClaim
 	} from '@prisma/client';
 
 	interface Props {
@@ -33,9 +33,6 @@
 	const userHoldsRequiredAchievement = () =>
 		relatedClaims.filter((c) => c.achievementId == achievement.achievementConfig?.claimRequiresId)
 			.length > 0;
-
-	const reviewRequires = (): Achievement | undefined =>
-		relatedAchievements.filter((c) => c.achievementConfig?.reviewRequiresId == achievement.id)[0];
 </script>
 
 {#if userHoldsAchievement()}
@@ -49,20 +46,20 @@
 					{#if claim.claimStatus == 'UNACCEPTED'}
 						{m.kind_dry_panther_bask()}
 						<a
-							href={`/achievements/${achievement.id}/claim`}
+							href={resolve(`/achievements/${achievement.id}/claim`)}
 							class="text-bold underline hover:no-underline">{m.best_teary_shrimp_pause()}</a
 						>
 					{:else if claim.claimStatus == 'ACCEPTED'}
 						{m.weary_bold_myna_buy()}
 						<a
-							href={`/achievements/${achievement.id}/claim`}
+							href={resolve(`/achievements/${achievement.id}/claim`)}
 							class="text-bold underline hover:no-underline">{m.gray_plane_kite_deny()}</a
 						>
 					{:else}
 						{m.piquant_curly_mantis_tickle()}
 						{#if showClaimLink}
 							<a
-								href={`/achievements/${achievement.id}/claim`}
+								href={resolve(`/achievements/${achievement.id}/claim`)}
 								class="text-bold underline hover:no-underline">{m.gray_plane_kite_deny()}</a
 							>
 						{/if}
@@ -82,7 +79,7 @@
 		</h2>
 		<div>
 			{#if showClaimLink && userHoldsRequiredAchievement()}
-				<a href={`/achievements/${achievement.id}/claim`}>
+				<a href={resolve(`/achievements/${achievement.id}/claim`)}>
 					<Button text={m.bold_swift_eagle_claim()} />
 				</a>
 			{/if}
@@ -93,7 +90,7 @@
 			<span>
 				{m.sharp_quiet_panther_requires()}
 				<a
-					href={`/achievements/${claimRequires.id}`}
+					href={resolve(`/achievements/${claimRequires.id}`)}
 					class="font-bold underline hover:no-underline"
 				>
 					{claimRequires.name}</a
@@ -115,7 +112,7 @@
 		</h2>
 		<div>
 			{#if showClaimLink}
-				<a href={`/achievements/${achievement.id}/claim`}>
+				<a href={resolve(`/achievements/${achievement.id}/claim`)}>
 					<Button text="Claim" />
 				</a>
 			{/if}

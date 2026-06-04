@@ -19,6 +19,6 @@
 		</blockquote>
 	{/if}
 	{#if item.id}<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
-			<a href={item.id} class="underline hover:no-underline">{item.id}</a>
+			<a href={item.id} rel="external" class="underline hover:no-underline">{item.id}</a>
 		</p>{/if}
 </div>

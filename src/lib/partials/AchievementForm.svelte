@@ -125,8 +125,8 @@
 		e.stopPropagation();
 
 		try {
-			const validationResults = await achievementFormSchema.validate(formData);
-		} catch (err) {
+			await achievementFormSchema.validate(formData);
+		} catch {
 			validate();
 			return;
 		}

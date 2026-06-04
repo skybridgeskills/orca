@@ -13,7 +13,7 @@
 </script>
 
 <div class="inline-flex rounded-md shadow-xs button-group" role="group">
-	{#each buttons as button}
+	{#each buttons as button (button.text)}
 		<button
 			{...button.props}
 			onclick={() => button.onClick()}

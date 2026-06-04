@@ -147,7 +147,7 @@ export const inviteToClaim = async ({
 	// ADMIN USERS and QUALIFIED INVITERS: May create claims for other users in unaccepted state.
 	data.creator = { connect: { id: session.user.id } };
 
-	let identifier = await prisma.identifier.findFirst({
+	const identifier = await prisma.identifier.findFirst({
 		where: {
 			identifier: data.inviteeEmail,
 			organizationId: org.id

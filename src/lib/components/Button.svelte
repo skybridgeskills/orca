@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
+	const isExternalHref = (value: string) => /^https?:\/\//i.test(value);
+
 	interface Props {
 		class?: string;
 		text?: string;
@@ -45,14 +49,26 @@
 </script>
 
 {#if href}
-	<a
-		{id}
-		{href}
-		{...moreProps}
-		class={disabled ? disabledClassList[submodule] : submoduleClassList[submodule]}
-	>
-		{#if children}{@render children()}{:else}{text}{/if}
-	</a>
+	{#if isExternalHref(href)}
+		<a
+			{id}
+			{href}
+			rel="external"
+			{...moreProps}
+			class={disabled ? disabledClassList[submodule] : submoduleClassList[submodule]}
+		>
+			{#if children}{@render children()}{:else}{text}{/if}
+		</a>
+	{:else}
+		<a
+			{id}
+			href={resolve(href)}
+			{...moreProps}
+			class={disabled ? disabledClassList[submodule] : submoduleClassList[submodule]}
+		>
+			{#if children}{@render children()}{:else}{text}{/if}
+		</a>
+	{/if}
 {:else}
 	<button
 		{id}

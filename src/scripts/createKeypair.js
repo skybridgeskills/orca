@@ -8,7 +8,6 @@ dotenv.config();
 const main = async () => {
 	const prisma = new PrismaClient();
 
-	// @ts-ignore
 	const selectAnOrg = async (skipRecords = 0) => {
 		let organizations = await prisma.organization.findMany({
 			take: 9,
@@ -27,7 +26,7 @@ const main = async () => {
 			}
 		});
 		let choices = [];
-		organizations.map((org, i) => {
+		organizations.map((org) => {
 			let thisOrg = {
 				...org,
 				value: org.id
@@ -65,7 +64,7 @@ const main = async () => {
 
 	console.log(keyPair.publicKeyMultibase);
 
-	const newKey = await prisma.signingKey.create({
+	await prisma.signingKey.create({
 		data: {
 			organization: { connect: { id: selectedOrganization.id } },
 			publicKeyMultibase: keyPair.publicKeyMultibase,

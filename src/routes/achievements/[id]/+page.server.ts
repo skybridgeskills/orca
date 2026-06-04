@@ -6,7 +6,7 @@ import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { canEditAchievements } from '$lib/server/permissions';
 
-export const load: PageServerLoad = async ({ url, params, locals }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const achievementId = params.id;
 
 	// Check if user has permission to edit achievements
@@ -52,7 +52,7 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 
 	// Get the existing claim(s) user has made for this badge,
 	// or for the badge that is required to be eligible to claim this badge
-	const relatedClaims = !!locals.session?.user?.id
+	const relatedClaims = locals.session?.user?.id
 		? await prisma.achievementClaim.findMany({
 				where: {
 					achievementId: {

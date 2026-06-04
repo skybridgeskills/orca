@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import type { PageProps } from './$types';
 	import Card from '$lib/components/Card.svelte';
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
@@ -17,7 +18,7 @@
 	<h2 class="text-xl sm:text-2xl mb-3 dark:text-white">{m.swift_steady_falcon_mostawarded()}</h2>
 
 	<ul class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
-		{#each data.highlightedAchievements as achievement}
+		{#each data.highlightedAchievements as achievement (achievement.id)}
 			<Card maxWidth="">
 				<div class="mb-4 max-w-xs">
 					{#if achievement.image}
@@ -33,7 +34,7 @@
 					{/if}
 				</div>
 
-				<a href="/achievements/{achievement.id}">
+				<a href={resolve(`/achievements/${achievement.id}`)}>
 					<h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
 						{achievement.name}
 					</h3>
@@ -44,7 +45,7 @@
 
 				{#snippet actions()}
 					<a
-						href="/achievements/{achievement.id}"
+						href={resolve(`/achievements/${achievement.id}`)}
 						class="align-bottom inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 					>
 						{m.happy_next_robin_clasp()}
@@ -56,7 +57,9 @@
 	</ul>
 	<p class="my-4 text-sm text-gray-500 dark:text-gray-400 text-center">
 		{m.bright_swift_eagle_see()}
-		<a href="/achievements" class="underline hover:no-underline">{m.happy_dry_shrimp_feel()}</a>.
+		<a href={resolve('/achievements')} class="underline hover:no-underline"
+			>{m.happy_dry_shrimp_feel()}</a
+		>.
 	</p>
 {:else}
 	<EmptyStateZone title={m.weird_small_oryx_tickle()}>
@@ -66,7 +69,8 @@
 		{#snippet descriptionSnippet()}
 			<p>
 				{m.bright_swift_eagle_see()}
-				<a href="/achievements" class="underline hover:no-underline">{m.happy_dry_shrimp_feel()}</a
+				<a href={resolve('/achievements')} class="underline hover:no-underline"
+					>{m.happy_dry_shrimp_feel()}</a
 				>.
 			</p>
 		{/snippet}

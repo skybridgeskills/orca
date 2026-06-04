@@ -52,7 +52,7 @@ const main = async () => {
 
 		// Uploading files to the bucket
 		const command = new PutObjectCommand(params);
-		const results = await s3Client.send(command);
+		await s3Client.send(command);
 		console.log(
 			'Successfully created ' +
 				params.Key +
@@ -88,7 +88,7 @@ const main = async () => {
 				CORSRules: [corsRule]
 			}
 		});
-		const results = await s3Client.send(command);
+		await s3Client.send(command);
 		console.log('Successfully added CORS config.');
 	} catch (err) {
 		console.log('Error', err);

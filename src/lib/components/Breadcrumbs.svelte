@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 
 	interface Item {
 		text: string;
@@ -19,7 +20,7 @@
 
 <nav class="flex" aria-label={m.top_fresh_scallop_ascend()}>
 	<ol class="inline-flex items-center space-x-1 md:space-x-3 mb-4">
-		{#each items as item, i}
+		{#each items as item, i (item.href ?? item.text ?? i)}
 			{#if i !== 0}
 				<li class="divider dark:text-gray-400">
 					<!-- The snippet used for divider -->
@@ -29,7 +30,7 @@
 			<li class="inline-flex items-center">
 				{#if item.href}
 					<a
-						href={item.href}
+						href={resolve(item.href)}
 						class="breadcrumb-item inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white {item.class}"
 						{...item.props}
 					>

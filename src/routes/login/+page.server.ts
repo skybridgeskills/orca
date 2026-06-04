@@ -1,5 +1,5 @@
 import * as m from '$lib/i18n/messages';
-import { sendOrcaMail, transporter } from '$lib/email/sendEmail';
+import { sendOrcaMail } from '$lib/email/sendEmail';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
 import * as dotenv from 'dotenv';
@@ -50,7 +50,7 @@ export const actions: Actions = {
 		if (!email || !email.toString().includes('@')) error(400, m.each_pink_fish_grin());
 
 		// Validate org and ensure user exists
-		let userIdentifier = await prisma.identifier.findFirst({
+		const userIdentifier = await prisma.identifier.findFirst({
 			where: {
 				type: 'EMAIL',
 				identifier: email,

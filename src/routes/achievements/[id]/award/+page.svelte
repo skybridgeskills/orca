@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import Alert from '$lib/components/Alert.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
@@ -30,9 +31,12 @@
 	let awardNarrative = '';
 
 	const breadcrumbItems = [
-		{ text: m.each_fluffy_fox_view(), href: '/' },
-		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
-		{ text: data.achievement?.name, href: `/achievements/${data.achievement.id}` }
+		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
+		{ text: m.antsy_grand_rabbit_gaze(), href: resolve('/achievements') },
+		{
+			text: data.achievement?.name,
+			href: resolve(`/achievements/${data.achievement.id}`)
+		}
 	];
 </script>
 
@@ -50,7 +54,7 @@
 			<p class="mt-4 mb-8 text-sm text-gray-500 dark:text-gray-400">
 				{m.patchy_silly_guppy_jump()}
 				<a
-					href={`/claims/${form.endorsement?.claim?.id}`}
+					href={resolve(`/claims/${form.endorsement?.claim?.id}`)}
 					class="text-blue-700 text-underline hover:no-underline"
 				>
 					{m.best_teary_shrimp_pause()}
@@ -92,7 +96,11 @@
 				{#if endorsementJson?.id}
 					<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 						<span class="font-bold">{m.calm_steady_lynx_evidence()}:</span>
-						<a href={endorsementJson.id} class="text-blue-700 text-underline hover:no-underline">
+						<a
+							href={endorsementJson.id}
+							rel="external"
+							class="text-blue-700 text-underline hover:no-underline"
+						>
 							{endorsementJson.id}
 						</a>
 					</p>
@@ -108,7 +116,11 @@
 					form = null;
 				}}
 			/>
-			<Button href="../{data.achievement.id}" submodule="primary" text="Done" />
+			<Button
+				href={resolve(`/achievements/${data.achievement.id}`)}
+				submodule="primary"
+				text="Done"
+			/>
 		</div>
 	{:else}
 		<!-- Submission form -->

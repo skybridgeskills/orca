@@ -11,6 +11,7 @@
 		inviteId
 	} from '$lib/stores/activeClaimStore';
 	import { deserialize } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { error } from '@sveltejs/kit';
@@ -63,7 +64,7 @@
 						}
 					}
 				}
-				goto('/login');
+				goto(resolve('/login'));
 			} else {
 				setTimeout(() => {
 					$claimEmail = userEmails[0]?.identifier || '';
@@ -144,7 +145,7 @@
 					bind:value={$claimEmail}
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 				>
-					{#each userEmails as identifier, i (identifier.id)}
+					{#each userEmails as identifier (identifier.id)}
 						<option value={identifier.identifier}>{identifier.identifier}</option>
 					{/each}
 				</select>

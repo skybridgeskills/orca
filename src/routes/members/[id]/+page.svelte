@@ -35,7 +35,7 @@
 					showShareModal = true;
 				}}
 			/>
-			<Button href={`/settings`} submodule="secondary" text={m.quiet_warm_dog_soar()} />
+			<Button href="/settings" submodule="secondary" text={m.quiet_warm_dog_soar()} />
 		{/if}
 	</div>
 </div>
@@ -55,7 +55,7 @@
 			{member.identifiers.length} {m.bright_happy_sparrow_identifier()}
 		{/if}
 	</h3>
-	{#each member.identifiers as identifier}
+	{#each member.identifiers as identifier (identifier.id)}
 		<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
 			{identifier.type}: {identifier.identifier}
 			{#if identifier.verifiedAt}({m.sad_vivid_myna_visit()}){/if}
@@ -75,7 +75,7 @@
 	/>
 
 	<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
-		{#each member.receivedAchievementClaims as claim}
+		{#each member.receivedAchievementClaims as claim (claim.id)}
 			<Card maxWidth="" hoverEffect={true} href="/claims/{claim.id}">
 				<div class="grid grid-cols-4 gap-2">
 					<div class="m-auto">

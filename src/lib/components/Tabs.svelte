@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	interface TabItem {
 		id: string;
 		name: string;
@@ -20,10 +22,13 @@
 </script>
 
 <ul class="flex flex-wrap -mb-px">
-	{#each items as item}
+	{#each items as item (item.id)}
 		<li class="me-2">
 			{#if item.href}
-				<a class={item.id == currentItemId ? currentClasses : defaultClasses} href={item.href}>
+				<a
+					class={item.id == currentItemId ? currentClasses : defaultClasses}
+					href={resolve(item.href)}
+				>
 					{item.name}
 				</a>
 			{:else}

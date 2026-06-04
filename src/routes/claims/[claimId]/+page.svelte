@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import type { PageProps } from './$types';
 	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -25,8 +26,11 @@
 	};
 
 	const breadcrumbItems = [
-		{ text: m.each_fluffy_fox_view(), href: '/' },
-		{ text: data.achievement.name, href: `../achievements/${data.achievement.id}` },
+		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
+		{
+			text: data.achievement.name,
+			href: resolve(`/achievements/${data.achievement.id}`)
+		},
 		{ text: `${data.claim.user.givenName} ${data.claim.user.familyName}` }
 	];
 
@@ -117,9 +121,12 @@
 		{#snippet actions()}
 			<span>
 				{#if data.hasProvidedEndorsement}
-					<a href={`${data.claim.id}/endorse`}><Button text={m.antsy_slow_robin_persuade()} /></a>
+					<a href={resolve(`/claims/${data.claim.id}/endorse`)}
+						><Button text={m.antsy_slow_robin_persuade()} /></a
+					>
 				{:else if data.session?.user?.id != data.claim.userId}
-					<a href={`${data.claim.id}/endorse`}><Button text={m.bright_gentle_cheetah_shrine()} /></a
+					<a href={resolve(`/claims/${data.claim.id}/endorse`)}
+						><Button text={m.bright_gentle_cheetah_shrine()} /></a
 					>
 				{/if}
 			</span>
@@ -140,7 +147,7 @@
 				count: data.achievement.achievementConfig?.reviewsRequired
 			})}
 			<a
-				href="/achievements/{data.achievement.achievementConfig.reviewRequires.id}"
+				href={resolve(`/achievements/${data.achievement.achievementConfig.reviewRequires.id}`)}
 				class="font-bold underline hover:no-underline"
 				>{data.achievement.achievementConfig.reviewRequires.name}</a
 			>.

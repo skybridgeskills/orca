@@ -103,7 +103,7 @@
 				<!-- Modal footer -->
 				{#if actions.length > 0}
 					<div class="flex flex-row justify-end p-6 space-x-2 border-t border-gray-200 rounded-b">
-						{#each actions as action}
+						{#each actions as action (action.label)}
 							<Button
 								submodule={action.submodule}
 								buttonType={action.buttonType}

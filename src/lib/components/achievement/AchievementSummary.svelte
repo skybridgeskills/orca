@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
-	import Card from '$lib/components/Card.svelte';
+	import { resolve } from '$app/paths';
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import StatusTag from '$lib/components/StatusTag.svelte';
 	import type { Achievement, AchievementClaim } from '@prisma/client';
@@ -40,7 +40,7 @@
 
 <svelte:element
 	this={href ? 'a' : 'section'}
-	href={href || undefined}
+	href={href ? resolve(href) : undefined}
 	onclick={() => {
 		if (isClickable) onclick?.();
 	}}
@@ -73,7 +73,7 @@
 			/>
 		{:else}
 			<div
-				class={`text-gray-400 dark:text-gray-700`}
+				class="text-gray-400 dark:text-gray-700"
 				class:w-32={imageSize === '32'}
 				class:w-16={imageSize === '16'}
 			>
@@ -89,9 +89,9 @@
 				}`}
 			>
 				{#if achievementHref}
-					<a href={achievementHref}>{achievement.name}</a>
+					<a href={resolve(achievementHref)}>{achievement.name}</a>
 				{:else if linkAchievement}
-					<a href="/achievements/{achievement.id}">{achievement.name}</a>
+					<a href={resolve(`/achievements/${achievement.id}`)}>{achievement.name}</a>
 				{:else}
 					{achievement.name}
 				{/if}

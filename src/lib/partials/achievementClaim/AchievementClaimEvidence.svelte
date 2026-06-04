@@ -1,7 +1,7 @@
 <script lang="ts">
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	import * as m from '$lib/i18n/messages';
-	import type { Achievement, AchievementClaim, AchievementCredential } from '@prisma/client';
+	import type { AchievementClaim } from '@prisma/client';
 
 	interface Props {
 		claim: AchievementClaim | null;
@@ -24,6 +24,7 @@
 		<span class="font-bold">{m.calm_steady_lynx_evidence()}</span>:
 		<a
 			href={claimData.id}
+			rel="external"
 			target="_{claim?.achievementId || 'blank'}"
 			class="underline hoder:no-underline"
 		>

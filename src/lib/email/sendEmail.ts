@@ -41,7 +41,7 @@ interface EmailResult {
 }
 
 export const sendOrcaMail = (mailOptions: nodemailer.SendMailOptions) => {
-	return new Promise<EmailResult>((resolve, reject) => {
+	return new Promise<EmailResult>((resolve) => {
 		transporter.sendMail(mailOptions, (err: Error | null, info: any) => {
 			if (env.MAILGUN_API_KEY == 'none') {
 				console.log(info?.message);

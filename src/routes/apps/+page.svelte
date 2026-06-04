@@ -55,16 +55,11 @@
 							/>
 						{/if}
 						<div class="grow">
-							<!--
-								Client-registered external URL (clientUri) — not a SvelteKit
-								route, so resolve() does not apply. Opens in a new tab.
-							-->
-							<!-- eslint-disable svelte/no-navigation-without-resolve -->
 							{#if app.clientUri}
 								<a
 									href={app.clientUri}
 									target="_blank"
-									rel="noopener noreferrer"
+									rel="noopener noreferrer external"
 									class="text-lg font-bold text-blue-600 hover:underline dark:text-blue-400"
 								>
 									{app.clientName}
@@ -74,7 +69,6 @@
 									{app.clientName}
 								</span>
 							{/if}
-							<!-- eslint-enable svelte/no-navigation-without-resolve -->
 
 							<div class="mt-2 flex flex-wrap gap-2">
 								{#each app.scopes as scope (scope)}

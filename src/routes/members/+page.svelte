@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import Tag from '$lib/components/Tag.svelte';
@@ -16,11 +17,11 @@
 <Pagination paging={{ ...calculatePageAndSize($page.url), count: data.count }} />
 
 <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-	{#each members as member}
+	{#each members as member (member.id)}
 		<li
 			class="p-6 max-w-md bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700"
 		>
-			<a href="/members/{member.id}">
+			<a href={resolve(`/members/${member.id}`)}>
 				<h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
 					{member.givenName}
 					{member.familyName}
@@ -28,7 +29,7 @@
 				</h5>
 			</a>
 			<a
-				href="/members/{member.id}"
+				href={resolve(`/members/${member.id}`)}
 				class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 			>
 				{m.mellow_dry_panther_fry()}

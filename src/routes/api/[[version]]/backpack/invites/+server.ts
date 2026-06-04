@@ -1,4 +1,4 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import { prefersHtml } from '$lib/utils/contentNegotiation';

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
 	import type { PageProps } from './$types';
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import Alert from '$lib/components/Alert.svelte';
@@ -22,9 +23,12 @@
 	let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
 
 	const breadcrumbItems = [
-		{ text: m.each_fluffy_fox_view(), href: '/' },
-		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
-		{ text: data.achievement.name, href: `../${data.achievement.id}` },
+		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
+		{ text: m.antsy_grand_rabbit_gaze(), href: resolve('/achievements') },
+		{
+			text: data.achievement.name,
+			href: resolve(`/achievements/${data.achievement.id}`)
+		},
 		{ text: m.bold_swift_eagle_claim() }
 	];
 </script>
@@ -39,7 +43,7 @@
 		existingBadgeClaim={data.existingBadgeClaim}
 		{claimIntent}
 		handleCancel={() => {
-			goto(`/achievements/${data.achievement.id}`);
+			goto(resolve(`/achievements/${data.achievement.id}`));
 		}}
 	/>
 {:else if config?.claimable && config?.claimRequiresId}
@@ -52,7 +56,7 @@
 		<Alert level="warning">
 			{m.sharp_quiet_panther_requires()}
 			<a
-				href={`/achievements/${config?.claimRequiresId}`}
+				href={resolve(`/achievements/${config?.claimRequiresId}`)}
 				class="font-bold underline hover:no-underline">{config?.claimRequires?.name}</a
 			>. {m.sharp_clear_fox_notmeets()}
 		</Alert>

@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import type { RequestEvent } from './$types';
 import { apiResponse } from '$lib/utils/api';

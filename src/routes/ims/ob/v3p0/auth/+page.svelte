@@ -61,18 +61,12 @@
 					<li>{scopeLabel(scope)}</li>
 				{/each}
 			</ul>
-
-			<!--
-				Client-registered external URLs (tos/policy/clientUri) — not SvelteKit
-				routes, so resolve() does not apply. They always open in a new tab.
-			-->
-			<!-- eslint-disable svelte/no-navigation-without-resolve -->
 			<div class="mb-6 flex flex-wrap gap-x-4 gap-y-1 text-sm">
 				{#if data.client.tosUri}
 					<a
 						href={data.client.tosUri}
 						target="_blank"
-						rel="noopener noreferrer"
+						rel="noopener noreferrer external"
 						class="text-blue-600 hover:underline dark:text-blue-400"
 					>
 						{m.merry_silver_robin_terms()}
@@ -82,7 +76,7 @@
 					<a
 						href={data.client.policyUri}
 						target="_blank"
-						rel="noopener noreferrer"
+						rel="noopener noreferrer external"
 						class="text-blue-600 hover:underline dark:text-blue-400"
 					>
 						{m.clever_dusky_quail_privacy()}
@@ -92,14 +86,13 @@
 					<a
 						href={data.client.clientUri}
 						target="_blank"
-						rel="noopener noreferrer"
+						rel="noopener noreferrer external"
 						class="text-blue-600 hover:underline dark:text-blue-400"
 					>
 						{m.quirky_solar_lynx_visit()}
 					</a>
 				{/if}
 			</div>
-			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 
 			<form method="POST" class="flex gap-3">
 				<input type="hidden" name="clientId" value={data.params.clientId} />

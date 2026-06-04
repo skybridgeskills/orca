@@ -1,6 +1,22 @@
-const fs = require('fs');
+#!/usr/bin/env node
+// Generate unique i18n message key(s) in orca's canonical
+// `adjective_adjective_animal_verb` pattern (e.g. `gentle_brave_falcon_rest`).
+// Each generated key is guaranteed NOT to collide with any existing key in the
+// source locale (src/messages/en-US/orca.json) or with the other keys produced
+// in the same run.
+//
+// Usage (run from the orca project root):
+//   node scripts/generate-key-mapping.cjs       -> prints 1 key
+//   node scripts/generate-key-mapping.cjs 5     -> prints 5 distinct keys, one per line
+//
+// Used by the `i18n-new-message` agent skill. Keys are random per run
+// (node:crypto), so repeated single-key calls vary.
 
-// Word lists for random key generation
+const fs = require('fs');
+const path = require('path');
+const { randomInt } = require('node:crypto');
+
+// Word lists for random key generation.
 const adjectives = [
 	'bright',
 	'calm',
@@ -53,8 +69,6 @@ const adjectives = [
 	'antsy',
 	'top',
 	'patchy',
-	'dry',
-	'early',
 	'stout',
 	'true',
 	'sea',
@@ -65,12 +79,9 @@ const adjectives = [
 	'teary',
 	'kind',
 	'ok',
-	'antsy',
 	'tidy',
 	'major',
 	'legal',
-	'warm',
-	'happy',
 	'watery',
 	'arable',
 	'house',
@@ -79,7 +90,6 @@ const adjectives = [
 	'known',
 	'proof',
 	'dull',
-	'merry',
 	'gray',
 	'aqua',
 	'home',
@@ -106,11 +116,6 @@ const adjectives = [
 	'red',
 	'frail',
 	'cuddly',
-	'petty',
-	'dark',
-	'weary',
-	'funny',
-	'sparse',
 	'each'
 ];
 
@@ -163,18 +168,7 @@ const animals = [
 	'mouse',
 	'turtle',
 	'oryx',
-	'hound',
-	'robin',
-	'rabbit',
-	'pug',
-	'goat',
-	'guppy',
-	'crossbill',
-	'marten',
-	'bat',
-	'parrot',
-	'kite',
-	'panther'
+	'hound'
 ];
 
 const verbs = [
@@ -232,76 +226,45 @@ const verbs = [
 	'succeed',
 	'favor',
 	'bask',
-	'jump',
-	'buy',
-	'shrine',
 	'read',
-	'fry',
 	'emerge',
 	'feel',
 	'ask',
 	'spin',
 	'startle',
-	'tap',
-	'ascend',
-	'fry',
-	'drip',
-	'enchant',
-	'link',
-	'cook',
-	'file',
-	'support',
-	'view',
-	'approve',
-	'intend',
-	'march',
-	'lead',
-	'climb',
-	'zoom'
+	'tap'
 ];
 
-// Simple seeded random for reproducibility
-let seed = 42;
-function random() {
-	seed = (seed * 9301 + 49297) % 233280;
-	return seed / 233280;
+/** Pick a uniformly random element from `list` using a CSPRNG. */
+function pick(list) {
+	return list[randomInt(list.length)];
 }
 
-function randomInt(max) {
-	return Math.floor(random() * max);
-}
-
-function generateRandomKey(existingKeys) {
-	let attempts = 0;
-	while (attempts < 1000) {
-		const adj1 = adjectives[randomInt(adjectives.length)];
-		const adj2 = adjectives[randomInt(adjectives.length)];
-		const animal = animals[randomInt(animals.length)];
-		const verb = verbs[randomInt(verbs.length)];
-		const key = `${adj1}_${adj2}_${animal}_${verb}`;
-
-		if (!existingKeys.has(key)) {
-			return key;
-		}
-		attempts++;
+/** Generate a pattern key not present in `existingKeys`. */
+function generateUniqueKey(existingKeys) {
+	for (let attempts = 0; attempts < 1000; attempts++) {
+		const key = `${pick(adjectives)}_${pick(adjectives)}_${pick(animals)}_${pick(verbs)}`;
+		if (!existingKeys.has(key)) return key;
 	}
-	throw new Error('Failed to generate unique key after 1000 attempts');
+	throw new Error('Failed to generate a unique key after 1000 attempts');
 }
 
-// Read existing keys
-const json = JSON.parse(fs.readFileSync('src/messages/en-US/orca.json', 'utf8'));
-const allKeys = Object.keys(json).filter((k) => k !== '$schema');
-const pattern = /^[a-z]+_[a-z]+_[a-z]+_[a-z]+$/;
-const notMatching = allKeys.filter((k) => !pattern.test(k));
-const existingKeys = new Set(allKeys);
+const SOURCE_MESSAGES = path.resolve(__dirname, '..', 'src', 'messages', 'en-US', 'orca.json');
 
-// Generate mapping
-const mapping = {};
-for (const oldKey of notMatching) {
-	const newKey = generateRandomKey(existingKeys);
-	mapping[oldKey] = newKey;
-	existingKeys.add(newKey);
+function main() {
+	const count = Math.max(1, Number.parseInt(process.argv[2], 10) || 1);
+
+	const json = JSON.parse(fs.readFileSync(SOURCE_MESSAGES, 'utf8'));
+	const existingKeys = new Set(Object.keys(json)); // includes `$schema`, harmless
+
+	const keys = [];
+	for (let i = 0; i < count; i++) {
+		const key = generateUniqueKey(existingKeys);
+		existingKeys.add(key); // keep keys generated in this run mutually unique
+		keys.push(key);
+	}
+
+	process.stdout.write(keys.join('\n') + '\n');
 }
 
-// Output mapping as JSON (only JSON, no other output)
-console.log(JSON.stringify(mapping, null, 2));
+main();

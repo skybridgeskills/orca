@@ -10,7 +10,6 @@ import type { PageServerLoad } from './$types';
 //import { getUploadUrl } from '$lib/server/media';
 import stripTags from '$lib/utils/stripTags';
 import { v4 as uuidv4 } from 'uuid';
-import { connect } from 'http2';
 import { getUploadUrl } from '$lib/server/media';
 import { getAchievement } from '$lib/data/achievement';
 import { canEditAchievements } from '$lib/server/permissions';
@@ -91,7 +90,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, cookies, request }) => {
+	default: async ({ locals, request }) => {
 		if (!locals.session?.user?.id) {
 			error(403, m.lower_home_cow_view());
 		}
@@ -149,11 +148,8 @@ export const actions: Actions = {
 
 		if (formData.capabilities_inviteRequires) {
 			try {
-				const relatedInviteRequiresAchievement = await getAchievement(
-					formData.capabilities_inviteRequires,
-					locals.org.id
-				);
-			} catch (e) {
+				await getAchievement(formData.capabilities_inviteRequires, locals.org.id);
+			} catch {
 				return fail(400, {
 					code: 'inviteRequires',
 					message: m.swift_steady_falcon_notfound()
