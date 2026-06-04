@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { getOrganizationFromRequest } from '../../../src/hooks.server';
 import { prisma } from '../../../src/prisma/client';
 import { testOrganization } from '../testObjects';
+import type { RequestEvent } from '@sveltejs/kit';
 
 vi.mock('../../../src/prisma/client', () => ({
 	prisma: {
@@ -31,7 +32,7 @@ describe('getOrganizationFromRequest', () => {
 
 		const event = {
 			url: { host: 'example.com' }
-		} as any;
+		} as unknown as RequestEvent;
 
 		// Check that error is 503
 		try {
@@ -54,7 +55,7 @@ describe('getOrganizationFromRequest', () => {
 
 		const event = {
 			url: { host: 'example.com' }
-		} as any;
+		} as unknown;
 
 		const result = await getOrganizationFromRequest(event);
 		expect(result).toEqual(enabledOrg);
@@ -70,7 +71,7 @@ describe('getOrganizationFromRequest', () => {
 
 		const event = {
 			url: { host: 'example.com' }
-		} as any;
+		} as unknown;
 
 		const result = await getOrganizationFromRequest(event);
 		expect(result).toEqual(orgWithoutStatus);
@@ -86,7 +87,7 @@ describe('getOrganizationFromRequest', () => {
 
 		const event = {
 			url: { host: 'example.com' }
-		} as any;
+		} as unknown;
 
 		const result = await getOrganizationFromRequest(event);
 		expect(result).toEqual(underReviewOrg);
@@ -102,13 +103,13 @@ describe('getOrganizationFromRequest', () => {
 
 		const event = {
 			url: { host: 'example.com' }
-		} as any;
+		} as unknown;
 
 		// Check that error is 403
 		try {
 			await getOrganizationFromRequest(event);
 			expect.fail('Should have thrown an error');
-		} catch (err: any) {
+		} catch (err: unknown) {
 			expect(err.status).toBe(403);
 			const errorBody = typeof err.body === 'string' ? err.body : JSON.stringify(err.body);
 			expect(errorBody).toContain('not yet activated');
