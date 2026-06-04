@@ -1,7 +1,8 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import Button from '$lib/components/Button.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import * as m from '$lib/i18n/messages';
+
 	import type { PageData } from './$types';
 	export let data: PageData;
 	const noErrors: { [key: string]: string | null } = {

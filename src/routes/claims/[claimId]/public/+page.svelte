@@ -1,10 +1,13 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import { MetaTags } from 'svelte-meta-tags';
-	import type { PageProps } from './$types';
-	import { page } from '$app/stores';
+
+	import * as m from '$lib/i18n/messages';
 	import PublicClaimDetail from '$lib/partials/achievementClaim/PublicClaimDetail.svelte';
 	import { staticImageUrlForAchievement } from '$lib/utils/imageUrl';
+
+	import type { PageProps } from './$types';
+
+	import { page } from '$app/stores';
 
 	let { data }: PageProps = $props();
 	const achievementWithOrgData = {

@@ -1,9 +1,12 @@
-import * as m from '$lib/i18n/messages';
-import { prisma } from '../../../prisma/client';
 import { redirect, error } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
-import stripTags from '../../../lib/utils/stripTags';
+
+import * as m from '$lib/i18n/messages';
+
 import parseIntData from '../../../lib/utils/parseIntData';
+import stripTags from '../../../lib/utils/stripTags';
+import { prisma } from '../../../prisma/client';
+
+import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = ({ locals }) => {
 	// Don't include edit controls if not an admin

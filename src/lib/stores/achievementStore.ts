@@ -1,6 +1,8 @@
-import * as m from '$lib/i18n/messages';
 import type { Achievement, AchievementConfig } from '@prisma/client';
 import { get, writable } from 'svelte/store';
+
+import * as m from '$lib/i18n/messages';
+
 import { LoadingStatus } from './common';
 import { notifications, Notification } from './notificationStore';
 

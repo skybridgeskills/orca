@@ -1,19 +1,22 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
+	import type { Achievement, AchievementClaim, Organization } from '@prisma/client';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime.js';
 	import { Icon } from 'svelte-icons-pack';
-	import { FaShareFromSquare as FaShareSquare } from 'svelte-icons-pack/fa';
-	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
 	import { BiSolidNoEntry } from 'svelte-icons-pack/bi';
-	import AchievementSummary from './AchievementSummary.svelte';
+	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
+	import { FaShareFromSquare as FaShareSquare } from 'svelte-icons-pack/fa';
+
 	import Modal from '$lib/components/Modal.svelte';
-	import type { Achievement, AchievementClaim, Organization } from '@prisma/client';
-	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
+	import * as m from '$lib/i18n/messages';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
 	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
+
+	import AchievementSummary from './AchievementSummary.svelte';
+
+	import { resolve } from '$app/paths';
+	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	dayjs.extend(relativeTime);
 

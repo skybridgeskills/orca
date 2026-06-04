@@ -1,9 +1,11 @@
 import type { OAuthClient, Organization } from '@prisma/client';
+
 import { prisma } from '$lib/../prisma/client';
+
+import { revokeTokensForClient } from './accessToken';
+import { intersectSupportedApi } from './scopes';
 import { hashSecret } from './secretHash';
 import { generateOpaqueToken, CLIENT_SECRET_BYTES } from './tokens';
-import { intersectSupportedApi } from './scopes';
-import { revokeTokensForClient } from './accessToken';
 
 /** Typed error for the confidential-client admin service. */
 export class ConfidentialClientError extends Error {

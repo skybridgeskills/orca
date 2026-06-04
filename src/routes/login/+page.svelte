@@ -1,21 +1,24 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { enhance } from '$app/forms';
-	import { resolve } from '$app/paths';
-	import { goto } from '$app/navigation';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
+
 	import Button from '$lib/components/Button.svelte';
-	import type { ActionData, PageData, SubmitFunction } from './$types';
+	import Heading from '$lib/components/Heading.svelte';
+	import * as m from '$lib/i18n/messages';
 	import {
 		claimPending,
 		claimEmail,
 		inviteId,
 		inviteCreatedAt
 	} from '$lib/stores/activeClaimStore';
-	import { onMount } from 'svelte';
-	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { nextPath, session } from '$lib/stores/sessionStore';
-	import Heading from '$lib/components/Heading.svelte';
-	import type { ActionResult } from '@sveltejs/kit';
+
+	import type { ActionData, PageData, SubmitFunction } from './$types';
+
+	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	export let form: ActionData;
 	export let data: PageData;

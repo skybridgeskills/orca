@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+
 import { prisma } from '../../prisma/client';
 
 export const GET = async () => {

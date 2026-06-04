@@ -1,8 +1,11 @@
-import * as m from '$lib/i18n/messages';
 import { error, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import { prisma } from '../../../prisma/client';
+
+import * as m from '$lib/i18n/messages';
 import { calculatePageAndSize } from '$lib/utils/pagination';
+
+import { prisma } from '../../../prisma/client';
+
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals, params }) => {
 	// redirect user if logged out

@@ -1,25 +1,27 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
+	import type { Achievement, AchievementClaim } from '@prisma/client';
+	import dayjs from 'dayjs';
+	import relativeTime from 'dayjs/plugin/relativeTime.js';
+	import { onMount } from 'svelte';
 	import { Icon } from 'svelte-icons-pack';
 	import { FaShareFromSquare as FaShareSquare } from 'svelte-icons-pack/fa';
 	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
-	import dayjs from 'dayjs';
-	import relativeTime from 'dayjs/plugin/relativeTime.js';
-	import Alert from '$lib/components/Alert.svelte';
+
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import type { PageData } from './$types';
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 	import Heading from '$lib/components/Heading.svelte';
-	import Backpack from '$lib/illustrations/Backpack.svelte';
-	import type { Achievement, AchievementClaim } from '@prisma/client';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
-	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 	import Pagination from '$lib/components/Pagination.svelte';
-	import { calculatePageAndSize } from '$lib/utils/pagination';
+	import * as m from '$lib/i18n/messages';
+	import Backpack from '$lib/illustrations/Backpack.svelte';
+	import {
+		achievementsLoading,
+		fetchAchievements,
+		getAchievementById
+	} from '$lib/stores/achievementStore';
 	import {
 		backpackClaims,
 		backpackClaimsLoading,
@@ -28,13 +30,14 @@
 		fetchOutstandingInvites
 	} from '$lib/stores/backpackStore';
 	import { LoadingStatus, ensureLoaded } from '$lib/stores/common';
-	import { onMount } from 'svelte';
-	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
-	import {
-		achievementsLoading,
-		fetchAchievements,
-		getAchievementById
-	} from '$lib/stores/achievementStore';
+	import { calculatePageAndSize } from '$lib/utils/pagination';
+	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
+
+	import type { PageData } from './$types';
+
+	import { resolve } from '$app/paths';
+	import { page } from '$app/stores';
+	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	dayjs.extend(relativeTime);
 	export let data: PageData;

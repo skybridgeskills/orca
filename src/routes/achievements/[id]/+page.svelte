@@ -1,25 +1,4 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
-	import dayjs from 'dayjs';
-	import relativeTime from 'dayjs/plugin/relativeTime.js';
-	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
-	import Modal from '$lib/components/Modal.svelte';
-	import type { PageProps } from './$types';
-	import { Icon } from 'svelte-icons-pack';
-	import { FaSolidEnvelopeOpenText } from 'svelte-icons-pack/fa';
-	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
-	import { FaSolidTrash as FaTrashAlt } from 'svelte-icons-pack/fa';
-	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
-	import { imageUrl } from '$lib/utils/imageUrl';
-	import { isAdmin } from '$lib/permissions/isAdmin';
-	import ClaimSummaryCard from '$lib/components/achievement/ClaimSummaryCard.svelte';
-	import Heading from '$lib/components/Heading.svelte';
-	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
-	import QRCode from '$lib/components/QRCode.svelte';
 	import type {
 		Achievement,
 		AchievementCategory,
@@ -27,17 +6,32 @@
 		ClaimEndorsement,
 		User
 	} from '@prisma/client';
+	import dayjs from 'dayjs';
+	import relativeTime from 'dayjs/plugin/relativeTime.js';
+	import { onMount, setContext } from 'svelte';
+	import { Icon } from 'svelte-icons-pack';
+	import { FaSolidEnvelopeOpenText } from 'svelte-icons-pack/fa';
+	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
+	import { FaSolidTrash as FaTrashAlt } from 'svelte-icons-pack/fa';
+
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
+	import ClaimSummaryCard from '$lib/components/achievement/ClaimSummaryCard.svelte';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import Heading from '$lib/components/Heading.svelte';
+	import Modal from '$lib/components/Modal.svelte';
+	import QRCode from '$lib/components/QRCode.svelte';
+	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
+	import * as m from '$lib/i18n/messages';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
+	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
+	import { isAdmin } from '$lib/permissions/isAdmin';
 	import {
 		acLoading,
 		fetchAchievementCategories,
 		getCategoryById
 	} from '$lib/stores/achievementCategoryStore';
-	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
-	import { onMount, setContext } from 'svelte';
-	import { calculatePageAndSize } from '$lib/utils/pagination';
-	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
-	import { ensureLoaded } from '$lib/stores/common';
 	import {
 		achievements,
 		achievementsLoading,
@@ -48,6 +42,15 @@
 		backpackClaimsLoading,
 		fetchBackpackClaims
 	} from '$lib/stores/backpackStore';
+	import { ensureLoaded } from '$lib/stores/common';
+	import { imageUrl } from '$lib/utils/imageUrl';
+	import { calculatePageAndSize } from '$lib/utils/pagination';
+
+	import type { PageProps } from './$types';
+
+	import { resolve } from '$app/paths';
+	import { page } from '$app/stores';
+	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	dayjs.extend(relativeTime);
 

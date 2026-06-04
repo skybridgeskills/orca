@@ -1,8 +1,10 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import type { PageProps } from './$types';
 	import Button from '$lib/components/Button.svelte';
+	import * as m from '$lib/i18n/messages';
+
+	import type { PageProps } from './$types';
+
+	import { resolve } from '$app/paths';
 
 	let { data }: PageProps = $props();
 </script>

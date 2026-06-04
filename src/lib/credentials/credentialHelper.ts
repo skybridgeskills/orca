@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import type { AchievementCredential } from '@prisma/client';
+
 import { env } from '$env/dynamic/private';
 
 const DEFAULT_CACHE_TIMEOUT = parseInt(env.CREDENTIAL_CACHE_TIMEOUT ?? '600000');

@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 export interface BuildLinkHeaderParams {

@@ -1,18 +1,20 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { imageUrl } from '$lib/utils/imageUrl';
-	import { page } from '$app/stores';
 	import Button from '$lib/components/Button.svelte';
+	import Card from '$lib/components/Card.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import Tag from '$lib/components/Tag.svelte';
+	import * as m from '$lib/i18n/messages';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
+	import { imageUrl } from '$lib/utils/imageUrl';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
+
 	import type { PageProps } from './$types';
+
+	import { page } from '$app/stores';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
-	import Card from '$lib/components/Card.svelte';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	let { data }: PageProps = $props();
 	let member = data.member;
 	let showShareModal = $state(false);

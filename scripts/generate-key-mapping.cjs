@@ -13,8 +13,8 @@
 // (node:crypto), so repeated single-key calls vary.
 
 const fs = require('fs');
-const path = require('path');
 const { randomInt } = require('node:crypto');
+const path = require('path');
 
 // Word lists for random key generation.
 const adjectives = [

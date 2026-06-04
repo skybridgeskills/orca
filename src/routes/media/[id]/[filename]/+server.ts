@@ -1,10 +1,13 @@
-import * as m from '$lib/i18n/messages';
-import * as path from 'path';
 import * as fs from 'fs/promises';
-import mime from 'mime-types';
+import * as path from 'path';
+
 import { error, json } from '@sveltejs/kit';
-import type { RequestEvent } from './$types';
+import mime from 'mime-types';
+
+import * as m from '$lib/i18n/messages';
 import { isLocalDevFileMedia } from '$lib/server/media.js';
+
+import type { RequestEvent } from './$types';
 
 export const GET = async ({ params }: RequestEvent) => {
 	if (!isLocalDevFileMedia()) error(500, { message: m.clear_mellow_goat_lead() });

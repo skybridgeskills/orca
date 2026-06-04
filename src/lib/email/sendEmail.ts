@@ -1,5 +1,6 @@
 import * as nodemailer from 'nodemailer';
 import mailgunTransport from 'nodemailer-mailgun-transport';
+
 import { env } from '$env/dynamic/private';
 
 const mailgunAuth = {

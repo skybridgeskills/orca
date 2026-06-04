@@ -1,18 +1,20 @@
-import { json } from '@sveltejs/kit';
 import type { Prisma } from '@prisma/client';
+import { json } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
-import { authenticateBearer } from '$lib/server/oauth/accessToken';
-import { SCOPE_CREDENTIAL_READONLY } from '$lib/server/oauth/scopes';
 import {
 	ensureClaimCredential,
 	TransactionServiceIssuerError
 } from '$lib/credentials/ensureClaimCredential';
-import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 import {
 	buildLinkHeader,
 	credentialsBaseUrl,
 	getCredentialsResponseBody
 } from '$lib/ob3/getCredentialsResponse';
+import { authenticateBearer } from '$lib/server/oauth/accessToken';
+import { SCOPE_CREDENTIAL_READONLY } from '$lib/server/oauth/scopes';
+import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
+
 import type { RequestHandler } from './$types';
 
 // OB3 getCredentials (§6.2.2). Bearer-protected; requires the credential.readonly

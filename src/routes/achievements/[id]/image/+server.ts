@@ -1,6 +1,8 @@
-import { imageUrl } from '$lib/utils/imageUrl';
-import { prisma } from '$lib/../prisma/client';
 import { redirect } from '@sveltejs/kit';
+
+import { prisma } from '$lib/../prisma/client';
+import { imageUrl } from '$lib/utils/imageUrl';
+
 import type { RequestEvent } from './$types';
 
 export const GET = async ({ params }: RequestEvent) => {

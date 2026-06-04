@@ -1,8 +1,11 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
 import { ValidationError } from 'yup';
-import { prisma } from '../../../../prisma/client';
+
 import { encrypt } from '$lib/server/secrets/orgConfigCrypto';
+
+import { prisma } from '../../../../prisma/client';
+
+import type { Actions, PageServerLoad } from './$types';
 import { setIssuerSchema, setTransactionServiceSchema, removeApiKeySchema } from './schema';
 
 const ALLOWED_ROLES = ['GENERAL_ADMIN', 'CONTENT_ADMIN'];

@@ -1,10 +1,12 @@
-import * as m from '$lib/i18n/messages';
-import { prisma } from '$lib/../prisma/client';
 import type { ClaimEndorsement, User } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+
+import { prisma } from '$lib/../prisma/client';
+import * as m from '$lib/i18n/messages';
 import { canEditAchievements } from '$lib/server/permissions';
+
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const achievementId = params.id;

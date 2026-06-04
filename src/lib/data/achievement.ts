@@ -1,6 +1,3 @@
-import * as m from '$lib/i18n/messages';
-import { error } from '@sveltejs/kit';
-import { prisma } from '$lib/../prisma/client';
 import type {
 	Achievement,
 	AchievementClaim,
@@ -10,10 +7,15 @@ import type {
 	User
 } from '@prisma/client';
 import { Prisma } from '@prisma/client';
+import { error } from '@sveltejs/kit';
+
+import { prisma } from '$lib/../prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
-import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
-import { validateEmailAddress } from '$lib/utils/email';
+import * as m from '$lib/i18n/messages';
 import { isAdmin } from '$lib/permissions/isAdmin';
+import { validateEmailAddress } from '$lib/utils/email';
+
+import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 export const getAchievement = async (achievementId: string, orgId: string) => {
 	const achievement = (await prisma.achievement.findFirstOrThrow({

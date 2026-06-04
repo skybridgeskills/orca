@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData, PageData } from './$types';
-	import RadioOption from '$lib/components/forms/RadioOption.svelte';
-	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
+	import RadioOption from '$lib/components/forms/RadioOption.svelte';
+
+	import type { ActionData, PageData } from './$types';
+
+	import { enhance } from '$app/forms';
 
 	export let data: PageData;
 	export let form: ActionData;

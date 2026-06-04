@@ -1,8 +1,9 @@
 <script lang="ts" module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 
-	import AlignmentInput from './AlignmentInput.svelte';
 	import type { Alignment } from '$lib/data/alignment';
+
+	import AlignmentInput from './AlignmentInput.svelte';
 
 	const { Story } = defineMeta({
 		title: 'components/forms/AlignmentInput',

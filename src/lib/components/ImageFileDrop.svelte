@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { FileDrop } from 'svelte-droplet';
+
 	import * as m from '$lib/i18n/messages';
 	import { imageUrl } from '$lib/utils/imageUrl';
-	import { FileDrop } from 'svelte-droplet';
 
 	interface Props {
 		errorMessage?: string | null;

@@ -1,8 +1,9 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
+	import { Carta, CartaEditor } from 'carta-md';
 	import sanitizeHtml from 'sanitize-html';
 
-	import { Carta, CartaEditor } from 'carta-md';
+	import * as m from '$lib/i18n/messages';
+
 	import 'carta-md/default.css';
 	import './markdown-editor.css';
 

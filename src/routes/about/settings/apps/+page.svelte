@@ -1,6 +1,4 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { enhance } from '$app/forms';
 	import Badge from '$lib/components/Badge.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
@@ -8,7 +6,11 @@
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import * as m from '$lib/i18n/messages';
+
 	import type { ActionData, PageData } from './$types';
+
+	import { enhance } from '$app/forms';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 

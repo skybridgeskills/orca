@@ -1,6 +1,8 @@
-import * as m from '$lib/i18n/messages';
 import type { AchievementClaim, ClaimEndorsement } from '@prisma/client';
 import { get, writable } from 'svelte/store';
+
+import * as m from '$lib/i18n/messages';
+
 import { ensureLoaded, LoadingStatus } from './common';
 import { notifications, Notification } from './notificationStore';
 import { session, sessionStatus } from './sessionStore';

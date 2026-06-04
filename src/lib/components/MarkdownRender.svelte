@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { marked } from 'marked';
+
 	import stripTags from '$lib/utils/stripTags';
 
 	interface Props {

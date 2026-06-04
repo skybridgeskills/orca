@@ -1,14 +1,17 @@
 import type { OAuthClient, Organization } from '@prisma/client';
-import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
+
 import { prisma } from '$lib/../prisma/client';
-import { hashSecret } from './secretHash';
-import { generateOpaqueToken, CLIENT_SECRET_BYTES } from './tokens';
+
 import {
 	intersectSupported,
 	parseScopeString,
 	SCOPE_CREDENTIAL_READONLY,
 	SCOPE_OFFLINE_ACCESS
 } from './scopes';
+import { hashSecret } from './secretHash';
+import { generateOpaqueToken, CLIENT_SECRET_BYTES } from './tokens';
+
+import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 /** RFC7591 registration error with an OAuth error code. */
 export class RegistrationError extends Error {

@@ -1,10 +1,12 @@
 import { json } from '@sveltejs/kit';
+
 import {
 	createClient,
 	RegistrationError,
 	toRegistrationResponse,
 	validateRegistrationRequest
 } from '$lib/server/oauth/clientRegistration';
+
 import type { RequestHandler } from './$types';
 
 // RFC7591 Dynamic Client Registration (§7.1.1). Unprotected.

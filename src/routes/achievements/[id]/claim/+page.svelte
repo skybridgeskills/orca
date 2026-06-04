@@ -1,14 +1,17 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageProps } from './$types';
-	import { resolve } from '$app/paths';
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+
+	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import * as m from '$lib/i18n/messages';
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
 	import { claimEmail, inviteId, inviteCreatedAt } from '$lib/stores/activeClaimStore';
+
+	import type { PageProps } from './$types';
+
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let { data }: PageProps = $props();
 	const config = data.achievement.achievementConfig;

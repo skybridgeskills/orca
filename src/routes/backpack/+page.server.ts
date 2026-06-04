@@ -1,8 +1,10 @@
-import * as dotenv from 'dotenv';
-import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
+import * as dotenv from 'dotenv';
+
 import { prisma } from '$lib/../prisma/client';
 import { calculatePageAndSize } from '$lib/utils/pagination';
+
+import type { PageServerLoad } from './$types';
 
 dotenv.config();
 

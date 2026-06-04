@@ -1,6 +1,9 @@
-import type { OAuthClient, Organization } from '@prisma/client';
 import { createHash, timingSafeEqual } from 'node:crypto';
+
+import type { OAuthClient, Organization } from '@prisma/client';
+
 import { prisma } from '$lib/../prisma/client';
+
 import {
 	AUTHORIZATION_CODE_TTL_SECONDS,
 	expiryFromNow,

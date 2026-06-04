@@ -1,7 +1,9 @@
-import * as m from '$lib/i18n/messages';
-import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
+import * as m from '$lib/i18n/messages';
+
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const claim = await prisma.achievementClaim.findUnique({

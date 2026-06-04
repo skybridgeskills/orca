@@ -1,5 +1,6 @@
-import { PUBLIC_HTTP_PROTOCOL, PUBLIC_MEDIA_DOMAIN } from '$env/static/public';
 import type { Achievement, Organization } from '@prisma/client';
+
+import { PUBLIC_HTTP_PROTOCOL, PUBLIC_MEDIA_DOMAIN } from '$env/static/public';
 
 /**
  * This function takes an achievement with its organization data and returns a url to our server that

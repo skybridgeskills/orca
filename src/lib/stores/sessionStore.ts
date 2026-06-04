@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+
 import { LoadingStatus } from './common';
 
 export const session = writable<App.SessionData | undefined>();

@@ -1,7 +1,8 @@
 import { expect, test } from 'vitest';
 
-import { testAchievement, testAchievementClaim, testOrganization } from '../../testObjects';
 import { linkedInShareUrl } from '$lib/utils/shareCredentials';
+
+import { testAchievement, testAchievementClaim, testOrganization } from '../../testObjects';
 
 test('linkedInShareUrl no expiration', () => {
 	const achievementClaim = {

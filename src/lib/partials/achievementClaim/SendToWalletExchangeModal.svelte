@@ -2,6 +2,7 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import * as m from '$lib/i18n/messages';
+
 	import {
 		buildProtocolOptions,
 		type ExchangeProtocolMessageKey,

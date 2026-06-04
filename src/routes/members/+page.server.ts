@@ -1,7 +1,10 @@
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import { prisma } from '../../prisma/client';
+
 import { calculatePageAndSize } from '$lib/utils/pagination';
+
+import { prisma } from '../../prisma/client';
+
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
 	// redirect user if logged out

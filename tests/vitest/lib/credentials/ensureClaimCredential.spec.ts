@@ -1,4 +1,11 @@
+import type { AchievementCredential } from '@prisma/client';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+
+import { achievementClaimToCredential } from '$lib/credentials/achievementCredential';
+import {
+	ensureClaimCredential,
+	TransactionServiceIssuerError
+} from '$lib/credentials/ensureClaimCredential';
 
 import { prisma } from '../../../../src/prisma/client';
 import {
@@ -8,12 +15,6 @@ import {
 	testUser,
 	testUserIdentifier
 } from '../../testObjects';
-import type { AchievementCredential } from '@prisma/client';
-import {
-	ensureClaimCredential,
-	TransactionServiceIssuerError
-} from '$lib/credentials/ensureClaimCredential';
-import { achievementClaimToCredential } from '$lib/credentials/achievementCredential';
 
 vi.mock('../../../../src/prisma/client');
 vi.mock('$lib/credentials/achievementCredential');

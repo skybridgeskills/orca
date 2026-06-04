@@ -1,6 +1,7 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import type { ClaimStatus } from '@prisma/client';
+
+	import * as m from '$lib/i18n/messages';
 
 	interface Props {
 		status: ClaimStatus;

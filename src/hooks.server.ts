@@ -1,11 +1,14 @@
-import * as m from '$lib/i18n/messages';
 import { error, type Handle, type RequestEvent } from '@sveltejs/kit';
 import cookie from 'cookie';
-import { prisma } from './prisma/client';
+
+import * as m from '$lib/i18n/messages';
 import { setLocale, locales } from '$lib/i18n/runtime';
 import { paraglideMiddleware } from '$lib/i18n/server';
-import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 import { getLanguageForRequest } from '$lib/utils/language-selection';
+
+import { prisma } from './prisma/client';
+
+import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 
 export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
 	return orgJson.orgStatus ?? 'ENABLED';

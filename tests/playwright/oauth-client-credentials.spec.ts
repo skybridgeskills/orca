@@ -1,7 +1,9 @@
-import { test, expect, type Locator } from '@playwright/test';
 import { randomBytes } from 'node:crypto';
-import { prisma } from '../../src/prisma/client.js';
+
+import { test, expect, type Locator } from '@playwright/test';
 import type { Organization, User } from '@prisma/client';
+
+import { prisma } from '../../src/prisma/client.js';
 
 // End-to-end exercise of the organisation (client_credentials) OAuth flow:
 // a GENERAL_ADMIN creates a confidential app at /about/settings/apps (in a modal;

@@ -1,6 +1,7 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import { v4 as uuidv4 } from 'uuid';
+
+	import * as m from '$lib/i18n/messages';
 
 	interface Props {
 		level?: App.NotificationLevel;

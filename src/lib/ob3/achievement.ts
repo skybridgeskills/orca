@@ -1,10 +1,14 @@
 import type { Achievement, Organization } from '@prisma/client';
+
 import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
 import { staticImageUrlForAchievement } from '$lib/utils/imageUrl';
+
 import { OB2_NAMESPACE, OB_VERSION_DESCRIPTORS } from '../ob2/constants';
-import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
-import { ob3IssuerProfileFromOrganization, type OB3Profile } from './profile';
+
 import { OB3_CONTEXT_URL, type OB3Image } from './constants';
+import { ob3IssuerProfileFromOrganization, type OB3Profile } from './profile';
+
+import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 interface RelatedItem {
 	type: string[];

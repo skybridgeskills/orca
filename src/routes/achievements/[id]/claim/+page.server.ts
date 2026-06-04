@@ -1,12 +1,13 @@
-import * as m from '$lib/i18n/messages';
-import { error, redirect } from '@sveltejs/kit';
-import { prisma } from '$lib/../prisma/client';
-import type { Prisma } from '@prisma/client';
 import { ClaimStatus, type Identifier } from '@prisma/client';
-import stripTags from '$lib/utils/stripTags';
+import type { Prisma } from '@prisma/client';
+import type { AchievementClaim, ClaimEndorsement } from '@prisma/client';
+import { error, redirect } from '@sveltejs/kit';
+
+import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
-import type { AchievementClaim, ClaimEndorsement } from '@prisma/client';
+import * as m from '$lib/i18n/messages';
+import stripTags from '$lib/utils/stripTags';
 
 export const load = async ({ locals, params, url }) => {
 	const inviteId = url.searchParams.get('i');

@@ -1,8 +1,10 @@
 import { error } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
-import type { RequestEvent } from './$types';
 import { apiResponse } from '$lib/utils/api';
 import { calculatePageAndSize } from '$lib/utils/pagination';
+
+import type { RequestEvent } from './$types';
 
 export const GET = async ({ url, params, locals }: RequestEvent) => {
 	if (!locals.session?.user) {

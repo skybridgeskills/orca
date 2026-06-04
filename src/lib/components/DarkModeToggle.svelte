@@ -1,8 +1,10 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import { Icon } from 'svelte-icons-pack';
 	import { WiWiNightClear as WiNightClear } from 'svelte-icons-pack/wi';
 	import { WiWiHorizonAlt as WiHorizonAlt } from 'svelte-icons-pack/wi';
+
+	import * as m from '$lib/i18n/messages';
+
 	import { preferredTheme } from '../stores/interfacePrefsStore';
 
 	interface Props {

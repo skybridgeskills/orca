@@ -1,17 +1,20 @@
-import * as m from '$lib/i18n/messages';
-import type { Actions } from './$types';
-import { error, fail, redirect } from '@sveltejs/kit';
-import { prisma } from '../../../../prisma/client';
 import type { Achievement } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import stripTags from '../../../../lib/utils/stripTags';
-import { ValidationError } from 'yup';
-import { achievementFormSchema } from '$lib/data/achievementForm';
-import { getUploadUrl } from '$lib/server/media';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
+import { ValidationError } from 'yup';
+
 import { getAchievement } from '$lib/data/achievement';
-import { canEditAchievements } from '$lib/server/permissions';
+import { achievementFormSchema } from '$lib/data/achievementForm';
 import type { Alignment } from '$lib/data/alignment';
+import * as m from '$lib/i18n/messages';
+import { getUploadUrl } from '$lib/server/media';
+import { canEditAchievements } from '$lib/server/permissions';
+
+import stripTags from '../../../../lib/utils/stripTags';
+import { prisma } from '../../../../prisma/client';
+
+import type { Actions } from './$types';
 
 function parseAlignmentsFromFormData(formData: FormData): Alignment[] {
 	const alignments: Alignment[] = [];

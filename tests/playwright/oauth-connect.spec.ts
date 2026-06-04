@@ -1,8 +1,10 @@
-import { test, expect, type Page } from '@playwright/test';
 import { createHash, randomBytes } from 'node:crypto';
+
 import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020';
-import { prisma } from '../../src/prisma/client.js';
+import { test, expect, type Page } from '@playwright/test';
 import type { Organization, User } from '@prisma/client';
+
+import { prisma } from '../../src/prisma/client.js';
 
 // End-to-end exercise of the OB3 user-delegated OAuth flow against a real
 // server + test database: dynamic registration → discovery → consent UI →

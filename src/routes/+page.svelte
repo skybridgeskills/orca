@@ -1,13 +1,15 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import type { PageProps } from './$types';
 	import Card from '$lib/components/Card.svelte';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
-	import RightArrow from '$lib/illustrations/RightArrow.svelte';
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import * as m from '$lib/i18n/messages';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
+	import RightArrow from '$lib/illustrations/RightArrow.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
+
+	import type { PageProps } from './$types';
+
+	import { resolve } from '$app/paths';
 
 	let { data }: PageProps = $props();
 </script>

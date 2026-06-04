@@ -1,7 +1,9 @@
 import { expect, test, vi } from 'vitest';
 
-import { prisma } from '../../../../src/prisma/client';
+import { achievementClaimToCredential } from '$lib/credentials/achievementCredential';
+import { CredentialSubjectDID } from '$lib/credentials/did';
 
+import { prisma } from '../../../../src/prisma/client';
 import {
 	testAchievement,
 	testAchievementClaim,
@@ -10,8 +12,6 @@ import {
 	testUser,
 	testUserIdentifier
 } from '../../testObjects';
-import { achievementClaimToCredential } from '$lib/credentials/achievementCredential';
-import { CredentialSubjectDID } from '$lib/credentials/did';
 
 vi.mock('../../../../src/prisma/client');
 

@@ -1,11 +1,13 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
-	import StatusTag from '$lib/components/StatusTag.svelte';
 	import type { Achievement, AchievementClaim } from '@prisma/client';
-	import { imageUrl } from '$lib/utils/imageUrl';
 	import type { Snippet } from 'svelte';
+
+	import StatusTag from '$lib/components/StatusTag.svelte';
+	import * as m from '$lib/i18n/messages';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
+	import { imageUrl } from '$lib/utils/imageUrl';
+
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		achievement: Achievement;

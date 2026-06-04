@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { prisma } from '../src/prisma/client.js';
 import type { Achievement } from '@prisma/client';
+
+import { prisma } from '../src/prisma/client.js';
 
 const currentOrgUrl = `http://${process.env.ORG_DOMAIN}`;
 let achievement: Achievement;

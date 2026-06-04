@@ -1,7 +1,7 @@
-import * as m from '$lib/i18n/messages';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClaimStatus } from '@prisma/client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import * as m from '$lib/i18n/messages';
 import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 import { TransactionServiceUpstreamError } from '$lib/server/transactionService/client';

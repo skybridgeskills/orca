@@ -1,23 +1,25 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import type {
 		Achievement,
 		AchievementCategory,
 		AchievementClaim,
 		Organization
 	} from '@prisma/client';
+	import { onMount } from 'svelte';
+
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
 	import DownloadButton from '$lib/components/DownloadButton.svelte';
-	import AchievementClaimEvidence from '$lib/partials/achievementClaim/AchievementClaimEvidence.svelte';
-	import SendToWalletExchangeModal from '$lib/partials/achievementClaim/SendToWalletExchangeModal.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
-	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
-	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
-	import { onMount } from 'svelte';
+	import * as m from '$lib/i18n/messages';
+	import AchievementClaimEvidence from '$lib/partials/achievementClaim/AchievementClaimEvidence.svelte';
+	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
+	import SendToWalletExchangeModal from '$lib/partials/achievementClaim/SendToWalletExchangeModal.svelte';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
+	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
+
+	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	interface Props {
 		achievement: Achievement & {

@@ -1,17 +1,18 @@
-import * as m from '$lib/i18n/messages';
-import { error, json } from '@sveltejs/kit';
 import type { Organization } from '@prisma/client';
-import type { RequestEvent } from './$types';
-import { prisma } from '$lib/../prisma/client';
+import { error, json } from '@sveltejs/kit';
 
+import { prisma } from '$lib/../prisma/client';
 import { buildAchievementCredentialTemplate } from '$lib/credentials/credentialTemplate';
+import * as m from '$lib/i18n/messages';
+import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
+import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 import {
 	createExchange,
 	TransactionServiceUpstreamError
 } from '$lib/server/transactionService/client';
 import { isExchangeEnabled } from '$lib/server/transactionService/config';
-import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
-import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
+
+import type { RequestEvent } from './$types';
 
 export const POST = async ({ locals, params }: RequestEvent) => {
 	if (!locals.session?.user?.id) error(404, m.best_sharp_lamb_enchant());

@@ -1,14 +1,17 @@
-import * as m from '$lib/i18n/messages';
-import { sendOrcaMail } from '$lib/email/sendEmail';
+import type { Session, User } from '@prisma/client';
+import type { ClaimEndorsement } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
 import * as dotenv from 'dotenv';
+
 import { prisma } from '$lib/../prisma/client';
-import type { Session, User } from '@prisma/client';
-import stripTags from '$lib/utils/stripTags';
-import type { ClaimEndorsement } from '@prisma/client';
-import type { PageServerLoad } from './$types';
+import { sendOrcaMail } from '$lib/email/sendEmail';
+import * as m from '$lib/i18n/messages';
 import { INVITE_SESSION_VALIDITY_MS } from '$lib/utils/session';
+import stripTags from '$lib/utils/stripTags';
+
+import type { PageServerLoad } from './$types';
+
 import { USE_SECURE_COOKIES } from '$env/static/private';
 
 dotenv.config();

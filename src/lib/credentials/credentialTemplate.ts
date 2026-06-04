@@ -1,9 +1,11 @@
 import { createHash } from 'crypto';
-import { v4 as uuidv4 } from 'uuid';
+
 import type { Achievement, AchievementClaim, Identifier, Organization, User } from '@prisma/client';
 import { IdentifierType } from '@prisma/client';
-import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
+import { v4 as uuidv4 } from 'uuid';
+
 import { CredentialSubjectDID, OrganizationDID } from '$lib/credentials/did';
+import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
 
 /**
  * Builds an unsigned Open Badge credential payload. No `proof` field is set; signing adds it.

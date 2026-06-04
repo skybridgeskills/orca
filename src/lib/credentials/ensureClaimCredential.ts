@@ -1,4 +1,3 @@
-import { prisma } from '$lib/../prisma/client';
 import { Prisma } from '@prisma/client';
 import type {
 	AchievementClaim,
@@ -7,6 +6,8 @@ import type {
 	Identifier,
 	AchievementCredential
 } from '@prisma/client';
+
+import { prisma } from '$lib/../prisma/client';
 import { achievementClaimToCredential } from '$lib/credentials/achievementCredential';
 import { isCredentialCacheExired } from '$lib/credentials/credentialHelper';
 

@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { locales, getLocale, baseLocale } from '$lib/i18n/runtime';
 	import { onMount } from 'svelte';
+
+	import { locales, getLocale, baseLocale } from '$lib/i18n/runtime';
+
 	import PopupMenu from './PopupMenu.svelte';
 
 	type AvailableLanguageTag = (typeof locales)[number];

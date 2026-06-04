@@ -1,7 +1,8 @@
 <script lang="ts">
+	import type { AchievementClaim } from '@prisma/client';
+
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	import * as m from '$lib/i18n/messages';
-	import type { AchievementClaim } from '@prisma/client';
 
 	interface Props {
 		claim: AchievementClaim | null;

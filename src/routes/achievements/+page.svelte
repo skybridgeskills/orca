@@ -1,27 +1,29 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageProps } from './$types';
+	import type { AchievementCategory, Achievement, AchievementConfig } from '@prisma/client';
+	import { onMount } from 'svelte';
+
+	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import Card from '$lib/components/Card.svelte';
-	import {
-		achievements,
-		achievementsLoading,
-		fetchAchievements
-	} from '$lib/stores/achievementStore';
+	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
+	import Heading from '$lib/components/Heading.svelte';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+	import * as m from '$lib/i18n/messages';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import {
 		achievementCategories,
 		acLoading,
 		fetchAchievementCategories
 	} from '$lib/stores/achievementCategoryStore';
-	import type { AchievementCategory, Achievement, AchievementConfig } from '@prisma/client';
-	import Heading from '$lib/components/Heading.svelte';
-	import { imageUrl } from '$lib/utils/imageUrl';
-	import { onMount } from 'svelte';
+	import {
+		achievements,
+		achievementsLoading,
+		fetchAchievements
+	} from '$lib/stores/achievementStore';
 	import { ensureLoaded, LoadingStatus } from '$lib/stores/common';
-	import Alert from '$lib/components/Alert.svelte';
-	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
+	import { imageUrl } from '$lib/utils/imageUrl';
+
+	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const U = {

@@ -1,10 +1,15 @@
+import { randomBytes, createHash } from 'crypto';
+
 import type { Achievement, AchievementClaim, Identifier, Organization, User } from '@prisma/client';
+
+import { arrayOf } from '$lib/utils/arrayOf';
+
+import { OB3_NAMESPACE } from '../ob3/constants';
+
 import { badgeClassFromAchievement, type OB2BadgeClass } from './badgeClass';
 import { OB2_CONTEXT_URL, OB_VERSION_DESCRIPTORS, type OB_VERSION } from './constants';
-import { OB3_NAMESPACE } from '../ob3/constants';
+
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
-import { arrayOf } from '$lib/utils/arrayOf';
-import { randomBytes, createHash } from 'crypto';
 
 export interface OB2BadgeAssertion {
 	'@context': string;

@@ -1,14 +1,15 @@
-import * as m from '$lib/i18n/messages';
+import type { AchievementCredential } from '@prisma/client';
 import { error, json } from '@sveltejs/kit';
-import type { RequestEvent } from './$types';
-import { prisma } from '$lib/../prisma/client';
 
+import { prisma } from '$lib/../prisma/client';
 import {
 	ensureClaimCredential,
 	TransactionServiceIssuerError
 } from '$lib/credentials/ensureClaimCredential';
-import type { AchievementCredential } from '@prisma/client';
+import * as m from '$lib/i18n/messages';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
+
+import type { RequestEvent } from './$types';
 
 export const POST = async ({ locals, params }: RequestEvent) => {
 	if (!locals.session?.user?.id) error(404, m.best_sharp_lamb_enchant());

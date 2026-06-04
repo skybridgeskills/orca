@@ -1,11 +1,7 @@
-import { defineConfig, devices } from '@playwright/test';
-
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-import dotenv from 'dotenv';
 import path from 'path';
+
+import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(process.env.CI ? '.env.test.ci' : '.env.test') });
 

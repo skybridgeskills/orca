@@ -4,6 +4,11 @@ vi.mock('$env/static/public', () => ({
 	PUBLIC_HTTP_PROTOCOL: 'http'
 }));
 
+import { OrganizationDID } from '$lib/credentials/did';
+import { badgeAssertionFromAchievementClaim } from '$lib/ob2/badgeAssertion';
+import { badgeClassFromAchievement, type OB2BadgeClass } from '$lib/ob2/badgeClass';
+import { issuerFromOrganization, type OB2Issuer } from '$lib/ob2/issuer';
+
 import {
 	testAchievement,
 	testAchievementClaim,
@@ -11,10 +16,6 @@ import {
 	testUser,
 	testUserIdentifier
 } from '../../testObjects';
-import { OrganizationDID } from '$lib/credentials/did';
-import { issuerFromOrganization, type OB2Issuer } from '$lib/ob2/issuer';
-import { badgeClassFromAchievement, type OB2BadgeClass } from '$lib/ob2/badgeClass';
-import { badgeAssertionFromAchievementClaim } from '$lib/ob2/badgeAssertion';
 
 test('issuerFromOrganization', () => {
 	const ob2Issuer = issuerFromOrganization(testOrganization);

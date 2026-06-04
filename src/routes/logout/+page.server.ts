@@ -1,6 +1,9 @@
 import { redirect } from '@sveltejs/kit';
+
 import { prisma } from '../../prisma/client';
+
 import type { Actions, PageServerLoad } from './$types';
+
 import { USE_SECURE_COOKIES } from '$env/static/private';
 
 export const load: PageServerLoad = async () => {

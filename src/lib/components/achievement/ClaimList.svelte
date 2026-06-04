@@ -1,19 +1,20 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import StatusTag from '$lib/components/StatusTag.svelte';
-
-	import { FaSolidTrash } from 'svelte-icons-pack/fa';
-	import Button from '$lib/components/Button.svelte';
-	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
-	import Tabs from '$lib/components/Tabs.svelte';
-	import { notifications, Notification } from '$lib/stores/notificationStore';
-	import { getContext, onMount } from 'svelte';
 	import type { AchievementClaim, ClaimEndorsement, User } from '@prisma/client';
-	import Pagination from '$lib/components/Pagination.svelte';
-	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
+	import { getContext, onMount } from 'svelte';
+	import { FaSolidTrash } from 'svelte-icons-pack/fa';
+
+	import Button from '$lib/components/Button.svelte';
 	import IconButton from '$lib/components/IconButton.svelte';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import Pagination from '$lib/components/Pagination.svelte';
+	import StatusTag from '$lib/components/StatusTag.svelte';
+	import Tabs from '$lib/components/Tabs.svelte';
+	import * as m from '$lib/i18n/messages';
+	import { notifications, Notification } from '$lib/stores/notificationStore';
+	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
+
+	import { resolve } from '$app/paths';
 
 	type AchievementClaimTableData = AchievementClaim & {
 		user: User;

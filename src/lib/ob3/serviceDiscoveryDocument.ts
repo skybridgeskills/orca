@@ -1,5 +1,6 @@
-import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 import type { Organization } from '@prisma/client';
+
+import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 /**
  * Open Badges 3.0 Service Discovery Document

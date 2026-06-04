@@ -1,18 +1,21 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { MetaTags } from 'svelte-meta-tags';
-	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
 	import { onMount } from 'svelte';
-	import { session, sessionStatus } from '$lib/stores/sessionStore';
-	import { notifications } from '$lib/stores/notificationStore';
-	import '../app.css';
-	import Nav from '$lib/components/Nav.svelte';
+	import { MetaTags } from 'svelte-meta-tags';
+
 	import Alert from '$lib/components/Alert.svelte';
-	import type { LayoutProps } from './$types';
+	import Nav from '$lib/components/Nav.svelte';
+	import * as m from '$lib/i18n/messages';
 	import { setLocale } from '$lib/i18n/runtime';
 	import { LoadingStatus } from '$lib/stores/common';
-	import { resolve } from '$app/paths';
+	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
+	import { notifications } from '$lib/stores/notificationStore';
+	import { session, sessionStatus } from '$lib/stores/sessionStore';
+	import '../app.css';
 	import { getFooterUrl } from '$lib/utils/footer-links';
+
+	import type { LayoutProps } from './$types';
+
+	import { resolve } from '$app/paths';
 
 	let { children, data }: LayoutProps = $props();
 	const privacyUrl = getFooterUrl('privacy', '/privacy');

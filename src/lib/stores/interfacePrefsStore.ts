@@ -1,6 +1,8 @@
 import { writable, get } from 'svelte/store';
-import { browser } from '$app/environment';
+
 import { updateCookie } from '$lib/utils/themeUtils';
+
+import { browser } from '$app/environment';
 
 const getInitialDarkModePref = (initialValue: string): string => {
 	const userBrowserPrefersDark =

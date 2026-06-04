@@ -1,7 +1,9 @@
 import { json } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
-import type { RequestEvent } from './$types';
 import { calculatePageAndSize } from '$lib/utils/pagination';
+
+import type { RequestEvent } from './$types';
 
 export const GET = async ({ url, locals }: RequestEvent) => {
 	const { page, pageSize } = calculatePageAndSize(url);

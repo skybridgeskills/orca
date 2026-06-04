@@ -1,20 +1,22 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
+	import type { Achievement } from '@prisma/client';
 	import { onMount, type Snippet } from 'svelte';
+	import { Icon } from 'svelte-icons-pack';
+	import { FiSearch } from 'svelte-icons-pack/fi';
+
+	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
+	import Modal from '$lib/components/Modal.svelte';
+	import * as m from '$lib/i18n/messages';
 	import {
 		achievements,
 		achievementsLoading,
 		fetchAchievements
 	} from '$lib/stores/achievementStore';
-	import { Icon } from 'svelte-icons-pack';
-	import { FiSearch } from 'svelte-icons-pack/fi';
-	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
-	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
-	import Modal from '$lib/components/Modal.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import type { Achievement } from '@prisma/client';
-	import FormFieldHelperText from './FormFieldHelperText.svelte';
 	import { ensureLoaded } from '$lib/stores/common';
+
+	import FormFieldHelperText from './FormFieldHelperText.svelte';
 
 	interface Props {
 		badgeId?: string | null;

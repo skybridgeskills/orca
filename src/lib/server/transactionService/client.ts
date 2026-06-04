@@ -1,5 +1,5 @@
-import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 import { BadOrgConfigBlobError, decrypt } from '$lib/server/secrets/orgConfigCrypto';
+import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 
 import { isExchangeAvailable } from './config';
 import redactedFetch from './redactedFetch';

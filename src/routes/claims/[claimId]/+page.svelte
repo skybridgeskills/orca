@@ -1,20 +1,23 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import type { PageProps } from './$types';
-	import Alert from '$lib/components/Alert.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
+	import { setContext } from 'svelte';
+
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import ActionHeading from '$lib/components/ActionHeading.svelte';
+	import Alert from '$lib/components/Alert.svelte';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import EndorsementList from '$lib/components/EndorsementList.svelte';
+	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
+	import * as m from '$lib/i18n/messages';
 	import AcceptedClaimDetail from '$lib/partials/achievementClaim/AcceptedClaimDetail.svelte';
 	import RejectedClaimDetail from '$lib/partials/achievementClaim/RejectedClaimDetail.svelte';
 	import UnacceptedClaimDetail from '$lib/partials/achievementClaim/UnacceptedClaimDetail.svelte';
-	import ActionHeading from '$lib/components/ActionHeading.svelte';
 	import { evidenceItem } from '$lib/utils/evidenceItem';
-	import { setContext } from 'svelte';
-	import EndorsementList from '$lib/components/EndorsementList.svelte';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
+
+	import type { PageProps } from './$types';
+
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 
 	let { data }: PageProps = $props();

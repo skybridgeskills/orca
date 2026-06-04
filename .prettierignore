@@ -16,3 +16,7 @@ yarn.lock
 # Ignore auto-generated paraglide output
 src/paraglide
 src/lib/i18n/README.md
+
+# Inlang manages project.inlang; only settings.json is user-controlled source
+project.inlang/**
+!project.inlang/settings.json

@@ -1,7 +1,12 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import type { Achievement, AchievementClaim, Identifier } from '@prisma/client';
-	import { session } from '$lib/stores/sessionStore';
+	import { error } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
+
+	import Button from '$lib/components/Button.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
+	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
+	import * as m from '$lib/i18n/messages';
 	import {
 		claimEmail,
 		claimId,
@@ -10,15 +15,12 @@
 		claimUrl,
 		inviteId
 	} from '$lib/stores/activeClaimStore';
+	import { session } from '$lib/stores/sessionStore';
+
 	import { deserialize } from '$app/forms';
-	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
-	import { error } from '@sveltejs/kit';
-	import { onMount } from 'svelte';
-	import Button from '$lib/components/Button.svelte';
-	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
-	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	interface Props {
 		existingBadgeClaim?: AchievementClaim | null;
 		achievement: Achievement;

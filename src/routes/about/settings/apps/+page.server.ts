@@ -1,7 +1,6 @@
-import * as m from '$lib/i18n/messages';
 import { error, fail, redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
-import { API_SCOPES } from '$lib/server/oauth/scopes';
+
+import * as m from '$lib/i18n/messages';
 import {
 	ConfidentialClientError,
 	createConfidentialClient,
@@ -9,6 +8,9 @@ import {
 	disableConfidentialClient,
 	listConfidentialClients
 } from '$lib/server/oauth/confidentialClients';
+import { API_SCOPES } from '$lib/server/oauth/scopes';
+
+import type { Actions, PageServerLoad } from './$types';
 
 function isGeneralAdmin(locals: App.Locals): boolean {
 	return locals.session?.user?.orgRole === 'GENERAL_ADMIN';

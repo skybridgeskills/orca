@@ -1,5 +1,7 @@
 import type { OAuthAccessToken, OAuthClient, Organization } from '@prisma/client';
+
 import { prisma } from '$lib/../prisma/client';
+
 import { SCOPE_OFFLINE_ACCESS } from './scopes';
 import {
 	ACCESS_TOKEN_TTL_SECONDS,

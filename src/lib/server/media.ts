@@ -1,5 +1,8 @@
 import { PutObjectCommand, S3Client, type S3ClientConfig } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+import { imageUrl } from '$lib/utils/imageUrl';
+
 import {
 	AWS_ACCESS_KEY_ID,
 	AWS_SECRET_ACCESS_KEY,
@@ -9,7 +12,6 @@ import {
 	S3_USE_LOCALSTACK
 } from '$env/static/private';
 import { PUBLIC_MEDIA_DOMAIN } from '$env/static/public';
-import { imageUrl } from '$lib/utils/imageUrl';
 
 export const isLocalDevFileMedia = (): boolean => {
 	return '/media' === PUBLIC_MEDIA_DOMAIN;

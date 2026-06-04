@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+
 import { describe, expect, test } from 'vitest';
 
 import { hashSecret, verifySecret } from '../../../../../src/lib/server/oauth/secretHash';

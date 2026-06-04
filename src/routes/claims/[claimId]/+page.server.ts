@@ -1,11 +1,12 @@
-import * as m from '$lib/i18n/messages';
-import type { PageServerLoad } from './$types';
 import { error, redirect } from '@sveltejs/kit';
-import { prisma } from '$lib/../prisma/client';
 
+import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
 import { getValidUserClaim } from '$lib/data/achievementClaim';
+import * as m from '$lib/i18n/messages';
 import { isExchangeEnabled } from '$lib/server/transactionService/config';
+
+import type { PageServerLoad } from './$types';
 
 const throwRedirect = (url: URL) => {
 	redirect(307, `${url}/public`);

@@ -1,16 +1,19 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import DarkModeToggle from './DarkModeToggle.svelte';
-	import LanguageSelector from './LanguageSelector.svelte';
-	import PopupMenu from './PopupMenu.svelte';
-	import { FaCircleUser as FaUserCircle } from 'svelte-icons-pack/fa';
-	import IconButton from './IconButton.svelte';
-	import NavItem from './NavItem.svelte';
-	import { session } from '$lib/stores/sessionStore';
 	import { onDestroy, onMount } from 'svelte';
+	import { FaCircleUser as FaUserCircle } from 'svelte-icons-pack/fa';
+
+	import * as m from '$lib/i18n/messages';
+	import { session } from '$lib/stores/sessionStore';
 	import { imageUrl } from '$lib/utils/imageUrl';
+
+	import DarkModeToggle from './DarkModeToggle.svelte';
+	import IconButton from './IconButton.svelte';
+	import LanguageSelector from './LanguageSelector.svelte';
+	import NavItem from './NavItem.svelte';
+	import PopupMenu from './PopupMenu.svelte';
+
 	import { browser } from '$app/environment';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		org: App.SanitizedOrganization;

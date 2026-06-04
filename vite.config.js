@@ -1,15 +1,16 @@
+import fs from 'fs';
+import { fileURLToPath } from 'node:url';
+import path from 'path';
+
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { nodeLoaderPlugin } from '@vavite/node-loader/plugin';
 import basicSsl from '@vitejs/plugin-basic-ssl';
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
-import { defineConfig } from 'vitest/config';
-import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import * as dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vitest/config';
 
 dotenv.config();
 

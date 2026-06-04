@@ -1,8 +1,9 @@
+import type { RequestEvent } from '@sveltejs/kit';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { getOrganizationFromRequest } from '../../../src/hooks.server';
 import { prisma } from '../../../src/prisma/client';
 import { testOrganization } from '../testObjects';
-import type { RequestEvent } from '@sveltejs/kit';
 
 vi.mock('../../../src/prisma/client', () => ({
 	prisma: {

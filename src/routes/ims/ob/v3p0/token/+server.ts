@@ -1,7 +1,6 @@
-import { json } from '@sveltejs/kit';
 import type { OAuthClient } from '@prisma/client';
-import { parseClientSecretBasic, verifyClient } from '$lib/server/oauth/clientAuth';
-import { consumeAuthorizationCode, verifyPkceS256 } from '$lib/server/oauth/authorizationCode';
+import { json } from '@sveltejs/kit';
+
 import {
 	findActiveRefreshToken,
 	issueClientCredentialsToken,
@@ -9,7 +8,10 @@ import {
 	revokeTokensForUserClient,
 	rotateTokenPair
 } from '$lib/server/oauth/accessToken';
+import { consumeAuthorizationCode, verifyPkceS256 } from '$lib/server/oauth/authorizationCode';
+import { parseClientSecretBasic, verifyClient } from '$lib/server/oauth/clientAuth';
 import { intersectSupportedApi, isScopeSubset, parseScopeString } from '$lib/server/oauth/scopes';
+
 import type { RequestHandler } from './$types';
 
 // RFC6749 token endpoint (§7.2). Serves authorization_code, refresh_token and

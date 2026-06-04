@@ -1,11 +1,13 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import Tag from '$lib/components/Tag.svelte';
+	import * as m from '$lib/i18n/messages';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
+
 	import type { PageProps } from './$types';
+
+	import { resolve } from '$app/paths';
+	import { page } from '$app/stores';
 
 	let { data }: PageProps = $props();
 	let members = data.members;

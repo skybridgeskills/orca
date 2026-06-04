@@ -1,4 +1,5 @@
 import type { Organization } from '@prisma/client';
+
 import { OB3_CONTEXT_URL, type OB3Image } from './constants';
 
 export interface OB3Profile {

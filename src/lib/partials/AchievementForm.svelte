@@ -1,29 +1,31 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { page } from '$app/stores';
-	import { resolve } from '$app/paths';
-	import { deserialize } from '$app/forms';
-	import { goto } from '$app/navigation';
-	import { achievementFormSchema } from '$lib/data/achievementForm';
-	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
-	import type * as yup from 'yup';
 	import type { AchievementCategory } from '@prisma/client';
-	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
-	import Heading from '$lib/components/Heading.svelte';
-	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
+	import type * as yup from 'yup';
+
+	import CollapsiblePane from '$lib/components/CollapsiblePane.svelte';
+	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
+	import AlignmentInput from '$lib/components/forms/AlignmentInput.svelte';
+	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
+	import RadioOption from '$lib/components/forms/RadioOption.svelte';
+	import Heading from '$lib/components/Heading.svelte';
+	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
+	import { achievementFormSchema } from '$lib/data/achievementForm';
+	import type { Alignment } from '$lib/data/alignment';
+	import * as m from '$lib/i18n/messages';
 	import {
 		achievementsLoading,
 		fetchAchievements,
 		upsertAchievement
 	} from '$lib/stores/achievementStore';
-	import { onMount } from 'svelte';
 	import { ensureLoaded } from '$lib/stores/common';
-	import RadioOption from '$lib/components/forms/RadioOption.svelte';
-	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
-	import CollapsiblePane from '$lib/components/CollapsiblePane.svelte';
-	import AlignmentInput from '$lib/components/forms/AlignmentInput.svelte';
-	import type { Alignment } from '$lib/data/alignment';
+
+	import { deserialize } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { page } from '$app/stores';
 
 	// TODO Clean up the initialData type
 	interface InitialData {

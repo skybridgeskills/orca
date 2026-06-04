@@ -1,8 +1,10 @@
 import { json, text } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
-import { parseClientSecretBasic, verifyClient } from '$lib/server/oauth/clientAuth';
 import { revokeToken } from '$lib/server/oauth/accessToken';
+import { parseClientSecretBasic, verifyClient } from '$lib/server/oauth/clientAuth';
 import { hashToken } from '$lib/server/oauth/tokens';
+
 import type { RequestHandler } from './$types';
 
 // RFC7009 token revocation (§7.3). The authenticated client may only revoke its

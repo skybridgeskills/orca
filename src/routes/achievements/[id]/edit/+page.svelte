@@ -1,11 +1,13 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageProps } from './$types';
-	import AchievementForm from '$lib/partials/AchievementForm.svelte';
-	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import { imageExtension } from '$lib/utils/imageUrl';
 	import type { Achievement } from '@prisma/client';
+
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
+	import * as m from '$lib/i18n/messages';
+	import AchievementForm from '$lib/partials/AchievementForm.svelte';
+	import { imageExtension } from '$lib/utils/imageUrl';
+
+	import type { PageProps } from './$types';
 
 	const alignmentsFromJson = (json: Achievement['json']) => alignmentRowsFromAchievementJson(json);
 

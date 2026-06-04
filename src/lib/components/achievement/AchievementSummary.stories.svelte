@@ -1,6 +1,6 @@
 <script lang="ts" module>
-	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import type { Achievement } from '@prisma/client';
+	import { defineMeta } from '@storybook/addon-svelte-csf';
 
 	import AchievementSummary from './AchievementSummary.svelte';
 

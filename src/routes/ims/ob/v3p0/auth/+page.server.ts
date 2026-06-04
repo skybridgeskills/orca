@@ -1,8 +1,10 @@
-import { error, fail, redirect } from '@sveltejs/kit';
 import type { OAuthClient } from '@prisma/client';
+import { error, fail, redirect } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
 import { createAuthorizationCode } from '$lib/server/oauth/authorizationCode';
 import { intersectSupported, isScopeSubset, parseScopeString } from '$lib/server/oauth/scopes';
+
 import type { Actions, PageServerLoad } from './$types';
 
 // RFC6749 §4.1.1 authorization endpoint, rendered as a consent screen.

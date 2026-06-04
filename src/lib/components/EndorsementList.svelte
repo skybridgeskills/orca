@@ -1,13 +1,15 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { getContext } from 'svelte';
 	import type { ClaimEndorsement, User } from '@prisma/client';
+	import { getContext } from 'svelte';
+
+	import Pagination from '$lib/components/Pagination.svelte';
+	import * as m from '$lib/i18n/messages';
 	import { evidenceItem } from '$lib/utils/evidenceItem';
+	import { PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
+
 	import ActionHeading from './ActionHeading.svelte';
 	import Card from './Card.svelte';
 	import EvidenceItem from './EvidenceItem.svelte';
-	import Pagination from '$lib/components/Pagination.svelte';
-	import { PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
 
 	type EndorsementTableData = ClaimEndorsement & {
 		creator: User | null;

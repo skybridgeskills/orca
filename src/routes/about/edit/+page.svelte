@@ -1,21 +1,24 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
-	import type { ActionData, PageData } from './$types';
-	import { formSchema } from './schema';
-	import type * as yup from 'yup';
-	import { deserialize } from '$app/forms';
-	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { imageExtension } from '$lib/utils/imageUrl';
+	import type * as yup from 'yup';
+
 	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
-	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
+	import RadioOption from '$lib/components/forms/RadioOption.svelte';
+	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
+	import * as m from '$lib/i18n/messages';
+	import { locales } from '$lib/i18n/runtime';
 	import { achievementsLoading, fetchAchievements } from '$lib/stores/achievementStore';
 	import { ensureLoaded } from '$lib/stores/common';
-	import { locales } from '$lib/i18n/runtime';
+	import { imageExtension } from '$lib/utils/imageUrl';
+
+	import type { ActionData, PageData } from './$types';
+	import { formSchema } from './schema';
+
+	import { deserialize } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { page } from '$app/stores';
 
 	export const form: ActionData | undefined = undefined;
 	export let data: PageData;

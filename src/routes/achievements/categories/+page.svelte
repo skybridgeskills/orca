@@ -1,9 +1,13 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
+	import type { AchievementCategory } from '@prisma/client';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
+
 	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import ButtonGroup from '$lib/components/ButtonGroup.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+	import * as m from '$lib/i18n/messages';
 	import {
 		achievementCategories,
 		upsertAchievementCategory,
@@ -11,11 +15,9 @@
 		fetchAchievementCategories,
 		acLoading
 	} from '$lib/stores/achievementCategoryStore';
-	import { enhance } from '$app/forms';
-	import type { ActionResult } from '@sveltejs/kit';
-	import type { AchievementCategory } from '@prisma/client';
-	import { onMount } from 'svelte';
 	import { LoadingStatus } from '$lib/stores/common';
+
+	import { enhance } from '$app/forms';
 
 	interface CategoryForm {
 		id: string | null;

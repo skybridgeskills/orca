@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { getLanguageForRequest } from '$lib/utils/language-selection';
 
 describe('getLanguageForRequest', () => {

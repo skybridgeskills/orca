@@ -1,7 +1,10 @@
-import * as m from '$lib/i18n/messages';
-import { error, redirect } from '@sveltejs/kit';
-import { prisma } from '../../prisma/client';
 import type { Visibility } from '@prisma/client';
+import { error, redirect } from '@sveltejs/kit';
+
+import * as m from '$lib/i18n/messages';
+
+import { prisma } from '../../prisma/client';
+
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {

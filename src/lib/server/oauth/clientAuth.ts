@@ -1,5 +1,7 @@
 import type { OAuthClient, Organization } from '@prisma/client';
+
 import { prisma } from '$lib/../prisma/client';
+
 import { verifySecret } from './secretHash';
 
 /**

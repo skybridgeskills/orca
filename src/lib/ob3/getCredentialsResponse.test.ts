@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { buildLinkHeader, getCredentialsResponseBody } from './getCredentialsResponse';
 
 const BASE = 'https://example.test/ims/ob/v3p0/credentials';

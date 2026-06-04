@@ -1,10 +1,12 @@
 import { error } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
-import type { RequestEvent } from './$types';
-import { apiResponse } from '$lib/utils/api';
-import { calculatePageAndSize } from '$lib/utils/pagination';
 import { resolveApiAuth } from '$lib/server/oauth/apiAuth';
 import { SCOPE_ACHIEVEMENTCLAIM_READONLY } from '$lib/server/oauth/scopes';
+import { apiResponse } from '$lib/utils/api';
+import { calculatePageAndSize } from '$lib/utils/pagination';
+
+import type { RequestEvent } from './$types';
 
 export const GET = async ({ request, url, params, locals }: RequestEvent) => {
 	// Accept either an ORCA session (unchanged behaviour) or a client_credentials

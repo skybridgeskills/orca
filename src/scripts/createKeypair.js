@@ -1,7 +1,7 @@
 import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020';
+import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
 import inquirer from 'inquirer';
-import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/i18n/messages';
+
 	import { resolve } from '$app/paths';
 
 	interface Item {

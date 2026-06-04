@@ -1,9 +1,9 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import type { Achievement, AchievementCategory, AchievementClaim } from '@prisma/client';
-	import Button from '$lib/components/Button.svelte';
-	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 
+	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import * as m from '$lib/i18n/messages';
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
 
 	interface Props {

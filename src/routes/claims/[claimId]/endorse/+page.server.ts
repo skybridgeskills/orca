@@ -1,10 +1,12 @@
-import * as m from '$lib/i18n/messages';
-import { error, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
-import { prisma } from '$lib/../prisma/client';
 import type { AchievementClaim } from '@prisma/client';
-import stripTags from '$lib/utils/stripTags';
+import { error, redirect } from '@sveltejs/kit';
+
+import { prisma } from '$lib/../prisma/client';
 import { getValidUserClaim } from '$lib/data/achievementClaim';
+import * as m from '$lib/i18n/messages';
+import stripTags from '$lib/utils/stripTags';
+
+import type { Actions } from './$types';
 
 export const load = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't hold org admin role

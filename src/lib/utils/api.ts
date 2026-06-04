@@ -1,6 +1,8 @@
-import { arrayOf } from '$lib/utils/arrayOf';
-import type { PaginationData } from './pagination';
 import { error, json } from '@sveltejs/kit';
+
+import { arrayOf } from '$lib/utils/arrayOf';
+
+import type { PaginationData } from './pagination';
 
 type ApiMetaInput = PaginationData & {
 	type: string;

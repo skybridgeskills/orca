@@ -1,10 +1,13 @@
-import * as m from '$lib/i18n/messages';
 import { error, redirect } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import type { RequestEvent } from './$types';
-import { prisma } from '../../../prisma/client';
+
+import * as m from '$lib/i18n/messages';
 import { badgeAssertionFromAchievementClaim } from '$lib/ob2/badgeAssertion';
 import { prefersHtml } from '$lib/utils/contentNegotiation';
+
+import { prisma } from '../../../prisma/client';
+
+import type { RequestEvent } from './$types';
 
 export const GET = async ({ request, params, locals }: RequestEvent) => {
 	if (prefersHtml(request)) redirect(302, `/claims/${params.claimId}/public`);

@@ -1,6 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
 import { revokeTokensForUserClient } from '$lib/server/oauth/accessToken';
+
 import type { Actions, PageServerLoad } from './$types';
 
 export interface ConnectedApp {

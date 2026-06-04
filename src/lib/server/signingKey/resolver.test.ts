@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { testOrganization, testSigningKey } from '../../../../tests/vitest/testObjects';
+
 import { IssuerMisconfiguredError, resolveActiveSigningKey } from './resolver';
 
 const { findFirst, findFirstOrThrow } = vi.hoisted(() => ({

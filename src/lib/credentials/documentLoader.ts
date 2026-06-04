@@ -2,9 +2,9 @@ import jsigs from 'jsonld-signatures';
 
 import { CONTEXT as CREDENTIALS_V1 } from './contexts/credentials_v1p1';
 import { CONTEXT as CREDENTIALS_V2 } from './contexts/credentials_v2';
+import { CONTEXT as ED25519_V1 } from './contexts/ed25519-signature-2020-v1';
 import { CONTEXT as OPEN_BADGES_V3_0 } from './contexts/openbadges-v3p0';
 import { CONTEXT as OPEN_BADGES_V3_0_3 } from './contexts/openbadges-v3p0p3';
-import { CONTEXT as ED25519_V1 } from './contexts/ed25519-signature-2020-v1';
 
 export const localContextUrls = {
 	CREDENTIALS_V1: 'https://www.w3.org/2018/credentials/v1',

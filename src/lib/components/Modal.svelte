@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+
 	import Button from '$lib/components/Button.svelte';
 
 	interface Action {

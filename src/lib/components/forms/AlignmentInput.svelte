@@ -1,6 +1,7 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import type { Alignment } from '$lib/data/alignment';
+	import * as m from '$lib/i18n/messages';
+
 	import FormFieldLabel from './FormFieldLabel.svelte';
 
 	interface Props {

@@ -1,11 +1,13 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { enhance } from '$app/forms';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import * as m from '$lib/i18n/messages';
+
 	import type { PageData } from './$types';
+
+	import { enhance } from '$app/forms';
 
 	let { data }: { data: PageData } = $props();
 

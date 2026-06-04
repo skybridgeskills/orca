@@ -1,9 +1,12 @@
-import * as m from '$lib/i18n/messages';
 import { error, redirect } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import type { RequestEvent } from './$types';
-import { prisma } from '../../../prisma/client';
+
+import * as m from '$lib/i18n/messages';
 import { ob3AchievementFromAchievement } from '$lib/ob3/achievement';
+
+import { prisma } from '../../../prisma/client';
+
+import type { RequestEvent } from './$types';
 
 export const GET = async ({ request, params, locals }: RequestEvent) => {
 	const accept = request.headers.get('Accept') ?? '';

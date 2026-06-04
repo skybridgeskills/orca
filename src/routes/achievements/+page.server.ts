@@ -1,6 +1,8 @@
-import { prisma } from '../../prisma/client';
-import type { PageServerLoad } from './$types';
 import { canEditAchievements } from '$lib/server/permissions';
+
+import { prisma } from '../../prisma/client';
+
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	// Check if user has permission to edit achievements

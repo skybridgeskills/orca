@@ -1,4 +1,5 @@
 import type { SigningKey } from '@prisma/client';
+
 import { prisma } from '../../../prisma/client';
 
 export class IssuerMisconfiguredError extends Error {

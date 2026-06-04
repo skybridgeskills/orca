@@ -1,4 +1,5 @@
 import { sanitizeOrganizationForClient } from '$lib/server/organization';
+
 import type { LayoutServerLoad } from './$types';
 
 // get `locals.user` and pass it to the `page` store

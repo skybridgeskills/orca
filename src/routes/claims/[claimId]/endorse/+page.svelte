@@ -1,16 +1,18 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { resolve } from '$app/paths';
-	import Alert from '$lib/components/Alert.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
-	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import type { PageData } from './$types';
 	import ActionHeading from '$lib/components/ActionHeading.svelte';
-	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
-	import { evidenceItem } from '$lib/utils/evidenceItem';
+	import Alert from '$lib/components/Alert.svelte';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
 	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
+	import * as m from '$lib/i18n/messages';
+	import { evidenceItem } from '$lib/utils/evidenceItem';
+
+	import type { PageData } from './$types';
+
+	import { resolve } from '$app/paths';
 
 	export let data: PageData;
 	export let form;

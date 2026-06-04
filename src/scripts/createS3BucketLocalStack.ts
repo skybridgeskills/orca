@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
 import fs from 'fs';
+
 import {
 	BucketCannedACL,
 	CreateBucketCommand,
@@ -8,6 +8,7 @@ import {
 	S3Client,
 	type CORSRule
 } from '@aws-sdk/client-s3';
+import dotenv from 'dotenv';
 
 const main = async () => {
 	dotenv.config();

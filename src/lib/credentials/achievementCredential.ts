@@ -1,16 +1,17 @@
+import { Ed25519Signature2020 } from '@digitalbazaar/ed25519-signature-2020';
+import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020';
+import type { Achievement, AchievementClaim, Organization, User, Identifier } from '@prisma/client';
 import jsigs from 'jsonld-signatures';
+
+import { buildAchievementCredentialTemplate } from '$lib/credentials/credentialTemplate';
+import { KeyDID, OrganizationDID } from '$lib/credentials/did';
+import { resolveActiveSigningKey } from '$lib/server/signingKey/resolver';
+
+import { extendedDocumentLoader } from './documentLoader';
+
 const {
 	purposes: { AssertionProofPurpose }
 } = jsigs;
-import { extendedDocumentLoader } from './documentLoader';
-import type { Achievement, AchievementClaim, Organization, User, Identifier } from '@prisma/client';
-
-// Required to set up a suite instance with private key
-import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020';
-import { Ed25519Signature2020 } from '@digitalbazaar/ed25519-signature-2020';
-import { KeyDID, OrganizationDID } from '$lib/credentials/did';
-import { buildAchievementCredentialTemplate } from '$lib/credentials/credentialTemplate';
-import { resolveActiveSigningKey } from '$lib/server/signingKey/resolver';
 
 export const achievementClaimToCredential = async function (
 	claim: AchievementClaim & {
