@@ -11,6 +11,7 @@
 		"build:storybook": "storybook build",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+		"psql": "pnpm exec dotenv -e .env -- psql",
 		"test": "pnpm test:unit && pnpm test:e2e",
 		"test:e2e": "dotenv -e .env.test -- pnpm exec playwright test",
 		"test:unit": "vitest --run --project unit",

@@ -17,9 +17,6 @@ importers:
       '@inlang/cli':
         specifier: ^2.0.0
         version: 2.18.1
-      '@inlang/plugin-message-format':
-        specifier: ^2.0.0
-        version: 2.2.0
       '@neondatabase/serverless':
         specifier: ^0.6.1
         version: 0.6.1
@@ -897,9 +894,6 @@ packages:
   '@inlang/paraglide-js@2.11.0':
     resolution: {integrity: sha512-UObGgxglpRpQA7Vt9tfPsLgfHOtZ6I6hnJjHSTNLP+8rqpmOjt5Xto2jubUaEzjteT3oqPV/yYB5O2GDwpIVgA==}
     hasBin: true
-
-  '@inlang/plugin-message-format@2.2.0':
-    resolution: {integrity: sha512-6MJLExr3OLqbR8gCP4UEgNMgdaJFFCug2GLmFwid7Ana4kObnbCA33YN3m3eN8p+lmnv7zpfW7oeyTZXZLoptg==}
 
   '@inlang/recommend-sherlock@0.2.1':
     resolution: {integrity: sha512-ckv8HvHy/iTqaVAEKrr+gnl+p3XFNwe5D2+6w6wJk2ORV2XkcRkKOJ/XsTUJbPSiyi4PI+p+T3bqbmNx/rDUlg==}
@@ -5237,8 +5231,6 @@ snapshots:
       urlpattern-polyfill: 10.1.0
     transitivePeerDependencies:
       - babel-plugin-macros
-
-  '@inlang/plugin-message-format@2.2.0': {}
 
   '@inlang/recommend-sherlock@0.2.1':
     dependencies:
