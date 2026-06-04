@@ -44,8 +44,10 @@
 						notifications.dismiss(n.id);
 					}}
 				>
-					{#each n.actions as action}
-						<a href={action.href} class="underline hover:no-underline font-bold">{action.label}</a>
+					{#each n.actions as action (action.href)}
+						<a href={action.href} rel="external" class="underline hover:no-underline font-bold"
+							>{action.label}</a
+						>
 					{/each}
 				</Alert>
 			{/each}

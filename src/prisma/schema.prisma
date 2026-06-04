@@ -10,43 +10,49 @@ datasource db {
 }
 
 model Organization {
-  id                    String                  @id @default(uuid())
-  createdAt             DateTime                @default(now())
-  name                  String
-  description           String
-  email                 String
-  json                  Json                    @default("{}")
-  url                   String?
-  domain                String                  @unique @default(uuid())
-  logo                  String?
-  primaryColor          String?
-  achievements          Achievement[]
-  achievementCategories AchievementCategory[]
-  claims                AchievementClaim[]
-  achievementConfigs    AchievementConfig[]
-  credentials           AchievementCredential[]
-  claimInvitations      ClaimEndorsement[]
-  identifiers           Identifier[]
-  profiles              Profile[]
-  userSessions          Session[]
-  signingKeys           SigningKey[]
-  users                 User[]
+  id                      String                   @id @default(uuid())
+  createdAt               DateTime                 @default(now())
+  name                    String
+  description             String
+  email                   String
+  json                    Json                     @default("{}")
+  url                     String?
+  domain                  String                   @unique @default(uuid())
+  logo                    String?
+  primaryColor            String?
+  achievements            Achievement[]
+  achievementCategories   AchievementCategory[]
+  claims                  AchievementClaim[]
+  achievementConfigs      AchievementConfig[]
+  credentials             AchievementCredential[]
+  claimInvitations        ClaimEndorsement[]
+  identifiers             Identifier[]
+  profiles                Profile[]
+  userSessions            Session[]
+  signingKeys             SigningKey[]
+  users                   User[]
+  oauthClients            OAuthClient[]
+  oauthAuthorizationCodes OAuthAuthorizationCode[]
+  oauthAccessTokens       OAuthAccessToken[]
 }
 
 model User {
-  id                        String                  @id @default(uuid())
+  id                        String                   @id @default(uuid())
   givenName                 String?
   familyName                String?
   organizationId            String
   orgRole                   RoleType?
-  defaultVisibility         Visibility              @default(COMMUNITY)
-  createdAchievementClaims  AchievementClaim[]      @relation("CreatedAchievementClaims")
-  receivedAchievementClaims AchievementClaim[]      @relation("AchievementClaims")
+  defaultVisibility         Visibility               @default(COMMUNITY)
+  createdAchievementClaims  AchievementClaim[]       @relation("CreatedAchievementClaims")
+  receivedAchievementClaims AchievementClaim[]       @relation("AchievementClaims")
   createdCredentials        AchievementCredential[]
-  createdEndorsements       ClaimEndorsement[]      @relation("CreatedEndorsements")
+  createdEndorsements       ClaimEndorsement[]       @relation("CreatedEndorsements")
   identifiers               Identifier[]
   sessions                  Session[]
-  organization              Organization            @relation(fields: [organizationId], references: [id])
+  organization              Organization             @relation(fields: [organizationId], references: [id])
+  oauthAuthorizationCodes   OAuthAuthorizationCode[]
+  oauthAccessTokens         OAuthAccessToken[]
+  createdOAuthClients       OAuthClient[]            @relation("CreatedOAuthClients")
 }
 
 model Identifier {
@@ -215,6 +221,80 @@ model SigningKey {
   organization        Organization @relation(fields: [organizationId], references: [id])
 }
 
+model OAuthClient {
+  id                      String                   @id @default(uuid())
+  organizationId          String
+  clientId                String                   @unique
+  clientSecretHash        String // scrypt string for secrets (see Phase 2); not sha256
+  clientType              OAuthClientType          @default(USER_DELEGATED)
+  clientName              String
+  clientUri               String
+  logoUri                 String
+  tosUri                  String
+  policyUri               String
+  softwareId              String?
+  softwareVersion         String?
+  contacts                String[]
+  redirectUris            String[] // empty for CONFIDENTIAL_SERVICE clients
+  scopes                  String[]
+  grantTypes              String[]
+  responseTypes           String[]
+  tokenEndpointAuthMethod String                   @default("client_secret_basic")
+  clientSecretExpiresAt   DateTime?
+  disabledAt              DateTime? // admin soft-disable; blocks token issuance, stays in the list
+  deletedAt               DateTime? // admin soft-delete; hidden from the list, history retained
+  createdByUserId         String? // the app's OWNER / accountable actor. Nullable at the DB
+  // level (USER_DELEGATED clients have none) but REQUIRED for
+  // CONFIDENTIAL_SERVICE clients (enforced in app code, Phase 2/7).
+  createdAt               DateTime                 @default(now())
+  organization            Organization             @relation(fields: [organizationId], references: [id])
+  createdByUser           User?                    @relation("CreatedOAuthClients", fields: [createdByUserId], references: [id])
+  authorizationCodes      OAuthAuthorizationCode[]
+  accessTokens            OAuthAccessToken[]
+
+  @@index([organizationId])
+}
+
+model OAuthAuthorizationCode {
+  id                  String       @id @default(uuid())
+  organizationId      String
+  clientId            String
+  userId              String
+  codeHash            String       @unique
+  redirectUri         String
+  scopes              String[]
+  codeChallenge       String
+  codeChallengeMethod String       @default("S256")
+  expiresAt           DateTime
+  consumedAt          DateTime?
+  createdAt           DateTime     @default(now())
+  client              OAuthClient  @relation(fields: [clientId], references: [id])
+  user                User         @relation(fields: [userId], references: [id])
+  organization        Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([userId])
+}
+
+model OAuthAccessToken {
+  id                    String       @id @default(uuid())
+  organizationId        String
+  clientId              String
+  userId                String? // null for CONFIDENTIAL_SERVICE (client_credentials) tokens
+  accessTokenHash       String       @unique
+  refreshTokenHash      String?      @unique
+  scopes                String[]
+  accessTokenExpiresAt  DateTime
+  refreshTokenExpiresAt DateTime?
+  revokedAt             DateTime?
+  lastUsedAt            DateTime?
+  createdAt             DateTime     @default(now())
+  client                OAuthClient  @relation(fields: [clientId], references: [id])
+  user                  User?        @relation(fields: [userId], references: [id])
+  organization          Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([userId, organizationId])
+}
+
 enum Visibility {
   PUBLIC
   COMMUNITY
@@ -243,4 +323,9 @@ enum ClaimStatus {
   ACCEPTED
   REJECTED
   UNACCEPTED
+}
+
+enum OAuthClientType {
+  USER_DELEGATED // DCR + authorization_code + PKCE; tokens owned by a User
+  CONFIDENTIAL_SERVICE // admin-registered; client_credentials grant; org-level; userless tokens
 }

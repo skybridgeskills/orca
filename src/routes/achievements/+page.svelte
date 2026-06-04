@@ -16,10 +16,9 @@
 		fetchAchievementCategories
 	} from '$lib/stores/achievementCategoryStore';
 	import type { AchievementCategory, Achievement, AchievementConfig } from '@prisma/client';
-	import { session } from '$lib/stores/sessionStore';
 	import Heading from '$lib/components/Heading.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { ensureLoaded, LoadingStatus } from '$lib/stores/common';
 	import Alert from '$lib/components/Alert.svelte';
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
@@ -83,7 +82,7 @@
 	{#if categoryAchievements[category.id]?.length}
 		<h2 class="text-l sm:text-xl font-bold mt-6 mb-4 dark:text-white">{category.name}</h2>
 		<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
-			{#each categoryAchievements[category.id] as achievement}
+			{#each categoryAchievements[category.id] as achievement (achievement.id)}
 				<Card maxWidth="" hoverEffect={true} href="/achievements/{achievement.id}">
 					<div class="grid grid-cols-4 gap-2">
 						<div class="m-auto">

@@ -2,7 +2,7 @@ import { prisma } from '../../prisma/client';
 import type { PageServerLoad } from './$types';
 import { canEditAchievements } from '$lib/server/permissions';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	// Check if user has permission to edit achievements
 	let editAchievementCapability = false;
 	let editCategoriesCapability = false;
@@ -22,14 +22,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		});
 	}
 
-	const achievements = await prisma.achievement.findMany({
-		where: {
-			organizationId: locals.org.id
-		},
-		include: {
-			achievementConfig: true
-		}
-	});
 	const categories = await prisma.achievementCategory.findMany({
 		where: {
 			organizationId: locals.org.id
@@ -42,7 +34,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	return {
 		editAchievementCapability,
 		editCategoriesCapability,
-		achievements,
 		categories
 	};
 };
