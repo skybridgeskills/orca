@@ -82,29 +82,29 @@
 			</thead>
 			<tbody>
 				{#each data.session?.user?.identifiers ?? [] as identifier (identifier.id)}
-						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-							<th
-								scope="row"
-								class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+					<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+						<th
+							scope="row"
+							class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+						>
+							{identifier.identifier}
+						</th>
+						<td class="py-4 px-6">
+							{identifier.type}
+						</td>
+						<td class="py-4 px-6">
+							<select
+								id="identifier_select"
+								name="identifierVisibility"
+								bind:value={formData.identifierVisibility}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 							>
-								{identifier.identifier}
-							</th>
-							<td class="py-4 px-6">
-								{identifier.type}
-							</td>
-							<td class="py-4 px-6">
-								<select
-									id="identifier_select"
-									name="identifierVisibility"
-									bind:value={formData.identifierVisibility}
-									class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-								>
-									<option value="PUBLIC">{m.short_deft_lemur_clasp()}</option>
-									<option value="COMMUNITY">{m.equal_small_dolphin_spur()}</option>
-									<option value="PRIVATE">{m.pink_last_marten_grin()}</option>
-								</select>
-							</td>
-						</tr>
+								<option value="PUBLIC">{m.short_deft_lemur_clasp()}</option>
+								<option value="COMMUNITY">{m.equal_small_dolphin_spur()}</option>
+								<option value="PRIVATE">{m.pink_last_marten_grin()}</option>
+							</select>
+						</td>
+					</tr>
 				{/each}
 			</tbody>
 		</table>

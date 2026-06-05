@@ -33,7 +33,9 @@
 				The actions snippet renders at the foot.
 			</p>
 			{#snippet actions()}
-				<button type="button" class="text-sm font-medium text-blue-700 hover:underline">Learn more</button>
+				<button type="button" class="text-sm font-medium text-blue-700 hover:underline"
+					>Learn more</button
+				>
 			{/snippet}
 		</Card>
 	</ul>

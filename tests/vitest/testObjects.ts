@@ -1,5 +1,3 @@
-import type { RequestEvent } from '@sveltejs/kit';
-
 import type {
 	Achievement,
 	AchievementClaim,
@@ -8,6 +6,7 @@ import type {
 	SigningKey,
 	User
 } from '@prisma/client';
+import type { RequestEvent } from '@sveltejs/kit';
 
 /**
  * Build a minimal stand-in for SvelteKit's `RequestEvent` suitable for unit
