@@ -1,3 +1,5 @@
+import type { RequestEvent } from '@sveltejs/kit';
+
 import type {
 	Achievement,
 	AchievementClaim,
@@ -6,6 +8,21 @@ import type {
 	SigningKey,
 	User
 } from '@prisma/client';
+
+/**
+ * Build a minimal stand-in for SvelteKit's `RequestEvent` suitable for unit
+ * tests that exercise hook/server helpers. The inner `as unknown as RequestEvent`
+ * cast is intentional and local: the mock is deliberately partial.
+ */
+export function makeFakeRequestEvent(
+	overrides: Partial<RequestEvent> & { host?: string } = {}
+): RequestEvent<Record<string, string>, string | null> {
+	const { host = 'example.com', ...rest } = overrides;
+	return {
+		url: new URL(`http://${host}`),
+		...rest
+	} as unknown as RequestEvent<Record<string, string>, string | null>;
+}
 
 export const testDate = new Date('2023-05-23');
 

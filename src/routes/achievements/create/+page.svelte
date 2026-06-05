@@ -6,7 +6,7 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	const categories = data.categories;
+	const categories = $derived(data.categories);
 
 	let formData = {
 		name: '',

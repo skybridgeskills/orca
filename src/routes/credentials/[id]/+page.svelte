@@ -7,12 +7,12 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	let achievement = data.credential.achievement;
+	const achievement = $derived(data.credential.achievement);
 
-	let breadcrumbItems = [
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: achievement.name, href: `/achievements/${achievement.id}` }
-	];
+	]);
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />

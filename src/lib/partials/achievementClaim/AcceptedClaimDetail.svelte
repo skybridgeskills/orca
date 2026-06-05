@@ -34,9 +34,9 @@
 	let { achievement, existingBadgeClaim, exchangeEnabled = false }: Props = $props();
 
 	let showClaimForm = $state(false);
-	let claimIntent: 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' = $state(
-		existingBadgeClaim?.claimStatus || 'ACCEPTED'
-	);
+	const initialClaimIntent = (): 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' =>
+		existingBadgeClaim?.claimStatus || 'ACCEPTED';
+	let claimIntent: 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' = $state(initialClaimIntent());
 
 	let sendToWalletModalVisible = $state(false);
 	let showQRShareModal = $state(false);

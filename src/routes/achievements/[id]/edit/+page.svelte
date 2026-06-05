@@ -12,9 +12,9 @@
 	const alignmentsFromJson = (json: Achievement['json']) => alignmentRowsFromAchievementJson(json);
 
 	let { data }: PageProps = $props();
-	const categories = data.categories;
+	const categories = $derived(data.categories);
 
-	let formData = {
+	const formData = $derived({
 		name: data.achievement.name,
 		description: data.achievement.description,
 		criteriaId: data.achievement.criteriaId,
@@ -31,13 +31,13 @@
 			data.achievement.achievementConfig?.json?.capabilities?.inviteRequires || '',
 		claimTemplate: data.achievement.achievementConfig?.json?.claimTemplate || '',
 		alignments: alignmentsFromJson(data.achievement.json)
-	};
+	});
 
-	let breadcrumbItems = [
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name }
-	];
+	]);
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />

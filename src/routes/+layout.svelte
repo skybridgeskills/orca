@@ -21,7 +21,11 @@
 	const privacyUrl = getFooterUrl('privacy', '/privacy');
 	const termsUrl = getFooterUrl('terms', '/terms');
 	const contactUrl = getFooterUrl('contact', '/contact');
+	// One-time init side-effects intentionally use the initial `data`;
+	// preferredTheme is re-initialized in onMount below.
+	// svelte-ignore state_referenced_locally
 	preferredTheme.initialize(data.cookieTheme || 'light');
+	// svelte-ignore state_referenced_locally
 	setLocale(data.locale);
 
 	onMount(() => {

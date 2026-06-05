@@ -122,7 +122,7 @@
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>{m.patchy_crazy_marten_march()}</label
 			>
-			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative} />
+			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative}></textarea>
 			<MarkdownEditor inputName="narrative" bind:value={endorsementNarrative} />
 		</div>
 		<div class="mb-6">

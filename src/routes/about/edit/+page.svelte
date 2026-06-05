@@ -156,7 +156,7 @@
 			class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 			placeholder={m.elegant_free_cow_cherish()}
 			bind:value={formData.description}
-		/>
+		></textarea>
 		{#if errors.description}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 				{errors.description}
 			</p>{/if}
@@ -370,7 +370,7 @@
 	.isError label {
 		@apply text-red-700;
 	}
-	.dark .isError label {
+	:global(.dark) .isError label {
 		@apply text-red-500;
 	}
 
@@ -380,7 +380,7 @@
 	.isError input:focus {
 		@apply border-red-500;
 	}
-	.dark .isError input {
+	:global(.dark) .isError input {
 		@apply bg-red-100 border-red-400;
 	}
 </style>

@@ -10,7 +10,7 @@
 
 	let { claim }: Props = $props();
 
-	const claimData = JSON.parse(claim?.json?.toString() || '{}') || {};
+	const claimData = $derived(JSON.parse(claim?.json?.toString() || '{}') || {});
 </script>
 
 {#if claimData.narrative}

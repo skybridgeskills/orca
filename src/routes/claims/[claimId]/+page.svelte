@@ -28,15 +28,17 @@
 		ACCEPTED: 'info'
 	};
 
-	const breadcrumbItems = [
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
 		{
 			text: data.achievement.name,
 			href: resolve(`/achievements/${data.achievement.id}`)
 		},
 		{ text: `${data.claim.user.givenName} ${data.claim.user.familyName}` }
-	];
+	]);
 
+	// setContext runs once during init; using the initial `data` is intentional.
+	// svelte-ignore state_referenced_locally
 	setContext('claimId', data.claim.id);
 
 	const translatedStatus = $derived.by(() => {

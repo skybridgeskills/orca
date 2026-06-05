@@ -33,7 +33,7 @@
 				The actions snippet renders at the foot.
 			</p>
 			{#snippet actions()}
-				<a href="#" class="text-sm font-medium text-blue-700 hover:underline">Learn more</a>
+				<button type="button" class="text-sm font-medium text-blue-700 hover:underline">Learn more</button>
 			{/snippet}
 		</Card>
 	</ul>

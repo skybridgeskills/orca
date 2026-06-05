@@ -26,12 +26,12 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	const U = {
+	const U = $derived({
 		id: 'uncategorized',
 		organizationId: data.org.id,
 		name: m.light_early_owl_shrine(),
 		weight: -1
-	};
+	});
 
 	const categoryAchievements: {
 		[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;

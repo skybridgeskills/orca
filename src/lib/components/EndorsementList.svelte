@@ -27,9 +27,15 @@
 
 	let { data }: Props = $props();
 
-	let page = $state(data.page);
-	let pageSize = $state(data.pageSize);
-	let total = $state(data.total);
+	// `page`, `pageSize` and `total` are seeded from `data` once and then
+	// reassigned in `getData` (rule 3: locally mutated). Reading the prop inside
+	// an init closure avoids `state_referenced_locally` while preserving the
+	// original synchronous seeding (the first `getData(page)` call relies on
+	// `pageSize` already being set).
+	const initialPaging = () => ({ page: data.page, pageSize: data.pageSize, total: data.total });
+	let page = $state(initialPaging().page);
+	let pageSize = $state(initialPaging().pageSize);
+	let total = $state(initialPaging().total);
 
 	let endorsements: EndorsementTableData[] = $state([]);
 

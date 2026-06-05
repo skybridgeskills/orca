@@ -10,12 +10,12 @@
 	import { page } from '$app/stores';
 
 	let { data }: PageProps = $props();
-	const achievementWithOrgData = {
+	const achievementWithOrgData = $derived({
 		...data.claim.achievement,
 		organization: data.org
-	};
+	});
 
-	const derivedImageUrl = staticImageUrlForAchievement(achievementWithOrgData);
+	const derivedImageUrl = $derived(staticImageUrlForAchievement(achievementWithOrgData));
 </script>
 
 <MetaTags

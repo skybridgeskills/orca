@@ -19,10 +19,16 @@
 		id?: string;
 	};
 
+	type AwardedEndorsement = {
+		json?: string;
+		claim?: unknown;
+		createdAt?: Date;
+	};
+
 	$: {
 		if (form && form.endorsement) {
-			const endorsement = form.endorsement as unknown;
-			if ('json' in endorsement && typeof endorsement.json === 'string') {
+			const endorsement = form.endorsement as AwardedEndorsement | undefined;
+			if (endorsement && typeof endorsement.json === 'string') {
 				endorsementJson = JSON.parse(endorsement.json);
 			} else {
 				endorsementJson = {};
@@ -168,7 +174,7 @@
 					class="hidden"
 					placeholder={m.elegant_soft_oryx_read()}
 					bind:value={awardNarrative}
-				/>
+				></textarea>
 				<MarkdownEditor bind:value={awardNarrative} inputName="narrative" />
 			</div>
 			<div class="mb-6">

@@ -54,7 +54,11 @@
 
 	let { categories, initialData, achievementId = '' }: Props = $props();
 
-	let formData = $state({
+	// Seed the form once from `initialData`. Reading the prop inside this closure
+	// (rather than directly at the `$state(...)` declaration) keeps the form's
+	// mutable state independent of upstream changes while avoiding
+	// `state_referenced_locally`.
+	const initialFormData = () => ({
 		...initialData,
 		image: initialData.image ?? null,
 		imageExtension: initialData.imageExtension ?? null,
@@ -82,6 +86,8 @@
 			: 'none',
 		inviteSelectedOption: initialData.capabilities_inviteRequires ? 'badge' : 'none'
 	});
+
+	let formData = $state(initialFormData());
 
 	let noErrors = {
 		name: '',
@@ -285,7 +291,7 @@
 					class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 					placeholder={m.dark_major_goat_support()}
 					bind:value={formData.description}
-				/>
+				></textarea>
 				{#if errors.description}
 					<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 						{errors.description}
@@ -683,7 +689,7 @@
 											? 'translate-x-5 border-white'
 											: 'border-gray-300'
 									}`}
-								/>
+								></div>
 							</div>
 							<span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
 								>{formData.claimTemplate_enabled

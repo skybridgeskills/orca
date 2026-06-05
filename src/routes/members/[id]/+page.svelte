@@ -16,7 +16,7 @@
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	let { data }: PageProps = $props();
-	let member = data.member;
+	const member = $derived(data.member);
 	let showShareModal = $state(false);
 </script>
 
@@ -85,7 +85,6 @@
 							<img
 								src={imageUrl(claim.achievement.image)}
 								alt={m.dull_bright_ostrich_delight({ achievementName: claim.achievement.name })}
-								aria-hidden
 							/>
 						{:else}
 							<div class="text-gray-400 dark:text-gray-700">

@@ -1,9 +1,8 @@
-import type { RequestEvent } from '@sveltejs/kit';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { getOrganizationFromRequest } from '../../../src/hooks.server';
 import { prisma } from '../../../src/prisma/client';
-import { testOrganization } from '../testObjects';
+import { makeFakeRequestEvent, testOrganization } from '../testObjects';
 
 vi.mock('../../../src/prisma/client', () => ({
 	prisma: {
@@ -31,9 +30,7 @@ describe('getOrganizationFromRequest', () => {
 
 		vi.mocked(prisma.organization.findMany).mockResolvedValue([suspendedOrg]);
 
-		const event = {
-			url: { host: 'example.com' }
-		} as unknown as RequestEvent;
+		const event = makeFakeRequestEvent({ host: 'example.com' });
 
 		// Check that error is 503
 		try {
@@ -54,9 +51,7 @@ describe('getOrganizationFromRequest', () => {
 
 		vi.mocked(prisma.organization.findMany).mockResolvedValue([enabledOrg]);
 
-		const event = {
-			url: { host: 'example.com' }
-		} as unknown;
+		const event = makeFakeRequestEvent({ host: 'example.com' });
 
 		const result = await getOrganizationFromRequest(event);
 		expect(result).toEqual(enabledOrg);
@@ -70,9 +65,7 @@ describe('getOrganizationFromRequest', () => {
 
 		vi.mocked(prisma.organization.findMany).mockResolvedValue([orgWithoutStatus]);
 
-		const event = {
-			url: { host: 'example.com' }
-		} as unknown;
+		const event = makeFakeRequestEvent({ host: 'example.com' });
 
 		const result = await getOrganizationFromRequest(event);
 		expect(result).toEqual(orgWithoutStatus);
@@ -86,9 +79,7 @@ describe('getOrganizationFromRequest', () => {
 
 		vi.mocked(prisma.organization.findMany).mockResolvedValue([underReviewOrg]);
 
-		const event = {
-			url: { host: 'example.com' }
-		} as unknown;
+		const event = makeFakeRequestEvent({ host: 'example.com' });
 
 		const result = await getOrganizationFromRequest(event);
 		expect(result).toEqual(underReviewOrg);
@@ -102,17 +93,16 @@ describe('getOrganizationFromRequest', () => {
 
 		vi.mocked(prisma.organization.findMany).mockResolvedValue([notActivatedOrg]);
 
-		const event = {
-			url: { host: 'example.com' }
-		} as unknown;
+		const event = makeFakeRequestEvent({ host: 'example.com' });
 
 		// Check that error is 403
 		try {
 			await getOrganizationFromRequest(event);
 			expect.fail('Should have thrown an error');
 		} catch (err: unknown) {
-			expect(err.status).toBe(403);
-			const errorBody = typeof err.body === 'string' ? err.body : JSON.stringify(err.body);
+			const e = err as { status?: number; body?: unknown };
+			expect(e.status).toBe(403);
+			const errorBody = typeof e.body === 'string' ? e.body : JSON.stringify(e.body);
 			expect(errorBody).toContain('not yet activated');
 		}
 	});

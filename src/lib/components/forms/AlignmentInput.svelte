@@ -80,7 +80,7 @@
 					rows="2"
 					placeholder={m.misty_grand_elk_roam()}
 					class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-				/>
+				></textarea>
 				<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
 					{m.light_fair_dove_wish()}
 				</p>

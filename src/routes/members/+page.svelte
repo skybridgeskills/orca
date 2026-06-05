@@ -10,7 +10,7 @@
 	import { page } from '$app/stores';
 
 	let { data }: PageProps = $props();
-	let members = data.members;
+	const members = $derived(data.members);
 </script>
 
 <h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{m.pink_shy_penguin_express()}</h1>

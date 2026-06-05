@@ -14,7 +14,7 @@
 	import { resolve } from '$app/paths';
 
 	let { data }: PageProps = $props();
-	const config = data.achievement.achievementConfig;
+	const config = $derived(data.achievement.achievementConfig);
 
 	onMount(() => {
 		if (data.inviteId) $inviteId = data.inviteId;
@@ -25,7 +25,7 @@
 	// initially show claim form if user is eligible to self-claim a fresh claim now.
 	let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
 
-	const breadcrumbItems = [
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
 		{ text: m.antsy_grand_rabbit_gaze(), href: resolve('/achievements') },
 		{
@@ -33,7 +33,7 @@
 			href: resolve(`/achievements/${data.achievement.id}`)
 		},
 		{ text: m.bold_swift_eagle_claim() }
-	];
+	]);
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />

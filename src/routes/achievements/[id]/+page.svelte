@@ -61,11 +61,11 @@
 	let showDeleteModal = $state(false);
 	let showShareModal = $state(false);
 
-	const breadcrumbItems = [
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
 		{ text: m.antsy_grand_rabbit_gaze(), href: resolve('/achievements') },
 		{ text: data.achievement.name }
-	];
+	]);
 
 	let category: AchievementCategory | undefined = $state();
 
@@ -101,7 +101,10 @@
 		data.outstandingInvites.find(() => true)
 	);
 
+	// setContext runs once during init; using the initial `data` is intentional.
+	// svelte-ignore state_referenced_locally
 	setContext('achievementId', data.achievement.id);
+	// svelte-ignore state_referenced_locally
 	setContext('session', data.session);
 
 	onMount(async () => {
@@ -380,7 +383,7 @@
 	</div>
 {/if}
 
-<form id="deleteForm" action="?/delete" method="POST" />
+<form id="deleteForm" action="?/delete" method="POST"></form>
 
 <Modal
 	visible={showDeleteModal}
