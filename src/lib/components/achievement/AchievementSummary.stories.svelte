@@ -1,6 +1,9 @@
 <script lang="ts" module>
 	import type { Achievement } from '@prisma/client';
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { fn } from 'storybook/test';
+
+	import { StoryPreview } from '$lib/storybook';
 
 	import AchievementSummary from './AchievementSummary.svelte';
 
@@ -15,33 +18,30 @@
 
 	const { Story } = defineMeta({
 		title: 'components/achievement/AchievementSummary',
-		component: AchievementSummary,
-		tags: ['autodocs'],
-		args: {
-			achievement,
-			linkAchievement: false
-		}
+		component: AchievementSummary
 	});
+
+	const onclick = fn().mockName('onclick');
 </script>
 
-<Story name="Default">
-	<div class="p-4">
+<Story name="Default" asChild>
+	<StoryPreview>
 		<AchievementSummary {achievement} linkAchievement={false} />
-	</div>
+	</StoryPreview>
 </Story>
 
-<Story name="Accepted claim">
-	<div class="p-4">
+<Story name="Accepted claim" asChild>
+	<StoryPreview>
 		<AchievementSummary
 			{achievement}
 			linkAchievement={false}
 			claim={{ claimStatus: 'ACCEPTED', validFrom: new Date('2020-01-01') } as never}
 		/>
-	</div>
+	</StoryPreview>
 </Story>
 
-<Story name="With actions snippet">
-	<div class="p-4">
+<Story name="With actions snippet" asChild>
+	<StoryPreview>
 		<AchievementSummary {achievement} linkAchievement={false}>
 			{#snippet actions()}
 				<!-- Demo action only (Storybook has nowhere to navigate); real usages
@@ -50,11 +50,17 @@
 				>
 			{/snippet}
 		</AchievementSummary>
-	</div>
+	</StoryPreview>
 </Story>
 
-<Story name="Clickable (small image)">
-	<div class="p-4">
-		<AchievementSummary {achievement} linkAchievement={false} imageSize="16" isClickable />
-	</div>
+<Story name="Clickable (small image)" asChild>
+	<StoryPreview>
+		<AchievementSummary
+			{achievement}
+			linkAchievement={false}
+			imageSize="16"
+			isClickable
+			{onclick}
+		/>
+	</StoryPreview>
 </Story>

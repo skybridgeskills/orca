@@ -1,37 +1,27 @@
 <script lang="ts" module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { fn } from 'storybook/test';
+
+	import { StoryPreview } from '$lib/storybook';
 
 	import Pagination from './Pagination.svelte';
 
 	const { Story } = defineMeta({
 		title: 'components/Pagination',
-		component: Pagination,
-		tags: ['autodocs']
+		component: Pagination
 	});
 
-	const noop = () => {};
+	const action = fn().mockName('action');
 </script>
 
-<Story name="Middle page">
-	<div class="p-4">
-		<Pagination paging={{ count: 95, page: 3, pageSize: 10, action: noop }} />
-	</div>
-</Story>
-
-<Story name="First page">
-	<div class="p-4">
-		<Pagination paging={{ count: 95, page: 1, pageSize: 10, action: noop }} />
-	</div>
-</Story>
-
-<Story name="Last page">
-	<div class="p-4">
-		<Pagination paging={{ count: 95, page: 10, pageSize: 10, action: noop }} />
-	</div>
-</Story>
-
-<Story name="Single page (hidden)">
-	<div class="p-4">
-		<Pagination paging={{ count: 4, page: 1, pageSize: 10, action: noop }} />
-	</div>
+<Story name="Pagination" asChild>
+	<StoryPreview widths={[320, 768]}>
+		<div class="space-y-4">
+			<Pagination paging={{ count: 95, page: 3, pageSize: 10, action }} />
+			<Pagination paging={{ count: 95, page: 1, pageSize: 10, action }} />
+			<Pagination paging={{ count: 95, page: 10, pageSize: 10, action }} />
+			<!-- Single page: count <= pageSize → renders nothing (hidden). -->
+			<Pagination paging={{ count: 4, page: 1, pageSize: 10, action }} />
+		</div>
+	</StoryPreview>
 </Story>

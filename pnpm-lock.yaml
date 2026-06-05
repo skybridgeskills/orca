@@ -90,6 +90,9 @@ importers:
       '@storybook/addon-svelte-csf':
         specifier: ^5.1.2
         version: 5.1.2(@storybook/svelte@10.0.2(storybook@10.0.2(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2)))(svelte@5.56.0(@typescript-eslint/types@8.60.0)))(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.56.0(@typescript-eslint/types@8.60.0))(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2)))(storybook@10.0.2(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2)))(svelte@5.56.0(@typescript-eslint/types@8.60.0))(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2))
+      '@storybook/addon-themes':
+        specifier: 10.0.2
+        version: 10.0.2(storybook@10.0.2(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2)))
       '@storybook/addon-vitest':
         specifier: 10.0.2
         version: 10.0.2(@vitest/browser-playwright@4.1.7)(@vitest/browser@4.1.7(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2))(vitest@4.1.7))(@vitest/runner@4.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(storybook@10.0.2(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2)))(vitest@4.1.7)
@@ -1491,6 +1494,11 @@ packages:
       storybook: ^0.0.0-0 || ^8.2.0 || ^9.0.0 || ^9.1.0-0 || ^10.0.0-0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0
       svelte: ^5.0.0
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+
+  '@storybook/addon-themes@10.0.2':
+    resolution: {integrity: sha512-l2bR7v8Mj1YPsbcKqZmMeRDsyJvJ+b5XEyz/vyIK0rC6Y6qiExPq3RrE7wiGaPIA3Yk/k81AzdsYer1Gv7ERKQ==}
+    peerDependencies:
+      storybook: ^10.0.2
 
   '@storybook/addon-vitest@10.0.2':
     resolution: {integrity: sha512-ilpjflHJPa0au4YX48QsOmrkWFFqBjzfOGwKEDY2jBYJRyCqsdYju2Jl9Uku2CIXnJJJHI+iGLngPL225yV4Lg==}
@@ -6079,6 +6087,11 @@ snapshots:
       zimmerframe: 1.1.4
     transitivePeerDependencies:
       - babel-plugin-macros
+
+  '@storybook/addon-themes@10.0.2(storybook@10.0.2(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2)))':
+    dependencies:
+      storybook: 10.0.2(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2))
+      ts-dedent: 2.2.0
 
   '@storybook/addon-vitest@10.0.2(@vitest/browser-playwright@4.1.7)(@vitest/browser@4.1.7(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2))(vitest@4.1.7))(@vitest/runner@4.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(storybook@10.0.2(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.8.2)))(vitest@4.1.7)':
     dependencies:

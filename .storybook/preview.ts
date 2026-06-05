@@ -1,46 +1,15 @@
-import '../src/app.css';
+import { withThemeByClassName } from '@storybook/addon-themes';
 import type { Preview } from '@storybook/sveltekit';
 
-// Initialize dark mode based on system preference (orca uses class dark mode:
-// `.dark` on <html>, matching @custom-variant dark in src/app.css).
-function initializeDarkMode() {
-	if (typeof window === 'undefined') return;
-
-	const theme = localStorage.getItem('theme') || 'system';
-	const html = document.documentElement;
-
-	if (theme === 'system') {
-		const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-			? 'dark'
-			: 'light';
-		if (systemTheme === 'dark') {
-			html.classList.add('dark');
-		} else {
-			html.classList.remove('dark');
-		}
-	} else if (theme === 'dark') {
-		html.classList.add('dark');
-	} else {
-		html.classList.remove('dark');
-	}
-}
-
-// Set theme immediately to prevent flash
-if (typeof window !== 'undefined') {
-	initializeDarkMode();
-
-	// Listen for system preference changes
-	const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-	mediaQuery.addEventListener('change', () => {
-		const theme = localStorage.getItem('theme') || 'system';
-		if (theme === 'system') {
-			initializeDarkMode();
-		}
-	});
-}
+import '../src/app.css';
 
 const preview: Preview = {
-	decorators: [],
+	decorators: [
+		withThemeByClassName({
+			themes: { light: '', dark: 'dark' },
+			defaultTheme: 'light'
+		})
+	],
 	parameters: {
 		controls: {
 			matchers: {
