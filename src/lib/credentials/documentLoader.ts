@@ -1,4 +1,4 @@
-import jsigs from 'jsonld-signatures';
+import jsigs from '@interop/jsonld-signatures';
 
 import { CONTEXT as CREDENTIALS_V1 } from './contexts/credentials_v1p1';
 import { CONTEXT as CREDENTIALS_V2 } from './contexts/credentials_v2';

@@ -45,7 +45,8 @@ test('achievement claim to credential', async () => {
 	expect(credentialResult.type).toEqual(['VerifiableCredential', 'OpenBadgeCredential']);
 	expect(credentialResult.proof).toBeDefined();
 	expect(credentialResult.proof?.type).toEqual('Ed25519Signature2020');
-	expect(credentialResult.proof?.created).toEqual(date.toISOString());
+	// @interop/vc normalizes `proof.created` to W3C second precision (no milliseconds).
+	expect(credentialResult.proof?.created).toEqual(date.toISOString().replace(/\.\d{3}Z$/, 'Z'));
 	expect(credentialResult.proof?.verificationMethod).toEqual(
 		`did:web:${testOrganization.domain}#key-0`
 	); // TODO: the domain doesn't have the port colon specifier percent encoded

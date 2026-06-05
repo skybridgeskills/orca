@@ -1,4 +1,4 @@
-import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020';
+import { Ed25519VerificationKey } from '@interop/ed25519-verification-key';
 import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
 import inquirer from 'inquirer';
@@ -60,7 +60,10 @@ const main = async () => {
 	console.log(`You selected ${selectedOrganization.name} (${selectedOrganization.id})!`);
 
 	console.log(`Generating a new key for this organization...`);
-	const keyPair = await Ed25519VerificationKey2020.generate();
+	const keyPair = await Ed25519VerificationKey.generate();
+	if (!keyPair.privateKeyMultibase) {
+		throw new Error('Generated key pair is missing a private key.');
+	}
 
 	console.log(keyPair.publicKeyMultibase);
 

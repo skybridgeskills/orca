@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
 
-import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020';
+import { Ed25519VerificationKey } from '@interop/ed25519-verification-key';
 import { test, expect, type Page } from '@playwright/test';
 import type { Organization, User } from '@prisma/client';
 
@@ -78,7 +78,10 @@ test.beforeAll(async () => {
 		}
 	});
 
-	const keyPair = await Ed25519VerificationKey2020.generate();
+	const keyPair = await Ed25519VerificationKey.generate();
+	if (!keyPair.privateKeyMultibase) {
+		throw new Error('Generated key pair is missing a private key.');
+	}
 	await prisma.signingKey.create({
 		data: {
 			organizationId: org.id,
