@@ -39,11 +39,11 @@
 	let awardNarrative = '';
 
 	const breadcrumbItems = [
-		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
-		{ text: m.antsy_grand_rabbit_gaze(), href: resolve('/achievements') },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{
 			text: data.achievement?.name,
-			href: resolve(`/achievements/${data.achievement.id}`)
+			href: `/achievements/${data.achievement.id}`
 		}
 	];
 </script>
@@ -124,11 +124,7 @@
 					form = null;
 				}}
 			/>
-			<Button
-				href={resolve(`/achievements/${data.achievement.id}`)}
-				submodule="primary"
-				text="Done"
-			/>
+			<Button href={`/achievements/${data.achievement.id}`} submodule="primary" text="Done" />
 		</div>
 	{:else}
 		<!-- Submission form -->

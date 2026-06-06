@@ -29,10 +29,10 @@
 	};
 
 	const breadcrumbItems = $derived([
-		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{
 			text: data.achievement.name,
-			href: resolve(`/achievements/${data.achievement.id}`)
+			href: `/achievements/${data.achievement.id}`
 		},
 		{ text: `${data.claim.user.givenName} ${data.claim.user.familyName}` }
 	]);

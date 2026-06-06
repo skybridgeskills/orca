@@ -26,11 +26,11 @@
 	let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
 
 	const breadcrumbItems = $derived([
-		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
-		{ text: m.antsy_grand_rabbit_gaze(), href: resolve('/achievements') },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{
 			text: data.achievement.name,
-			href: resolve(`/achievements/${data.achievement.id}`)
+			href: `/achievements/${data.achievement.id}`
 		},
 		{ text: m.bold_swift_eagle_claim() }
 	]);

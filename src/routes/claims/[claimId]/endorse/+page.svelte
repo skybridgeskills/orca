@@ -31,14 +31,14 @@
 	}
 
 	const breadcrumbItems = [
-		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{
 			text: data.achievement.name,
-			href: resolve(`/achievements/${data.achievement.id}`)
+			href: `/achievements/${data.achievement.id}`
 		},
 		{
 			text: `${data.claim.user.givenName} ${data.claim.user.familyName}`,
-			href: resolve(`/claims/${data.claim.id}`)
+			href: `/claims/${data.claim.id}`
 		},
 		{ text: m.warm_tangy_deer_endorseform() }
 	];
