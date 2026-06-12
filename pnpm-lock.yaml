@@ -17,6 +17,9 @@ importers:
       '@inlang/cli':
         specifier: ^2.0.0
         version: 2.18.1
+      '@interop/data-integrity-proof':
+        specifier: ^3.2.1
+        version: 3.2.1
       '@interop/ed25519-signature':
         specifier: ^7.0.0
         version: 7.0.1(@interop/jsonld-signatures@11.6.7)

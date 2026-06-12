@@ -44,11 +44,12 @@ test('achievement claim to credential', async () => {
 	);
 	expect(credentialResult.type).toEqual(['VerifiableCredential', 'OpenBadgeCredential']);
 	expect(credentialResult.proof).toBeDefined();
-	expect(credentialResult.proof?.type).toEqual('Ed25519Signature2020');
+	expect(credentialResult.proof?.type).toEqual('DataIntegrityProof');
+	expect(credentialResult.proof?.cryptosuite).toEqual('eddsa-rdfc-2022');
 	// @interop/vc normalizes `proof.created` to W3C second precision (no milliseconds).
 	expect(credentialResult.proof?.created).toEqual(date.toISOString().replace(/\.\d{3}Z$/, 'Z'));
 	expect(credentialResult.proof?.verificationMethod).toEqual(
-		`did:web:${testOrganization.domain}#key-0`
+		`did:web:${testOrganization.domain}#key-0-multikey`
 	); // TODO: the domain doesn't have the port colon specifier percent encoded
 	expect(credentialResult.proof?.proofValue).toBeDefined();
 	expect(credentialResult.proof?.proofPurpose).toEqual('assertionMethod');
@@ -62,8 +63,7 @@ test('achievement claim to credential', async () => {
 	expect(credentialResult.issuer.description).toEqual(testOrganization.description);
 	expect(credentialResult['@context']).toEqual([
 		'https://www.w3.org/ns/credentials/v2',
-		'https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json',
-		'https://w3id.org/security/suites/ed25519-2020/v1'
+		'https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json'
 	]);
 	expect(credentialResult.validFrom).toEqual(testAchievementClaim.validFrom?.toISOString());
 	expect(credentialResult.credentialSubject).toBeDefined();

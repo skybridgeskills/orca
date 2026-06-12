@@ -160,6 +160,7 @@ declare namespace App {
 		type: string[];
 		proof?: {
 			type: string;
+			cryptosuite?: string; // present for DataIntegrityProof (e.g. 'eddsa-rdfc-2022')
 			created: string;
 			proofPurpose: string;
 			proofValue: string;

@@ -111,6 +111,7 @@
 		"@aws-sdk/client-s3": "^3.299.0",
 		"@aws-sdk/s3-request-presigner": "^3.326.0",
 		"@inlang/cli": "^2.0.0",
+		"@interop/data-integrity-proof": "^3.2.1",
 		"@interop/ed25519-signature": "^7.0.0",
 		"@interop/ed25519-verification-key": "^7.0.0",
 		"@interop/jsonld-signatures": "^11.6.0",
