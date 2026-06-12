@@ -8,6 +8,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import { SELF_REQUIREMENT } from '$lib/data/achievementForm';
 	import * as m from '$lib/i18n/messages';
 	import {
 		achievements,
@@ -27,6 +28,7 @@
 		inputId?: string;
 		inputName?: string;
 		achievementFilter?: (a: Achievement) => boolean;
+		allowSelf?: boolean;
 		onselected?: (badgeId: string) => void;
 		onunselected?: () => void;
 		invoker?: Snippet<[() => void]>;
@@ -42,11 +44,22 @@
 		inputId = 'achievementSelect_generic',
 		inputName = inputId,
 		achievementFilter = () => true,
+		allowSelf = false,
 		onselected,
 		onunselected,
 		invoker,
 		selectedSummary
 	}: Props = $props();
+
+	// "This badge" sentinel state: the badge being created/edited is its own requirement.
+	const isSelf = $derived(badgeId === SELF_REQUIREMENT);
+
+	const selectSelf = () => {
+		onselected?.(SELF_REQUIREMENT);
+		searchModalOpen = false;
+		searchQuery = '';
+		achievement = undefined;
+	};
 
 	let searchModalOpen = $state(false);
 	let searchQuery = $state('');
@@ -73,6 +86,9 @@
 
 	onMount(async () => {
 		await ensureLoaded(achievementsLoading, fetchAchievements);
+		// The 'self' sentinel is not a real achievement: keep the selection, don't look it
+		// up in the store, and don't clear it via onunselected.
+		if (badgeId === SELF_REQUIREMENT) return;
 		if (badgeId) {
 			achievement = $achievements.find((a) => a.id === badgeId);
 		}
@@ -111,6 +127,36 @@
 
 {#if selectedSummary}
 	{@render selectedSummary()}
+{:else if isSelf && allowSelf}
+	<div class="pt-2">
+		<div class="flex items-center gap-3">
+			<span class="text-sm font-medium text-gray-900 dark:text-white"
+				>{m.lucky_bold_swan_pick()}</span
+			>
+			<button
+				type="button"
+				class="text-sm {disabled ? dtColor : tColor} underline"
+				onclick={() => {
+					searchModalOpen = true;
+				}}
+				{disabled}
+			>
+				{m.quick_safe_deer_change()}
+			</button>
+			<button
+				type="button"
+				class="text-sm {disabled ? dtColor : tColor} underline"
+				onclick={(e) => {
+					e.preventDefault();
+					onunselected?.();
+					achievement = undefined;
+				}}
+				{disabled}
+			>
+				{m.firm_clear_fox_remove()}
+			</button>
+		</div>
+	</div>
 {:else if !!badgeId && achievement != null}
 	<div class="pt-2">
 		<AchievementSummary {achievement} imageSize="16" linkAchievement={false} {disabled}>
@@ -165,6 +211,20 @@
 			bind:value={searchQuery}
 		/>
 	</div>
+
+	{#if allowSelf}
+		<ul class="mt-4">
+			<li>
+				<button
+					type="button"
+					class="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium text-gray-900 dark:text-white"
+					onclick={selectSelf}
+				>
+					{m.lucky_bold_swan_pick()}
+				</button>
+			</li>
+		</ul>
+	{/if}
 
 	{#if searchResults.length > 0}
 		<ul class="mt-4 space-y-2">

@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { ValidationError } from 'yup';
 
 import { getAchievement } from '$lib/data/achievement';
-import { achievementFormSchema } from '$lib/data/achievementForm';
+import {
+	achievementFormSchema,
+	resolveSelfRequirement,
+	SELF_REQUIREMENT
+} from '$lib/data/achievementForm';
 import type { Alignment } from '$lib/data/alignment';
 import {
 	diffAndApplyRubric,
@@ -189,10 +193,17 @@ export const actions: Actions = {
 		// override below), matching the pre-merge ordering.
 		let reviewRequires: { connect: { id: string } } | undefined;
 		if (formData.reviewsRequired > 0 && !!formData.reviewRequires)
-			reviewRequires = { connect: { id: formData.reviewRequires || '' } };
+			// "This badge": resolve the 'self' sentinel to this achievement's own id (the row
+			// already exists in edit, so a nested connect is fine).
+			reviewRequires = {
+				connect: { id: resolveSelfRequirement(formData.reviewRequires, params.id) || '' }
+			};
 		else if (formData.reviewsRequired == 0) reviewRequires = undefined;
 
-		if (formData.capabilities_inviteRequires) {
+		if (
+			formData.capabilities_inviteRequires &&
+			formData.capabilities_inviteRequires !== SELF_REQUIREMENT
+		) {
 			try {
 				await getAchievement(formData.capabilities_inviteRequires, locals.org.id);
 			} catch {
@@ -254,7 +265,7 @@ export const actions: Actions = {
 			delete mergedAchievementJson.alignment;
 		}
 		mergedAchievementJson.capabilities = {
-			inviteRequires: formData.capabilities_inviteRequires
+			inviteRequires: resolveSelfRequirement(formData.capabilities_inviteRequires, params.id)
 		};
 		mergedAchievementJson.claimTemplate = claimTemplate;
 		mergedAchievementJson.reviewsRequired = reviewsRequired;

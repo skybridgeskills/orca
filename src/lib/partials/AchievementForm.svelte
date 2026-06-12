@@ -13,7 +13,7 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
 	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
-	import { achievementFormSchema } from '$lib/data/achievementForm';
+	import { achievementFormSchema, SELF_REQUIREMENT } from '$lib/data/achievementForm';
 	import type { Alignment } from '$lib/data/alignment';
 	import * as m from '$lib/i18n/messages';
 	import {
@@ -69,6 +69,11 @@
 	const stewardName = (member: Member): string =>
 		`${member.givenName ?? ''} ${member.familyName ?? ''}`.trim() || member.id;
 
+	// Edit hydration: an already-saved "this badge" requirement comes back as the
+	// badge's own id; present it as the self sentinel so the picker reads "This badge".
+	const selfOr = (value: string | null | undefined): string | null =>
+		achievementId && value === achievementId ? SELF_REQUIREMENT : (value ?? null);
+
 	// Seed the form once from `initialData`. Reading the prop inside this closure
 	// (rather than directly at the `$state(...)` declaration) keeps the form's
 	// mutable state independent of upstream changes while avoiding
@@ -81,9 +86,9 @@
 		criteriaNarrative: initialData.criteriaNarrative ?? '',
 		reviewsRequired: initialData.reviewsRequired ?? 0,
 		claimRequires: initialData.claimRequires ?? null,
-		reviewRequires: initialData.reviewRequires ?? null,
+		reviewRequires: selfOr(initialData.reviewRequires),
 		inviteRequires: initialData.inviteRequires ?? null,
-		capabilities_inviteRequires: initialData.capabilities_inviteRequires ?? null,
+		capabilities_inviteRequires: selfOr(initialData.capabilities_inviteRequires),
 		claimTemplate: initialData.claimTemplate ?? '',
 		stewards: initialData.stewards ?? [],
 		resultDescriptions: initialData.resultDescriptions ?? [],
@@ -505,6 +510,7 @@
 							<span class="inline">{m.quick_safe_deer_reviewspec()}</span>
 							<AchievementSelect
 								badgeId={formData.reviewRequires}
+								allowSelf
 								onunselected={() => {
 									if (formData.reviewableSelectedOption == 'badge') {
 										// only unselect if something a badge selected
@@ -649,6 +655,7 @@
 							<span class="inline">{m.warm_tangy_deer_holders()}</span>
 							<AchievementSelect
 								badgeId={formData.capabilities_inviteRequires}
+								allowSelf
 								onunselected={() => {
 									formData.inviteSelectedOption = 'none';
 									formData.capabilities_inviteRequires = null;

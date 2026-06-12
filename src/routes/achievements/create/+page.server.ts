@@ -7,7 +7,11 @@ import { ValidationError } from 'yup';
 
 import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
-import { achievementFormSchema } from '$lib/data/achievementForm';
+import {
+	achievementFormSchema,
+	resolveSelfRequirement,
+	SELF_REQUIREMENT
+} from '$lib/data/achievementForm';
 import type { Alignment } from '$lib/data/alignment';
 import { diffAndApplyRubric, parseRubricFromFormData } from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
@@ -155,7 +159,10 @@ export const actions: Actions = {
 			if (err instanceof ValidationError) error(400, err.message);
 		}
 
-		if (formData.capabilities_inviteRequires) {
+		if (
+			formData.capabilities_inviteRequires &&
+			formData.capabilities_inviteRequires !== SELF_REQUIREMENT
+		) {
 			try {
 				await getAchievement(formData.capabilities_inviteRequires, locals.org.id);
 			} catch {
@@ -200,34 +207,39 @@ export const actions: Actions = {
 			id: newIdentifier,
 			identifier: `urn:uuid:${newIdentifier}`,
 			name: formData.name,
-			organization: { connect: { id: locals.org.id } },
+			// Scalar FKs (unchecked input) so the "This badge" review requirement can be a
+			// self-reference at create time — the row does not exist yet, so a nested
+			// `connect` is impossible, but a self-referencing FK is valid within a single-row
+			// INSERT. `resolveSelfRequirement` maps the 'self' sentinel to the new id.
+			organizationId: locals.org.id,
 			description: formData.description,
 			criteriaId: formData.criteriaId,
 			criteriaNarrative: formData.criteriaNarrative,
 			image: imageKey,
 			claimable: formData.claimable == 'on',
-			claimRequires:
-				formData.claimable == 'on' && formData.claimRequires
-					? { connect: { id: formData.claimRequires } }
-					: undefined,
-			reviewRequires: formData.reviewRequires
-				? { connect: { id: formData.reviewRequires } }
-				: undefined,
+			claimRequiresId:
+				formData.claimable == 'on' && formData.claimRequires ? formData.claimRequires : undefined,
+			reviewRequiresId: resolveSelfRequirement(formData.reviewRequires, newIdentifier) ?? undefined,
 			json: {
 				...(formData.alignments.length > 0 ? { alignment: formData.alignments } : {}),
 				capabilities: {
-					inviteRequires: formData.capabilities_inviteRequires
+					inviteRequires: resolveSelfRequirement(
+						formData.capabilities_inviteRequires,
+						newIdentifier
+					)
 				},
 				claimTemplate: formData.claimTemplate,
 				reviewsRequired,
 				...(stewards ? { stewards } : {}),
 				...(resultDescriptions.length ? { resultDescriptions } : {})
 			} as unknown as Prisma.InputJsonObject,
-			category:
-				formData.category != 'uncategorized' ? { connect: { id: formData.category } } : undefined
+			categoryId: formData.category != 'uncategorized' ? formData.category : undefined
 		};
 
-		if (formData.capabilities_inviteRequires) {
+		if (
+			formData.capabilities_inviteRequires &&
+			formData.capabilities_inviteRequires !== SELF_REQUIREMENT
+		) {
 			const inviteRequiresAchievement = await prisma.achievement.findFirst({
 				where: {
 					organizationId: locals.org.id,

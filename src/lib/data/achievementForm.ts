@@ -6,6 +6,21 @@ import { alignmentsArraySchema } from './alignment';
 
 const emptyNulled = (value: string | null) => (value === '' ? null : value);
 
+// "This badge" sentinel: the form submits this literal for a review/invite requirement
+// that targets the badge being created/edited; the server resolves it to the badge's
+// own id (the new UUID at create, `params.id` at edit). See the
+// 2026-06-11-this-badge-requirement-option plan.
+export const SELF_REQUIREMENT = 'self';
+
+/** Resolve the "this badge" sentinel to the achievement's own id; passthrough otherwise. */
+export const resolveSelfRequirement = (
+	value: string | null | undefined,
+	selfId: string
+): string | null => {
+	if (!value) return null;
+	return value === SELF_REQUIREMENT ? selfId : value;
+};
+
 export const achievementFormSchema = yup
 	.object()
 	.shape({
@@ -22,7 +37,15 @@ export const achievementFormSchema = yup
 		reviewableSelectedOption: yup.string().oneOf(['none', 'admin', 'badge']),
 		inviteSelectedOption: yup.string().oneOf(['none', 'badge']),
 
-		capabilities_inviteRequires: yup.string().nullable().transform(emptyNulled).uuid(),
+		capabilities_inviteRequires: yup
+			.string()
+			.nullable()
+			.transform(emptyNulled)
+			.test(
+				'uuid-or-self',
+				'capabilities_inviteRequires must be a UUID or the "self" sentinel',
+				(v) => v == null || v === SELF_REQUIREMENT || yup.string().uuid().isValidSync(v)
+			),
 
 		alignments: alignmentsArraySchema.optional().default([])
 	})
