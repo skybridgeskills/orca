@@ -14,11 +14,11 @@
 </script>
 
 {#if claimData.narrative}
-	<p class="my-2 text-gray-500 dark:text-gray-400">
+	<div class="my-2 text-gray-500 dark:text-gray-400">
 		<span class="font-bold">{m.fancy_flat_kite_relish()}</span>: <MarkdownRender
 			value={claimData.narrative}
 		/>
-	</p>
+	</div>
 {/if}
 {#if claimData.id}
 	<p class="my-2 text-gray-500 dark:text-gray-400">

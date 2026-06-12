@@ -68,9 +68,9 @@
 				<p class="font-bold max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 					{m.fancy_flat_kite_relish()}:
 				</p>
-				<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
+				<div class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 					<MarkdownRender value={endorsementJson.narrative} />
-				</p>
+				</div>
 			{/if}
 			{#if endorsementJson?.id}
 				<p>

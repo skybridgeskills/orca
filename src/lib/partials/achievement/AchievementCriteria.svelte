@@ -25,7 +25,7 @@
 {/if}
 
 {#if achievement.criteriaNarrative}
-	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
+	<div class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
 		<MarkdownRender value={achievement.criteriaNarrative} />
-	</p>
+	</div>
 {/if}

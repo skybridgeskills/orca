@@ -97,9 +97,9 @@
 					<p class="font-bold max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 						{m.fancy_flat_kite_relish()}:
 					</p>
-					<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
+					<div class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 						<MarkdownRender value={endorsementJson.narrative} />
-					</p>
+					</div>
 				{/if}
 				{#if endorsementJson?.id}
 					<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
@@ -160,9 +160,9 @@
 					>{m.patchy_crazy_marten_march()}</label
 				>
 				{#if data.achievement.criteriaNarrative}
-					<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
+					<div class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 						<MarkdownRender value={data.achievement.criteriaNarrative} />
-					</p>
+					</div>
 				{/if}
 				<textarea
 					id="narrative"

@@ -172,13 +172,13 @@
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>{m.patchy_crazy_marten_march()}</label
 			>
-			<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
+			<div class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 				{#if achievement.criteriaNarrative}
 					<MarkdownRender value={achievement.criteriaNarrative} />
 				{:else}
 					{m.bright_swift_eagle_narrinst()}
 				{/if}
-			</p>
+			</div>
 			<MarkdownEditor bind:value={$claimNarrative} inputName="narrative" />
 		</div>
 		<div class="mb-6">
