@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '$lib/../prisma/client';
 import { sendUserMessage } from '$lib/server/messaging/sendUserMessage';
 
-
 import { isStewardUser, notifyStewardsForReview, stewardIdsFor } from './stewards';
 
 vi.mock('$lib/../prisma/client', () => ({ prisma: { user: { findMany: vi.fn() } } }));

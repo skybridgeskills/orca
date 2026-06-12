@@ -3,6 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import { getValidUserClaim } from '$lib/data/achievementClaim';
+import { buildResults, getRubricForReview } from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
 import { isStewardUser } from '$lib/server/stewards';
 import stripTags from '$lib/utils/stripTags';
@@ -39,14 +40,8 @@ export const actions: Actions = {
 		}
 
 		const requestData = await request.formData();
-		const data = {
-			organization: { connect: { id: locals.org.id } },
-
-			json: JSON.stringify({
-				id: stripTags(requestData.get('evidenceUrl')?.toString()),
-				narrative: stripTags(requestData.get('narrative')?.toString())
-			} as App.EvidenceItem)
-		};
+		const evidenceUrl = stripTags(requestData.get('evidenceUrl')?.toString());
+		const narrative = stripTags(requestData.get('narrative')?.toString());
 
 		const claim = await prisma.achievementClaim.findUniqueOrThrow({
 			where: { id: params.claimId },
@@ -64,6 +59,21 @@ export const actions: Actions = {
 		const inviteeEmail = claim.user.identifiers.filter((i) => i.type == 'EMAIL')[0]?.identifier;
 		if (!inviteeEmail) error(400, m.curly_tired_guppy_link());
 
+		// Rubric: record the reviewer's per-criterion picks (self-describing Results).
+		// Pre-filter to allowed values so buildResults never throws on a tampered request.
+		const rubric = getRubricForReview(claim.achievement.json);
+		const picks: Record<string, string> = {};
+		for (const rd of rubric) {
+			const value = requestData.get(`result[${rd.id}]`)?.toString();
+			if (value && rd.allowedValue.includes(value)) picks[rd.id] = value;
+		}
+		const results = buildResults(picks, rubric);
+		const endorsementJson = JSON.stringify({
+			id: evidenceUrl,
+			narrative,
+			...(results.length ? { results } : {})
+		} as App.EvidenceItem);
+
 		const created = true;
 		// If there is a member, ensure that there is an AchievementClaim
 		const endorsement = await prisma.claimEndorsement.upsert({
@@ -80,10 +90,10 @@ export const actions: Actions = {
 				organization: { connect: { id: locals.org.id } },
 				achievement: { connect: { id: claim.achievementId } },
 				creator: { connect: { id: locals.session.user.id } },
-				json: data.json
+				json: endorsementJson
 			},
 			update: {
-				json: data.json,
+				json: endorsementJson,
 				claim: { connect: { id: claim.id } }
 			}
 		});

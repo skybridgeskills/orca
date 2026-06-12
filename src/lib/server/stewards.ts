@@ -4,7 +4,6 @@ import { prisma } from '$lib/../prisma/client';
 import * as m from '$lib/i18n/messages';
 import { sendUserMessage } from '$lib/server/messaging/sendUserMessage';
 
-
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 // Stewards are an additive overlay stored in `Achievement.json.stewards` (user IDs).

@@ -9,6 +9,7 @@ import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
 import { achievementFormSchema } from '$lib/data/achievementForm';
 import type { Alignment } from '$lib/data/alignment';
+import { diffAndApplyRubric, parseRubricFromFormData } from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
 import { getUploadUrl } from '$lib/server/media';
 import { canEditAchievements } from '$lib/server/permissions';
@@ -186,6 +187,15 @@ export const actions: Actions = {
 				? stewardMembers.map((u) => u.id)
 				: undefined;
 
+		// Rubric: parse the submitted result descriptions and mint ids (no existing
+		// rubric on create).
+		const submittedRubric = parseRubricFromFormData(requestData).map((rd) => ({
+			...rd,
+			name: stripTags(rd.name),
+			allowedValue: rd.allowedValue.map((v) => stripTags(v))
+		}));
+		const resultDescriptions = diffAndApplyRubric(submittedRubric, []);
+
 		const achievementData = {
 			id: newIdentifier,
 			identifier: `urn:uuid:${newIdentifier}`,
@@ -210,7 +220,8 @@ export const actions: Actions = {
 				},
 				claimTemplate: formData.claimTemplate,
 				reviewsRequired,
-				...(stewards ? { stewards } : {})
+				...(stewards ? { stewards } : {}),
+				...(resultDescriptions.length ? { resultDescriptions } : {})
 			} as unknown as Prisma.InputJsonObject,
 			category:
 				formData.category != 'uncategorized' ? { connect: { id: formData.category } } : undefined

@@ -6,6 +6,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
+import { resultsFromEndorsementJson, reviewIsCurrent } from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
 import { notifyStewardsForReview, stewardIdsFor } from '$lib/server/stewards';
 import { isVisibility } from '$lib/server/visibility';
@@ -131,10 +132,16 @@ export const actions = {
 				return { id: ee.id };
 			});
 
-		// Steward overlay: a prior endorsement by a current steward validates the claim
-		// immediately, regardless of the base review rule.
+		// Rubric: when the achievement has a rubric, only endorsements whose review is
+		// current count toward validity (no-op for no-rubric / narrative-only reviews).
+		const currentEndorsements = existingEndorsements.filter((ee) =>
+			reviewIsCurrent(resultsFromEndorsementJson(ee.json), achievement.json)
+		);
+
+		// Steward overlay: a prior (current) endorsement by a current steward validates
+		// the claim immediately, regardless of the base review rule.
 		const stewards = stewardIdsFor(achievement);
-		const stewardEndorsed = existingEndorsements.some(
+		const stewardEndorsed = currentEndorsements.some(
 			(ee) => ee.creatorId && stewards.includes(ee.creatorId)
 		);
 
@@ -145,7 +152,7 @@ export const actions = {
 				where: {
 					AND: {
 						userId: {
-							in: existingEndorsements
+							in: currentEndorsements
 								.map((ee) => (ee.creatorId !== null ? [ee.creatorId] : []))
 								.flat(1)
 						},
@@ -239,12 +246,15 @@ export const actions = {
 			const achievement = await getAchievement(params.id, locals.org.id);
 			const stewards = stewardIdsFor(achievement);
 			if (!validFrom) {
-				// Steward overlay: a prior endorsement by a current steward validates now.
-				const stewardEndorsed =
-					stewards.length > 0 &&
-					(await prisma.claimEndorsement.count({
-						where: { claimId: existingClaim.id, creatorId: { in: stewards } }
-					})) > 0;
+				// Steward overlay: a prior *current* endorsement by a current steward validates now.
+				const stewardEndorsements = stewards.length
+					? await prisma.claimEndorsement.findMany({
+							where: { claimId: existingClaim.id, creatorId: { in: stewards } }
+						})
+					: [];
+				const stewardEndorsed = stewardEndorsements.some((ee) =>
+					reviewIsCurrent(resultsFromEndorsementJson(ee.json), achievement.json)
+				);
 				if (stewardEndorsed) {
 					validFrom = new Date();
 				} else if (achievement.reviewRequiresId) {

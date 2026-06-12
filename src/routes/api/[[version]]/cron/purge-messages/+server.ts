@@ -3,11 +3,9 @@ import { error, json } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import { MESSAGE_RETENTION_MS } from '$lib/server/messaging/constants';
 
-
 import type { RequestHandler } from './$types';
 
 import { env } from '$env/dynamic/private';
-
 
 // Guarded message garbage-collection endpoint. Deletes `Message` rows older than the
 // 30-day retention window. Intended to be called on a schedule (e.g. Vercel Cron)

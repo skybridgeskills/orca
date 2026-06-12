@@ -441,5 +441,15 @@
 	"bright_calm_heron_await": "Demande en attente d'examen",
 	"gentle_eager_finch_notify": "La demande d'un membre pour {achievementName} est en attente d'examen. En tant que référent, vous pouvez l'approuver directement.",
 	"quick_warm_robin_open": "Examiner la demande",
-	"merry_bold_swan_notify": "Recevoir des notifications par e-mail"
+	"merry_bold_swan_notify": "Recevoir des notifications par e-mail",
+	"fancy_lush_owl_rubric": "Grille d'évaluation",
+	"proud_clear_swan_rubricdesc": "Définissez ce que les évaluateurs évaluent. Chaque critère propose un ensemble de valeurs autorisées (de la plus basse à la plus haute). Laissez vide pour utiliser Réussite/Échec par défaut.",
+	"lucky_warm_dove_rubricempty": "Aucun critère pour le moment — les évaluateurs utiliseront Réussite/Échec par défaut.",
+	"keen_brave_hawk_rubricadd": "Ajouter un critère",
+	"plain_jolly_wren_count": "Critère {number}",
+	"tidy_swift_lark_name": "Nom du critère",
+	"mellow_keen_vole_scale": "Valeurs autorisées (de la plus basse à la plus haute)",
+	"brisk_fair_moth_add": "Ajouter une valeur",
+	"pure_lush_wren_assess": "Évaluation",
+	"dizzy_keen_owl_stale": "Plus à jour"
 }

@@ -30,6 +30,11 @@
 		capabilities_inviteRequires: data.achievement.json?.capabilities?.inviteRequires || '',
 		claimTemplate: data.achievement.json?.claimTemplate || '',
 		stewards: data.achievement.json?.stewards ?? [],
+		resultDescriptions: (data.achievement.json?.resultDescriptions ?? []).map((rd) => ({
+			id: rd.id,
+			name: rd.name,
+			allowedValue: rd.allowedValue
+		})),
 		alignments: alignmentsFromJson(data.achievement.json)
 	});
 

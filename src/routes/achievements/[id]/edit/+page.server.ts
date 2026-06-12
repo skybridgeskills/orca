@@ -6,6 +6,11 @@ import { ValidationError } from 'yup';
 import { getAchievement } from '$lib/data/achievement';
 import { achievementFormSchema } from '$lib/data/achievementForm';
 import type { Alignment } from '$lib/data/alignment';
+import {
+	diffAndApplyRubric,
+	getCurrentResultDescriptions,
+	parseRubricFromFormData
+} from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
 import { getUploadUrl } from '$lib/server/media';
 import { canEditAchievements } from '$lib/server/permissions';
@@ -218,6 +223,18 @@ export const actions: Actions = {
 				? stewardMembers.map((u) => u.id)
 				: undefined;
 
+		// Rubric: diff the submitted result descriptions against the existing rubric
+		// (keep id when unchanged, re-mint on content change, drop removed rows).
+		const submittedRubric = parseRubricFromFormData(requestData).map((rd) => ({
+			...rd,
+			name: stripTags(rd.name),
+			allowedValue: rd.allowedValue.map((v) => stripTags(v))
+		}));
+		const resultDescriptions = diffAndApplyRubric(
+			submittedRubric,
+			getCurrentResultDescriptions(achievementJsonBaseline)
+		);
+
 		try {
 			await achievementFormSchema.validate(formData);
 		} catch (err) {
@@ -245,6 +262,11 @@ export const actions: Actions = {
 			mergedAchievementJson.stewards = stewards;
 		} else {
 			delete mergedAchievementJson.stewards;
+		}
+		if (resultDescriptions.length) {
+			mergedAchievementJson.resultDescriptions = resultDescriptions;
+		} else {
+			delete mergedAchievementJson.resultDescriptions;
 		}
 
 		const achievementData = {

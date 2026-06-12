@@ -49,9 +49,11 @@ A badge template that can be claimed or awarded.
 - `json`: JSON field for additional metadata, including `alignment`,
   `reviewsRequired` (number of reviews needed, 0-5),
   `capabilities.inviteRequires` (achievement that gates who may invite),
-  `claimTemplate`, and `stewards` (array of user IDs who can approve a claim
+  `claimTemplate`, `stewards` (array of user IDs who can approve a claim
   directly — an additive overlay on any review rule; see ADR
-  `2026-06-09-steward-review-and-messaging`)
+  `2026-06-09-steward-review-and-messaging`), and `resultDescriptions` (the current
+  review rubric — OB3 `ResultDescription`s; see ADR
+  `2026-06-09-achievement-rubrics-results`)
 
 **Unique constraint**: `(organizationId, identifier)` - ensures achievements are unique within an org.
 

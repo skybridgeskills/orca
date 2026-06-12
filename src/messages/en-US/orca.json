@@ -441,5 +441,15 @@
 	"bright_calm_heron_await": "Claim awaiting review",
 	"gentle_eager_finch_notify": "A member's claim for {achievementName} is awaiting review. As a steward, you can approve it directly.",
 	"quick_warm_robin_open": "Review claim",
-	"merry_bold_swan_notify": "Receive email notifications"
+	"merry_bold_swan_notify": "Receive email notifications",
+	"fancy_lush_owl_rubric": "Review rubric",
+	"proud_clear_swan_rubricdesc": "Define what reviewers assess. Each criterion offers a set of allowed values (low to high). Leave empty to use a default Pass/Fail.",
+	"lucky_warm_dove_rubricempty": "No criteria yet — reviewers will use a default Pass/Fail.",
+	"keen_brave_hawk_rubricadd": "Add criterion",
+	"plain_jolly_wren_count": "Criterion {number}",
+	"tidy_swift_lark_name": "Criterion name",
+	"mellow_keen_vole_scale": "Allowed values (low to high)",
+	"brisk_fair_moth_add": "Add value",
+	"pure_lush_wren_assess": "Assessment",
+	"dizzy_keen_owl_stale": "Not current"
 }

@@ -13,6 +13,8 @@
 
 	type EndorsementTableData = ClaimEndorsement & {
 		creator: User | null;
+		results?: App.Result[];
+		current?: boolean;
 	};
 
 	const claimId = getContext('claimId');
@@ -75,6 +77,24 @@
 				</ActionHeading>
 
 				<EvidenceItem item={evidenceItem(endorsement)} />
+
+				{#if endorsement.results?.length}
+					<div class="mt-2 text-sm text-gray-700 dark:text-gray-400">
+						{#each endorsement.results as result (result.resultDescription)}
+							<span class="inline-block mr-3">
+								<span class="font-medium">{result.name}:</span>
+								{result.value}
+							</span>
+						{/each}
+						{#if endorsement.current === false}
+							<span
+								class="ml-1 inline-block rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+							>
+								{m.dizzy_keen_owl_stale()}
+							</span>
+						{/if}
+					</div>
+				{/if}
 			</Card>
 		{/each}
 	</div>

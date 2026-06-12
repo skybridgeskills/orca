@@ -286,6 +286,19 @@
 	</Heading>
 </div>
 
+{#if config?.json?.resultDescriptions?.length}
+	<div class="mt-4 max-w-2xl">
+		<h3 class="text-md font-semibold text-gray-900 dark:text-white mb-2">
+			{m.fancy_lush_owl_rubric()}
+		</h3>
+		<ul class="text-sm text-gray-700 dark:text-gray-400 space-y-1">
+			{#each config.json.resultDescriptions as rd (rd.id)}
+				<li><span class="font-medium">{rd.name}:</span> {rd.allowedValue.join(' · ')}</li>
+			{/each}
+		</ul>
+	</div>
+{/if}
+
 {#if data.org.json?.permissions?.editAchievementCapability?.requiresAchievement == data.achievement.id}
 	<div class="mt-4 max-w-2xl">
 		<p class="text-sm text-gray-500 dark:text-gray-400">

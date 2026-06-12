@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '$lib/../prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
 
-
 import { sendUserMessage, type SendUserMessageArgs } from './sendUserMessage';
 
 vi.mock('$lib/../prisma/client', () => ({

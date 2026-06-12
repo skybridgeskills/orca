@@ -441,5 +441,15 @@
 	"bright_calm_heron_await": "Richiesta in attesa di revisione",
 	"gentle_eager_finch_notify": "La richiesta di un membro per {achievementName} è in attesa di revisione. In qualità di referente, puoi approvarla direttamente.",
 	"quick_warm_robin_open": "Esamina la richiesta",
-	"merry_bold_swan_notify": "Ricevi notifiche via e-mail"
+	"merry_bold_swan_notify": "Ricevi notifiche via e-mail",
+	"fancy_lush_owl_rubric": "Griglia di valutazione",
+	"proud_clear_swan_rubricdesc": "Definisci cosa valutano i revisori. Ogni criterio offre un insieme di valori consentiti (dal più basso al più alto). Lascia vuoto per usare Promosso/Bocciato predefinito.",
+	"lucky_warm_dove_rubricempty": "Nessun criterio per ora — i revisori useranno Promosso/Bocciato predefinito.",
+	"keen_brave_hawk_rubricadd": "Aggiungi criterio",
+	"plain_jolly_wren_count": "Criterio {number}",
+	"tidy_swift_lark_name": "Nome del criterio",
+	"mellow_keen_vole_scale": "Valori consentiti (dal più basso al più alto)",
+	"brisk_fair_moth_add": "Aggiungi valore",
+	"pure_lush_wren_assess": "Valutazione",
+	"dizzy_keen_owl_stale": "Non aggiornato"
 }

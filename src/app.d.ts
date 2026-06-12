@@ -94,6 +94,28 @@ declare namespace App {
 	interface EvidenceItem {
 		id?: string;
 		narrative?: string;
+		results?: Result[]; // per-RD review picks recorded on a ClaimEndorsement
+	}
+
+	// OB3 ResultDescription (spec B.1.17) — a rubric criterion. Stored on
+	// `Achievement.json.resultDescriptions`; the current rubric only (re-minted id on
+	// content change). See ADR 2026-06-09-achievement-rubrics-results.
+	interface ResultDescription {
+		id: string; // 'urn:uuid:…' (stable; re-minted on content change)
+		type: ['ResultDescription'];
+		name: string;
+		resultType: string; // default 'Result'
+		allowedValue: string[]; // ordered low→high
+		requiredValue?: string; // optional pass threshold (recorded, not enforced)
+	}
+
+	// OB3 Result (spec B.1.16) — a reviewer's chosen value for one RD, self-describing
+	// (snapshots `name`) so a stale/retired RD still renders.
+	interface Result {
+		type: ['Result'];
+		resultDescription: string; // RD id this result is for (may be the default sentinel)
+		value: string; // chosen allowedValue
+		name: string; // RD label snapshotted at review time
 	}
 
 	// The achievement `json` blob, carrying the config fields that were flattened
@@ -108,7 +130,7 @@ declare namespace App {
 		reviewsRequired?: number;
 		alignment?: unknown[];
 		stewards?: string[]; // user IDs; validated on write, member-filtered on read
-		// resultDescriptions added by the rubrics plan (do NOT add here)
+		resultDescriptions?: ResultDescription[]; // current rubric only (rubrics plan)
 	};
 
 	type AchievementWithJson = import('@prisma/client').Achievement & {

@@ -5,7 +5,6 @@ import { sendOrcaMail } from '$lib/email/sendEmail';
 import { renderOrcaEmail } from '$lib/email/template';
 import { emailNotificationsEnabled } from '$lib/server/notificationPrefs';
 
-
 import { REVIEW_NOTIFY_THROTTLE_MS } from './constants';
 
 export interface SendUserMessageArgs {

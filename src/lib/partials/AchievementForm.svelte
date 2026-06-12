@@ -9,6 +9,7 @@
 	import AlignmentInput from '$lib/components/forms/AlignmentInput.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import RadioOption from '$lib/components/forms/RadioOption.svelte';
+	import ResultDescriptionInput from '$lib/components/forms/ResultDescriptionInput.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
 	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
@@ -45,6 +46,7 @@
 		claimTemplate?: string | null;
 		alignments?: Array<Alignment>;
 		stewards?: string[];
+		resultDescriptions?: Array<{ id?: string; name: string; allowedValue: string[] }>;
 	}
 
 	// Stewards are an additive overlay: org members who can approve a claim directly,
@@ -84,6 +86,7 @@
 		capabilities_inviteRequires: initialData.capabilities_inviteRequires ?? null,
 		claimTemplate: initialData.claimTemplate ?? '',
 		stewards: initialData.stewards ?? [],
+		resultDescriptions: initialData.resultDescriptions ?? [],
 		alignments: initialData.alignments || [],
 		// claim template toggle: enabled when there is an initial template
 		claimTemplate_enabled: !!initialData.claimTemplate,
@@ -214,6 +217,23 @@
 
 	function hasAlignments(): boolean {
 		return formData.alignments.length > 0;
+	}
+
+	function addResultDescription() {
+		formData.resultDescriptions = [
+			...formData.resultDescriptions,
+			{ name: '', allowedValue: ['', ''] }
+		];
+	}
+
+	function removeResultDescription(index: number) {
+		formData.resultDescriptions = formData.resultDescriptions.filter(
+			(_rd: { name: string }, i: number) => i !== index
+		);
+	}
+
+	function hasRubric(): boolean {
+		return formData.resultDescriptions.length > 0;
 	}
 
 	onMount(async () => {
@@ -841,6 +861,55 @@
 							value={alignment.targetCode}
 						/>
 					{/if}
+				{/each}
+			{/snippet}
+		</CollapsiblePane>
+		<CollapsiblePane title={m.fancy_lush_owl_rubric()} open={hasRubric()}>
+			<div class="flex flex-col gap-3">
+				<p class="text-sm text-gray-600 dark:text-gray-400">
+					{m.proud_clear_swan_rubricdesc()}
+				</p>
+
+				{#if formData.resultDescriptions.length === 0}
+					<p class="text-sm text-gray-500 dark:text-gray-400 italic">
+						{m.lucky_warm_dove_rubricempty()}
+					</p>
+				{:else}
+					{#each formData.resultDescriptions as resultDescription, index (index)}
+						<ResultDescriptionInput
+							{resultDescription}
+							{index}
+							onRemove={() => removeResultDescription(index)}
+						/>
+					{/each}
+				{/if}
+
+				<button
+					type="button"
+					onclick={addResultDescription}
+					class="mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
+				>
+					+ {m.keen_brave_hawk_rubricadd()}
+				</button>
+			</div>
+
+			{#snippet whenClosed()}
+				{#each formData.resultDescriptions as resultDescription, index (index)}
+					{#if resultDescription.id}
+						<input
+							type="hidden"
+							name={`resultDescription[${index}].id`}
+							value={resultDescription.id}
+						/>
+					{/if}
+					<input
+						type="hidden"
+						name={`resultDescription[${index}].name`}
+						value={resultDescription.name}
+					/>
+					{#each resultDescription.allowedValue as value, j (j)}
+						<input type="hidden" name={`resultDescription[${index}].allowedValue[${j}]`} {value} />
+					{/each}
 				{/each}
 			{/snippet}
 		</CollapsiblePane>
