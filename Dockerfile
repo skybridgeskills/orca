@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:24-alpine
 
 # Install OpenSSL for Prisma compatibility
 RUN apk add --no-cache openssl

@@ -32,7 +32,7 @@ Instructions have been developed and tested on MacOS. A development environment 
 
 Prerequisites:
 
-- Node.js (see `.nvmrc` for version, e.g. `lts/iron`). pnpm via Corepack.
+- Node.js (see `.nvmrc` for version, e.g. `24`). pnpm via Corepack.
 - A Postgres database which can be run locally on one of 2 ways:
   - Install PostgreSQL ([How to](https://www.moncefbelyamani.com/how-to-install-postgresql-on-a-mac-with-homebrew-and-lunchy/) install PostgreSQL on a Mac with Homebrew)
   - Install Docker (https://www.docker.com/products/docker-desktop/) and use the provided docker compose
@@ -135,9 +135,11 @@ GitHub Actions and the Docker image build use the default (no `VERCEL` in the en
 
 To reproduce the Vercel bundle locally: `rm -rf build .svelte-kit .vercel && VERCEL=1 pnpm run build`. A Prisma step runs after the Vite build on that path; `DATABASE_URL` and `DATABASE_URL_DIRECT` must be in the **shell environment** (not only in `.env` on disk). For example: `set -a && . ./.env && set +a` (bash) before the command, or export those variables explicitly.
 
+For production deployment to Vercel on Node 24 (runtime setup, env vars, Prisma migrations, rollback), follow the runbook in [`docs/deployment-vercel.md`](docs/deployment-vercel.md).
+
 ## Docker
 
-The image is based on `node:20-alpine` and uses `pnpm@10.29.2` (activated via Corepack inside the build) for dependency installation and the build. Build it locally from the repository root:
+The image is based on `node:24-alpine` and uses `pnpm@10.29.2` (activated via Corepack inside the build) for dependency installation and the build. Build it locally from the repository root:
 
 ```sh
 docker build -t orca:dev .

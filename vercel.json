@@ -1,0 +1,5 @@
+{
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"buildCommand": "pnpm exec prisma migrate deploy --schema src/prisma/schema.prisma && pnpm run build",
+	"installCommand": "corepack enable && pnpm install --frozen-lockfile"
+}

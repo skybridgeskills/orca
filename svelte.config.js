@@ -4,8 +4,9 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 // Vercel auto-injects VERCEL=1; every other build context (Docker,
 // local, GH Actions) falls through to adapter-node.
-// adapter-vercel only auto-maps Node 16/18/20; set runtime so `VERCEL=1` works on Node 22.
-const adapter = process.env.VERCEL ? vercelAdapter({ runtime: 'nodejs20.x' }) : nodeAdapter();
+// adapter-vercel does not infer Node 24 from project settings alone; set the
+// runtime explicitly so the `VERCEL=1` path targets nodejs24.x.
+const adapter = process.env.VERCEL ? vercelAdapter({ runtime: 'nodejs24.x' }) : nodeAdapter();
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
