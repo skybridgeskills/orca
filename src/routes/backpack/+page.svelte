@@ -50,7 +50,7 @@
 	let currentShareIntent: (AchievementClaim & { achievement: Achievement }) | null = null;
 
 	const breadcrumbItems = [
-		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: m.bold_petty_dog_march() }
 	];
 

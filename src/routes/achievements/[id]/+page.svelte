@@ -62,8 +62,8 @@
 	let showShareModal = $state(false);
 
 	const breadcrumbItems = $derived([
-		{ text: m.each_fluffy_fox_view(), href: resolve('/') },
-		{ text: m.antsy_grand_rabbit_gaze(), href: resolve('/achievements') },
+		{ text: m.each_fluffy_fox_view(), href: '/' },
+		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name }
 	]);
 
