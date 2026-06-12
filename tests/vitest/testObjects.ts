@@ -44,7 +44,8 @@ export const testUser: User = {
 	familyName: 'User',
 	orgRole: null,
 	organizationId: testOrganization.id,
-	defaultVisibility: 'PRIVATE'
+	defaultVisibility: 'PRIVATE',
+	json: {}
 };
 
 export const testUserIdentifier: Identifier = {

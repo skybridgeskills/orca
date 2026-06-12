@@ -11,8 +11,10 @@ import { error } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
+import { renderOrcaEmail } from '$lib/email/template';
 import * as m from '$lib/i18n/messages';
 import { isAdmin } from '$lib/permissions/isAdmin';
+import { notifyStewardsForReview, stewardIdsFor } from '$lib/server/stewards';
 import { validateEmailAddress } from '$lib/utils/email';
 
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
@@ -174,6 +176,18 @@ export const inviteToClaim = async ({
 			update: {}
 		});
 
+		// If the awarded claim needs review and the achievement has stewards, notify
+		// them (throttled, so repeat awards don't re-spam). Skips the claimant.
+		if (!claim.validFrom && stewardIdsFor(achievement).length) {
+			await notifyStewardsForReview({
+				achievement,
+				org,
+				achievementId,
+				claimId: claim.id,
+				claimantUserId: identifier.userId
+			});
+		}
+
 		// Ensure there is an endorsement for this claim, on behalf of this admin, if not self-awarding
 		const endorsement = isSelfClaim
 			? { id: '', claim, createdAt: new Date() }
@@ -190,16 +204,24 @@ export const inviteToClaim = async ({
 				});
 
 		// Notify user of claim
+		const badgeUrl = `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/login?e=${encodeURIComponent(
+			data.inviteeEmail
+		)}&next=${encodeURIComponent('/claims/' + claim.id)}`;
+		const awardedText = m.gentle_brave_falcon_awardeddesc({
+			achievementName: achievement.name,
+			communityName: org.name,
+			badgeUrl
+		});
 		const emailResult = await sendOrcaMail({
 			from: org.email,
 			to: data.inviteeEmail,
 			subject: m.warm_tangy_deer_awarded(),
-			text: m.gentle_brave_falcon_awardeddesc({
-				achievementName: achievement.name,
-				communityName: org.name,
-				badgeUrl: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/login?e=${encodeURIComponent(
-					data.inviteeEmail
-				)}&next=${encodeURIComponent('/claims/' + claim.id)}`
+			text: awardedText,
+			html: renderOrcaEmail({
+				org,
+				title: m.warm_tangy_deer_awarded(),
+				intro: awardedText.replace(badgeUrl, '').trim(),
+				cta: { label: m.bright_swift_eagle_login(), url: badgeUrl }
 			})
 		});
 		if (!emailResult.success) {
@@ -233,16 +255,24 @@ export const inviteToClaim = async ({
 			});
 
 		// If there isn't already a user, we'll invite them to join by email
+		const inviteLink = `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/achievements/${
+			endorsement.achievementId
+		}/claim?i=${endorsement.id}&e=${encodeURIComponent(data.inviteeEmail)}`;
+		const inviteText = m.grand_lucky_kite_climb({
+			achievementName: endorsement.achievement?.name ?? '',
+			orgName: org.name,
+			inviteLink
+		});
 		const emailResult = await sendOrcaMail({
 			from: org.email,
 			to: data.inviteeEmail,
 			subject: m.male_active_turtle_view({ orgName: org.name }),
-			text: m.grand_lucky_kite_climb({
-				achievementName: endorsement.achievement?.name ?? '',
-				orgName: org.name,
-				inviteLink: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/achievements/${
-					endorsement.achievementId
-				}/claim?i=${endorsement.id}&e=${encodeURIComponent(data.inviteeEmail)}`
+			text: inviteText,
+			html: renderOrcaEmail({
+				org,
+				title: m.male_active_turtle_view({ orgName: org.name }),
+				intro: inviteText.replace(inviteLink, '').trim(),
+				cta: { label: m.bold_swift_eagle_claim(), url: inviteLink }
 			})
 		});
 		if (!emailResult.success) {

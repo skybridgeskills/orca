@@ -432,5 +432,14 @@
 	"plush_warm_dove_calm": "Its access tokens stop working immediately.",
 	"bleak_swift_raven_purge": "Delete {appName}?",
 	"murky_lone_shark_burn": "This removes the app from your organization and its tokens stop working immediately. Its history is retained, but this can't be undone here.",
-	"mellow_brisk_otter_amend": "Change acceptance"
+	"mellow_brisk_otter_amend": "Change acceptance",
+	"brisk_mellow_otter_assign": "Stewards",
+	"swift_kind_eagle_steward": "These members can approve a claim directly, in addition to any review requirement above.",
+	"calm_proud_finch_empty": "No other members to assign yet.",
+	"gentle_warm_heron_review": "or review by a designated steward",
+	"noble_swift_otter_review": "A badge claim needs your review",
+	"bright_calm_heron_await": "Claim awaiting review",
+	"gentle_eager_finch_notify": "A member's claim for {achievementName} is awaiting review. As a steward, you can approve it directly.",
+	"quick_warm_robin_open": "Review claim",
+	"merry_bold_swan_notify": "Receive email notifications"
 }

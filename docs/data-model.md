@@ -27,6 +27,8 @@ Represents a user within an organization.
 - `givenName`, `familyName`: User's name
 - `orgRole`: Role within the org (`GENERAL_ADMIN`, `BILLING_ADMIN`, `CONTENT_ADMIN`)
 - `defaultVisibility`: Default visibility setting for user's data
+- `json`: JSON field for user preferences, including
+  `notifications.email` (email notifications on/off; default on when unset)
 
 ### Achievement
 
@@ -46,8 +48,10 @@ A badge template that can be claimed or awarded.
   hold (`reviewRequires` / `reviewEnabledBy`, relation `ReviewBadge`)
 - `json`: JSON field for additional metadata, including `alignment`,
   `reviewsRequired` (number of reviews needed, 0-5),
-  `capabilities.inviteRequires` (achievement that gates who may invite), and
-  `claimTemplate`
+  `capabilities.inviteRequires` (achievement that gates who may invite),
+  `claimTemplate`, and `stewards` (array of user IDs who can approve a claim
+  directly — an additive overlay on any review rule; see ADR
+  `2026-06-09-steward-review-and-messaging`)
 
 **Unique constraint**: `(organizationId, identifier)` - ensures achievements are unique within an org.
 
@@ -97,6 +101,22 @@ An invitation sent to an email to claim a specific achievement. Also used for cl
 - `json`: JSON field for invitation details
 
 **Unique constraint**: `(creatorId, achievementId, inviteeEmail)` - prevents duplicate invites.
+
+### Message
+
+A log of user-directed messages (e.g. steward review notifications). A row is written
+only on a successful send; used for notification throttling and 30-day retention. See
+ADR `2026-06-09-steward-review-and-messaging`.
+
+- `id`: UUID primary key
+- `organizationId`: Foreign key to Organization (required)
+- `userId`: Foreign key to User (the recipient)
+- `type`: `MessageType` enum (`REVIEW_NEEDED`)
+- `achievementId`, `claimId`: Optional loose references (no FK) for context + throttling
+- `createdAt`: Timestamp (used for the 3-day throttle window and 30-day GC)
+
+**Indexes**: `(userId, type, achievementId, createdAt)` for throttle queries;
+`(organizationId, createdAt)` for GC.
 
 ### Profile
 

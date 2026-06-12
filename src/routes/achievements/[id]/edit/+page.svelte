@@ -29,6 +29,7 @@
 		reviewRequires: data.achievement.reviewRequiresId,
 		capabilities_inviteRequires: data.achievement.json?.capabilities?.inviteRequires || '',
 		claimTemplate: data.achievement.json?.claimTemplate || '',
+		stewards: data.achievement.json?.stewards ?? [],
 		alignments: alignmentsFromJson(data.achievement.json)
 	});
 
@@ -46,4 +47,9 @@
 	{m.ok_direct_kite_gaze()}
 </p>
 
-<AchievementForm achievementId={data.achievement.id} initialData={formData} {categories} />
+<AchievementForm
+	achievementId={data.achievement.id}
+	initialData={formData}
+	{categories}
+	members={data.members}
+/>

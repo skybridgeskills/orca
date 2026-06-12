@@ -20,4 +20,4 @@
 
 <Heading title={m.wet_house_owl_cook()} description={m.funny_grand_thrush_intend()} level="h1" />
 
-<AchievementForm initialData={formData} {categories} />
+<AchievementForm initialData={formData} {categories} members={data.members} />

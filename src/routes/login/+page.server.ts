@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 
 import { prisma } from '$lib/../prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
+import { renderOrcaEmail } from '$lib/email/template';
 import * as m from '$lib/i18n/messages';
 import { INVITE_SESSION_VALIDITY_MS } from '$lib/utils/session';
 import stripTags from '$lib/utils/stripTags';
@@ -88,7 +89,12 @@ export const actions: Actions = {
 			from: locals.org.email,
 			to: email,
 			subject: m.active_antsy_panther_view({ orgName: locals.org.name }),
-			text: m.alert_soft_honeybadger_lead({ code })
+			text: m.alert_soft_honeybadger_lead({ code }),
+			html: renderOrcaEmail({
+				org: locals.org,
+				title: m.active_antsy_panther_view({ orgName: locals.org.name }),
+				intro: m.alert_soft_honeybadger_lead({ code })
+			})
 		});
 		if (!emailResult.success) {
 			error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));

@@ -7,6 +7,7 @@ import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
 import * as m from '$lib/i18n/messages';
+import { notifyStewardsForReview, stewardIdsFor } from '$lib/server/stewards';
 import { isVisibility } from '$lib/server/visibility';
 import stripTags from '$lib/utils/stripTags';
 
@@ -130,7 +131,16 @@ export const actions = {
 				return { id: ee.id };
 			});
 
-		if (achievement.reviewRequiresId) {
+		// Steward overlay: a prior endorsement by a current steward validates the claim
+		// immediately, regardless of the base review rule.
+		const stewards = stewardIdsFor(achievement);
+		const stewardEndorsed = existingEndorsements.some(
+			(ee) => ee.creatorId && stewards.includes(ee.creatorId)
+		);
+
+		if (stewardEndorsed) {
+			data.validFrom = new Date();
+		} else if (achievement.reviewRequiresId) {
 			const reviewerClaims = await prisma.achievementClaim.findMany({
 				where: {
 					AND: {
@@ -162,6 +172,19 @@ export const actions = {
 		}
 
 		const claim = await prisma.achievementClaim.create({ data });
+
+		// If the claim still needs review and the achievement has stewards, notify them.
+		const reviewRequired =
+			!!achievement.reviewRequiresId || (achievement.json?.reviewsRequired ?? 0) > 0;
+		if (!claim.validFrom && reviewRequired && stewards.length) {
+			await notifyStewardsForReview({
+				achievement,
+				org: locals.org,
+				achievementId: params.id,
+				claimId: claim.id,
+				claimantUserId: locals.session.user.id
+			});
+		}
 
 		// Get rid of any outstanding invites that were self-invites or unauthenticated
 		await prisma.claimEndorsement.deleteMany({
@@ -213,9 +236,18 @@ export const actions = {
 		if (claimStatus == 'ACCEPTED') {
 			// Update validFrom if needed, based on the achievement's review rules and existing endorsements.
 			let { validFrom } = existingClaim;
+			const achievement = await getAchievement(params.id, locals.org.id);
+			const stewards = stewardIdsFor(achievement);
 			if (!validFrom) {
-				const achievement = await getAchievement(params.id, locals.org.id);
-				if (achievement.reviewRequiresId) {
+				// Steward overlay: a prior endorsement by a current steward validates now.
+				const stewardEndorsed =
+					stewards.length > 0 &&
+					(await prisma.claimEndorsement.count({
+						where: { claimId: existingClaim.id, creatorId: { in: stewards } }
+					})) > 0;
+				if (stewardEndorsed) {
+					validFrom = new Date();
+				} else if (achievement.reviewRequiresId) {
 					// If review is required, we find some reviews and check if they are enough.
 					const numReviewsRequired = achievement.json?.reviewsRequired ?? 1;
 					const reviewerClaims = await prisma.achievementClaim.findMany({
@@ -259,6 +291,19 @@ export const actions = {
 					)
 				}
 			});
+
+			// If the re-accepted claim still needs review and has stewards, notify them.
+			const reviewRequired =
+				!!achievement.reviewRequiresId || (achievement.json?.reviewsRequired ?? 0) > 0;
+			if (!validFrom && reviewRequired && stewards.length) {
+				await notifyStewardsForReview({
+					achievement,
+					org: locals.org,
+					achievementId: params.id,
+					claimId: existingClaim.id,
+					claimantUserId: locals.session.user.id
+				});
+			}
 		} else if (claimStatus == 'REJECTED') {
 			// just update claim status, don't override json
 			updatedClaim = await prisma.achievementClaim.update({

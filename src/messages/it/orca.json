@@ -432,5 +432,14 @@
 	"plush_warm_dove_calm": "I suoi token di accesso smettono di funzionare immediatamente.",
 	"bleak_swift_raven_purge": "Eliminare {appName}?",
 	"murky_lone_shark_burn": "Questo rimuove l'app dalla tua organizzazione e i suoi token smettono di funzionare immediatamente. La cronologia viene conservata, ma l'operazione non può essere annullata qui.",
-	"mellow_brisk_otter_amend": "Modifica accettazione"
+	"mellow_brisk_otter_amend": "Modifica accettazione",
+	"brisk_mellow_otter_assign": "Referenti",
+	"swift_kind_eagle_steward": "Questi membri possono approvare una richiesta direttamente, oltre a qualsiasi requisito di revisione sopra.",
+	"calm_proud_finch_empty": "Nessun altro membro da assegnare per ora.",
+	"gentle_warm_heron_review": "o revisione da parte di un referente designato",
+	"noble_swift_otter_review": "Una richiesta di badge necessita della tua revisione",
+	"bright_calm_heron_await": "Richiesta in attesa di revisione",
+	"gentle_eager_finch_notify": "La richiesta di un membro per {achievementName} è in attesa di revisione. In qualità di referente, puoi approvarla direttamente.",
+	"quick_warm_robin_open": "Esamina la richiesta",
+	"merry_bold_swan_notify": "Ricevi notifiche via e-mail"
 }

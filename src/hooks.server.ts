@@ -63,7 +63,8 @@ const getSession = async function (sessionId: string, orgId: string) {
 					organizationId: true,
 					orgRole: true,
 					identifiers: true,
-					defaultVisibility: true
+					defaultVisibility: true,
+					json: true
 				}
 			}
 		}

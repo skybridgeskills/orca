@@ -88,10 +88,17 @@ export const load = async ({ locals, params }) => {
 		}
 	});
 
+	const members = await prisma.user.findMany({
+		where: { organizationId: locals.org.id },
+		select: { id: true, givenName: true, familyName: true },
+		orderBy: [{ familyName: 'asc' }, { givenName: 'asc' }]
+	});
+
 	return {
 		organization: locals.org,
 		achievement: achievement,
-		categories: categories
+		categories: categories,
+		members
 	};
 };
 
@@ -195,6 +202,22 @@ export const actions: Actions = {
 		const reviewsRequired =
 			formData.reviewableSelectedOption == 'admin' ? 1 : formData.reviewsRequired;
 
+		// Stewards (additive overlay): persisted only when review is required, filtered
+		// to current org members (non-member IDs from a tampered request are dropped).
+		const requestedStewards = [
+			...new Set(requestData.getAll('stewards').map(String).filter(Boolean))
+		];
+		const stewardMembers = requestedStewards.length
+			? await prisma.user.findMany({
+					where: { organizationId: locals.org.id, id: { in: requestedStewards } },
+					select: { id: true }
+				})
+			: [];
+		const stewards =
+			formData.reviewableSelectedOption !== 'none' && stewardMembers.length
+				? stewardMembers.map((u) => u.id)
+				: undefined;
+
 		try {
 			await achievementFormSchema.validate(formData);
 		} catch (err) {
@@ -218,6 +241,11 @@ export const actions: Actions = {
 		};
 		mergedAchievementJson.claimTemplate = claimTemplate;
 		mergedAchievementJson.reviewsRequired = reviewsRequired;
+		if (stewards) {
+			mergedAchievementJson.stewards = stewards;
+		} else {
+			delete mergedAchievementJson.stewards;
+		}
 
 		const achievementData = {
 			name: formData.name,

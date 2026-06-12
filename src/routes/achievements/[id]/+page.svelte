@@ -280,6 +280,9 @@
 		{:else}
 			{m.gentle_brave_falcon_noreviews()}
 		{/if}
+		{#if config?.json?.stewards?.length}
+			&nbsp;{m.gentle_warm_heron_review()}
+		{/if}
 	</Heading>
 </div>
 

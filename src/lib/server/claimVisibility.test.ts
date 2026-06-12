@@ -23,7 +23,8 @@ const session = (
 			organizationId: 'org-1',
 			orgRole: orgRole ?? null,
 			identifiers: [],
-			defaultVisibility: 'COMMUNITY'
+			defaultVisibility: 'COMMUNITY',
+			json: {}
 		}
 	} as App.SessionData;
 };

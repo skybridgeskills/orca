@@ -84,9 +84,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	});
 
+	const members = await prisma.user.findMany({
+		where: { organizationId: locals.org.id },
+		select: { id: true, givenName: true, familyName: true },
+		orderBy: [{ familyName: 'asc' }, { givenName: 'asc' }]
+	});
+
 	return {
 		organization: locals.org,
-		categories: categories
+		categories: categories,
+		members
 	};
 };
 
@@ -162,6 +169,23 @@ export const actions: Actions = {
 		const reviewsRequired =
 			formData.reviewableSelectedOption == 'admin' ? 1 : formData.reviewsRequired;
 
+		// Stewards (additive overlay): persisted only when review is required, and
+		// filtered to current org members (non-member IDs from a tampered request are
+		// dropped). Does not affect reviewsRequired / reviewRequires.
+		const requestedStewards = [
+			...new Set(requestData.getAll('stewards').map(String).filter(Boolean))
+		];
+		const stewardMembers = requestedStewards.length
+			? await prisma.user.findMany({
+					where: { organizationId: locals.org.id, id: { in: requestedStewards } },
+					select: { id: true }
+				})
+			: [];
+		const stewards =
+			formData.reviewableSelectedOption !== 'none' && stewardMembers.length
+				? stewardMembers.map((u) => u.id)
+				: undefined;
+
 		const achievementData = {
 			id: newIdentifier,
 			identifier: `urn:uuid:${newIdentifier}`,
@@ -185,7 +209,8 @@ export const actions: Actions = {
 					inviteRequires: formData.capabilities_inviteRequires
 				},
 				claimTemplate: formData.claimTemplate,
-				reviewsRequired
+				reviewsRequired,
+				...(stewards ? { stewards } : {})
 			} as unknown as Prisma.InputJsonObject,
 			category:
 				formData.category != 'uncategorized' ? { connect: { id: formData.category } } : undefined

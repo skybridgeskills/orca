@@ -14,7 +14,15 @@ declare namespace App {
 		orgRole: string?;
 		identifiers: import('@prisma/client').Identifier[];
 		defaultVisibility: import('@prisma/client').Visibility;
+		json: import('@prisma/client').Prisma.JsonValue;
 	}
+
+	// User `json` blob. Notification prefs default to email-on when unset (P6 toggle).
+	type UserConfig = import('@prisma/client').Prisma.JsonObject & {
+		notifications?: {
+			email?: boolean; // default true when unset
+		};
+	};
 
 	interface SessionData {
 		id: string;
@@ -99,6 +107,7 @@ declare namespace App {
 		claimTemplate?: string;
 		reviewsRequired?: number;
 		alignment?: unknown[];
+		stewards?: string[]; // user IDs; validated on write, member-filtered on read
 		// resultDescriptions added by the rubrics plan (do NOT add here)
 	};
 

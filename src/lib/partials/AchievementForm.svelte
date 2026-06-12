@@ -44,15 +44,28 @@
 		capabilities_inviteRequires?: string | null;
 		claimTemplate?: string | null;
 		alignments?: Array<Alignment>;
+		stewards?: string[];
+	}
+
+	// Stewards are an additive overlay: org members who can approve a claim directly,
+	// shown alongside any review requirement (not a separate review type).
+	interface Member {
+		id: string;
+		givenName: string | null;
+		familyName: string | null;
 	}
 
 	interface Props {
 		categories: Array<AchievementCategory>;
 		initialData: InitialData;
 		achievementId?: string;
+		members?: Array<Member>;
 	}
 
-	let { categories, initialData, achievementId = '' }: Props = $props();
+	let { categories, initialData, achievementId = '', members = [] }: Props = $props();
+
+	const stewardName = (member: Member): string =>
+		`${member.givenName ?? ''} ${member.familyName ?? ''}`.trim() || member.id;
 
 	// Seed the form once from `initialData`. Reading the prop inside this closure
 	// (rather than directly at the `$state(...)` declaration) keeps the form's
@@ -70,6 +83,7 @@
 		inviteRequires: initialData.inviteRequires ?? null,
 		capabilities_inviteRequires: initialData.capabilities_inviteRequires ?? null,
 		claimTemplate: initialData.claimTemplate ?? '',
+		stewards: initialData.stewards ?? [],
 		alignments: initialData.alignments || [],
 		// claim template toggle: enabled when there is an initial template
 		claimTemplate_enabled: !!initialData.claimTemplate,
@@ -548,6 +562,49 @@
 							</p>
 						{/if}
 					</div>
+
+					<!-- Stewards: additive overlay shown whenever review is required. A
+						 steward (like an admin) can approve a claim directly. -->
+					{#if formData.reviewableSelectedOption != 'none'}
+						<div class="mt-4">
+							<FormFieldLabel for="achievementEdit_stewards">
+								{m.brisk_mellow_otter_assign()}
+							</FormFieldLabel>
+							<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+								{m.swift_kind_eagle_steward()}
+							</p>
+							{#if members.length === 0}
+								<p class="text-sm text-gray-500 dark:text-gray-400">
+									{m.calm_proud_finch_empty()}
+								</p>
+							{:else}
+								<div
+									id="achievementEdit_stewards"
+									class="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-gray-300 p-2 dark:border-gray-600"
+								>
+									{#each members as member (member.id)}
+										<label class="flex items-center gap-2 text-sm text-gray-900 dark:text-white">
+											<input
+												type="checkbox"
+												name="stewards"
+												value={member.id}
+												checked={formData.stewards.includes(member.id)}
+												onchange={(e) => {
+													if (e.currentTarget.checked) {
+														if (!formData.stewards.includes(member.id))
+															formData.stewards = [...formData.stewards, member.id];
+													} else {
+														formData.stewards = formData.stewards.filter((s) => s !== member.id);
+													}
+												}}
+											/>
+											<span>{stewardName(member)}</span>
+										</label>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{/if}
 				</div>
 
 				<!-- Invite Settings -->

@@ -25,7 +25,8 @@
 		"createAdmin": "pnpm exec tsx src/scripts/createAdmin.ts",
 		"createOrganization": "pnpm exec tsx src/scripts/createOrganization.ts",
 		"createKeypair": "node src/scripts/createKeypair",
-		"createS3BucketLocalStack": "pnpm exec tsx src/scripts/createS3BucketLocalStack.ts"
+		"createS3BucketLocalStack": "pnpm exec tsx src/scripts/createS3BucketLocalStack.ts",
+		"purgeMessages": "pnpm exec tsx src/scripts/purgeMessages.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",

@@ -17,7 +17,8 @@
 		familyName: data.session?.user?.familyName ?? '',
 		identifierVisibility:
 			data.session?.user?.identifiers.find(() => true)?.visibility ?? 'COMMUNITY',
-		defaultVisibility: data.session?.user?.defaultVisibility ?? 'COMMUNITY'
+		defaultVisibility: data.session?.user?.defaultVisibility ?? 'COMMUNITY',
+		emailNotifications: data.emailNotifications ?? true
 	};
 </script>
 
@@ -130,6 +131,17 @@
 				<option value="PRIVATE">{m.pink_last_marten_grin()}</option>
 			</select>
 			{#if errors.name}<p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.name}</p>{/if}
+		</div>
+
+		<div class="mb-6">
+			<label class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+				<input
+					type="checkbox"
+					name="emailNotifications"
+					bind:checked={formData.emailNotifications}
+				/>
+				{m.merry_bold_swan_notify()}
+			</label>
 		</div>
 
 		<Button buttonType="submit" submodule="primary">{m.quick_safe_deer_save()}</Button>

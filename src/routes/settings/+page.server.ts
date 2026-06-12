@@ -2,6 +2,7 @@ import type { Visibility } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 
 import * as m from '$lib/i18n/messages';
+import { emailNotificationsEnabled, setEmailNotifications } from '$lib/server/notificationPrefs';
 import { isVisibility } from '$lib/server/visibility';
 
 import { prisma } from '../../prisma/client';
@@ -11,6 +12,7 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
 	if (!locals.session?.user?.id) redirect(302, `/`);
+	return { emailNotifications: emailNotificationsEnabled(locals.session.user.json) };
 };
 
 export const actions: Actions = {
@@ -29,12 +31,18 @@ export const actions: Actions = {
 			? identifierVisibilityRaw
 			: 'COMMUNITY';
 
+		// Email notification preference (default on); merge into User.json, preserving
+		// any other keys.
+		const emailNotifications = requestData.get('emailNotifications') === 'on';
+		const json = setEmailNotifications(locals.session.user.json, emailNotifications);
+
 		const user = await prisma.user.update({
 			where: { id: locals.session.user.id },
 			data: {
 				givenName,
 				familyName,
-				defaultVisibility
+				defaultVisibility,
+				json
 			},
 			include: {
 				identifiers: true

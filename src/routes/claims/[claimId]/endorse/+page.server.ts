@@ -4,6 +4,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import { getValidUserClaim } from '$lib/data/achievementClaim';
 import * as m from '$lib/i18n/messages';
+import { isStewardUser } from '$lib/server/stewards';
 import stripTags from '$lib/utils/stripTags';
 
 import type { Actions } from './$types';
@@ -89,12 +90,18 @@ export const actions: Actions = {
 
 		let updatedClaim: AchievementClaim | null = null;
 		let shouldMakeClaimValid = false;
+		// A steward (an assigned reviewer) validates a claim unilaterally, like an
+		// admin — regardless of the base review rule — but never their own claim.
+		const endorserIsSteward =
+			isStewardUser(claim.achievement, locals.session.user.id) &&
+			claim.userId !== locals.session.user.id;
 		// check the cases where we should make the claim valid
 		if (
 			!claim.validFrom &&
-			['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none')
+			(['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none') ||
+				endorserIsSteward)
 		) {
-			// If the current user is an admin, the claim becomes valid.
+			// If the current user is an admin or an assigned steward, the claim becomes valid.
 			shouldMakeClaimValid = true;
 		} else if (!claim.validFrom && claim.achievement.reviewRequiresId) {
 			// If the current user is not an admin but holds the required reviewer badge, the claim becomes valid.
