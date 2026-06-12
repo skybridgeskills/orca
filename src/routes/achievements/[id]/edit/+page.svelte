@@ -23,13 +23,12 @@
 		imageExtension: data.achievement.image ? imageExtension(data.achievement.image) : null,
 		category: data.achievement.categoryId || 'uncategorized',
 
-		claimable: data.achievement.achievementConfig?.claimable || false,
-		claimRequires: data.achievement.achievementConfig?.claimRequiresId,
-		reviewsRequired: data.achievement.achievementConfig?.reviewsRequired || 0,
-		reviewRequires: data.achievement.achievementConfig?.reviewRequiresId,
-		capabilities_inviteRequires:
-			data.achievement.achievementConfig?.json?.capabilities?.inviteRequires || '',
-		claimTemplate: data.achievement.achievementConfig?.json?.claimTemplate || '',
+		claimable: data.achievement.claimable || false,
+		claimRequires: data.achievement.claimRequiresId,
+		reviewsRequired: data.achievement.json?.reviewsRequired || 0,
+		reviewRequires: data.achievement.reviewRequiresId,
+		capabilities_inviteRequires: data.achievement.json?.capabilities?.inviteRequires || '',
+		claimTemplate: data.achievement.json?.claimTemplate || '',
 		alignments: alignmentsFromJson(data.achievement.json)
 	});
 

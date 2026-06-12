@@ -65,23 +65,22 @@
 		{/snippet}
 	</ActionHeading>
 
-	{#if data.claim.validFrom && !data.achievement.achievementConfig?.reviewsRequired}
+	{#if data.claim.validFrom && !data.achievement.json?.reviewsRequired}
 		<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 			{m.shy_male_thrush_jump()}
 		</p>
-	{:else if data.claim.validFrom && data.achievement.achievementConfig?.reviewsRequired}
+	{:else if data.claim.validFrom && data.achievement.json?.reviewsRequired}
 		<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 			{m.funny_piquant_guppy_deny()}
 		</p>
-	{:else if data.achievement.achievementConfig?.reviewsRequired && data.achievement.achievementConfig?.reviewRequires}
+	{:else if data.achievement.json?.reviewsRequired && data.achievement.reviewRequires}
 		<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 			{m.curly_quiet_mantis_express({
-				count: data.achievement.achievementConfig?.reviewsRequired
+				count: data.achievement.json?.reviewsRequired
 			})}
 			<a
-				href={resolve(`/achievements/${data.achievement.achievementConfig.reviewRequires.id}`)}
-				class="font-bold underline hover:no-underline"
-				>{data.achievement.achievementConfig.reviewRequires.name}</a
+				href={resolve(`/achievements/${data.achievement.reviewRequires.id}`)}
+				class="font-bold underline hover:no-underline">{data.achievement.reviewRequires.name}</a
 			>.
 		</p>
 	{/if}

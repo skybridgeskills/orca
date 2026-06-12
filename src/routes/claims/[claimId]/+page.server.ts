@@ -27,7 +27,6 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!canViewClaim(claim, locals.session)) error(404, m.best_sharp_lamb_enchant());
 
 	const achievement = await getAchievement(claim.achievementId, locals.org.id);
-	const config = achievement.achievementConfig;
 
 	const hasProvidedEndorsement = !!(await prisma.claimEndorsement.findFirst({
 		where: {
@@ -47,8 +46,8 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	// If they have it, they are eligible to claim this badge. Only bother to do this if they don't already
 	// have a claim.
 	const prerequisiteClaim =
-		!claim && config?.claimable && config?.claimRequiresId && locals.session?.user.id
-			? await getValidUserClaim(locals.session?.user.id, config?.claimRequiresId, locals.org.id)
+		!claim && achievement.claimable && achievement.claimRequiresId && locals.session?.user.id
+			? await getValidUserClaim(locals.session?.user.id, achievement.claimRequiresId, locals.org.id)
 			: null;
 
 	return {

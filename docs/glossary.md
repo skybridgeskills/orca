@@ -21,7 +21,7 @@ Glossary of terms used in ORCA.
 | Profile               | A community profile (e.g., creator profile) distinct from User accounts. Has its own identifier and organizationId. Used for representing entities that issue credentials. |
 | Paraglide             | Compiler-based i18n library used in ORCA. Emits tree-shakable message functions from JSON translation files. See [i18n.md](i18n.md).                                       |
 | AchievementCredential | A credential (badge) that has been issued. Contains the full OpenBadges-compliant credential data in JSON format.                                                          |
-| AchievementConfig     | Configuration for how an achievement can be claimed and reviewed. Defines prerequisites, review requirements, and claim templates.                                         |
+| claim/review config   | How an achievement can be claimed and reviewed (claimable, prerequisite/reviewer badges, reviews required, claim template). Flattened onto `Achievement` as columns + `json` (formerly the separate `AchievementConfig` table; see ADR 2026-06-09-achievement-config-merge). |
 | Visibility            | Enum controlling who can see a resource. Values: `PUBLIC`, `COMMUNITY`, `ACHIEVEMENT`, `PRIVATE`.                                                                          |
 | ClaimStatus           | Status of a claim or invite. Values: `ACCEPTED`, `REJECTED`, `UNACCEPTED`.                                                                                                 |
 | AchievementStatus     | Status of an achievement. Values: `ACTIVE`, `ARCHIVED`.                                                                                                                    |

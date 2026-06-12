@@ -88,19 +88,29 @@ declare namespace App {
 		narrative?: string;
 	}
 
-	type AchievementConfigJson = import('@prisma/client').Prisma.JsonObject & {
-		capabilities: {
+	// The achievement `json` blob, carrying the config fields that were flattened
+	// out of the former `AchievementConfig` satellite (plus pre-existing `alignment`).
+	// `json.reviewsRequired` is the source of truth for reviews required (it has no
+	// column). See ADR 2026-06-09-achievement-config-merge.
+	type AchievementJson = import('@prisma/client').Prisma.JsonObject & {
+		capabilities?: {
 			inviteRequires: string | null;
 		};
-		claimTemplate: string;
-	};
-	type AchievementConfig = import('@prisma/client').AchievementConfig & {
-		json: AchievementConfigJson;
+		claimTemplate?: string;
+		reviewsRequired?: number;
+		alignment?: unknown[];
+		// resultDescriptions added by the rubrics plan (do NOT add here)
 	};
 
-	interface ConfigWithRelations extends AchievementConfig {
-		claimRequires?: Achievement | null;
-		reviewRequires?: Achievement | null;
+	type AchievementWithJson = import('@prisma/client').Achievement & {
+		json: AchievementJson;
+	};
+
+	// Replaces ConfigWithRelations: an achievement with its config-derived relations.
+	interface AchievementWithRelations extends AchievementWithJson {
+		claimRequires?: import('@prisma/client').Achievement | null;
+		reviewRequires?: import('@prisma/client').Achievement | null;
+		category?: import('@prisma/client').AchievementCategory | null;
 	}
 
 	// Design System

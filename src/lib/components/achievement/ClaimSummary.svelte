@@ -1,10 +1,5 @@
 <script lang="ts">
-	import type {
-		Achievement,
-		AchievementConfig,
-		AchievementCategory,
-		AchievementClaim
-	} from '@prisma/client';
+	import type { Achievement, AchievementClaim } from '@prisma/client';
 
 	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -14,16 +9,8 @@
 	import { page } from '$app/stores';
 
 	interface Props {
-		achievement: Achievement & {
-			category: AchievementCategory | null;
-			achievementConfig: AchievementConfig | null;
-		};
-		relatedAchievements: Array<
-			Achievement & {
-				category: AchievementCategory | null;
-				achievementConfig: AchievementConfig | null;
-			}
-		>;
+		achievement: App.AchievementWithRelations;
+		relatedAchievements: Achievement[];
 		relatedClaims: AchievementClaim[];
 		showClaimLink?: boolean;
 	}
@@ -33,8 +20,7 @@
 	const userHoldsAchievement = () =>
 		relatedClaims.filter((c) => c.achievementId == achievement.id).length > 0;
 	const userHoldsRequiredAchievement = () =>
-		relatedClaims.filter((c) => c.achievementId == achievement.achievementConfig?.claimRequiresId)
-			.length > 0;
+		relatedClaims.filter((c) => c.achievementId == achievement.claimRequiresId).length > 0;
 </script>
 
 {#if userHoldsAchievement()}
@@ -70,7 +56,7 @@
 			{/each}
 		</Alert>
 	</div>
-{:else if achievement.achievementConfig?.claimable && achievement.achievementConfig?.claimRequiresId}
+{:else if achievement.claimable && achievement.claimRequiresId}
 	<div class="max-w-2xl flex justify-between items-center mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
 			{#if userHoldsRequiredAchievement()}
@@ -88,7 +74,7 @@
 		</div>
 	</div>
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
-		{#each relatedAchievements.filter((rc) => achievement.achievementConfig?.claimRequiresId == rc.id) as claimRequires (claimRequires.id)}
+		{#each relatedAchievements.filter((rc) => achievement.claimRequiresId == rc.id) as claimRequires (claimRequires.id)}
 			<span>
 				{m.sharp_quiet_panther_requires()}
 				<a
@@ -103,7 +89,7 @@
 			</span>
 		{/each}
 	</p>
-{:else if achievement.achievementConfig?.claimable && !achievement.achievementConfig?.claimRequiresId}
+{:else if achievement.claimable && !achievement.claimRequiresId}
 	<div class="max-w-2xl flex justify-between items-center mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
 			{#if $page.data.session?.user.id}
@@ -124,7 +110,7 @@
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
 		{m.sharp_fluffy_mantis_delight()}
 	</p>
-{:else if !achievement.achievementConfig?.claimable || false}
+{:else if !achievement.claimable || false}
 	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.firm_clear_fox_disabled()}</h2>
 	<p class="max-w-2xl mt-4 text-sm text-gray-500 dark:text-gray-400">
 		{m.calm_steady_lynx_adminonly()}

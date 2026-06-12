@@ -70,7 +70,10 @@ export const testAchievement: Achievement = {
 	image: null,
 	creatorProfileId: null,
 	json: null,
-	categoryId: null
+	categoryId: null,
+	claimable: false,
+	claimRequiresId: null,
+	reviewRequiresId: null
 };
 
 export const testAchievementClaim: AchievementClaim = {

@@ -158,6 +158,10 @@ export const actions: Actions = {
 			}
 		}
 
+		// "Reviewed by an admin requires only one review, no matter what."
+		const reviewsRequired =
+			formData.reviewableSelectedOption == 'admin' ? 1 : formData.reviewsRequired;
+
 		const achievementData = {
 			id: newIdentifier,
 			identifier: `urn:uuid:${newIdentifier}`,
@@ -167,42 +171,31 @@ export const actions: Actions = {
 			criteriaId: formData.criteriaId,
 			criteriaNarrative: formData.criteriaNarrative,
 			image: imageKey,
-			json: (formData.alignments.length > 0
-				? { alignment: formData.alignments }
-				: {}) as unknown as Prisma.InputJsonObject,
+			claimable: formData.claimable == 'on',
+			claimRequires:
+				formData.claimable == 'on' && formData.claimRequires
+					? { connect: { id: formData.claimRequires } }
+					: undefined,
+			reviewRequires: formData.reviewRequires
+				? { connect: { id: formData.reviewRequires } }
+				: undefined,
+			json: {
+				...(formData.alignments.length > 0 ? { alignment: formData.alignments } : {}),
+				capabilities: {
+					inviteRequires: formData.capabilities_inviteRequires
+				},
+				claimTemplate: formData.claimTemplate,
+				reviewsRequired
+			} as unknown as Prisma.InputJsonObject,
 			category:
-				formData.category != 'uncategorized' ? { connect: { id: formData.category } } : undefined,
-			achievementConfig: {
-				create: {
-					organization: { connect: { id: locals.org.id } },
-					claimable: formData.claimable == 'on',
-					claimRequires:
-						formData.claimable == 'on' && formData.claimRequires
-							? { connect: { id: formData.claimRequires } }
-							: undefined,
-					reviewRequires: formData.reviewRequires
-						? { connect: { id: formData.reviewRequires } }
-						: undefined,
-					reviewsRequired: formData.reviewsRequired,
-					json: {
-						capabilities: {
-							inviteRequires: formData.capabilities_inviteRequires
-						},
-						claimTemplate: formData.claimTemplate
-					}
-				}
-			}
+				formData.category != 'uncategorized' ? { connect: { id: formData.category } } : undefined
 		};
 
-		// "Reviewed by an admin requires only one review, no matter what."
-		if (formData.reviewableSelectedOption == 'admin')
-			achievementData.achievementConfig.create['reviewsRequired'] = 1;
-
-		if (achievementData.achievementConfig.create?.json.capabilities.inviteRequires) {
+		if (formData.capabilities_inviteRequires) {
 			const inviteRequiresAchievement = await prisma.achievement.findFirst({
 				where: {
 					organizationId: locals.org.id,
-					id: achievementData.achievementConfig.create.json.capabilities.inviteRequires
+					id: formData.capabilities_inviteRequires
 				}
 			});
 			if (!inviteRequiresAchievement) {
@@ -213,7 +206,9 @@ export const actions: Actions = {
 		const achievement = await prisma.achievement.create({
 			data: achievementData,
 			include: {
-				achievementConfig: true
+				category: true,
+				claimRequires: true,
+				reviewRequires: true
 			}
 		});
 

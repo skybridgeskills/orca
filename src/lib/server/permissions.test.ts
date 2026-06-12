@@ -12,10 +12,10 @@ vi.mock('$lib/../prisma/client', () => ({
 	}
 }));
 
-const achievementConfig = (inviteRequires: string | null): App.AchievementConfig =>
+const achievementWithInvite = (inviteRequires: string | null): App.AchievementWithJson =>
 	({
 		json: { capabilities: { inviteRequires }, claimTemplate: '' }
-	}) as App.AchievementConfig;
+	}) as unknown as App.AchievementWithJson;
 
 describe('canInviteToAchievement', () => {
 	beforeEach(() => {
@@ -25,7 +25,7 @@ describe('canInviteToAchievement', () => {
 	it('returns true for GENERAL_ADMIN without querying claims', async () => {
 		const result = await canInviteToAchievement({
 			user: { id: 'user-1', orgRole: 'GENERAL_ADMIN' },
-			achievementConfig: achievementConfig(null)
+			achievement: achievementWithInvite(null)
 		});
 
 		expect(result).toBe(true);
@@ -35,7 +35,7 @@ describe('canInviteToAchievement', () => {
 	it('returns false for non-admin when achievement has no inviteRequires', async () => {
 		const result = await canInviteToAchievement({
 			user: { id: 'user-1', orgRole: null },
-			achievementConfig: achievementConfig(null)
+			achievement: achievementWithInvite(null)
 		});
 
 		expect(result).toBe(false);
@@ -49,7 +49,7 @@ describe('canInviteToAchievement', () => {
 
 		const result = await canInviteToAchievement({
 			user: { id: 'user-1', orgRole: null },
-			achievementConfig: achievementConfig('badge-1')
+			achievement: achievementWithInvite('badge-1')
 		});
 
 		expect(result).toBe(true);
@@ -67,7 +67,7 @@ describe('canInviteToAchievement', () => {
 
 		const result = await canInviteToAchievement({
 			user: { id: 'user-1', orgRole: null },
-			achievementConfig: achievementConfig('badge-1')
+			achievement: achievementWithInvite('badge-1')
 		});
 
 		expect(result).toBe(false);

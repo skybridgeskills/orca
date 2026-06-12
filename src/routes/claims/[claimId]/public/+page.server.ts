@@ -12,9 +12,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			endorsements: true,
 			achievement: {
 				include: {
-					achievementConfig: {
-						include: { claimRequires: true, reviewRequires: true }
-					},
+					claimRequires: true,
+					reviewRequires: true,
 					category: true
 				}
 			}

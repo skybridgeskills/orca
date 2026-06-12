@@ -1,4 +1,3 @@
-import type { Achievement, AchievementConfig } from '@prisma/client';
 import { get, writable } from 'svelte/store';
 
 import * as m from '$lib/i18n/messages';
@@ -9,15 +8,13 @@ import { notifications, Notification } from './notificationStore';
 /*
 // Achievements
 */
-export const achievements = writable<
-	(Achievement & { achievementConfig: AchievementConfig | null })[]
->([]);
+export const achievements = writable<App.AchievementWithRelations[]>([]);
 
 // Initially unset to indicate uninitialized store, periodically needs to update.
 export const achievementsLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
 
 export const fetchAchievements = async (): Promise<LoadingStatus> => {
-	let a: (Achievement & { achievementConfig: AchievementConfig | null })[] = [];
+	let a: App.AchievementWithRelations[] = [];
 	const page1 = await fetch('/api/v1/achievements?includeCount=true');
 	if (page1.status !== 200) {
 		notifications.add(new Notification(m.calm_great_panther_approve(), true, 'error'));
@@ -42,9 +39,7 @@ export const fetchAchievements = async (): Promise<LoadingStatus> => {
 	return LoadingStatus.Complete;
 };
 
-export const upsertAchievement = async (
-	achievement: Achievement & { achievementConfig: AchievementConfig | null }
-) => {
+export const upsertAchievement = async (achievement: App.AchievementWithRelations) => {
 	achievements.set([...get(achievements).filter((a) => a.id !== achievement.id), achievement]);
 };
 

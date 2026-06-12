@@ -50,9 +50,7 @@ export const actions: Actions = {
 		const claim = await prisma.achievementClaim.findUniqueOrThrow({
 			where: { id: params.claimId },
 			include: {
-				achievement: {
-					include: { achievementConfig: true }
-				},
+				achievement: true,
 				endorsements: {
 					where: {
 						creatorId: locals.session.user.id
@@ -98,17 +96,17 @@ export const actions: Actions = {
 		) {
 			// If the current user is an admin, the claim becomes valid.
 			shouldMakeClaimValid = true;
-		} else if (!claim.validFrom && claim.achievement.achievementConfig?.reviewRequiresId) {
+		} else if (!claim.validFrom && claim.achievement.reviewRequiresId) {
 			// If the current user is not an admin but holds the required reviewer badge, the claim becomes valid.
 			const endorserReviewerBadge = await getValidUserClaim(
 				locals.session.user.id,
-				claim.achievement.achievementConfig.reviewRequiresId,
+				claim.achievement.reviewRequiresId,
 				locals.org.id
 			);
 			if (endorserReviewerBadge) {
 				shouldMakeClaimValid = true;
 			}
-		} else if (!claim.validFrom && !claim.achievement.achievementConfig?.reviewRequiresId) {
+		} else if (!claim.validFrom && !claim.achievement.reviewRequiresId) {
 			// If the validFrom date just isn't set already but should be.
 			shouldMakeClaimValid = true;
 		}

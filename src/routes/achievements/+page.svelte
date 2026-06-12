@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AchievementCategory, Achievement, AchievementConfig } from '@prisma/client';
+	import type { AchievementCategory, Achievement } from '@prisma/client';
 	import { onMount } from 'svelte';
 
 	import Alert from '$lib/components/Alert.svelte';
@@ -34,10 +34,10 @@
 	});
 
 	const categoryAchievements: {
-		[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;
+		[key: string]: App.AchievementWithRelations[];
 	} = $derived.by(() => {
 		const map: {
-			[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;
+			[key: string]: App.AchievementWithRelations[];
 		} = {};
 		[...$achievementCategories, U].map(
 			(c: AchievementCategory) =>

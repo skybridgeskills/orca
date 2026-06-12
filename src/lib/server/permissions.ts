@@ -70,7 +70,7 @@ interface CanInviteToAchievementParams {
 		id: string;
 		orgRole: string | null;
 	};
-	achievementConfig: App.AchievementConfig | null;
+	achievement: App.AchievementWithJson | null;
 }
 
 /**
@@ -80,13 +80,13 @@ interface CanInviteToAchievementParams {
  */
 export async function canInviteToAchievement({
 	user,
-	achievementConfig
+	achievement
 }: CanInviteToAchievementParams): Promise<boolean> {
 	if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(user.orgRole || 'none')) {
 		return true;
 	}
 
-	const inviteRequiresId = achievementConfig?.json?.capabilities?.inviteRequires;
+	const inviteRequiresId = achievement?.json?.capabilities?.inviteRequires;
 	if (!inviteRequiresId) {
 		return false;
 	}

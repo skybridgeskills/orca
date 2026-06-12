@@ -23,7 +23,6 @@ model Organization {
   achievements            Achievement[]
   achievementCategories   AchievementCategory[]
   claims                  AchievementClaim[]
-  achievementConfigs      AchievementConfig[]
   credentials             AchievementCredential[]
   claimInvitations        ClaimEndorsement[]
   identifiers             Identifier[]
@@ -83,32 +82,21 @@ model Achievement {
   image             String?
   achievementStatus AchievementStatus       @default(ACTIVE)
   categoryId        String?
+  claimable         Boolean                 @default(false)
+  claimRequiresId   String?
+  reviewRequiresId  String?
   category          AchievementCategory?    @relation(fields: [categoryId], references: [id])
   creator           Profile?                @relation(fields: [creatorProfileId], references: [id])
   organization      Organization            @relation(fields: [organizationId], references: [id])
   achievementClaims AchievementClaim[]
-  achievementConfig AchievementConfig?      @relation("AchievementConfig")
-  claimRequiredBy   AchievementConfig[]     @relation("EnablesClaimOf")
-  reviewEnabledBy   AchievementConfig[]     @relation("EnablesReviewOf")
+  claimRequires     Achievement?            @relation("ClaimPrereq", fields: [claimRequiresId], references: [id])
+  claimRequiredBy   Achievement[]           @relation("ClaimPrereq")
+  reviewRequires    Achievement?            @relation("ReviewBadge", fields: [reviewRequiresId], references: [id])
+  reviewEnabledBy   Achievement[]           @relation("ReviewBadge")
   credentials       AchievementCredential[]
   claimEndorsements ClaimEndorsement[]
 
   @@unique([organizationId, identifier])
-}
-
-model AchievementConfig {
-  id               String       @id @default(uuid())
-  organizationId   String
-  achievementId    String       @unique
-  claimable        Boolean      @default(false)
-  claimRequiresId  String?
-  json             Json         @default("{}")
-  reviewRequiresId String?
-  reviewsRequired  Int          @default(0)
-  achievement      Achievement  @relation("AchievementConfig", fields: [achievementId], references: [id])
-  claimRequires    Achievement? @relation("EnablesClaimOf", fields: [claimRequiresId], references: [id])
-  organization     Organization @relation(fields: [organizationId], references: [id])
-  reviewRequires   Achievement? @relation("EnablesReviewOf", fields: [reviewRequiresId], references: [id])
 }
 
 model AchievementCategory {

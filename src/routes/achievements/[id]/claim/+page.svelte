@@ -14,7 +14,7 @@
 	import { resolve } from '$app/paths';
 
 	let { data }: PageProps = $props();
-	const config = $derived(data.achievement.achievementConfig);
+	const config = $derived(data.achievement);
 
 	onMount(() => {
 		if (data.inviteId) $inviteId = data.inviteId;
@@ -42,7 +42,6 @@
 	<AchievementSummary achievement={data.achievement} />
 	<ClaimForm
 		achievement={data.achievement}
-		achievementConfig={config}
 		existingBadgeClaim={data.existingBadgeClaim}
 		{claimIntent}
 		handleCancel={() => {

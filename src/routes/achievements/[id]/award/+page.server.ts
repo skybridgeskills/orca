@@ -19,7 +19,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			organizationId: locals.org.id
 		},
 		include: {
-			achievementConfig: true,
 			_count: {
 				select: { achievementClaims: true, claimEndorsements: true }
 			}
@@ -31,7 +30,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			id: locals.session.user.id,
 			orgRole: locals.session.user.orgRole
 		},
-		achievementConfig: achievement.achievementConfig as App.AchievementConfig | null
+		achievement: achievement as unknown as App.AchievementWithJson
 	});
 	if (!inviteCapability) redirect(302, `/achievements/${params.id}`);
 

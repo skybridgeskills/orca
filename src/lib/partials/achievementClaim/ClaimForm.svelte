@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Achievement, AchievementClaim, Identifier } from '@prisma/client';
+	import type { AchievementClaim, Identifier } from '@prisma/client';
 	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 
@@ -23,8 +23,7 @@
 	import { page } from '$app/stores';
 	interface Props {
 		existingBadgeClaim?: AchievementClaim | null;
-		achievement: Achievement;
-		achievementConfig?: App.AchievementConfig | null;
+		achievement: App.AchievementWithRelations;
 		claimIntent?: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED';
 		handleSubmit?: (e: SubmitEvent) => Promise<void>;
 		handleCancel: () => void;
@@ -36,19 +35,18 @@
 	let {
 		existingBadgeClaim = null,
 		achievement,
-		achievementConfig = null,
 		claimIntent = 'ACCEPTED',
 		handleSubmit = async (e: SubmitEvent) => {
 			if (
 				!$session?.user &&
-				($inviteId || (achievementConfig?.claimable && !achievementConfig?.claimRequiresId))
+				($inviteId || (achievement.claimable && !achievement.claimRequiresId))
 			) {
 				// User is unauthenticated, so needs to create an invite, then prove email address / create a session, but then can submit a claim
 				e.preventDefault();
 				$claimId = achievement.id;
 				$claimPending = true;
 
-				if (achievementConfig?.claimable && !achievementConfig?.claimRequiresId) {
+				if (achievement.claimable && !achievement.claimRequiresId) {
 					const formData = new FormData();
 					formData.append('email', $claimEmail);
 					formData.append('narrative', 'Self-invitation of open claiming badge');
@@ -105,10 +103,10 @@
 			const claimJson = JSON.parse(existingBadgeClaim.json?.toString() || '{}') || {};
 
 			// Priority: Existing claim narrative, template narrative, or empty string
-			$claimNarrative = claimJson.narrative || achievementConfig?.json?.claimTemplate || '';
+			$claimNarrative = claimJson.narrative || achievement.json?.claimTemplate || '';
 			$claimUrl = claimJson.id ?? '';
 		} else if (!existingBadgeClaim && !$claimPending) {
-			$claimNarrative = achievementConfig?.json?.claimTemplate ?? '';
+			$claimNarrative = achievement.json?.claimTemplate ?? '';
 			$claimUrl = '';
 		}
 	});

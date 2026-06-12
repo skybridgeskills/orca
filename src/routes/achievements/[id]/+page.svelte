@@ -64,7 +64,7 @@
 
 	let category: AchievementCategory | undefined = $state();
 
-	const config = $derived(data.achievement.achievementConfig as App.AchievementConfig | null);
+	const config = $derived(data.achievement as unknown as App.AchievementWithRelations);
 	const claim: AchievementClaim | undefined = $derived(
 		data.relatedClaims.find((c) => data.achievement.id == c.achievementId)
 	);
@@ -78,9 +78,7 @@
 		).length > 0
 	);
 	const reviewRequires: Achievement | undefined = $derived(
-		data.relatedAchievements
-			.filter((c) => data.achievement.achievementConfig?.reviewRequiresId == c.id)
-			.find(() => true)
+		data.relatedAchievements.filter((c) => config?.reviewRequiresId == c.id).find(() => true)
 	);
 	const invite: (ClaimEndorsement & { creator: User | null }) | undefined = $derived(
 		data.outstandingInvites.find(() => true)
@@ -267,9 +265,9 @@
 			{m.calm_steady_lynx_adminonly()}
 		{/if}
 
-		{#if reviewRequires && !!config?.reviewsRequired}
+		{#if reviewRequires && !!config?.json?.reviewsRequired}
 			{m.warm_tangy_deer_reviewsum({
-				reviewsRequired: config?.reviewsRequired ?? 0
+				reviewsRequired: config?.json?.reviewsRequired ?? 0
 			})}
 			<a
 				href={resolve(`/achievements/${reviewRequires?.id}`)}
@@ -277,7 +275,7 @@
 			>
 				{reviewRequires.name}</a
 			>.
-		{:else if !config?.reviewRequiresId && config?.reviewsRequired}
+		{:else if !config?.reviewRequiresId && config?.json?.reviewsRequired}
 			{m.calm_steady_lynx_adminreview()}
 		{:else}
 			{m.gentle_brave_falcon_noreviews()}

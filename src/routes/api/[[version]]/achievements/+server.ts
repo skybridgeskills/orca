@@ -11,16 +11,15 @@ export const GET: RequestHandler = async ({ url, request, params, locals }) => {
 	if (prefersHtml(request)) redirect(302, '/achievements');
 
 	const { page, pageSize, includeCount } = calculatePageAndSize(url);
+	// Flattened shape: config fields are now columns/json on the achievement, so the
+	// default select returns them. No `achievementConfig` include (the table is gone).
 	const achievements = await prisma.achievement.findMany({
 		where: {
 			organizationId: locals.org.id
 		},
 		skip: (page - 1) * pageSize,
 		take: pageSize,
-		orderBy: { identifier: 'desc' },
-		include: {
-			achievementConfig: true
-		}
+		orderBy: { identifier: 'desc' }
 	});
 
 	return await apiResponse({

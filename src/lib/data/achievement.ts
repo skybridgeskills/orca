@@ -25,17 +25,11 @@ export const getAchievement = async (achievementId: string, orgId: string) => {
 		},
 		include: {
 			category: true,
-			achievementConfig: {
-				include: { claimRequires: true, reviewRequires: true }
-			}
+			claimRequires: true,
+			reviewRequires: true
 		}
 	})) as unknown; // Force application of the type including JSON fields.
-	return achievement as Achievement & {
-		achievementConfig?: App.AchievementConfig & {
-			claimRequires?: Achievement;
-			reviewRequires?: Achievement;
-		};
-	};
+	return achievement as App.AchievementWithRelations;
 };
 
 export interface InviteArgs {
@@ -83,14 +77,9 @@ export const inviteToClaim = async ({
 	}
 
 	const achievement = await getAchievement(achievementId, org.id);
-	const achievementConfig = achievement.achievementConfig;
 
 	// UNAUTHENTICATED USERS: can create an invite for open-claim achievements only.
-	if (
-		!session?.user?.id &&
-		achievement.achievementConfig?.claimable &&
-		!achievement?.achievementConfig?.claimRequiresId
-	) {
+	if (!session?.user?.id && achievement.claimable && !achievement.claimRequiresId) {
 		// achievement is claimable without any prerequisite. Unauthenticated
 		// user will create a self-endorsement (with null creator) and then use it as an invite-code.
 		const endorsement: ClaimEndorsement & { claim?: AchievementClaim } =
@@ -125,7 +114,7 @@ export const inviteToClaim = async ({
 		error(403, m.tiny_dark_ostrich_jump());
 	}
 
-	if (!isAdmin({ user: session?.user }) && !achievementConfig?.json?.capabilities?.inviteRequires) {
+	if (!isAdmin({ user: session?.user }) && !achievement.json?.capabilities?.inviteRequires) {
 		// NON ADMIN USERS for a badge that is only inviteable by admins
 		error(403, m.patchy_aqua_turtle_support());
 	}
@@ -133,11 +122,11 @@ export const inviteToClaim = async ({
 	if (
 		!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none') &&
 		session.user.id &&
-		achievementConfig?.json?.capabilities?.inviteRequires
+		achievement.json?.capabilities?.inviteRequires
 	) {
 		const inviteQualificationClaim = await prisma.achievementClaim.findFirst({
 			where: {
-				achievementId: achievementConfig?.json?.capabilities?.inviteRequires,
+				achievementId: achievement.json?.capabilities?.inviteRequires,
 				userId: session.user.id
 			}
 		});
@@ -178,7 +167,7 @@ export const inviteToClaim = async ({
 				claimStatus: isSelfClaim ? 'ACCEPTED' : 'UNACCEPTED',
 
 				// If the achievement requires review, the claim is not valid until reviewed.
-				validFrom: !achievement.achievementConfig?.reviewRequiresId ? new Date() : null,
+				validFrom: !achievement.reviewRequiresId ? new Date() : null,
 				creator: { connect: { id: session.user.id } },
 				json: isSelfClaim ? data.json : '{}'
 			},

@@ -1,10 +1,5 @@
 <script lang="ts">
-	import type {
-		Achievement,
-		AchievementCategory,
-		AchievementClaim,
-		Organization
-	} from '@prisma/client';
+	import type { AchievementClaim, Organization } from '@prisma/client';
 	import type { Snippet } from 'svelte';
 	import { onMount } from 'svelte';
 
@@ -39,7 +34,7 @@
 	/**
 	 * Single prop contract shared by BOTH the authenticated `/claims/[id]` route
 	 * and the public `/claims/[id]/public` route. The achievement carries its
-	 * `organization` (+ optional `category` / `achievementConfig`); the viewer's
+	 * `organization` (+ optional `category` and flattened claim/review fields); the viewer's
 	 * role is resolved once, server-side, via P1's `viewerRole` and passed in as
 	 * `viewer` (the public route passes the literal `'public'`).
 	 */
@@ -47,10 +42,8 @@
 		claim: AchievementClaim & {
 			user?: { givenName: string | null; familyName: string | null } | null;
 		};
-		achievement: Achievement & {
+		achievement: App.AchievementWithRelations & {
 			organization: Organization;
-			category?: AchievementCategory | null;
-			achievementConfig?: App.ConfigWithRelations | null;
 		};
 		viewer: ViewerRole;
 		exchangeEnabled?: boolean;
@@ -324,7 +317,6 @@
 		{#if showClaimForm && !formInModal}
 			<ClaimForm
 				{achievement}
-				achievementConfig={achievement.achievementConfig}
 				existingBadgeClaim={claim}
 				{claimIntent}
 				handleCancel={() => {
@@ -385,7 +377,6 @@
 		>
 			<ClaimForm
 				{achievement}
-				achievementConfig={achievement.achievementConfig}
 				existingBadgeClaim={claim}
 				{claimIntent}
 				handleCancel={() => {

@@ -33,22 +33,15 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		include: {
 			_count: {
 				select: { achievementClaims: true }
-			},
-			achievementConfig: true
+			}
 		}
 	});
 
 	const relatedAchievements = await prisma.achievement.findMany({
 		where: {
 			id: {
-				in: [
-					achievement?.achievementConfig?.claimRequiresId || 'N/A',
-					achievement?.achievementConfig?.reviewRequiresId || 'None'
-				]
+				in: [achievement.claimRequiresId || 'N/A', achievement.reviewRequiresId || 'None']
 			}
-		},
-		include: {
-			achievementConfig: true
 		}
 	});
 
@@ -58,7 +51,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		? await prisma.achievementClaim.findMany({
 				where: {
 					achievementId: {
-						in: [achievementId, achievement?.achievementConfig?.claimRequiresId || 'N/A']
+						in: [achievementId, achievement.claimRequiresId || 'N/A']
 					},
 					userId: locals.session?.user.id
 				},
@@ -78,7 +71,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 				id: locals.session.user.id,
 				orgRole: locals.session.user.orgRole
 			},
-			achievementConfig: achievement.achievementConfig as App.AchievementConfig | null
+			achievement: achievement as unknown as App.AchievementWithJson
 		});
 	}
 
@@ -119,16 +112,17 @@ export const actions: Actions = {
 
 		// TODO: require confirmation for delete
 		// TODO: ensure can't delete non-org achievement
-		const configDelete = prisma.achievementConfig.deleteMany({
-			where: {
-				achievementId: params.id
-			}
-		});
 
-		// Achievements that once required this achievement get their claimability reset
-		const requiredConfigDelete = prisma.achievementConfig.deleteMany({
+		// Achievements that once required this achievement get their claimability reset.
+		// Must run before the delete below: the self-relation FK is ON DELETE SET NULL,
+		// so after deletion `claimRequiresId` would already be null and no longer match.
+		const requiredAchievementReset = prisma.achievement.updateMany({
 			where: {
 				claimRequiresId: params.id
+			},
+			data: {
+				claimRequiresId: null,
+				claimable: false
 			}
 		});
 
@@ -173,8 +167,7 @@ export const actions: Actions = {
 		}
 
 		await prisma.$transaction([
-			configDelete,
-			requiredConfigDelete,
+			requiredAchievementReset,
 			credentialsDelete,
 			achievementClaimsDelete,
 			claimEndorsementDelete,

@@ -47,14 +47,13 @@
 
 <!-- Public surface: reuse the shared ClaimDetail with viewer='public'. The
 	view-model yields an empty action set, so no owner affordances are exposed.
-	The public loader's `achievementConfig` carries a loosely-typed `json`; the
-	public view never opens the claim form (owner-only), so we present it to
-	ClaimDetail's typed contract via a localized cast. -->
+	The public loader's achievement carries a loosely-typed `json`; the public view
+	never opens the claim form (owner-only), so we present it to ClaimDetail's typed
+	contract via a localized cast. -->
 <ClaimDetail
 	claim={data.claim}
-	achievement={{
-		...achievementWithOrgData,
-		achievementConfig: achievementWithOrgData.achievementConfig as App.ConfigWithRelations | null
+	achievement={achievementWithOrgData as unknown as App.AchievementWithRelations & {
+		organization: App.Organization;
 	}}
 	viewer="public"
 />

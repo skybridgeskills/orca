@@ -27,9 +27,7 @@ export default async function (): Promise<() => Promise<void>> {
 			identifier: uuidv4(),
 			criteriaNarrative: 'Anybody can claim this, just press the button and follow the steps.',
 			organization: { connect: { id: organization.id } },
-			achievementConfig: {
-				create: { claimable: true, organization: { connect: { id: organization.id } } }
-			}
+			claimable: true
 		}
 	});
 
@@ -40,7 +38,6 @@ export default async function (): Promise<() => Promise<void>> {
 	//return Tear down method
 	return async (): Promise<void> => {
 		await prisma.achievementClaim.deleteMany({ where: { organizationId: organization.id } });
-		await prisma.achievementConfig.deleteMany({ where: { organizationId: organization.id } });
 		await prisma.achievement.deleteMany({ where: { organizationId: organization.id } });
 		await prisma.organization.delete({ where: { id: organization.id } });
 	};

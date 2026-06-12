@@ -14,7 +14,6 @@ export const load = async ({ locals, params, url }) => {
 	const inviteId = url.searchParams.get('i');
 	const inviteeEmail = url.searchParams.get('e');
 	const achievement = await getAchievement(params.id, locals.org.id);
-	const config = achievement.achievementConfig;
 	let invite: ClaimEndorsement | null = null;
 
 	const existingBadgeClaim = locals.session?.user?.id
@@ -33,8 +32,8 @@ export const load = async ({ locals, params, url }) => {
 	// If this badge requires a member to hold another badge, get the relevant claim for that badge.
 	// If they have it, they are eligible to claim this badge.
 	const requiredBadgeClaim =
-		config?.claimable && config?.claimRequiresId && locals.session?.user?.id
-			? await getValidUserClaim(locals.session?.user.id, config?.claimRequiresId, locals.org.id)
+		achievement.claimable && achievement.claimRequiresId && locals.session?.user?.id
+			? await getValidUserClaim(locals.session?.user.id, achievement.claimRequiresId, locals.org.id)
 			: null;
 
 	return {
@@ -57,7 +56,6 @@ export const actions = {
 		}
 
 		const achievement = await getAchievement(params.id, locals.org.id);
-		const config = achievement.achievementConfig;
 
 		const formData = await request.formData();
 		const inviteId = formData.get('inviteId')?.toString();
@@ -77,15 +75,19 @@ export const actions = {
 				error(403, m.soft_bright_robin_link());
 		}
 
-		if (!invite && !config?.claimable) error(400, m.clear_weary_guppy_support());
+		if (!invite && !achievement.claimable) error(400, m.clear_weary_guppy_support());
 
 		// get required badge claim if the user needs one
 		const requiredBadgeClaim =
-			config?.claimRequiresId && locals.session?.user.id && !invite
-				? await getValidUserClaim(locals.session.user.id, config?.claimRequiresId, locals.org.id)
+			achievement.claimRequiresId && locals.session?.user.id && !invite
+				? await getValidUserClaim(
+						locals.session.user.id,
+						achievement.claimRequiresId,
+						locals.org.id
+					)
 				: null;
 
-		if (config?.claimRequiresId && !requiredBadgeClaim && !invite)
+		if (achievement.claimRequiresId && !requiredBadgeClaim && !invite)
 			error(400, {
 				code: m.fresh_bright_sparrow_notfound(),
 				message: m.wide_patchy_marten_view()
@@ -128,7 +130,7 @@ export const actions = {
 				return { id: ee.id };
 			});
 
-		if (achievement.achievementConfig?.reviewRequiresId) {
+		if (achievement.reviewRequiresId) {
 			const reviewerClaims = await prisma.achievementClaim.findMany({
 				where: {
 					AND: {
@@ -137,20 +139,17 @@ export const actions = {
 								.map((ee) => (ee.creatorId !== null ? [ee.creatorId] : []))
 								.flat(1)
 						},
-						achievementId: achievement.achievementConfig?.reviewRequiresId,
+						achievementId: achievement.reviewRequiresId,
 						validFrom: { not: null }
 					},
 					OR: [{ validUntil: null }, { validUntil: { gt: new Date() } }]
 				}
 			});
-			const numReviewsRequired = achievement.achievementConfig.reviewsRequired ?? 1;
+			const numReviewsRequired = achievement.json?.reviewsRequired ?? 1;
 			if (reviewerClaims?.length >= numReviewsRequired) {
 				data.validFrom = new Date();
 			}
-		} else if (
-			achievement.achievementConfig?.reviewsRequired &&
-			achievement.achievementConfig.reviewsRequired > 0
-		) {
+		} else if (achievement.json?.reviewsRequired && achievement.json.reviewsRequired > 0) {
 			// Admin review required - check if current user is an admin
 			if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none')) {
 				// Current user is an admin, so they can make the claim immediately valid
@@ -216,13 +215,13 @@ export const actions = {
 			let { validFrom } = existingClaim;
 			if (!validFrom) {
 				const achievement = await getAchievement(params.id, locals.org.id);
-				if (achievement.achievementConfig?.reviewRequiresId) {
+				if (achievement.reviewRequiresId) {
 					// If review is required, we find some reviews and check if they are enough.
-					const numReviewsRequired = achievement.achievementConfig?.reviewsRequired ?? 1;
+					const numReviewsRequired = achievement.json?.reviewsRequired ?? 1;
 					const reviewerClaims = await prisma.achievementClaim.findMany({
 						where: {
 							AND: {
-								achievementId: achievement.achievementConfig?.reviewRequiresId,
+								achievementId: achievement.reviewRequiresId,
 								validFrom: { not: null }
 							},
 							OR: [{ validUntil: null }, { validUntil: { gt: new Date() } }]

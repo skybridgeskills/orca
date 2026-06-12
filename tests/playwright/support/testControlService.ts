@@ -126,15 +126,10 @@ export function createPrismaTestControlService(): TestControlService {
 					criteriaNarrative: opts.criteriaNarrative ?? 'Awarded for e2e testing.',
 					identifier: `urn:uuid:${randomUUID()}`,
 					json: {},
-					achievementConfig: {
-						create: {
-							organization: { connect: { id: orgId } },
-							claimable: opts.claimable ?? true,
-							...(opts.claimRequiresId
-								? { claimRequires: { connect: { id: opts.claimRequiresId } } }
-								: {})
-						}
-					}
+					claimable: opts.claimable ?? true,
+					...(opts.claimRequiresId
+						? { claimRequires: { connect: { id: opts.claimRequiresId } } }
+						: {})
 				}
 			});
 			return { achievementId: achievement.id };
@@ -197,7 +192,6 @@ export function createPrismaTestControlService(): TestControlService {
 			await prisma.claimEndorsement.deleteMany({ where: { organizationId: orgId } });
 			await prisma.achievementClaim.deleteMany({ where: { organizationId: orgId } });
 			await prisma.achievementCredential.deleteMany({ where: { organizationId: orgId } });
-			await prisma.achievementConfig.deleteMany({ where: { organizationId: orgId } });
 			await prisma.achievement.deleteMany({ where: { organizationId: orgId } });
 			await prisma.identifier.deleteMany({ where: { organizationId: orgId } });
 			await prisma.user.deleteMany({ where: { organizationId: orgId } });

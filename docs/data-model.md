@@ -39,9 +39,22 @@ A badge template that can be claimed or awarded.
 - `criteriaNarrative`: Text describing what qualifies for this achievement
 - `image`: Image URL for the badge
 - `achievementStatus`: `ACTIVE` or `ARCHIVED`
-- `json`: JSON field for additional metadata
+- `claimable`: Whether the achievement can be claimed
+- `claimRequiresId`: Optional self-relation FK to a prerequisite Achievement
+  (`claimRequires` / `claimRequiredBy`, relation `ClaimPrereq`)
+- `reviewRequiresId`: Optional self-relation FK to the Achievement a reviewer must
+  hold (`reviewRequires` / `reviewEnabledBy`, relation `ReviewBadge`)
+- `json`: JSON field for additional metadata, including `alignment`,
+  `reviewsRequired` (number of reviews needed, 0-5),
+  `capabilities.inviteRequires` (achievement that gates who may invite), and
+  `claimTemplate`
 
 **Unique constraint**: `(organizationId, identifier)` - ensures achievements are unique within an org.
+
+> Claim/review configuration was previously held in a separate 1:1
+> `AchievementConfig` satellite. It was flattened into `Achievement` (queryable
+> fields as columns; the rest in `json`); see ADR
+> `2026-06-09-achievement-config-merge`.
 
 ### AchievementClaim
 
@@ -84,19 +97,6 @@ An invitation sent to an email to claim a specific achievement. Also used for cl
 - `json`: JSON field for invitation details
 
 **Unique constraint**: `(creatorId, achievementId, inviteeEmail)` - prevents duplicate invites.
-
-### AchievementConfig
-
-Configuration for how an achievement can be claimed and reviewed.
-
-- `id`: UUID primary key
-- `organizationId`: Foreign key to Organization (required)
-- `achievementId`: Foreign key to Achievement (one-to-one)
-- `claimable`: Whether the achievement can be claimed
-- `claimRequiresId`: Optional foreign key to Achievement (prerequisite)
-- `reviewRequiresId`: Optional foreign key to Achievement (required for reviewers)
-- `reviewsRequired`: Number of reviews needed (0-5)
-- `json`: JSON field for additional config (claim template, etc.)
 
 ### Profile
 
