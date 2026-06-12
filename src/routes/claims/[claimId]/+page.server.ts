@@ -4,6 +4,7 @@ import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
 import { getValidUserClaim } from '$lib/data/achievementClaim';
 import * as m from '$lib/i18n/messages';
+import { canViewClaim, viewerRole } from '$lib/server/claimVisibility';
 import { isExchangeEnabled } from '$lib/server/transactionService/config';
 
 import type { PageServerLoad } from './$types';
@@ -21,6 +22,9 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	});
 
 	if (!claim || claim.organizationId != locals.org.id) error(404, m.best_sharp_lamb_enchant());
+	// Visibility: owner and admins always pass; PRIVATE claims of others are
+	// hidden from community viewers. 404 (not 403) avoids confirming existence.
+	if (!canViewClaim(claim, locals.session)) error(404, m.best_sharp_lamb_enchant());
 
 	const achievement = await getAchievement(claim.achievementId, locals.org.id);
 	const config = achievement.achievementConfig;
@@ -51,6 +55,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		organization: locals.org,
 		claim,
 		achievement,
+		// P3: resolve the viewer's role once (P1's `viewerRole`) so the client
+		// `ClaimDetail` view-model never recomputes `session.user.id == claim.userId`
+		// inline. Does not affect the authz/404 gating above (P2-owned).
+		viewer: viewerRole(claim, locals.session),
 		hasProvidedEndorsement,
 		endorsementCount,
 		user: locals.session?.user,

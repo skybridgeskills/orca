@@ -431,5 +431,6 @@
 	"stark_dim_crow_warn": "Disable {appName}?",
 	"plush_warm_dove_calm": "Its access tokens stop working immediately.",
 	"bleak_swift_raven_purge": "Delete {appName}?",
-	"murky_lone_shark_burn": "This removes the app from your organization and its tokens stop working immediately. Its history is retained, but this can't be undone here."
+	"murky_lone_shark_burn": "This removes the app from your organization and its tokens stop working immediately. Its history is retained, but this can't be undone here.",
+	"mellow_brisk_otter_amend": "Change acceptance"
 }

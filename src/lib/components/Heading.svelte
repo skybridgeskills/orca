@@ -20,8 +20,10 @@
 </svelte:element>
 
 {#if description || children}
-	<p class="mb-6 text-sm text-gray-500 dark:text-gray-400 max-w-prose">
-		{description}
+	<div class="mb-6 text-sm text-gray-500 dark:text-gray-400 max-w-prose">
+		{#if description}
+			<p>{description}</p>
+		{/if}
 		{@render children?.()}
-	</p>
+	</div>
 {/if}

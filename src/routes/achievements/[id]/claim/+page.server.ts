@@ -1,4 +1,4 @@
-import { ClaimStatus, type Identifier } from '@prisma/client';
+import { ClaimStatus, type Identifier, type Visibility } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
 import type { AchievementClaim, ClaimEndorsement } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
@@ -7,6 +7,7 @@ import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
 import * as m from '$lib/i18n/messages';
+import { isVisibility } from '$lib/server/visibility';
 import stripTags from '$lib/utils/stripTags';
 
 export const load = async ({ locals, params, url }) => {
@@ -95,6 +96,8 @@ export const actions = {
 			achievement: { connect: { id: params.id } },
 			user: { connect: { id: locals.session.user.id } },
 			claimStatus: ClaimStatus.ACCEPTED,
+			// Snapshot the claimant's default visibility at creation time.
+			visibility: locals.session.user.defaultVisibility ?? 'COMMUNITY',
 
 			json: JSON.stringify(
 				Object.fromEntries(
@@ -200,6 +203,13 @@ export const actions = {
 		const narrative = stripTags(formData.get('narrative')?.toString());
 		const evidenceUrl = stripTags(formData.get('evidenceUrl')?.toString());
 
+		// Optional, owner-only visibility update. Validate against the enum; if the
+		// field is absent or invalid, leave the claim's visibility unchanged.
+		const visibilityRaw = formData.get('visibility')?.toString();
+		const visibility: Visibility | undefined = isVisibility(visibilityRaw)
+			? visibilityRaw
+			: undefined;
+
 		let updatedClaim: AchievementClaim | null = null;
 		if (claimStatus == 'ACCEPTED') {
 			// Update validFrom if needed, based on the achievement's review rules and existing endorsements.
@@ -239,6 +249,7 @@ export const actions = {
 				data: {
 					claimStatus,
 					validFrom,
+					...(visibility !== undefined && { visibility }),
 					json: JSON.stringify(
 						Object.fromEntries(
 							[
@@ -258,7 +269,7 @@ export const actions = {
 						achievementId: params.id as string
 					}
 				},
-				data: { claimStatus }
+				data: { claimStatus, ...(visibility !== undefined && { visibility }) }
 			});
 		}
 

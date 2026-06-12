@@ -2,6 +2,7 @@ import type { Visibility } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 
 import * as m from '$lib/i18n/messages';
+import { isVisibility } from '$lib/server/visibility';
 
 import { prisma } from '../../prisma/client';
 
@@ -19,10 +20,14 @@ export const actions: Actions = {
 		const requestData = await request.formData();
 		const givenName: string = requestData.get('givenName')?.toString() ?? '';
 		const familyName: string = requestData.get('familyName')?.toString() ?? '';
-		const defaultVisibility: Visibility =
-			(requestData.get('defaultVisibility')?.toString() as Visibility) ?? 'COMMUNITY'; // Todo validate
-		const identifierVisibility: Visibility =
-			(requestData.get('identifierVisibility')?.toString() as Visibility) ?? 'COMMUNITY'; // Todo validate
+		const defaultVisibilityRaw = requestData.get('defaultVisibility')?.toString();
+		const defaultVisibility: Visibility = isVisibility(defaultVisibilityRaw)
+			? defaultVisibilityRaw
+			: 'COMMUNITY';
+		const identifierVisibilityRaw = requestData.get('identifierVisibility')?.toString();
+		const identifierVisibility: Visibility = isVisibility(identifierVisibilityRaw)
+			? identifierVisibilityRaw
+			: 'COMMUNITY';
 
 		const user = await prisma.user.update({
 			where: { id: locals.session.user.id },

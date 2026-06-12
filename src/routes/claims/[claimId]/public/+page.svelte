@@ -2,7 +2,7 @@
 	import { MetaTags } from 'svelte-meta-tags';
 
 	import * as m from '$lib/i18n/messages';
-	import PublicClaimDetail from '$lib/partials/achievementClaim/PublicClaimDetail.svelte';
+	import ClaimDetail from '$lib/partials/achievementClaim/ClaimDetail.svelte';
 	import { staticImageUrlForAchievement } from '$lib/utils/imageUrl';
 
 	import type { PageProps } from './$types';
@@ -45,9 +45,16 @@
 	}}
 />
 
-<PublicClaimDetail
-	existingBadgeClaim={{
-		...data.claim,
-		achievement: achievementWithOrgData
+<!-- Public surface: reuse the shared ClaimDetail with viewer='public'. The
+	view-model yields an empty action set, so no owner affordances are exposed.
+	The public loader's `achievementConfig` carries a loosely-typed `json`; the
+	public view never opens the claim form (owner-only), so we present it to
+	ClaimDetail's typed contract via a localized cast. -->
+<ClaimDetail
+	claim={data.claim}
+	achievement={{
+		...achievementWithOrgData,
+		achievementConfig: achievementWithOrgData.achievementConfig as App.ConfigWithRelations | null
 	}}
+	viewer="public"
 />

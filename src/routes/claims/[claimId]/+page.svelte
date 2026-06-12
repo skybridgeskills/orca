@@ -1,18 +1,12 @@
 <script lang="ts">
 	import { setContext } from 'svelte';
 
-	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import ActionHeading from '$lib/components/ActionHeading.svelte';
-	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import EndorsementList from '$lib/components/EndorsementList.svelte';
-	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
 	import * as m from '$lib/i18n/messages';
-	import AcceptedClaimDetail from '$lib/partials/achievementClaim/AcceptedClaimDetail.svelte';
-	import RejectedClaimDetail from '$lib/partials/achievementClaim/RejectedClaimDetail.svelte';
-	import UnacceptedClaimDetail from '$lib/partials/achievementClaim/UnacceptedClaimDetail.svelte';
-	import { evidenceItem } from '$lib/utils/evidenceItem';
+	import ClaimDetail from '$lib/partials/achievementClaim/ClaimDetail.svelte';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 
 	import type { PageProps } from './$types';
@@ -22,11 +16,14 @@
 
 	let { data }: PageProps = $props();
 
-	const levelByStatus: Record<string, App.NotificationLevel> = {
-		UNACCEPTED: 'warning',
-		REJECTED: 'warning',
-		ACCEPTED: 'info'
-	};
+	// Single prop contract: normalize the loader's (claim, achievement, org)
+	// into the shape `ClaimDetail` consumes for BOTH routes. `data.org` comes
+	// from the root layout; `data.viewer` is P1's role, resolved server-side.
+	const achievementForDetail = $derived({
+		...data.achievement,
+		organization: data.org,
+		category: null
+	});
 
 	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
@@ -40,86 +37,16 @@
 	// setContext runs once during init; using the initial `data` is intentional.
 	// svelte-ignore state_referenced_locally
 	setContext('claimId', data.claim.id);
-
-	const translatedStatus = $derived.by(() => {
-		switch (data.claim.claimStatus) {
-			case 'ACCEPTED':
-				return m.bright_swift_eagle_soar();
-			case 'REJECTED':
-				return m.sharp_clear_fox_deny();
-			case 'UNACCEPTED':
-				return m.calm_steady_lynx_pause();
-			default:
-				return data.claim.claimStatus; // fallback to raw value
-		}
-	});
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
 
-{#if data.session?.user?.id == data.claim.userId}
-	{#if data.claim.claimStatus == 'ACCEPTED'}
-		<AcceptedClaimDetail
-			achievement={{ ...data.achievement, organization: data.org, category: null }}
-			existingBadgeClaim={data.claim}
-			exchangeEnabled={data.exchangeEnabled}
-		/>
-	{:else if data.claim.claimStatus == 'REJECTED'}
-		<RejectedClaimDetail achievement={data.achievement} existingBadgeClaim={data.claim} />
-	{:else if data.claim.claimStatus == 'UNACCEPTED'}
-		<UnacceptedClaimDetail achievement={data.achievement} existingBadgeClaim={data.claim} />
-	{/if}
-{:else}
-	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
-		{m.quick_clear_owl_otherbadge({
-			givenName: data.claim.user.givenName ?? '',
-			familyName: data.claim.user.familyName ?? ''
-		})}
-	</h1>
-
-	<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
-		{m.smooth_calm_guppy_ask()}
-	</p>
-	<AchievementSummary achievement={data.achievement} />
-{/if}
-
-{#if data.claim.userId != data.session?.user?.id}
-	<div class="max-w-2xl my-6">
-		<ActionHeading
-			text={m.swift_bold_eagle_announce({
-				givenName: data.claim.user.givenName ?? '',
-				familyName: data.claim.user.familyName ?? ''
-			})}
-		>
-			{#snippet actions()}
-				<span class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400"
-					>{data.claim.createdOn.toDateString()}</span
-				>
-			{/snippet}
-		</ActionHeading>
-
-		<EvidenceItem item={evidenceItem(data.claim)} />
-
-		<Alert level={levelByStatus[data.claim.claimStatus]}>
-			<p class="max-w-2xl text-sm">
-				<span class="font-bold">{m.kind_aqua_myna_jump()}</span>
-				{translatedStatus}
-			</p>
-			{#if data.claim.validFrom}
-				<p class="max-w-2xl mt-3 text-sm">
-					<span>{m.cuddly_fluffy_kite_drip()}:</span>
-					{data.claim.validFrom}
-				</p>
-			{/if}
-			{#if data.claim.validUntil}
-				<p class="max-w-2xl mt-3 text-sm">
-					<span>{m.tidy_fresh_seahorse_march()}:</span>
-					{data.claim.validUntil}
-				</p>
-			{/if}
-		</Alert>
-	</div>
-{/if}
+<ClaimDetail
+	claim={data.claim}
+	achievement={achievementForDetail}
+	viewer={data.viewer}
+	exchangeEnabled={data.exchangeEnabled}
+/>
 
 <div class="max-w-2xl mt-2">
 	<ActionHeading text={m.calm_steady_lynx_endorse({ count: data.endorsementCount })}>

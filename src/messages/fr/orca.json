@@ -431,5 +431,6 @@
 	"stark_dim_crow_warn": "Désactiver {appName} ?",
 	"plush_warm_dove_calm": "Ses jetons d'accès cessent de fonctionner immédiatement.",
 	"bleak_swift_raven_purge": "Supprimer {appName} ?",
-	"murky_lone_shark_burn": "Cela supprime l'application de votre organisation et ses jetons cessent de fonctionner immédiatement. Son historique est conservé, mais cette action est irréversible ici."
+	"murky_lone_shark_burn": "Cela supprime l'application de votre organisation et ses jetons cessent de fonctionner immédiatement. Son historique est conservé, mais cette action est irréversible ici.",
+	"mellow_brisk_otter_amend": "Modifier l’acceptation"
 }

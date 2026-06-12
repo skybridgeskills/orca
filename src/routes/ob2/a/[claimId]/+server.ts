@@ -35,6 +35,9 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 		});
 		if (!claim?.validFrom || claim?.claimStatus !== 'ACCEPTED')
 			error(404, m.sharp_flat_kite_clasp());
+		// Public JSON surface: only PUBLIC claims are served. 404 (not 403) avoids
+		// confirming a non-public claim exists.
+		else if (claim.visibility !== 'PUBLIC') error(404, m.sharp_flat_kite_clasp());
 		else if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
 		else error(404, m.fresh_bright_sparrow_notfound());

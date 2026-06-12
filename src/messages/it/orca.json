@@ -431,5 +431,6 @@
 	"stark_dim_crow_warn": "Disabilitare {appName}?",
 	"plush_warm_dove_calm": "I suoi token di accesso smettono di funzionare immediatamente.",
 	"bleak_swift_raven_purge": "Eliminare {appName}?",
-	"murky_lone_shark_burn": "Questo rimuove l'app dalla tua organizzazione e i suoi token smettono di funzionare immediatamente. La cronologia viene conservata, ma l'operazione non può essere annullata qui."
+	"murky_lone_shark_burn": "Questo rimuove l'app dalla tua organizzazione e i suoi token smettono di funzionare immediatamente. La cronologia viene conservata, ma l'operazione non può essere annullata qui.",
+	"mellow_brisk_otter_amend": "Modifica accettazione"
 }

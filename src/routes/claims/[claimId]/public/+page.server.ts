@@ -22,6 +22,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	});
 	if (!claim || claim?.organizationId != locals.org.id || claim.claimStatus != 'ACCEPTED')
 		error(404, m.best_sharp_lamb_enchant());
+	// Public/unauthenticated surface: only PUBLIC claims are served. 404 (not 403)
+	// avoids confirming a non-public claim exists.
+	if (claim.visibility !== 'PUBLIC') error(404, m.best_sharp_lamb_enchant());
 
 	return {
 		claim
