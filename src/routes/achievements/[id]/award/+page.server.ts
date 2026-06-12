@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 
 import { prisma } from '$lib/../prisma/client';
 import { inviteToClaim } from '$lib/data/achievement';
+import { canInviteToAchievement } from '$lib/server/permissions';
 import stripTags from '$lib/utils/stripTags';
 
 import type { PageServerLoad, Actions } from './$types';
@@ -24,6 +25,15 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			}
 		}
 	});
+
+	const inviteCapability = await canInviteToAchievement({
+		user: {
+			id: locals.session.user.id,
+			orgRole: locals.session.user.orgRole
+		},
+		achievementConfig: achievement.achievementConfig as App.AchievementConfig | null
+	});
+	if (!inviteCapability) redirect(302, `/achievements/${params.id}`);
 
 	return {
 		achievement: achievement

@@ -64,3 +64,40 @@ export async function canEditAchievements({
 
 	return !!userClaim;
 }
+
+interface CanInviteToAchievementParams {
+	user: {
+		id: string;
+		orgRole: string | null;
+	};
+	achievementConfig: App.AchievementConfig | null;
+}
+
+/**
+ * Check if a user may invite/award this achievement.
+ * Mirrors inviteToClaim authorization: admins always; others only when
+ * inviteRequires is configured and they hold a qualifying claim.
+ */
+export async function canInviteToAchievement({
+	user,
+	achievementConfig
+}: CanInviteToAchievementParams): Promise<boolean> {
+	if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(user.orgRole || 'none')) {
+		return true;
+	}
+
+	const inviteRequiresId = achievementConfig?.json?.capabilities?.inviteRequires;
+	if (!inviteRequiresId) {
+		return false;
+	}
+
+	const inviteQualificationClaim = await prisma.achievementClaim.findFirst({
+		where: {
+			achievementId: inviteRequiresId,
+			userId: user.id,
+			validFrom: { not: null }
+		}
+	});
+
+	return !!inviteQualificationClaim;
+}

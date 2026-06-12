@@ -4,7 +4,7 @@ import type { Actions } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import * as m from '$lib/i18n/messages';
-import { canEditAchievements } from '$lib/server/permissions';
+import { canEditAchievements, canInviteToAchievement } from '$lib/server/permissions';
 
 import type { PageServerLoad } from './$types';
 
@@ -71,6 +71,17 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			})
 		: [];
 
+	let inviteCapability = false;
+	if (locals.session?.user?.id) {
+		inviteCapability = await canInviteToAchievement({
+			user: {
+				id: locals.session.user.id,
+				orgRole: locals.session.user.orgRole
+			},
+			achievementConfig: achievement.achievementConfig as App.AchievementConfig | null
+		});
+	}
+
 	let outstandingInvites: (ClaimEndorsement & { creator: User | null })[] = [];
 	if (locals.session?.user?.id && relatedClaims.length == 0) {
 		outstandingInvites =
@@ -93,6 +104,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	return {
 		editAchievementCapability,
+		inviteCapability,
 		achievement,
 		relatedAchievements,
 		relatedClaims,

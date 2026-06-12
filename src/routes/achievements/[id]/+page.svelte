@@ -37,11 +37,6 @@
 		achievementsLoading,
 		fetchAchievements
 	} from '$lib/stores/achievementStore';
-	import {
-		backpackClaims,
-		backpackClaimsLoading,
-		fetchBackpackClaims
-	} from '$lib/stores/backpackStore';
 	import { ensureLoaded } from '$lib/stores/common';
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
@@ -82,16 +77,6 @@
 				(c.validUntil === null || new Date(c.validUntil) > new Date())
 		).length > 0
 	);
-	const inviteCapability = $derived(
-		isAdmin({ user: data.session?.user || undefined }) ||
-			(!!config?.json?.capabilities?.inviteRequires &&
-				!!$backpackClaims.find(
-					(c) =>
-						c.achievementId == config?.json?.capabilities?.inviteRequires &&
-						c.validFrom &&
-						c.claimStatus == 'ACCEPTED'
-				))
-	);
 	const reviewRequires: Achievement | undefined = $derived(
 		data.relatedAchievements
 			.filter((c) => data.achievement.achievementConfig?.reviewRequiresId == c.id)
@@ -110,7 +95,6 @@
 	onMount(async () => {
 		await ensureLoaded(achievementsLoading, fetchAchievements);
 		await ensureLoaded(acLoading, fetchAchievementCategories);
-		await ensureLoaded(backpackClaimsLoading, fetchBackpackClaims);
 		category = getCategoryById(data.achievement.categoryId ?? 'Uncategorized');
 	});
 </script>
@@ -122,7 +106,7 @@
 		{data.achievement.name}
 	</h1>
 	<div class="inline-flex items-center">
-		{#if inviteCapability}
+		{#if data.inviteCapability}
 			<Button
 				href={`/achievements/${data.achievement.id}/award`}
 				text={m.bright_happy_sparrow_award()}
@@ -374,7 +358,7 @@
 		<ClaimList
 			{...calculatePageAndSize($page.url)}
 			totalCount={data.achievement._count.achievementClaims}
-			enableInvites={inviteCapability}
+			enableInvites={data.inviteCapability}
 		/>
 	</div>
 {:else}
