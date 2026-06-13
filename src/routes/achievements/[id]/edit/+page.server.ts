@@ -163,6 +163,10 @@ export const actions: Actions = {
 
 			category: stripTags(requestData.get('category')?.toString()),
 
+			// OB3 achievementType: strip/trim, empty -> undefined (which clears the column below).
+			achievementType:
+				stripTags(requestData.get('achievementType')?.toString())?.trim() || undefined,
+
 			// Properties for AchievmentConfig
 			capabilities_inviteRequires:
 				requestData.get('capabilities_inviteRequires')?.toString() || null,
@@ -285,6 +289,7 @@ export const actions: Actions = {
 			description: formData.description,
 			criteriaId: formData.criteriaId,
 			criteriaNarrative: formData.criteriaNarrative,
+			achievementType: formData.achievementType ?? null,
 			...(imageUpdated ? { image: imageKey } : null), // Only include the image field value if image is changed.
 			category:
 				formData.category != 'uncategorized'

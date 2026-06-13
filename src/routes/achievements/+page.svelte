@@ -2,6 +2,7 @@
 	import type { AchievementCategory, Achievement } from '@prisma/client';
 	import { onMount } from 'svelte';
 
+	import AchievementIcon from '$lib/components/achievement/AchievementIcon.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
@@ -9,7 +10,6 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import * as m from '$lib/i18n/messages';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import {
 		achievementCategories,
 		acLoading,
@@ -21,7 +21,6 @@
 		fetchAchievements
 	} from '$lib/stores/achievementStore';
 	import { ensureLoaded, LoadingStatus } from '$lib/stores/common';
-	import { imageUrl } from '$lib/utils/imageUrl';
 
 	import type { PageProps } from './$types';
 
@@ -61,6 +60,11 @@
 <div class="flex items-center mb-9">
 	{#if data.editAchievementCapability}
 		<Button href="/achievements/create" text={m.fresh_bright_sparrow_create()} />
+		<Button
+			href="/achievements/add-skills"
+			text={m.plump_brisk_heron_gather()}
+			submodule="secondary"
+		/>
 	{/if}
 	{#if data.editCategoriesCapability}
 		<Button
@@ -88,17 +92,11 @@
 				<Card maxWidth="" hoverEffect={true} href="/achievements/{achievement.id}">
 					<div class="grid grid-cols-4 gap-2">
 						<div class="m-auto">
-							{#if achievement.image}
-								<img
-									src={imageUrl(achievement.image)}
-									class=""
-									alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
-								/>
-							{:else}
-								<div class="text-gray-400 dark:text-gray-700">
-									<Ribbon />
-								</div>
-							{/if}
+							<AchievementIcon
+								image={achievement.image}
+								achievementType={achievement.achievementType}
+								name={achievement.name}
+							/>
 						</div>
 
 						<div class="col-span-3">

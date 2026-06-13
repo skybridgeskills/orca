@@ -14,6 +14,7 @@
 	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
 	import { FaSolidTrash as FaTrashAlt } from 'svelte-icons-pack/fa';
 
+	import AchievementIcon from '$lib/components/achievement/AchievementIcon.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
 	import ClaimSummaryCard from '$lib/components/achievement/ClaimSummaryCard.svelte';
@@ -24,7 +25,6 @@
 	import QRCode from '$lib/components/QRCode.svelte';
 	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
 	import * as m from '$lib/i18n/messages';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
 	import { isAdmin } from '$lib/permissions/isAdmin';
 	import {
@@ -38,7 +38,6 @@
 		fetchAchievements
 	} from '$lib/stores/achievementStore';
 	import { ensureLoaded } from '$lib/stores/common';
-	import { imageUrl } from '$lib/utils/imageUrl';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 
 	import type { PageProps } from './$types';
@@ -160,16 +159,11 @@
 {/if}
 
 <div class="mb-4 max-w-xs dark:bg-gray-200 mt-4 p-2 rounded-md">
-	{#if data.achievement.image}
-		<img
-			src={imageUrl(data.achievement.image)}
-			alt={m.firm_steady_boar_imagealt({ name: data.achievement.name })}
-		/>
-	{:else}
-		<div class="text-gray-400 dark:text-gray-700">
-			<Ribbon />
-		</div>
-	{/if}
+	<AchievementIcon
+		image={data.achievement.image}
+		achievementType={data.achievement.achievementType}
+		name={data.achievement.name}
+	/>
 </div>
 
 <p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">

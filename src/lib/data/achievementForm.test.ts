@@ -43,3 +43,21 @@ describe('achievementFormSchema: capabilities_inviteRequires', () => {
 		await expect(at('not-a-uuid')).rejects.toThrow();
 	});
 });
+
+describe('achievementFormSchema: achievementType', () => {
+	const at = (value: unknown) =>
+		achievementFormSchema.validateAt('achievementType', { achievementType: value });
+
+	it('accepts an allow-list term', async () => {
+		await expect(at('Competency')).resolves.toBe('Competency');
+	});
+
+	it('accepts empty / null (no type), coercing empty -> null', async () => {
+		await expect(at('')).resolves.toBeNull();
+		await expect(at(null)).resolves.toBeNull();
+	});
+
+	it('rejects an unknown type', async () => {
+		await expect(at('NotARealType')).rejects.toThrow();
+	});
+});

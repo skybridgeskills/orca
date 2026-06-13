@@ -2,6 +2,7 @@ import * as yup from 'yup';
 
 import * as m from '$lib/i18n/messages';
 
+import { ACHIEVEMENT_TYPES } from './achievementType';
 import { alignmentsArraySchema } from './alignment';
 
 const emptyNulled = (value: string | null) => (value === '' ? null : value);
@@ -28,6 +29,13 @@ export const achievementFormSchema = yup
 		description: yup.string().required(),
 		criteriaId: yup.string().url('A complete valid URL is required if provided.').nullable(),
 		criteriaNarrative: yup.string().nullable(),
+
+		// OB3 AchievementType (B.1.28); empty -> null, otherwise must be an allow-list term.
+		achievementType: yup
+			.string()
+			.transform(emptyNulled)
+			.nullable()
+			.oneOf([null, ...ACHIEVEMENT_TYPES], 'achievementType must be a valid OB3 achievement type'),
 
 		claimable: yup.string().oneOf(['on', 'off']),
 		claimableSelectedOption: yup.string().oneOf(['off', 'badge', 'public']),

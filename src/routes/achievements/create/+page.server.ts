@@ -150,6 +150,9 @@ export const actions: Actions = {
 			capabilities_inviteRequires:
 				requestData.get('capabilities_inviteRequires')?.toString() || null,
 			claimTemplate: claimTemplate_enabled ? rawClaimTemplate : '',
+			// OB3 achievementType: strip/trim, empty -> undefined (cleared column).
+			achievementType:
+				stripTags(requestData.get('achievementType')?.toString())?.trim() || undefined,
 			alignments: rawAlignments
 		};
 
@@ -215,6 +218,7 @@ export const actions: Actions = {
 			description: formData.description,
 			criteriaId: formData.criteriaId,
 			criteriaNarrative: formData.criteriaNarrative,
+			achievementType: formData.achievementType ?? null,
 			image: imageKey,
 			claimable: formData.claimable == 'on',
 			claimRequiresId:
