@@ -284,12 +284,21 @@ export const actions: Actions = {
 			delete mergedAchievementJson.resultDescriptions;
 		}
 
+		// Preserve the stored achievementType on a plain edit. The edit form does not
+		// expose this field, so only overwrite it when the request actually carries it
+		// (e.g. a future type picker). Without this guard every edit would write null and
+		// wipe a type set elsewhere — e.g. the skills picker's 'Competency' — which would
+		// revert the competency icon to the no-image (Ribbon) fallback.
+		const achievementTypeUpdate = requestData.has('achievementType')
+			? { achievementType: formData.achievementType ?? null }
+			: {};
+
 		const achievementData = {
 			name: formData.name,
 			description: formData.description,
 			criteriaId: formData.criteriaId,
 			criteriaNarrative: formData.criteriaNarrative,
-			achievementType: formData.achievementType ?? null,
+			...achievementTypeUpdate,
 			...(imageUpdated ? { image: imageKey } : null), // Only include the image field value if image is changed.
 			category:
 				formData.category && formData.category != 'uncategorized'
