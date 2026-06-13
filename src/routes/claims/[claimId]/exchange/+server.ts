@@ -4,6 +4,7 @@ import { error, json } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import { buildAchievementCredentialTemplate } from '$lib/credentials/credentialTemplate';
 import * as m from '$lib/i18n/messages';
+import { isSuspended } from '$lib/server/moderation/suspension';
 import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 import {
@@ -36,6 +37,19 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 		claim.claimStatus !== 'ACCEPTED'
 	) {
 		error(404, m.best_sharp_lamb_enchant());
+	}
+
+	// P5 moderation: block wallet exchange (credential issuance) for a suspended claim or
+	// a suspended achievement.
+	if (
+		(await isSuspended({ originOrgId: locals.org.id, targetType: 'CLAIM', targetId: claim.id })) ||
+		(await isSuspended({
+			originOrgId: locals.org.id,
+			targetType: 'ACHIEVEMENT',
+			targetId: claim.achievementId
+		}))
+	) {
+		error(403, m.glum_stout_seal_block());
 	}
 
 	const template = buildAchievementCredentialTemplate(claim, locals.org as Organization, {

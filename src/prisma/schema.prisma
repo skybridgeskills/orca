@@ -34,6 +34,8 @@ model Organization {
   oauthAuthorizationCodes OAuthAuthorizationCode[]
   oauthAccessTokens       OAuthAccessToken[]
   messages                Message[]
+  reports                 Report[]
+  moderationActions       ModerationAction[]
 }
 
 model User {
@@ -56,6 +58,8 @@ model User {
   oauthAuthorizationCodes   OAuthAuthorizationCode[]
   oauthAccessTokens         OAuthAccessToken[]
   createdOAuthClients       OAuthClient[]            @relation("CreatedOAuthClients")
+  reportsFiled              Report[]                 @relation("ReportReporter")
+  moderationActions         ModerationAction[]       @relation("ModerationActor")
 }
 
 model Identifier {
@@ -79,12 +83,60 @@ model Message {
   type           MessageType
   achievementId  String?
   claimId        String?
+  reportId       String?
   createdAt      DateTime     @default(now())
   organization   Organization @relation(fields: [organizationId], references: [id])
   user           User         @relation(fields: [userId], references: [id])
+  report         Report?      @relation(fields: [reportId], references: [id])
 
   @@index([userId, type, achievementId, createdAt])
   @@index([organizationId, createdAt])
+  @@index([reportId])
+}
+
+// A user-submitted report against a piece of content (achievement, claim, or
+// endorsement). Lives logically in the origin org (`originOrgId`). Reporter identity
+// (`reporterUserId`) is stored but MUST NOT be exposed to org admins — only to
+// superadmin-org viewers. `reporterStatus` is snapshotted at submit time.
+model Report {
+  id             String           @id @default(uuid())
+  originOrgId    String
+  targetType     ReportTargetType
+  targetId       String
+  reporterUserId String?
+  reporterStatus ReporterStatus
+  reason         String
+  description    String?
+  createdAt      DateTime         @default(now())
+  originOrg      Organization     @relation(fields: [originOrgId], references: [id])
+  reporter       User?            @relation("ReportReporter", fields: [reporterUserId], references: [id])
+  messages       Message[]
+
+  @@index([originOrgId, targetType, targetId])
+}
+
+// A moderation action (suspension) against a content target. `tier` distinguishes an
+// org-admin (ORG) action from a superadmin (SITE) action; a SITE suspension cannot be
+// lifted by an ORG-tier actor. An active suspension = an unlifted SUSPEND row. Doubles
+// as an audit log.
+model ModerationAction {
+  id             String               @id @default(uuid())
+  originOrgId    String
+  targetType     ReportTargetType
+  targetId       String
+  action         ModerationActionType @default(SUSPEND)
+  tier           ModerationTier
+  actorUserId    String
+  actorOrgId     String
+  reason         String?
+  createdAt      DateTime             @default(now())
+  liftedAt       DateTime?
+  liftedByUserId String?
+  liftedTier     ModerationTier?
+  originOrg      Organization         @relation(fields: [originOrgId], references: [id])
+  actor          User                 @relation("ModerationActor", fields: [actorUserId], references: [id])
+
+  @@index([originOrgId, targetType, targetId, liftedAt])
 }
 
 model Achievement {
@@ -339,4 +391,27 @@ enum OAuthClientType {
 
 enum MessageType {
   REVIEW_NEEDED
+  CONTENT_REPORTED
+}
+
+enum ReportTargetType {
+  ACHIEVEMENT
+  CLAIM
+  ENDORSEMENT
+}
+
+enum ReporterStatus {
+  ANONYMOUS
+  USER
+  MEMBER
+  ADMIN
+}
+
+enum ModerationTier {
+  ORG
+  SITE
+}
+
+enum ModerationActionType {
+  SUSPEND
 }

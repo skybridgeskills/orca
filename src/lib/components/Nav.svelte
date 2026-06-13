@@ -138,6 +138,11 @@
 							title={m.steady_plane_cuckoo_fry()}
 							onclick={closeMobileMenu}
 						/>
+						<NavItem
+							href="/messages"
+							title={m.plain_calm_otter_inbox()}
+							onclick={closeMobileMenu}
+						/>
 						<li class="hidden md:block">
 							<IconButton
 								id="profile-menu-button"

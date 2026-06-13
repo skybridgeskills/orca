@@ -17,9 +17,15 @@
 		 * touching `ClaimDetail`'s layout.
 		 */
 		visibility?: Snippet;
+		/**
+		 * P2: a "…" report-content menu rendered alongside the title. Available to
+		 * any viewer of the claim. Supplied by `ClaimDetail`, which owns the modal
+		 * state shared with the public surface.
+		 */
+		report?: Snippet;
 	}
 
-	let { claim, viewer, visibility }: Props = $props();
+	let { claim, viewer, visibility, report }: Props = $props();
 
 	// Title + lede copy, preserved verbatim from the per-status / per-viewer
 	// partials being replaced:
@@ -61,7 +67,10 @@
 	});
 </script>
 
-<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{title}</h1>
+<div class="flex justify-between items-start gap-2">
+	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">{title}</h1>
+	{@render report?.()}
+</div>
 
 {#if lede}
 	<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">{lede}</p>

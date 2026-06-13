@@ -14,6 +14,10 @@ vi.mock('$lib/ob2/badgeAssertion', () => ({
 	badgeAssertionFromAchievementClaim: mockBadgeAssertion
 }));
 
+// P5: the public OB2 emitter now blocks suspended content; default to "not suspended".
+const mockIsSuspended = vi.hoisted(() => vi.fn().mockResolvedValue(false));
+vi.mock('$lib/server/moderation/suspension', () => ({ isSuspended: mockIsSuspended }));
+
 import { GET } from './+server';
 
 const ORG = { id: 'org-1' } as App.Organization;
@@ -55,6 +59,7 @@ describe('GET /ob2/a/[claimId]', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockBadgeAssertion.mockReturnValue({ id: 'assertion' });
+		mockIsSuspended.mockResolvedValue(false);
 	});
 
 	it('serves the assertion for a PUBLIC accepted claim', async () => {

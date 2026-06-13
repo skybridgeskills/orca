@@ -14,7 +14,9 @@
 	import Alert from '$lib/components/Alert.svelte';
 	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import KebabMenu from '$lib/components/KebabMenu.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import ReportModal from '$lib/components/moderation/ReportModal.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import * as m from '$lib/i18n/messages';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
@@ -69,6 +71,10 @@
 	let sendToWalletModalVisible = $state(false);
 	let showQRShareModal = $state(false);
 	let exchangeModalOpen = $state(false);
+	// Report-content affordance: available to ANY viewer of the claim (incl. the
+	// public / anonymous surface). The kebab + modal live here so both the authed
+	// and public branches share one state and one ReportModal instance.
+	let showReportModal = $state(false);
 
 	onMount(async () => {
 		// Owner-only: the credential-handler polyfill is only needed for the
@@ -259,9 +265,28 @@
 	});
 </script>
 
+{#snippet reportKebab()}
+	<KebabMenu id="claim-kebab" label={m.brisk_zesty_otter_flag()}>
+		<li>
+			<button
+				type="button"
+				class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+				onclick={() => {
+					showReportModal = true;
+				}}
+			>
+				{m.brisk_zesty_otter_flag()}
+			</button>
+		</li>
+	</KebabMenu>
+{/snippet}
+
 {#if isPublic}
 	<!-- Public surface (ACCEPTED + PUBLIC only): preserves PublicClaimDetail. -->
-	<Heading level="h1" title={`${m.fresh_bright_sparrow_earned()}: ${achievement.name}`} />
+	<div class="flex justify-between items-start gap-2">
+		<Heading level="h1" title={`${m.fresh_bright_sparrow_earned()}: ${achievement.name}`} />
+		{@render reportKebab()}
+	</div>
 
 	<AchievementSummary {achievement} {claim} />
 
@@ -282,7 +307,7 @@
 
 	<AchievementClaimEvidence {claim} />
 {:else}
-	<ClaimHeader {claim} {viewer} {visibility} />
+	<ClaimHeader {claim} {viewer} {visibility} report={reportKebab} />
 
 	{#if isOwner && claim.claimStatus === 'REJECTED'}
 		<Alert level="warning" message={m.piquant_curly_mantis_tickle()} />
@@ -443,3 +468,6 @@
 		/>
 	{/if}
 {/if}
+
+<!-- Available to every viewer (owner, admin, community, public/anonymous). -->
+<ReportModal targetType="CLAIM" targetId={claim.id} bind:open={showReportModal} />

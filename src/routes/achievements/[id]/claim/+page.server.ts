@@ -8,6 +8,7 @@ import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
 import { resultsFromEndorsementJson, reviewIsCurrent } from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
+import { isSuspended } from '$lib/server/moderation/suspension';
 import { notifyStewardsForReview, stewardIdsFor } from '$lib/server/stewards';
 import { isVisibility } from '$lib/server/visibility';
 import stripTags from '$lib/utils/stripTags';
@@ -58,6 +59,16 @@ export const actions = {
 		}
 
 		const achievement = await getAchievement(params.id, locals.org.id);
+
+		// P5 moderation: no new claims against a suspended achievement.
+		if (
+			await isSuspended({
+				originOrgId: locals.org.id,
+				targetType: 'ACHIEVEMENT',
+				targetId: params.id
+			})
+		)
+			error(403, m.glum_stout_toad_block());
 
 		const formData = await request.formData();
 		const inviteId = formData.get('inviteId')?.toString();

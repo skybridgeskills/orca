@@ -65,10 +65,10 @@ describe('notifyStewardsForReview', () => {
 		expect(vi.mocked(prisma.user.findMany).mock.calls[0][0]).toMatchObject({
 			where: { id: { in: ['s-1', 's-2', 'claimant'] }, organizationId: 'org-1' }
 		});
-		// points at the claim's endorse page
-		expect(vi.mocked(sendUserMessage).mock.calls[0][0].email.cta?.url).toBe(
-			'https://org.example.com/claims/claim-1/endorse'
-		);
+		// points at the claim's endorse page (steward caller passes the object form)
+		const email = vi.mocked(sendUserMessage).mock.calls[0][0].email;
+		const built = typeof email === 'function' ? email('m-1') : email;
+		expect(built.cta?.url).toBe('https://org.example.com/claims/claim-1/endorse');
 	});
 
 	it('does nothing when the achievement has no stewards', async () => {

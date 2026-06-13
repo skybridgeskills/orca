@@ -2,6 +2,8 @@ import { json } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import { resultsFromEndorsementJson, reviewIsCurrent } from '$lib/data/resultDescription';
+import { isAdmin } from '$lib/permissions/isAdmin';
+import { annotateSuspensions } from '$lib/server/moderation/suspension';
 import { calculatePageAndSize } from '$lib/utils/pagination';
 
 import type { RequestEvent } from './$types';
@@ -33,13 +35,29 @@ export const GET = async ({ url, locals }: RequestEvent) => {
 		orderBy: { createdAt: 'asc' }
 	});
 
+	// P5 moderation: one batched suspension query for the page (no N+1). Suspended
+	// endorsements are hidden from non-admins and flagged for admins.
+	const viewerIsAdmin = isAdmin({ user: locals.session?.user ?? undefined });
+	const annotated = await annotateSuspensions(locals.org.id, endorsements, (e) => ({
+		targetType: 'ENDORSEMENT',
+		targetId: e.id
+	}));
+	const visible = annotated.filter((row) => viewerIsAdmin || !row.suspended);
+
 	// Attach parsed self-describing results + a server-computed `current` flag (a review
 	// is stale if any result references an RD no longer in the current rubric).
-	const enriched = endorsements.map((endorsement) => {
+	const enriched = visible.map(({ item: endorsement, suspended }) => {
 		const results = resultsFromEndorsementJson(endorsement.json);
-		return { ...endorsement, results, current: reviewIsCurrent(results, claim.achievement.json) };
+		return {
+			...endorsement,
+			results,
+			current: reviewIsCurrent(results, claim.achievement.json),
+			suspended
+		};
 	});
 
+	// Count is best-effort: for admins it is the true total; for non-admins suspended
+	// rows are dropped post-query (a pagination corner — see P5 deferrals).
 	const total = await prisma.claimEndorsement.count({
 		where: {
 			claimId: claimId

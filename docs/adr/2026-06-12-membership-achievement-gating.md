@@ -6,11 +6,11 @@
 
 ## Context
 
-ORCA already lets an org gate the *edit-achievements* capability behind holding a
+ORCA already lets an org gate the _edit-achievements_ capability behind holding a
 specific achievement (`org.json.permissions.editAchievementCapability.requiresAchievement`,
 enforced by `canEditAchievements`). We want a parallel notion of **membership**: an
 org designates a "membership achievement", and holding a valid claim of it makes a
-user a *member* who can see the community (the members directory, the claims/earners
+user a _member_ who can see the community (the members directory, the claims/earners
 list on an achievement, and each other's profiles).
 
 Before this change the members list, member profiles, and the achievement claims list
@@ -23,19 +23,19 @@ control over appearing in the directory.
    `org.json.permissions.membershipAchievement.requiresAchievement` (mirrors the
    edit-capability key; configured in `about/edit` via the same `AchievementSelect`
    pattern). A **member** = an admin (`GENERAL_ADMIN`/`CONTENT_ADMIN`) **or** a user
-   holding a *valid* claim of that achievement. "Valid" reuses the existing rule:
+   holding a _valid_ claim of that achievement. "Valid" reuses the existing rule:
    `claimStatus: 'ACCEPTED'`, `validFrom` set, `validUntil` null or future. Enforced by
    `isMember()` in `src/lib/server/permissions.ts`; the validity fragment
    `validMembershipClaimWhere()` is the single source of truth shared by every gated
    query.
 
-2. **Unset = open (backwards-compatible).** When an org has *not* configured a
+2. **Unset = open (backwards-compatible).** When an org has _not_ configured a
    membership achievement, the members list, profiles, and claims list behave exactly
    as before (open to logged-in org users). Gating activates only once an admin sets
    it, so no existing org is disrupted.
 
 3. **Dedicated `User.profileVisibility` column.** A new `Visibility` column (default
-   `COMMUNITY`), separate from `defaultVisibility` (which remains *claim* visibility),
+   `COMMUNITY`), separate from `defaultVisibility` (which remains _claim_ visibility),
    set in user settings. The threshold for "visible to other members" is the existing
    `COMMUNITY_VISIBLE` set (`PUBLIC|COMMUNITY|ACHIEVEMENT`); `PRIVATE` hides a member
    from other members (admins still see them). A real column — not a `User.json` key —
@@ -43,7 +43,7 @@ control over appearing in the directory.
 
 4. **Server-side enforcement; admins are the superset.** All gating lives in load
    functions and the claims API, never only in the client. Admins always pass every
-   gate and, as *viewers*, see everyone (members + non-members); admin-only rows render
+   gate and, as _viewers_, see everyone (members + non-members); admin-only rows render
    as non-clickable plain text rather than being hidden.
 
 5. **Claims-list profile-linkability computed per page, cheaply.** The
@@ -85,4 +85,3 @@ control over appearing in the directory.
   view, so links are hidden there directly.
 - **Unset = admins-only.** Rejected: it would silently restrict every org that hasn't
   configured membership; "unset = open" preserves current behavior until opt-in.
-</content>

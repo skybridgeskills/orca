@@ -4,6 +4,7 @@
 
 	import AchievementIcon from '$lib/components/achievement/AchievementIcon.svelte';
 	import Alert from '$lib/components/Alert.svelte';
+	import Badge from '$lib/components/Badge.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
@@ -100,8 +101,13 @@
 						</div>
 
 						<div class="col-span-3">
-							<h3 class="mb-2 text-base font-bold tracking-tight text-gray-900 dark:text-white">
+							<h3
+								class="mb-2 text-base font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2 flex-wrap"
+							>
 								{achievement.name}
+								{#if achievement.suspended}
+									<Badge text={m.flat_grey_moth_flag()} variant="danger" />
+								{/if}
 							</h3>
 
 							<p class="mb-3 text-xs font-normal text-gray-700 dark:text-gray-400">

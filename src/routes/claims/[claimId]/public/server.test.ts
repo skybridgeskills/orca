@@ -9,6 +9,10 @@ vi.mock('$lib/../prisma/client', () => ({
 	prisma: { achievementClaim: { findUnique: mockFindUnique } }
 }));
 
+// P5: the public load now checks suspension; default to "not suspended" here.
+const mockIsSuspended = vi.hoisted(() => vi.fn().mockResolvedValue(false));
+vi.mock('$lib/server/moderation/suspension', () => ({ isSuspended: mockIsSuspended }));
+
 import { load } from './+page.server';
 
 const ORG = { id: 'org-1' } as App.Organization;
@@ -46,6 +50,7 @@ function isKitError(e: unknown): e is { status: number; body: { message: string 
 describe('GET /claims/[claimId]/public', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		mockIsSuspended.mockResolvedValue(false);
 	});
 
 	it('serves a PUBLIC accepted claim', async () => {

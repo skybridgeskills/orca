@@ -4,6 +4,8 @@ import type { Actions } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
+import { activeSuspensionFor } from '$lib/server/moderation/suspension';
 import {
 	canEditAchievements,
 	canInviteToAchievement,
@@ -41,6 +43,17 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			}
 		}
 	});
+
+	// P5 moderation: a suspended achievement is hidden from non-admins (treat as removed)
+	// and shown to admins with a `suspension` flag. Origin org for an org-owned
+	// achievement is its own org (== locals.org here).
+	const viewerIsAdmin = isAdmin({ user: locals.session?.user ?? undefined });
+	const suspension = await activeSuspensionFor({
+		originOrgId: locals.org.id,
+		targetType: 'ACHIEVEMENT',
+		targetId: achievementId
+	});
+	if (suspension && !viewerIsAdmin) error(404, m.best_sharp_lamb_enchant());
 
 	const relatedAchievements = await prisma.achievement.findMany({
 		where: {
@@ -123,6 +136,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		inviteCapability,
 		canViewClaimsList,
 		achievement,
+		// P5: present only to admins (non-admins 404 above). Drives the suspended marker.
+		suspension: suspension ? { tier: suspension.tier } : null,
 		relatedAchievements,
 		relatedClaims,
 		outstandingInvites

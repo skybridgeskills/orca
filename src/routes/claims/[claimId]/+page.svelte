@@ -2,6 +2,7 @@
 	import { setContext } from 'svelte';
 
 	import ActionHeading from '$lib/components/ActionHeading.svelte';
+	import Badge from '$lib/components/Badge.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import EndorsementList from '$lib/components/EndorsementList.svelte';
@@ -40,6 +41,15 @@
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
+
+{#if data.suspension}
+	<div class="max-w-2xl mb-3">
+		<Badge
+			text={data.suspension.tier === 'SITE' ? m.flat_grey_moth_global() : m.flat_grey_moth_local()}
+			variant="danger"
+		/>
+	</div>
+{/if}
 
 <ClaimDetail
 	claim={data.claim}

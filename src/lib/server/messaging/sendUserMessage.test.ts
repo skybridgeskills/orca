@@ -100,4 +100,48 @@ describe('sendUserMessage', () => {
 		expect(result).toBe('failed');
 		expect(prisma.message.create).not.toHaveBeenCalled();
 	});
+
+	it('persists reportId and creates the row with the same id the email linked to', async () => {
+		vi.mocked(prisma.message.findFirst).mockResolvedValue(null as never);
+		vi.mocked(sendOrcaMail).mockResolvedValue({ success: true });
+		vi.mocked(prisma.message.create).mockResolvedValue({ id: 'm-1' } as never);
+
+		let linkedId: string | undefined;
+		const result = await sendUserMessage(
+			args({
+				type: MessageType.CONTENT_REPORTED,
+				achievementId: undefined,
+				claimId: undefined,
+				reportId: 'report-9',
+				email: (messageId) => {
+					linkedId = messageId;
+					return {
+						subject: 's',
+						title: 't',
+						text: 'plain',
+						cta: { label: 'v', url: `/messages/${messageId}` }
+					};
+				}
+			})
+		);
+
+		expect(result).toBe('sent');
+		const createArg = vi.mocked(prisma.message.create).mock.calls[0][0] as {
+			data: { id: string; reportId: string; type: string };
+		};
+		expect(createArg.data.reportId).toBe('report-9');
+		expect(createArg.data.type).toBe('CONTENT_REPORTED');
+		// The row id equals the id passed to the email builder (so the link resolves).
+		expect(createArg.data.id).toBe(linkedId);
+	});
+
+	it('does not invoke the email builder when throttled (no send, no record)', async () => {
+		vi.mocked(prisma.message.findFirst).mockResolvedValue({ id: 'm-1' } as never);
+		const builder = vi.fn(() => ({ subject: 's', title: 't', text: 'plain' }));
+		const result = await sendUserMessage(args({ reportId: 'report-9', email: builder }));
+		expect(result).toBe('suppressed_throttle');
+		expect(builder).not.toHaveBeenCalled();
+		expect(sendOrcaMail).not.toHaveBeenCalled();
+		expect(prisma.message.create).not.toHaveBeenCalled();
+	});
 });

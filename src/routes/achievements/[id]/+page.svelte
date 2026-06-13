@@ -18,10 +18,13 @@
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
 	import ClaimSummaryCard from '$lib/components/achievement/ClaimSummaryCard.svelte';
+	import Badge from '$lib/components/Badge.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import KebabMenu from '$lib/components/KebabMenu.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import ReportModal from '$lib/components/moderation/ReportModal.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
 	import * as m from '$lib/i18n/messages';
@@ -54,6 +57,7 @@
 	const hasAlignments = $derived(alignments.length > 0);
 	let showDeleteModal = $state(false);
 	let showShareModal = $state(false);
+	let showReportModal = $state(false);
 
 	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
@@ -99,8 +103,18 @@
 <Breadcrumbs items={breadcrumbItems} />
 
 <div class="max-w-2xl flex justify-between items-center mb-4">
-	<h1 class="inline-flex mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white">
+	<h1
+		class="inline-flex items-center gap-2 mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white"
+	>
 		{data.achievement.name}
+		{#if data.suspension}
+			<Badge
+				text={data.suspension.tier === 'SITE'
+					? m.flat_grey_moth_global()
+					: m.flat_grey_moth_local()}
+				variant="danger"
+			/>
+		{/if}
 	</h1>
 	<div class="inline-flex items-center">
 		{#if data.inviteCapability}
@@ -148,6 +162,19 @@
 				submodule="primary"
 			/>
 		{/if}
+		<KebabMenu id="achievement-kebab" label={m.brisk_zesty_otter_flag()}>
+			<li>
+				<button
+					type="button"
+					class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+					onclick={() => {
+						showReportModal = true;
+					}}
+				>
+					{m.brisk_zesty_otter_flag()}
+				</button>
+			</li>
+		</KebabMenu>
 	</div>
 </div>
 
@@ -444,3 +471,5 @@
 		alt={m.plane_light_fish_view()}
 	/>
 </Modal>
+
+<ReportModal targetType="ACHIEVEMENT" targetId={data.achievement.id} bind:open={showReportModal} />

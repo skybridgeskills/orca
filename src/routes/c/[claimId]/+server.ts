@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 
 import * as m from '$lib/i18n/messages';
 import { badgeAssertionFromAchievementClaim } from '$lib/ob2/badgeAssertion';
+import { isSuspended } from '$lib/server/moderation/suspension';
 import { prefersHtml } from '$lib/utils/contentNegotiation';
 
 import { prisma } from '../../../prisma/client';
@@ -34,6 +35,22 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 		// Public JSON surface: only PUBLIC claims are served. 404 (not 403) avoids
 		// confirming a non-public claim exists.
 		if (claim.visibility !== 'PUBLIC') error(404, m.sharp_flat_kite_clasp());
+		// P5 moderation: never emit a public OB2 assertion for suspended content (the
+		// claim itself or its underlying achievement).
+		if (
+			(await isSuspended({
+				originOrgId: claim.organizationId,
+				targetType: 'CLAIM',
+				targetId: claim.id
+			})) ||
+			(await isSuspended({
+				originOrgId: claim.organizationId,
+				targetType: 'ACHIEVEMENT',
+				targetId: claim.achievementId
+			}))
+		) {
+			error(404, m.sharp_flat_kite_clasp());
+		}
 		if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
 		// TODO return the OB3 version, once access control is properly implemented

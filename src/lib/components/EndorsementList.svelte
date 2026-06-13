@@ -2,6 +2,9 @@
 	import type { ClaimEndorsement, User } from '@prisma/client';
 	import { getContext } from 'svelte';
 
+	import Badge from '$lib/components/Badge.svelte';
+	import KebabMenu from '$lib/components/KebabMenu.svelte';
+	import ReportModal from '$lib/components/moderation/ReportModal.svelte';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import * as m from '$lib/i18n/messages';
 	import { evidenceItem } from '$lib/utils/evidenceItem';
@@ -15,6 +18,8 @@
 		creator: User | null;
 		results?: App.Result[];
 		current?: boolean;
+		// P5: server flags suspended endorsements (admins only; non-admins never receive them).
+		suspended?: boolean;
 	};
 
 	const claimId = getContext('claimId');
@@ -41,6 +46,10 @@
 
 	let endorsements: EndorsementTableData[] = $state([]);
 
+	// Which endorsement (if any) is currently being reported. One shared modal,
+	// keyed by id, so any viewer (incl. anonymous) can report a specific row.
+	let reportingEndorsementId = $state<string | null>(null);
+
 	const getFetchUrl = (pageToFetch: number) => {
 		return `/endorsements?claimId=${claimId}&${PAGE_QUERY_PARAM}=${pageToFetch}&${PAGE_SIZE_QUERY_PARAM}=${pageSize}`;
 	};
@@ -64,15 +73,38 @@
 			<Card maxWidth="max-w-2xl mb-3">
 				<ActionHeading>
 					{#snippet heading()}
-						<span class="dark:text-gray-400">
+						<span class="dark:text-gray-400 inline-flex items-center gap-2">
 							{#if endorsement.creator?.givenName || endorsement.creator?.familyName}
 								{endorsement.creator?.givenName || ''}
 								{endorsement.creator?.familyName || ''}
 							{/if}
+							{#if endorsement.suspended}
+								<Badge text={m.flat_grey_moth_flag()} variant="danger" />
+							{/if}
 						</span>
 					{/snippet}
 					{#snippet actions()}
-						<span class="dark:text-gray-400">{new Date(endorsement.createdAt).toDateString()}</span>
+						<span class="inline-flex items-center gap-1">
+							<span class="dark:text-gray-400"
+								>{new Date(endorsement.createdAt).toDateString()}</span
+							>
+							<KebabMenu
+								id={`endorsement-kebab-${endorsement.id}`}
+								label={m.brisk_zesty_otter_flag()}
+							>
+								<li>
+									<button
+										type="button"
+										class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+										onclick={() => {
+											reportingEndorsementId = endorsement.id;
+										}}
+									>
+										{m.brisk_zesty_otter_flag()}
+									</button>
+								</li>
+							</KebabMenu>
+						</span>
 					{/snippet}
 				</ActionHeading>
 
@@ -99,3 +131,14 @@
 		{/each}
 	</div>
 {/await}
+
+{#if reportingEndorsementId}
+	<ReportModal
+		targetType="ENDORSEMENT"
+		targetId={reportingEndorsementId}
+		open={true}
+		onclose={() => {
+			reportingEndorsementId = null;
+		}}
+	/>
+{/if}

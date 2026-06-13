@@ -146,6 +146,9 @@ declare namespace App {
 		claimRequires?: import('@prisma/client').Achievement | null;
 		reviewRequires?: import('@prisma/client').Achievement | null;
 		category?: import('@prisma/client').AchievementCategory | null;
+		// P5 moderation: present on list rows for admins (the API flags suspended
+		// achievements; non-admins never receive suspended rows).
+		suspended?: boolean;
 	}
 
 	// Design System
