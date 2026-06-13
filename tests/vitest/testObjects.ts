@@ -56,7 +56,8 @@ export const testUserIdentifier: Identifier = {
 	verifiedAt: testDate,
 	userId: testUser.id,
 	organizationId: testOrganization.id,
-	visibility: 'PRIVATE'
+	visibility: 'PRIVATE',
+	json: {}
 };
 
 export const testAchievement: Achievement = {

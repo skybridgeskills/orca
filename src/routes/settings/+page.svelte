@@ -1,9 +1,16 @@
 <script lang="ts">
+	import { startRegistration } from '@simplewebauthn/browser';
+
 	import Button from '$lib/components/Button.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import * as m from '$lib/i18n/messages';
 
 	import type { PageData } from './$types';
+
+	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
+
 	export let data: PageData;
 	const noErrors: { [key: string]: string | null } = {
 		givenName: null,
@@ -12,15 +19,68 @@
 		defaultVisibility: null
 	};
 	let errors = { ...noErrors };
+	// Passkeys are authenticators, never contact/identity: exclude PASSKEY rows from the
+	// contact Identifiers table + the contact-visibility control. They appear only in the
+	// Passkeys section below.
+	$: contactIdentifiers = (data.session?.user?.identifiers ?? []).filter(
+		(i) => i.type !== 'PASSKEY'
+	);
 	let formData = {
 		givenName: data.session?.user?.givenName ?? '',
 		familyName: data.session?.user?.familyName ?? '',
-		identifierVisibility:
-			data.session?.user?.identifiers.find(() => true)?.visibility ?? 'COMMUNITY',
+		identifierVisibility: contactIdentifiers.find(() => true)?.visibility ?? 'COMMUNITY',
 		defaultVisibility: data.session?.user?.defaultVisibility ?? 'COMMUNITY',
 		profileVisibility: data.session?.user?.profileVisibility ?? 'COMMUNITY',
 		emailNotifications: data.emailNotifications ?? true
 	};
+
+	let passkeyError: string | null = null;
+	let registering = false;
+
+	// Add-a-passkey flow: ask for a label, fetch creation options, run the browser
+	// ceremony, then post the response + label to the verify endpoint. All verification
+	// happens server-side; we never send credential material beyond the raw `response`.
+	let showAddModal = false;
+	let newPasskeyLabel = '';
+
+	async function addPasskey() {
+		passkeyError = null;
+		registering = true;
+		try {
+			const optionsRes = await fetch('/api/webauthn/register/options', { method: 'POST' });
+			if (!optionsRes.ok) {
+				passkeyError = m.merry_lone_swan_falter();
+				return;
+			}
+			const optionsJSON = await optionsRes.json();
+			const attResp = await startRegistration({ optionsJSON });
+			const verifyRes = await fetch('/api/webauthn/register/verify', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ response: attResp, label: newPasskeyLabel })
+			});
+			if (!verifyRes.ok) {
+				passkeyError = m.merry_lone_swan_falter();
+				return;
+			}
+			newPasskeyLabel = '';
+			showAddModal = false;
+			await invalidateAll();
+		} catch {
+			// User cancelled, or the authenticator rejected the ceremony.
+			passkeyError = m.swift_warm_vole_cancel();
+		} finally {
+			registering = false;
+		}
+	}
+
+	// Inline rename: which passkey id is currently being renamed, and the draft label.
+	let renamingId: string | null = null;
+	let renameLabel = '';
+	function startRename(id: string, label: string) {
+		renamingId = id;
+		renameLabel = label;
+	}
 </script>
 
 <h1 class="text-xl sm:text-2xl mb-3 dark:text-white">
@@ -31,7 +91,7 @@
 	{m.home_vivid_mole_gaze()}
 </p>
 
-<form method="POST" class="max-w-2xl">
+<form method="POST" action="?/save" class="max-w-2xl">
 	<div class="mb-6" class:isError={errors.givenName}>
 		<label
 			for="settings_givenName"
@@ -83,7 +143,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each data.session?.user?.identifiers ?? [] as identifier (identifier.id)}
+				{#each contactIdentifiers as identifier (identifier.id)}
 					<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
 						<th
 							scope="row"
@@ -171,3 +231,166 @@
 		<Button buttonType="submit" submodule="primary">{m.quick_safe_deer_save()}</Button>
 	</div>
 </form>
+
+<section class="max-w-2xl mt-10">
+	<Heading level="h3" title={m.brisk_lush_finch_secure()}>
+		{m.snug_brave_otter_explain()}
+	</Heading>
+
+	{#if passkeyError}
+		<p class="mt-2 text-sm text-red-600 dark:text-red-500">{passkeyError}</p>
+	{/if}
+
+	<div class="overflow-x-auto relative my-6">
+		{#if (data.passkeys ?? []).length}
+			<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+				<thead
+					class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+				>
+					<tr>
+						<th scope="col" class="py-3 px-6"> {m.calm_tidy_owl_label()} </th>
+						<th scope="col" class="py-3 px-6"> {m.plump_neat_crow_device()} </th>
+						<th scope="col" class="py-3 px-6"> {m.kind_warm_dove_added()} </th>
+						<th scope="col" class="py-3 px-6"> {m.lone_soft_hare_used()} </th>
+						<th scope="col" class="py-3 px-6"
+							><span class="sr-only">{m.fair_keen_swan_act()}</span></th
+						>
+					</tr>
+				</thead>
+				<tbody>
+					{#each data.passkeys as passkey (passkey.id)}
+						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 align-top">
+							<th
+								scope="row"
+								class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+							>
+								{#if renamingId === passkey.id}
+									<form
+										method="POST"
+										action="?/renamePasskey"
+										class="flex items-center gap-2"
+										use:enhance={() =>
+											async ({ update }) => {
+												await update();
+												renamingId = null;
+												await invalidateAll();
+											}}
+									>
+										<input type="hidden" name="id" value={passkey.id} />
+										<input
+											type="text"
+											name="label"
+											bind:value={renameLabel}
+											class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+										/>
+										<Button
+											buttonType="submit"
+											submodule="primary"
+											text={m.quick_safe_deer_save()}
+										/>
+										<Button
+											buttonType="button"
+											submodule="secondary"
+											text={m.calm_steady_lynx_cancel()}
+											onclick={() => (renamingId = null)}
+										/>
+									</form>
+								{:else}
+									{passkey.label}
+								{/if}
+							</th>
+							<td class="py-4 px-6">{passkey.deviceType ?? '—'}</td>
+							<td class="py-4 px-6">
+								{passkey.createdAt ? new Date(passkey.createdAt).toLocaleDateString() : '—'}
+							</td>
+							<td class="py-4 px-6">
+								{passkey.lastUsedAt
+									? new Date(passkey.lastUsedAt).toLocaleDateString()
+									: m.lone_soft_hare_never()}
+							</td>
+							<td class="py-4 px-6">
+								{#if renamingId !== passkey.id}
+									<div class="flex items-center gap-2">
+										<Button
+											buttonType="button"
+											submodule="secondary"
+											text={m.gray_swift_mole_rename()}
+											onclick={() => startRename(passkey.id, passkey.label)}
+										/>
+										<form
+											method="POST"
+											action="?/deletePasskey"
+											use:enhance={() =>
+												async ({ update }) => {
+													await update();
+													await invalidateAll();
+												}}
+										>
+											<input type="hidden" name="id" value={passkey.id} />
+											<Button
+												buttonType="submit"
+												submodule="danger"
+												text={m.dim_bold_stork_remove()}
+											/>
+										</form>
+									</div>
+								{/if}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{:else}
+			<p class="text-sm text-gray-500 dark:text-gray-400">{m.calm_pale_swan_none()}</p>
+		{/if}
+	</div>
+
+	<Button
+		buttonType="button"
+		submodule="primary"
+		text={m.brave_lush_finch_add()}
+		onclick={() => {
+			passkeyError = null;
+			newPasskeyLabel = '';
+			showAddModal = true;
+		}}
+	/>
+</section>
+
+<Modal
+	visible={showAddModal}
+	title={m.brave_lush_finch_add()}
+	onclose={() => (showAddModal = false)}
+	actions={[
+		{
+			label: m.calm_steady_lynx_cancel(),
+			buttonType: 'button',
+			submodule: 'secondary',
+			onClick: () => (showAddModal = false)
+		},
+		{
+			label: m.brave_lush_finch_add(),
+			buttonType: 'button',
+			submodule: 'primary',
+			onClick: () => addPasskey()
+		}
+	]}
+>
+	<p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{m.snug_brave_otter_explain()}</p>
+	<label
+		for="new_passkey_label"
+		class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+		>{m.calm_tidy_owl_label()}</label
+	>
+	<input
+		type="text"
+		id="new_passkey_label"
+		bind:value={newPasskeyLabel}
+		disabled={registering}
+		placeholder={m.warm_neat_finch_hint()}
+		class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+	/>
+	{#if passkeyError}
+		<p class="mt-2 text-sm text-red-600 dark:text-red-500">{passkeyError}</p>
+	{/if}
+</Modal>

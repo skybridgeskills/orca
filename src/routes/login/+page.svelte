@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { startAuthentication } from '@simplewebauthn/browser';
 	import type { ActionResult } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
@@ -73,10 +74,24 @@
 		};
 	};
 
+	// Superadmin-org 2FA: when the email `verify` step returns `needsPasskey`, the session's
+	// email factor is satisfied but it is NOT yet valid. We hold the returned authentication
+	// options and intended destination, show the passkey step, and finish via the 2FA verify
+	// endpoint. The whole ceremony is bound to the same cookie session server-side.
+	let needsPasskey = false;
+	let twoFactorOptions: unknown = undefined;
+	let twoFactorLocation = '/';
+	let twoFactorPending = false;
+
 	const verifyHandler: SubmitFunction = () => {
 		return ({ result }: { result: ActionResult }) => {
 			if (result.type === 'success' && result.data?.register) {
 				register = true;
+			} else if (result.type === 'success' && result.data?.needsPasskey) {
+				errorMessage = '';
+				twoFactorOptions = result.data.options;
+				twoFactorLocation = result.data.location ?? $nextPath ?? '/';
+				needsPasskey = true;
 			} else if (result.type === 'error') {
 				errorMessage = result.error?.message;
 			} else if (result.type === 'success') {
@@ -89,20 +104,117 @@
 		};
 	};
 
+	// Run the passkey assertion for the email-verified session and post it to the 2FA verify
+	// endpoint. On success, mirror the normal login path (set the session store + navigate).
+	// Cancel/failure keeps the user on the 2FA step; the email factor stays satisfied for the
+	// session TTL, so they can retry without re-entering the code.
+	async function confirmWithPasskey() {
+		if (!twoFactorOptions) return;
+		errorMessage = '';
+		twoFactorPending = true;
+		try {
+			const response = await startAuthentication({
+				optionsJSON: twoFactorOptions as Parameters<typeof startAuthentication>[0]['optionsJSON']
+			});
+			const verifyRes = await fetch('/api/webauthn/2fa/verify', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ response, next: twoFactorLocation })
+			});
+			if (!verifyRes.ok) {
+				errorMessage = m.mellow_brisk_hawk_failed();
+				return;
+			}
+			const data = await verifyRes.json();
+			if (data?.ok && data?.session) {
+				$session = data.session as App.SessionData;
+				goto(resolve(data.location ?? twoFactorLocation));
+				$nextPath = undefined;
+			} else {
+				errorMessage = m.mellow_brisk_hawk_failed();
+			}
+		} catch {
+			// User cancelled or no usable credential — stay on the 2FA step with an error.
+			errorMessage = m.gentle_mild_otter_cancel();
+		} finally {
+			twoFactorPending = false;
+		}
+	}
+
 	const loginHandler: SubmitFunction = () => {
 		return ({ result, update }) => {
-			if (result.type === 'success') sessionId = result.data?.sessionId ?? '';
+			if (result.type === 'success')
+				sessionId =
+					result.data && 'sessionId' in result.data ? (result.data.sessionId ?? '') : '';
 			else if (result.type === 'error') errorMessage = result.error?.message;
 			update();
 		};
 	};
+
+	// Usernameless passkey login: fetch discoverable authentication options, run the
+	// browser ceremony, post the assertion to the verify endpoint, then mirror the email
+	// `verify` path (set the session store + navigate to the returned location). All
+	// verification + identity resolution happens server-side.
+	let passkeyPending = false;
+	async function signInWithPasskey() {
+		errorMessage = '';
+		passkeyPending = true;
+		try {
+			const optionsRes = await fetch('/api/webauthn/authenticate/options', { method: 'POST' });
+			if (!optionsRes.ok) {
+				errorMessage = m.glossy_lucky_swan_unauth();
+				return;
+			}
+			const optionsJSON = await optionsRes.json();
+			const response = await startAuthentication({ optionsJSON });
+			const verifyRes = await fetch('/api/webauthn/authenticate/verify', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ response, next: $nextPath ?? undefined })
+			});
+			if (!verifyRes.ok) {
+				errorMessage = m.glossy_lucky_swan_unauth();
+				return;
+			}
+			const data = await verifyRes.json();
+			if (data?.ok && data?.session) {
+				$session = data.session as App.SessionData;
+				goto(resolve(data.location ?? $nextPath ?? '/'));
+				$nextPath = undefined;
+			} else {
+				errorMessage = m.glossy_lucky_swan_unauth();
+			}
+		} catch {
+			// User cancelled, or no usable credential — the browser throws here.
+			errorMessage = m.gentle_mild_otter_cancel();
+		} finally {
+			passkeyPending = false;
+		}
+	}
 </script>
 
 <div
 	class="mt-8 shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 p-8 rounded-xl mx-auto max-w-2xl"
 >
 	<!-- if the invite is less than 24 hours old no login code required, just use inviteId secret -->
-	{#if register || (!sessionId && Date.now() < ($inviteCreatedAt?.getTime() ?? 0) + 86400000)}
+	{#if needsPasskey}
+		<!-- Superadmin-org 2FA: email verified, now confirm with a passkey to finish. -->
+		<Heading title={m.bright_swift_eagle_login()} description={m.brave_calm_heron_confirm()} />
+		{#if errorMessage}
+			<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+				{errorMessage}
+			</p>
+		{/if}
+		<div class="mt-5">
+			<Button
+				id="twoFactorPasskeyButton"
+				buttonType="button"
+				disabled={twoFactorPending}
+				text={m.swift_keen_otter_finish()}
+				onclick={confirmWithPasskey}
+			/>
+		</div>
+	{:else if register || (!sessionId && Date.now() < ($inviteCreatedAt?.getTime() ?? 0) + 86400000)}
 		<!-- Step 3: User needs to fill out the rest of the registration form. -->
 		<!-- Or a user goes directly here if they have a fresh (less than 1 day old) invite -->
 		<Heading
@@ -262,5 +374,14 @@
 				<Button id="loginFormSubmit" buttonType="submit" text={m.early_next_seahorse_change()} />
 			</div>
 		</form>
+		<div class="mt-5">
+			<Button
+				id="passkeyLoginButton"
+				submodule="secondary"
+				disabled={passkeyPending}
+				text={m.proud_swift_eagle_signin()}
+				onclick={signInWithPasskey}
+			/>
+		</div>
 	{/if}
 </div>

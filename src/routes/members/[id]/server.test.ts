@@ -73,6 +73,15 @@ describe('member profile load: access gating', () => {
 		expect(mockClaimFindFirst).not.toHaveBeenCalled();
 	});
 
+	it('excludes PASSKEY identifiers from the profile identifier display', async () => {
+		// The profile shows contact/identity identifiers only; PASSKEY rows are
+		// authenticators and must be filtered out at the query level.
+		mockUserFindUniqueOrThrow.mockResolvedValue(targetRow('t'));
+		await loadProfile(makeEvent(OPEN_ORG, viewerUser('v'), 't'));
+		const include = mockUserFindUniqueOrThrow.mock.calls[0][0].include;
+		expect(include.identifiers).toEqual({ where: { type: { not: 'PASSKEY' } } });
+	});
+
 	it('self → allowed even when hidden, no membership query', async () => {
 		mockUserFindUniqueOrThrow.mockResolvedValue(targetRow('me', { profileVisibility: 'PRIVATE' }));
 		const result = await loadProfile(makeEvent(GATED_ORG, viewerUser('me'), 'me'));

@@ -70,6 +70,7 @@ model Identifier {
   organizationId String
   userId         String
   visibility     Visibility     @default(COMMUNITY)
+  json           Json           @default("{}")
   organization   Organization   @relation(fields: [organizationId], references: [id])
   user           User           @relation(fields: [userId], references: [id])
 
@@ -258,17 +259,20 @@ model Profile {
 }
 
 model Session {
-  id             String            @id @default(uuid())
-  code           String
-  createdAt      DateTime          @default(now())
-  expiresAt      DateTime
-  userId         String?
-  organizationId String
-  valid          Boolean           @default(false)
-  inviteId       String?
-  invite         ClaimEndorsement? @relation(fields: [inviteId], references: [id])
-  organization   Organization      @relation(fields: [organizationId], references: [id])
-  user           User?             @relation(fields: [userId], references: [id])
+  id                        String            @id @default(uuid())
+  code                      String
+  createdAt                 DateTime          @default(now())
+  expiresAt                 DateTime
+  userId                    String?
+  organizationId            String
+  valid                     Boolean           @default(false)
+  inviteId                  String?
+  passkeyChallenge          String?
+  passkeyChallengeExpiresAt DateTime?
+  emailVerifiedAt           DateTime?
+  invite                    ClaimEndorsement? @relation(fields: [inviteId], references: [id])
+  organization              Organization      @relation(fields: [organizationId], references: [id])
+  user                      User?             @relation(fields: [userId], references: [id])
 }
 
 model SigningKey {
@@ -371,6 +375,7 @@ enum IdentifierType {
   EMAIL
   DID
   URL
+  PASSKEY
 }
 
 enum AchievementStatus {

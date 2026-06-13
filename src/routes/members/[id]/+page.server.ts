@@ -31,7 +31,9 @@ export const load: PageServerLoad = async ({ url, locals, params }) => {
 			id: params.id
 		},
 		include: {
-			identifiers: true,
+			// PASSKEY identifiers are authenticators, never contact/identity: exclude them
+			// from the profile's identifier display.
+			identifiers: { where: { type: { not: 'PASSKEY' } } },
 			receivedAchievementClaims: {
 				where: visibleClaimsWhere,
 				include: { achievement: true },

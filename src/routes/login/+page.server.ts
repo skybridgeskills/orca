@@ -8,6 +8,11 @@ import { prisma } from '$lib/../prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
 import { renderOrcaEmail } from '$lib/email/template';
 import * as m from '$lib/i18n/messages';
+import { isSuperadminOrg } from '$lib/server/moderation/superadminOrg';
+import { buildAuthenticationOptions } from '$lib/server/webauthn/ceremonies';
+import { issueChallenge } from '$lib/server/webauthn/challenge';
+import { getUserPasskeys, userHasPasskey } from '$lib/server/webauthn/passkeys';
+import { rpForOrg } from '$lib/server/webauthn/rp';
 import { INVITE_SESSION_VALIDITY_MS } from '$lib/utils/session';
 import stripTags from '$lib/utils/stripTags';
 
@@ -113,13 +118,30 @@ export const actions: Actions = {
 		locals,
 		cookies,
 		request
-	}): Promise<{
-		sessionId?: string;
-		session?: Omit<Session, 'code' | 'createdAt' | 'userId'> & { user: User | null };
-		location?: string;
-		register?: boolean;
-		success?: boolean;
-	}> => {
+	}): Promise<
+		| {
+				sessionId?: string;
+				session?: Omit<
+					Session,
+					| 'code'
+					| 'createdAt'
+					| 'userId'
+					| 'passkeyChallenge'
+					| 'passkeyChallengeExpiresAt'
+					| 'emailVerifiedAt'
+				> & { user: User | null };
+				location?: string;
+				register?: boolean;
+				success?: boolean;
+		  }
+		| {
+				// Superadmin-org 2FA: the email factor is satisfied but the session is NOT yet
+				// valid. The client must complete a passkey assertion (P4) before login finishes.
+				needsPasskey: true;
+				options: Awaited<ReturnType<typeof buildAuthenticationOptions>>;
+				location?: string;
+		  }
+	> => {
 		const requestData = await request.formData();
 		const vcode = requestData.get('verificationCode')?.toString();
 		const sessionId = cookies.get('sessionId');
@@ -145,6 +167,37 @@ export const actions: Actions = {
 
 		// Advance user to next step in invite claim: user account creation.
 		if (!session.userId && session.invite?.inviteeEmail) return { success: true, register: true };
+
+		// The destination once login fully completes (after 2FA, if required).
+		const intendedLocation = session.invite
+			? `/achievements/${session.invite.achievementId}/claim?i=${
+					session.invite.id
+				}&e=${encodeURIComponent(session.invite.inviteeEmail ?? '')}`
+			: nextPath && nextPath?.startsWith('/')
+				? nextPath
+				: '/';
+
+		// Superadmin-org 2FA gate: if this is the superadmin org AND the known user has at
+		// least one passkey, the email code is only the FIRST factor. Do NOT activate yet —
+		// mark the email factor done (`emailVerifiedAt`), issue a fresh challenge bound to
+		// THIS session, and return authentication options for the client to assert against.
+		// The passkey step (…/webauthn/2fa/verify) is bound to this same cookie session and
+		// requires `emailVerifiedAt`, so neither factor can be skipped or swapped. A
+		// superadmin with no passkey (and every other org) falls through to email-only login.
+		if (
+			session.userId &&
+			isSuperadminOrg(locals.org.id) &&
+			(await userHasPasskey(session.userId, locals.org.id))
+		) {
+			const allowed = await getUserPasskeys(session.userId, locals.org.id);
+			const options = await buildAuthenticationOptions({ rp: rpForOrg(locals.org), allowed });
+			await prisma.session.update({
+				where: { id: session.id },
+				data: { emailVerifiedAt: new Date() }
+			});
+			await issueChallenge(session.id, options.challenge);
+			return { needsPasskey: true, options, location: intendedLocation };
+		}
 
 		const activatedSession = await prisma.session.update({
 			where: {
@@ -184,7 +237,15 @@ export const actions: Actions = {
 		request
 	}): Promise<{
 		sessionId?: string;
-		session?: Omit<Session, 'code' | 'createdAt' | 'userId'> & { user: User | null };
+		session?: Omit<
+			Session,
+			| 'code'
+			| 'createdAt'
+			| 'userId'
+			| 'passkeyChallenge'
+			| 'passkeyChallengeExpiresAt'
+			| 'emailVerifiedAt'
+		> & { user: User | null };
 		location?: string;
 		register?: boolean;
 		success?: boolean;

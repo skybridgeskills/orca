@@ -25,6 +25,20 @@ declare namespace App {
 		};
 	};
 
+	// A WebAuthn passkey credential, stored on a PASSKEY-type `Identifier.json`
+	// (`identifier` = the credentialId). `publicKey` is base64url(Uint8Array). The
+	// signature `counter` is updated on every assertion (clone detection). See
+	// ADR 2026-06-13-passkey-webauthn-auth.
+	type PasskeyCredential = import('@prisma/client').Prisma.JsonObject & {
+		publicKey: string; // base64url
+		counter: number;
+		transports?: string[];
+		deviceType?: string;
+		backedUp?: boolean;
+		label: string;
+		lastUsedAt?: string; // ISO
+	};
+
 	interface SessionData {
 		id: string;
 		user: UserData?;
