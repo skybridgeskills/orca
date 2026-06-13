@@ -237,7 +237,11 @@ export const actions: Actions = {
 				...(stewards ? { stewards } : {}),
 				...(resultDescriptions.length ? { resultDescriptions } : {})
 			} as unknown as Prisma.InputJsonObject,
-			categoryId: formData.category != 'uncategorized' ? formData.category : undefined
+			// Treat a missing/empty category (e.g. the add-skills picker omits it) the same
+			// as 'uncategorized' — an empty string here would be used as a (nonexistent)
+			// categoryId and violate the FK.
+			categoryId:
+				formData.category && formData.category != 'uncategorized' ? formData.category : undefined
 		};
 
 		if (

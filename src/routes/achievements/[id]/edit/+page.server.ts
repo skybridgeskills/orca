@@ -292,7 +292,7 @@ export const actions: Actions = {
 			achievementType: formData.achievementType ?? null,
 			...(imageUpdated ? { image: imageKey } : null), // Only include the image field value if image is changed.
 			category:
-				formData.category != 'uncategorized'
+				formData.category && formData.category != 'uncategorized'
 					? { connect: { id: formData.category } }
 					: { disconnect: true },
 			claimable,

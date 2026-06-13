@@ -101,4 +101,16 @@ describe('achievements/create action: achievementType + seeded resultDescription
 		expect(data.achievementType).toBeNull();
 		expect(data.json.resultDescriptions).toBeUndefined();
 	});
+
+	it('leaves categoryId undefined when no category is sent (add-skills picker case)', async () => {
+		// The picker omits `category` entirely; an empty string must not become a
+		// (nonexistent) categoryId and violate the FK — it should stay unset.
+		const fd = baseForm();
+		fd.set('achievementType', 'Competency');
+
+		await actions.default(makeEvent(fd));
+
+		const data = mockCreate.mock.calls[0][0].data;
+		expect(data.categoryId).toBeUndefined();
+	});
 });
