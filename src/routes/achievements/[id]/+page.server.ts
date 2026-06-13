@@ -4,7 +4,12 @@ import type { Actions } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import * as m from '$lib/i18n/messages';
-import { canEditAchievements, canInviteToAchievement } from '$lib/server/permissions';
+import {
+	canEditAchievements,
+	canInviteToAchievement,
+	isMember,
+	membershipAchievementId
+} from '$lib/server/permissions';
 
 import type { PageServerLoad } from './$types';
 
@@ -95,9 +100,28 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			})) ?? [];
 	}
 
+	// P4: gate the claims/earners list to members (+ admins) when a membership
+	// achievement is configured. When unset (`!gatingActive`) the list stays open
+	// to any logged-in user, preserving today's behavior.
+	const gatingActive = membershipAchievementId(locals.org) !== null;
+	const canViewClaimsList =
+		!gatingActive ||
+		(!!locals.session?.user &&
+			(await isMember({
+				user: {
+					id: locals.session.user.id,
+					orgRole: locals.session.user.orgRole
+				},
+				org: {
+					id: locals.org.id,
+					json: locals.org.json
+				}
+			})));
+
 	return {
 		editAchievementCapability,
 		inviteCapability,
+		canViewClaimsList,
 		achievement,
 		relatedAchievements,
 		relatedClaims,

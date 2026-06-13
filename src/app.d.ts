@@ -14,6 +14,7 @@ declare namespace App {
 		orgRole: string?;
 		identifiers: import('@prisma/client').Identifier[];
 		defaultVisibility: import('@prisma/client').Visibility;
+		profileVisibility: import('@prisma/client').Visibility;
 		json: import('@prisma/client').Prisma.JsonValue;
 	}
 
@@ -50,6 +51,9 @@ declare namespace App {
 		orgStatus?: OrgStatus;
 		permissions?: {
 			editAchievementCapability?: {
+				requiresAchievement: string | null;
+			};
+			membershipAchievement?: {
 				requiresAchievement: string | null;
 			};
 		};

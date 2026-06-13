@@ -21,6 +21,10 @@
 		_count: {
 			endorsements: number;
 		};
+		// P4: server-computed per row — whether this viewer may follow the claimant's
+		// name to their member profile. Governs only the profile link, never whether
+		// the row or its claim-detail affordance is shown.
+		profileLinkable: boolean;
 	};
 
 	interface Props {
@@ -47,6 +51,14 @@
 
 	const session: App.SessionData | undefined = getContext('session');
 	const achievementId: string = getContext('achievementId');
+
+	// The invites API doesn't supply a per-row `profileLinkable` (membership/visibility),
+	// so the endorsement/invite-creator name links to the profile only for the creator
+	// themselves or an admin. Admins may open any user's (incl. a non-member's) profile;
+	// broader member→member linking here is deferred to the moderation fast-follow.
+	const viewerIsAdmin = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
+		session?.user?.orgRole || 'none'
+	);
 
 	const getFetchUrl = (pageToFetch: number) => {
 		if (category == 'AchievementClaim')
@@ -190,11 +202,16 @@
 									scope="row"
 									class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
 								>
-									<a href={resolve(`/claims/${memberClaim.id}`)} class="hover:underline">
+									{#if memberClaim.profileLinkable}
+										<a href={resolve(`/members/${memberClaim.userId}`)} class="hover:underline">
+											{memberClaim.user?.givenName}
+											{memberClaim.user?.familyName}
+										</a>
+									{:else}
 										{memberClaim.user?.givenName}
 										{memberClaim.user?.familyName}
-										{#if session?.user?.id == memberClaim.user.id}({m.red_aqua_mule_jest()}){/if}
-									</a>
+									{/if}
+									{#if session?.user?.id == memberClaim.user.id}({m.red_aqua_mule_jest()}){/if}
 								</th>
 								<td class="px-6 py-4">
 									<StatusTag
@@ -248,11 +265,14 @@
 								{invite.inviteeEmail}
 							</th>
 							<td class="px-6 py-4">
-								{#if invite.creator}
+								{#if invite.creator && (session?.user?.id === invite.creatorId || viewerIsAdmin)}
 									<a href={resolve(`/members/${invite.creatorId}`)} class="hover:underline">
 										{invite.creator?.givenName ?? ''}
 										{invite.creator?.familyName ?? ''}
 									</a>
+								{:else if invite.creator}
+									{invite.creator?.givenName ?? ''}
+									{invite.creator?.familyName ?? ''}
 								{/if}
 								{#if session?.user?.id == invite.creatorId}({m.red_aqua_mule_jest()}){/if}
 								{#if !invite.creator}N/A{/if}

@@ -37,7 +37,12 @@
 			? 'achievement'
 			: 'admin',
 		editAchievementRequires:
-			data.org.json?.permissions?.editAchievementCapability?.requiresAchievement || null
+			data.org.json?.permissions?.editAchievementCapability?.requiresAchievement || null,
+		membershipAchievement: data.org.json?.permissions?.membershipAchievement?.requiresAchievement
+			? 'achievement'
+			: 'admin',
+		membershipAchievementRequires:
+			data.org.json?.permissions?.membershipAchievement?.requiresAchievement || null
 	};
 	const noErrors: { [key: string]: string | null } = {
 		name: null,
@@ -48,7 +53,9 @@
 		tagline: null,
 		defaultLanguage: null,
 		editAchievementCapability: null,
-		editAchievementRequires: null
+		editAchievementRequires: null,
+		membershipAchievement: null,
+		membershipAchievementRequires: null
 	};
 	let errors = { ...noErrors };
 
@@ -345,6 +352,83 @@
 			{#if errors.editAchievementCapability}
 				<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 					{errors.editAchievementCapability}
+				</p>
+			{/if}
+		</div>
+	</div>
+
+	<!-- Membership -->
+	<div class="mb-6">
+		<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+			{m.gentle_brisk_heron_gather()}
+		</h3>
+		<p class="text-sm mb-2 text-gray-900">
+			{m.keen_warm_lynx_settle()}
+		</p>
+		<div class:isError={errors.membershipAchievement}>
+			<FormFieldLabel for="membershipAchievement">{m.merry_calm_otter_belong()}</FormFieldLabel>
+			<input
+				type="hidden"
+				name="membershipAchievement"
+				bind:value={formData.membershipAchievement}
+			/>
+			<div class="space-y-2">
+				<RadioOption
+					bind:selectedOption={formData.membershipAchievement}
+					value="admin"
+					name="membershipAchievement"
+					label="Only administrators"
+					id="orgEdit_membershipAchievement_admin"
+				/>
+				<RadioOption
+					bind:selectedOption={formData.membershipAchievement}
+					value="achievement"
+					name="membershipAchievement"
+					id="orgEdit_membershipAchievement_achievement"
+				>
+					<span class="inline">{m.due_fit_guppy_surge()}</span>
+					<AchievementSelect
+						badgeId={formData.membershipAchievementRequires || ''}
+						onunselected={() => {
+							formData.membershipAchievement = 'admin';
+							formData.membershipAchievementRequires = null;
+						}}
+						onselected={(id) => {
+							formData.membershipAchievementRequires = id;
+						}}
+						disabled={formData.membershipAchievement != 'achievement'}
+						label={m.fuzzy_nimble_squirrel_approve()}
+						description={m.keen_warm_lynx_settle()}
+						inputId="orgEdit_membershipAchievementRequires"
+						inputName="membershipAchievementRequires"
+						errorMessage={errors.membershipAchievementRequires || ''}
+					>
+						{#snippet invoker(handler)}
+							<span class="inline">
+								{#if !formData.membershipAchievementRequires}
+									<button
+										on:click|preventDefault={() => {
+											formData.membershipAchievement = 'achievement';
+											handler();
+										}}
+										class={`font-medium${
+											formData.membershipAchievement == 'achievement'
+												? ' underline hover:no-underline'
+												: 'text-gray-700 dark:text-gray-500 cursor-auto'
+										}`}
+										tabindex={formData.membershipAchievement == 'achievement' ? 0 : -1}
+									>
+										{m.bright_swift_eagle_choose()}
+									</button>
+								{/if}
+							</span>
+						{/snippet}
+					</AchievementSelect>
+				</RadioOption>
+			</div>
+			{#if errors.membershipAchievement}
+				<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+					{errors.membershipAchievement}
 				</p>
 			{/if}
 		</div>

@@ -64,6 +64,7 @@ const getSession = async function (sessionId: string, orgId: string) {
 					orgRole: true,
 					identifiers: true,
 					defaultVisibility: true,
+					profileVisibility: true,
 					json: true
 				}
 			}

@@ -54,6 +54,10 @@ export const actions: Actions = {
 		const defaultLanguage = requestData.get('defaultLanguage')?.toString();
 		const editAchievementCapability = requestData.get('editAchievementCapability')?.toString();
 		const editAchievementRequires = requestData.get('editAchievementRequires')?.toString();
+		const membershipAchievement = requestData.get('membershipAchievement')?.toString();
+		const membershipAchievementRequires = requestData
+			.get('membershipAchievementRequires')
+			?.toString();
 
 		// Parse the current json object
 		const jsonData: App.OrganizationConfig =
@@ -94,6 +98,33 @@ export const actions: Actions = {
 			// Clear the permission setting (default to admins only)
 			if (updatedJson.permissions?.editAchievementCapability) {
 				delete updatedJson.permissions.editAchievementCapability;
+			}
+		}
+
+		// Handle membership achievement (who is a member of the community)
+		if (membershipAchievement === 'achievement' && membershipAchievementRequires) {
+			// Validate that the achievement exists in this organization
+			const achievement = await prisma.achievement.findFirst({
+				where: {
+					id: membershipAchievementRequires,
+					organizationId: locals.org.id
+				}
+			});
+
+			if (!achievement) {
+				error(400, 'Selected membership achievement does not exist in this organization');
+			}
+
+			updatedJson.permissions = {
+				...updatedJson.permissions,
+				membershipAchievement: {
+					requiresAchievement: membershipAchievementRequires
+				}
+			};
+		} else {
+			// Clear the membership setting (default to admins only)
+			if (updatedJson.permissions?.membershipAchievement) {
+				delete updatedJson.permissions.membershipAchievement;
 			}
 		}
 

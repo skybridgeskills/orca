@@ -65,6 +65,71 @@ export async function canEditAchievements({
 	return !!userClaim;
 }
 
+/**
+ * The Prisma `where` fragment for a claim that makes its holder a member of the
+ * organization: approved (`validFrom` set), accepted, and not expired. This is the
+ * single source of truth for membership-claim validity — P3 (members list) and P4
+ * (batched claims query) reuse it rather than re-stating the rule.
+ */
+export function validMembershipClaimWhere(achievementId: string, orgId: string) {
+	return {
+		achievementId,
+		organizationId: orgId,
+		validFrom: { not: null }, // Claim must be approved
+		claimStatus: 'ACCEPTED' as const, // Claim must be accepted
+		OR: [
+			{ validUntil: null }, // No expiration
+			{ validUntil: { gt: new Date() } } // Not yet expired
+		]
+	};
+}
+
+interface IsMemberParams {
+	user: {
+		id: string;
+		orgRole: string | null;
+	};
+	org: {
+		id: string;
+		json: App.OrganizationConfig;
+	};
+}
+
+/**
+ * Whether a user is a "member" of the org for community-visibility gating.
+ * Admins are always members. Otherwise requires a valid claim of the configured
+ * membership achievement. NOTE: when no membership achievement is configured this
+ * returns `false`; callers decide the "unset = open" behavior (they must treat an
+ * unconfigured org as open — see each gated call site in P3/P4).
+ * @param params - Object containing user and organization data
+ * @returns Promise<boolean> - True if the user is a member
+ */
+export async function isMember({ user, org }: IsMemberParams): Promise<boolean> {
+	// Admins are always members
+	if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(user.orgRole || 'none')) {
+		return true;
+	}
+
+	const requiredAchievementId = org.json?.permissions?.membershipAchievement?.requiresAchievement;
+	if (!requiredAchievementId) {
+		return false;
+	}
+
+	const claim = await prisma.achievementClaim.findFirst({
+		where: {
+			userId: user.id,
+			...validMembershipClaimWhere(requiredAchievementId, org.id)
+		}
+	});
+
+	return !!claim;
+}
+
+/** The configured membership achievement id, or null when unset. */
+export function membershipAchievementId(org: { json: App.OrganizationConfig }): string | null {
+	return org.json?.permissions?.membershipAchievement?.requiresAchievement ?? null;
+}
+
 interface CanInviteToAchievementParams {
 	user: {
 		id: string;

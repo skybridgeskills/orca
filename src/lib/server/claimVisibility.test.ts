@@ -24,6 +24,7 @@ const session = (
 			orgRole: orgRole ?? null,
 			identifiers: [],
 			defaultVisibility: 'COMMUNITY',
+			profileVisibility: 'COMMUNITY',
 			json: {}
 		}
 	} as App.SessionData;

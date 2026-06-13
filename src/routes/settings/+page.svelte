@@ -18,6 +18,7 @@
 		identifierVisibility:
 			data.session?.user?.identifiers.find(() => true)?.visibility ?? 'COMMUNITY',
 		defaultVisibility: data.session?.user?.defaultVisibility ?? 'COMMUNITY',
+		profileVisibility: data.session?.user?.profileVisibility ?? 'COMMUNITY',
 		emailNotifications: data.emailNotifications ?? true
 	};
 </script>
@@ -110,6 +111,29 @@
 			</tbody>
 		</table>
 	</div>
+	<div>
+		<Heading level="h3" title="Profile">
+			{m.calm_brisk_heron_reveal()}
+		</Heading>
+		<div class="mb-6">
+			<label
+				for="settings_profileVisibility"
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+				>{m.proud_lunar_otter_show()}</label
+			>
+			<select
+				id="settings_profileVisibility"
+				name="profileVisibility"
+				bind:value={formData.profileVisibility}
+				class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+			>
+				<option value="PUBLIC">{m.short_deft_lemur_clasp()}</option>
+				<option value="COMMUNITY">{m.equal_small_dolphin_spur()}</option>
+				<option value="PRIVATE">{m.pink_last_marten_grin()}</option>
+			</select>
+		</div>
+	</div>
+
 	<div>
 		<Heading level="h3" title="Badges and Credentials">
 			{m.best_sweet_termite_work()}

@@ -2,7 +2,9 @@ import type { Prisma } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 
 import * as m from '$lib/i18n/messages';
-import { claimVisibilityWhere } from '$lib/server/claimVisibility';
+import { isAdmin } from '$lib/permissions/isAdmin';
+import { claimVisibilityWhere, COMMUNITY_VISIBLE } from '$lib/server/claimVisibility';
+import { isMember, membershipAchievementId } from '$lib/server/permissions';
 import { calculatePageAndSize } from '$lib/utils/pagination';
 
 import { prisma } from '../../../prisma/client';
@@ -43,6 +45,25 @@ export const load: PageServerLoad = async ({ url, locals, params }) => {
 		}
 	});
 	if (member.organizationId != locals.org.id) error(404, m.slow_clear_cheetah_spill());
+
+	// Gate profile access by membership + profileVisibility when gating is active.
+	// When unset, behavior is unchanged (any logged-in same-org user). Not-found /
+	// cross-org keep the 404 above; gated-out viewers are redirected to /members.
+	const viewer = locals.session.user;
+	if (
+		membershipAchievementId(locals.org) !== null &&
+		!isAdmin({ user: viewer }) &&
+		params.id !== viewer.id
+	) {
+		// Non-admin, non-self viewer under gating: allow only when both viewer and
+		// target are members and the target's profile is community-visible. Short-circuit
+		// on viewer membership and target visibility to keep this to O(1) queries.
+		const visibleMember =
+			COMMUNITY_VISIBLE.includes(member.profileVisibility) &&
+			(await isMember({ user: viewer, org: locals.org })) &&
+			(await isMember({ user: { id: member.id, orgRole: member.orgRole }, org: locals.org }));
+		if (!visibleMember) redirect(302, `/members`);
+	}
 
 	return {
 		member

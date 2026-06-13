@@ -30,6 +30,12 @@ export const actions: Actions = {
 		const identifierVisibility: Visibility = isVisibility(identifierVisibilityRaw)
 			? identifierVisibilityRaw
 			: 'COMMUNITY';
+		// Profile/member-directory visibility (separate from defaultVisibility, which is
+		// claim visibility). Governs whether other members can see/open this profile.
+		const profileVisibilityRaw = requestData.get('profileVisibility')?.toString();
+		const profileVisibility: Visibility = isVisibility(profileVisibilityRaw)
+			? profileVisibilityRaw
+			: 'COMMUNITY';
 
 		// Email notification preference (default on); merge into User.json, preserving
 		// any other keys.
@@ -42,6 +48,7 @@ export const actions: Actions = {
 				givenName,
 				familyName,
 				defaultVisibility,
+				profileVisibility,
 				json
 			},
 			include: {

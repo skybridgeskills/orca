@@ -361,7 +361,7 @@
 	}`}
 />
 
-{#if data.session?.user}
+{#if data.canViewClaimsList}
 	<div class="relative overflow-x-auto">
 		<ClaimList
 			{...calculatePageAndSize($page.url)}

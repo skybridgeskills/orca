@@ -12,8 +12,10 @@ export type { ViewerRole };
 const ADMIN_ROLES = ['GENERAL_ADMIN', 'CONTENT_ADMIN'];
 
 // Visibilities a non-owner community member may see. ACHIEVEMENT is treated as
-// COMMUNITY for now (D2: deferred), so community members can see it.
-const COMMUNITY_VISIBLE: Visibility[] = ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'];
+// COMMUNITY for now (D2: deferred), so community members can see it. Exported so the
+// membership-gating call sites (members list, profile, claims list) share one
+// threshold for "visible to other members".
+export const COMMUNITY_VISIBLE: Visibility[] = ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'];
 
 /**
  * Resolve the viewer's role relative to a single claim.

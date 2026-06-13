@@ -462,5 +462,10 @@
 	"brisk_fair_moth_add": "Add value",
 	"pure_lush_wren_assess": "Assessment",
 	"dizzy_keen_owl_stale": "Not current",
-	"lucky_bold_swan_pick": "This badge"
+	"lucky_bold_swan_pick": "This badge",
+	"gentle_brisk_heron_gather": "Membership",
+	"merry_calm_otter_belong": "Who is a member of this community?",
+	"keen_warm_lynx_settle": "Holders of this achievement are considered members of the community.",
+	"proud_lunar_otter_show": "Profile visibility",
+	"calm_brisk_heron_reveal": "Choose who can find you in the member directory and open your profile. Other members see you only when this allows it; admins always can."
 }

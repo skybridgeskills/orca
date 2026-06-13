@@ -43,6 +43,7 @@ model User {
   organizationId            String
   orgRole                   RoleType?
   defaultVisibility         Visibility               @default(COMMUNITY)
+  profileVisibility         Visibility               @default(COMMUNITY)
   json                      Json                     @default("{}")
   messages                  Message[]
   createdAchievementClaims  AchievementClaim[]       @relation("CreatedAchievementClaims")

@@ -45,6 +45,7 @@ export const testUser: User = {
 	orgRole: null,
 	organizationId: testOrganization.id,
 	defaultVisibility: 'PRIVATE',
+	profileVisibility: 'COMMUNITY',
 	json: {}
 };
 
