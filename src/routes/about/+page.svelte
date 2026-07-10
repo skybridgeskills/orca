@@ -1,15 +1,17 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import * as m from '$lib/i18n/messages';
+	import { getSession } from '$lib/session/context';
 
 	import type { PageProps } from './$types';
 
 	import { resolve } from '$app/paths';
 
 	let { data }: PageProps = $props();
+	const session = getSession();
 </script>
 
-{#if data.session?.user?.orgRole === 'GENERAL_ADMIN'}
+{#if $session?.user?.orgRole === 'GENERAL_ADMIN'}
 	<div class="max-w-2xl flex justify-between items-center">
 		<h1 class="inline-flex mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white">
 			{m.mellow_elegant_parrot_ask()}
@@ -28,7 +30,7 @@
 	</h1>
 {/if}
 
-{#if ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(data.session?.user?.orgRole ?? '')}
+{#if ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes($session?.user?.orgRole ?? '')}
 	<p class="max-w-2xl mt-3 text-sm">
 		<a
 			class="text-blue-600 dark:text-blue-400 hover:underline"

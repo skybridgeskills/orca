@@ -8,14 +8,16 @@
 	import EndorsementList from '$lib/components/EndorsementList.svelte';
 	import * as m from '$lib/i18n/messages';
 	import ClaimDetail from '$lib/partials/achievementClaim/ClaimDetail.svelte';
+	import { getSession } from '$lib/session/context';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 
 	import type { PageProps } from './$types';
 
 	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	let { data }: PageProps = $props();
+	const session = getSession();
 
 	// Single prop contract: normalize the loader's (claim, achievement, org)
 	// into the shape `ClaimDetail` consumes for BOTH routes. `data.org` comes
@@ -66,7 +68,7 @@
 					<a href={resolve(`/claims/${data.claim.id}/endorse`)}
 						><Button text={m.antsy_slow_robin_persuade()} /></a
 					>
-				{:else if data.session?.user?.id != data.claim.userId}
+				{:else if $session?.user?.id != data.claim.userId}
 					<a href={resolve(`/claims/${data.claim.id}/endorse`)}
 						><Button text={m.bright_gentle_cheetah_shrine()} /></a
 					>
@@ -96,6 +98,6 @@
 	{/if}
 
 	{#if data.endorsementCount > 0}
-		<EndorsementList data={{ ...calculatePageAndSize($page.url), total: data.endorsementCount }} />
+		<EndorsementList data={{ ...calculatePageAndSize(page.url), total: data.endorsementCount }} />
 	{/if}
 </div>

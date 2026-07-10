@@ -17,6 +17,7 @@
 	import Pagination from '$lib/components/Pagination.svelte';
 	import * as m from '$lib/i18n/messages';
 	import Backpack from '$lib/illustrations/Backpack.svelte';
+	import { getSession } from '$lib/session/context';
 	import {
 		achievementsLoading,
 		fetchAchievements,
@@ -36,12 +37,13 @@
 	import type { PageData } from './$types';
 
 	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	dayjs.extend(relativeTime);
 	export let data: PageData;
-	let { page: currentPageNum, pageSize } = calculatePageAndSize($page.url);
+	const session = getSession();
+	let { page: currentPageNum, pageSize } = calculatePageAndSize(page.url);
 	$: currentPageData = $backpackClaims.slice(
 		(currentPageNum - 1) * pageSize,
 		currentPageNum * pageSize
@@ -76,7 +78,7 @@
 	};
 
 	onMount(() => {
-		ensureLoaded(backpackClaimsLoading, fetchBackpackClaims);
+		ensureLoaded(backpackClaimsLoading, () => fetchBackpackClaims(!!$session?.user));
 		ensureLoaded(outstandingInvitesLoading, fetchOutstandingInvites);
 		ensureLoaded(achievementsLoading, fetchAchievements);
 	});

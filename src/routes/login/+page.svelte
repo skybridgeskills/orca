@@ -13,12 +13,12 @@
 		inviteId,
 		inviteCreatedAt
 	} from '$lib/stores/activeClaimStore';
-	import { nextPath, session } from '$lib/stores/sessionStore';
+	import { nextPath } from '$lib/stores/sessionStore';
 
 	import type { ActionData, PageData, SubmitFunction } from './$types';
 
 	import { enhance } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
 	export let form: ActionData;
@@ -66,10 +66,9 @@
 				}
 			} else if (result.type === 'success' && result.data?.session) {
 				const data = result.data;
-				$session = data.session as App.SessionData;
-				goto(resolve(data.location ?? $nextPath ?? '/'));
+				await invalidateAll();
+				await goto(resolve(data.location ?? $nextPath ?? '/'));
 				$nextPath = undefined;
-				console.log('Processed nextPath and reset.');
 			}
 		};
 	};
@@ -84,7 +83,7 @@
 	let twoFactorPending = false;
 
 	const verifyHandler: SubmitFunction = () => {
-		return ({ result }: { result: ActionResult }) => {
+		return async ({ result }: { result: ActionResult }) => {
 			if (result.type === 'success' && result.data?.register) {
 				register = true;
 			} else if (result.type === 'success' && result.data?.needsPasskey) {
@@ -95,11 +94,9 @@
 			} else if (result.type === 'error') {
 				errorMessage = result.error?.message;
 			} else if (result.type === 'success') {
-				$session = result.data?.session;
-
-				goto(resolve(result.data?.location ?? '/'));
+				await invalidateAll();
+				await goto(resolve(result.data?.location ?? '/'));
 				$nextPath = undefined;
-				console.log('Processed nextPath and reset.');
 			}
 		};
 	};
@@ -127,8 +124,8 @@
 			}
 			const data = await verifyRes.json();
 			if (data?.ok && data?.session) {
-				$session = data.session as App.SessionData;
-				goto(resolve(data.location ?? twoFactorLocation));
+				await invalidateAll();
+				await goto(resolve(data.location ?? twoFactorLocation));
 				$nextPath = undefined;
 			} else {
 				errorMessage = m.mellow_brisk_hawk_failed();
@@ -144,8 +141,7 @@
 	const loginHandler: SubmitFunction = () => {
 		return ({ result, update }) => {
 			if (result.type === 'success')
-				sessionId =
-					result.data && 'sessionId' in result.data ? (result.data.sessionId ?? '') : '';
+				sessionId = result.data && 'sessionId' in result.data ? (result.data.sessionId ?? '') : '';
 			else if (result.type === 'error') errorMessage = result.error?.message;
 			update();
 		};
@@ -178,8 +174,8 @@
 			}
 			const data = await verifyRes.json();
 			if (data?.ok && data?.session) {
-				$session = data.session as App.SessionData;
-				goto(resolve(data.location ?? $nextPath ?? '/'));
+				await invalidateAll();
+				await goto(resolve(data.location ?? $nextPath ?? '/'));
 				$nextPath = undefined;
 			} else {
 				errorMessage = m.glossy_lucky_swan_unauth();

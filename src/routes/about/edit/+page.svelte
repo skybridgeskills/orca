@@ -16,9 +16,9 @@
 	import { formSchema } from './schema';
 
 	import { deserialize } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	export const form: ActionData | undefined = undefined;
 	export let data: PageData;
@@ -91,7 +91,7 @@
 
 		if (formData['imageExtension']) formsData.append('imageExtension', formData.imageExtension);
 
-		const response = await fetch($page.url, { method: 'POST', body: formsData });
+		const response = await fetch(page.url, { method: 'POST', body: formsData });
 		const result = deserialize(await response.text());
 		switch (result.type) {
 			case 'failure':
@@ -109,7 +109,9 @@
 						}
 					});
 				}
-				window.location.replace(`/about`); // force page reload so header gets updated
+				// Refresh server data (org header, session) without a full reload, then navigate.
+				await invalidateAll();
+				await goto(resolve('/about'));
 				break;
 			case 'redirect':
 				goto(resolve(result.location));

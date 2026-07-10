@@ -30,6 +30,7 @@
 	import * as m from '$lib/i18n/messages';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
 	import { isAdmin } from '$lib/permissions/isAdmin';
+	import { getSession } from '$lib/session/context';
 	import {
 		acLoading,
 		fetchAchievementCategories,
@@ -46,12 +47,13 @@
 	import type { PageProps } from './$types';
 
 	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	dayjs.extend(relativeTime);
 
 	let { data }: PageProps = $props();
+	const session = getSession();
 
 	const alignments = $derived(alignmentRowsFromAchievementJson(data.achievement.json));
 	const hasAlignments = $derived(alignments.length > 0);
@@ -90,8 +92,6 @@
 	// setContext runs once during init; using the initial `data` is intentional.
 	// svelte-ignore state_referenced_locally
 	setContext('achievementId', data.achievement.id);
-	// svelte-ignore state_referenced_locally
-	setContext('session', data.session);
 
 	onMount(async () => {
 		await ensureLoaded(achievementsLoading, fetchAchievements);
@@ -131,7 +131,7 @@
 				text={m.sharp_clear_fox_edit()}
 			/>
 		{/if}
-		{#if isAdmin({ user: data.session?.user || undefined })}
+		{#if isAdmin({ user: $session?.user || undefined })}
 			<Button
 				submodule="danger"
 				onclick={() => {
@@ -382,7 +382,7 @@
 	description={`${m.vivid_best_bat_soar({
 		count: data.achievement._count.achievementClaims
 	})} ${
-		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(data.session?.user?.orgRole || 'none')
+		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes($session?.user?.orgRole || 'none')
 			? m.bad_mad_jackdaw_tap()
 			: m.great_merry_boar_ascend()
 	}`}
@@ -391,7 +391,7 @@
 {#if data.canViewClaimsList}
 	<div class="relative overflow-x-auto">
 		<ClaimList
-			{...calculatePageAndSize($page.url)}
+			{...calculatePageAndSize(page.url)}
 			totalCount={data.achievement._count.achievementClaims}
 			enableInvites={data.inviteCapability}
 		/>

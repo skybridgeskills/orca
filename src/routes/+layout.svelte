@@ -6,10 +6,9 @@
 	import Nav from '$lib/components/Nav.svelte';
 	import * as m from '$lib/i18n/messages';
 	import { setLocale } from '$lib/i18n/runtime';
-	import { LoadingStatus } from '$lib/stores/common';
+	import { setSessionContext } from '$lib/session/context';
 	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
 	import { notifications } from '$lib/stores/notificationStore';
-	import { session, sessionStatus } from '$lib/stores/sessionStore';
 	import '../app.css';
 	import { getFooterUrl } from '$lib/utils/footer-links';
 
@@ -28,10 +27,19 @@
 	// svelte-ignore state_referenced_locally
 	setLocale(data.locale);
 
+	// Per-request session store provided via context. Seeded synchronously so SSR
+	// renders auth-gated UI correctly, then kept in sync with `data.session` below.
+	// svelte-ignore state_referenced_locally
+	const sessionCtx = setSessionContext(data.session ?? undefined);
+
 	onMount(() => {
 		preferredTheme.initialize(data.cookieTheme || 'light'); // reinitialize but with the ability to set document.cookie
-		if (data.session) $session = data.session;
-		$sessionStatus = LoadingStatus.Complete;
+	});
+
+	// Keep the context session in sync with the authoritative server session
+	// (refreshed via invalidateAll after login/mutations).
+	$effect(() => {
+		sessionCtx.set(data.session ?? undefined);
 	});
 </script>
 

@@ -5,6 +5,7 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import * as m from '$lib/i18n/messages';
+	import { getSession } from '$lib/session/context';
 
 	import type { PageData } from './$types';
 
@@ -12,6 +13,7 @@
 	import { invalidateAll } from '$app/navigation';
 
 	export let data: PageData;
+	const session = getSession();
 	const noErrors: { [key: string]: string | null } = {
 		givenName: null,
 		familyName: null,
@@ -25,15 +27,15 @@
 	function contactIdentifiersFrom(identifiers: App.UserData['identifiers'] | undefined) {
 		return (identifiers ?? []).filter((i) => i.type !== 'PASSKEY');
 	}
-	$: contactIdentifiers = contactIdentifiersFrom(data.session?.user?.identifiers);
+	$: contactIdentifiers = contactIdentifiersFrom($session?.user?.identifiers);
 	let formData = {
-		givenName: data.session?.user?.givenName ?? '',
-		familyName: data.session?.user?.familyName ?? '',
+		givenName: $session?.user?.givenName ?? '',
+		familyName: $session?.user?.familyName ?? '',
 		identifierVisibility:
-			contactIdentifiersFrom(data.session?.user?.identifiers).find(() => true)?.visibility ??
+			contactIdentifiersFrom($session?.user?.identifiers).find(() => true)?.visibility ??
 			'COMMUNITY',
-		defaultVisibility: data.session?.user?.defaultVisibility ?? 'COMMUNITY',
-		profileVisibility: data.session?.user?.profileVisibility ?? 'COMMUNITY',
+		defaultVisibility: $session?.user?.defaultVisibility ?? 'COMMUNITY',
+		profileVisibility: $session?.user?.profileVisibility ?? 'COMMUNITY',
 		emailNotifications: data.emailNotifications ?? true
 	};
 
@@ -87,8 +89,8 @@
 </script>
 
 <h1 class="text-xl sm:text-2xl mb-3 dark:text-white">
-	User Settings for {data.session?.user?.givenName}
-	{data.session?.user?.familyName}
+	User Settings for {$session?.user?.givenName}
+	{$session?.user?.familyName}
 </h1>
 <p class="my-4 text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
 	{m.home_vivid_mole_gaze()}

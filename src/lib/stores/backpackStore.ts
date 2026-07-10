@@ -3,9 +3,8 @@ import { get, writable } from 'svelte/store';
 
 import * as m from '$lib/i18n/messages';
 
-import { ensureLoaded, LoadingStatus } from './common';
+import { LoadingStatus } from './common';
 import { notifications, Notification } from './notificationStore';
-import { session, sessionStatus } from './sessionStore';
 
 /*
 // AchievementClaims in the current User's backpack
@@ -15,10 +14,8 @@ export const backpackClaims = writable<AchievementClaim[]>([]);
 
 export const backpackClaimsLoading = writable<LoadingStatus>(LoadingStatus.NotStarted);
 
-export const fetchBackpackClaims = async (): Promise<LoadingStatus> => {
-	await ensureLoaded(sessionStatus);
-
-	if (!get(session)?.user) return LoadingStatus.NotStarted;
+export const fetchBackpackClaims = async (hasUser: boolean): Promise<LoadingStatus> => {
+	if (!hasUser) return LoadingStatus.NotStarted;
 
 	let a: AchievementClaim[] = [];
 	backpackClaimsLoading.set(LoadingStatus.Loading);

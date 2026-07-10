@@ -4,9 +4,9 @@
 	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import * as m from '$lib/i18n/messages';
+	import { getSession } from '$lib/session/context';
 
 	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
 
 	interface Props {
 		achievement: App.AchievementWithRelations;
@@ -16,6 +16,7 @@
 	}
 
 	let { achievement, relatedAchievements, relatedClaims, showClaimLink = false }: Props = $props();
+	const session = getSession();
 
 	const userHoldsAchievement = () =>
 		relatedClaims.filter((c) => c.achievementId == achievement.id).length > 0;
@@ -92,7 +93,7 @@
 {:else if achievement.claimable && !achievement.claimRequiresId}
 	<div class="max-w-2xl flex justify-between items-center mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
-			{#if $page.data.session?.user.id}
+			{#if $session?.user?.id}
 				{m.fresh_bright_sparrow_openclaim()}
 			{:else}
 				{m.quick_safe_deer_enabled()}

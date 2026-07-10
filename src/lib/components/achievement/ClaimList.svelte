@@ -11,6 +11,7 @@
 	import StatusTag from '$lib/components/StatusTag.svelte';
 	import Tabs from '$lib/components/Tabs.svelte';
 	import * as m from '$lib/i18n/messages';
+	import { getSession } from '$lib/session/context';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
 	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
 
@@ -49,15 +50,15 @@
 	let deleteModalVisible = $state(false);
 	let inviteToDelete: (ClaimEndorsement & { creator: User }) | null = $state(null);
 
-	const session: App.SessionData | undefined = getContext('session');
+	const session = getSession();
 	const achievementId: string = getContext('achievementId');
 
 	// The invites API doesn't supply a per-row `profileLinkable` (membership/visibility),
 	// so the endorsement/invite-creator name links to the profile only for the creator
 	// themselves or an admin. Admins may open any user's (incl. a non-member's) profile;
 	// broader member→member linking here is deferred to the moderation fast-follow.
-	const viewerIsAdmin = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
-		session?.user?.orgRole || 'none'
+	const viewerIsAdmin = $derived(
+		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes($session?.user?.orgRole || 'none')
 	);
 
 	const getFetchUrl = (pageToFetch: number) => {
@@ -211,7 +212,7 @@
 										{memberClaim.user?.givenName}
 										{memberClaim.user?.familyName}
 									{/if}
-									{#if session?.user?.id == memberClaim.user.id}({m.red_aqua_mule_jest()}){/if}
+									{#if $session?.user?.id == memberClaim.user.id}({m.red_aqua_mule_jest()}){/if}
 								</th>
 								<td class="px-6 py-4">
 									<StatusTag
@@ -224,7 +225,7 @@
 									{memberClaim._count.endorsements}
 								</td>
 								<td class="px-6 py-4">
-									{#if session?.user?.id}
+									{#if $session?.user?.id}
 										<a href={resolve(`/claims/${memberClaim.id}`)}>
 											<Button text={m.happy_next_robin_clasp()} />
 										</a>
@@ -265,7 +266,7 @@
 								{invite.inviteeEmail}
 							</th>
 							<td class="px-6 py-4">
-								{#if invite.creator && (session?.user?.id === invite.creatorId || viewerIsAdmin)}
+								{#if invite.creator && ($session?.user?.id === invite.creatorId || viewerIsAdmin)}
 									<a href={resolve(`/members/${invite.creatorId}`)} class="hover:underline">
 										{invite.creator?.givenName ?? ''}
 										{invite.creator?.familyName ?? ''}
@@ -274,14 +275,14 @@
 									{invite.creator?.givenName ?? ''}
 									{invite.creator?.familyName ?? ''}
 								{/if}
-								{#if session?.user?.id == invite.creatorId}({m.red_aqua_mule_jest()}){/if}
+								{#if $session?.user?.id == invite.creatorId}({m.red_aqua_mule_jest()}){/if}
 								{#if !invite.creator}N/A{/if}
 							</td>
 							<td class="px-6 py-4">
 								{invite.createdAt}
 							</td>
 							<td class="px-6 py-4">
-								{#if session?.user?.id === invite.creatorId || ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none')}
+								{#if $session?.user?.id === invite.creatorId || ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes($session?.user?.orgRole || 'none')}
 									<IconButton
 										id="trash-button"
 										src={FaSolidTrash}

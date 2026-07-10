@@ -7,6 +7,7 @@
 	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	import * as m from '$lib/i18n/messages';
+	import { getSession } from '$lib/session/context';
 	import {
 		claimEmail,
 		claimId,
@@ -15,12 +16,11 @@
 		claimUrl,
 		inviteId
 	} from '$lib/stores/activeClaimStore';
-	import { session } from '$lib/stores/sessionStore';
 
 	import { deserialize } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	interface Props {
 		existingBadgeClaim?: AchievementClaim | null;
 		achievement: App.AchievementWithRelations;
@@ -29,7 +29,8 @@
 		handleCancel: () => void;
 	}
 
-	const userIdentifiers: Identifier[] = $page.data.user?.identifiers || [];
+	const session = getSession();
+	const userIdentifiers: Identifier[] = page.data.user?.identifiers || [];
 	const userEmails = userIdentifiers.filter((iden) => iden.type == 'EMAIL');
 
 	let {
@@ -88,7 +89,7 @@
 
 	onMount(() => {
 		if (!$claimEmail) $claimEmail = userEmails[0]?.identifier || '';
-		if ($claimId && $claimId != $page.params.id) {
+		if ($claimId && $claimId != page.params.id) {
 			// Reset previous claim data
 			$claimEmail = userEmails[0]?.identifier || '';
 			$claimNarrative = '';

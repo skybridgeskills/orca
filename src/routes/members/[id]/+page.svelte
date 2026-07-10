@@ -7,15 +7,17 @@
 	import Tag from '$lib/components/Tag.svelte';
 	import * as m from '$lib/i18n/messages';
 	import Ribbon from '$lib/illustrations/Ribbon.svelte';
+	import { getSession } from '$lib/session/context';
 	import { imageUrl } from '$lib/utils/imageUrl';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 
 	import type { PageProps } from './$types';
 
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	let { data }: PageProps = $props();
+	const session = getSession();
 	const member = $derived(data.member);
 	let showShareModal = $state(false);
 </script>
@@ -29,7 +31,7 @@
 		{/if}
 	</h1>
 	<div class="inline-flex items-center">
-		{#if member.id == data.session?.user?.id}
+		{#if member.id == $session?.user?.id}
 			<Button
 				text={m.happy_sparse_lemur_clasp()}
 				submodule="secondary"
@@ -42,7 +44,7 @@
 	</div>
 </div>
 <p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
-	{#if member.id == data.session?.user?.id}
+	{#if member.id == $session?.user?.id}
 		{m.merry_bright_rabbit_bask()}
 	{:else}
 		{m.red_wide_jackdaw_drip()}
@@ -73,7 +75,7 @@
 			: m.soft_dense_boar_drip()}
 	</h3>
 	<Pagination
-		paging={{ ...calculatePageAndSize($page.url), count: member._count.receivedAchievementClaims }}
+		paging={{ ...calculatePageAndSize(page.url), count: member._count.receivedAchievementClaims }}
 	/>
 
 	<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
@@ -108,7 +110,7 @@
 	</div>
 {/if}
 
-{#if member.id == data.session?.user?.id}
+{#if member.id == $session?.user?.id}
 	<Modal
 		visible={showShareModal}
 		title={m.happy_sparse_lemur_clasp()}
