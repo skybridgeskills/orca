@@ -69,8 +69,8 @@
 			newPasskeyLabel = '';
 			showAddModal = false;
 			await invalidateAll();
-		} catch {
-			// User cancelled, or the authenticator rejected the ceremony.
+		} catch (e: unknown) {
+			console.error(e);
 			passkeyError = m.swift_warm_vole_cancel();
 		} finally {
 			registering = false;

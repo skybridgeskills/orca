@@ -37,7 +37,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	let cred: Awaited<ReturnType<typeof verifyRegistration>> = null;
 	try {
 		cred = await verifyRegistration({ rp, expectedChallenge: challenge, response });
-	} catch {
+	} catch (e: unknown) {
+		console.error(e);
 		cred = null;
 	}
 	if (!cred) error(400, m.zesty_calm_finch_falter());

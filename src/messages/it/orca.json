@@ -84,8 +84,13 @@
 	"calm_steady_lynx_pause": "Non accettato",
 	"calm_steady_lynx_endorse": [
 		{
-			"declarations": ["input count", "local countPlural = count: plural"],
-			"selectors": ["countPlural"],
+			"declarations": [
+				"input count",
+				"local countPlural = count: plural"
+			],
+			"selectors": [
+				"countPlural"
+			],
 			"match": {
 				"countPlural=one": "{count} approvazione",
 				"countPlural=other": "{count} approvazioni"
@@ -538,7 +543,7 @@
 	"brisk_lush_finch_secure": "Passkey",
 	"snug_brave_otter_explain": "Le passkey ti permettono di accedere in modo sicuro senza password, usando i dati biometrici o il PIN del tuo dispositivo.",
 	"merry_lone_swan_falter": "Non è stato possibile aggiungere la passkey. Riprova.",
-	"swift_warm_vole_cancel": "La registrazione della passkey è stata annullata.",
+	"swift_warm_vole_cancel": "La registrazione della passkey non è riuscita.",
 	"calm_tidy_owl_label": "Etichetta",
 	"plump_neat_crow_device": "Dispositivo",
 	"kind_warm_dove_added": "Aggiunta",

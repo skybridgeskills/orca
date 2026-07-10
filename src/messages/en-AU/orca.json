@@ -84,8 +84,13 @@
 	"calm_steady_lynx_pause": "Unaccepted",
 	"calm_steady_lynx_endorse": [
 		{
-			"declarations": ["input count", "local countPlural = count: plural"],
-			"selectors": ["countPlural"],
+			"declarations": [
+				"input count",
+				"local countPlural = count: plural"
+			],
+			"selectors": [
+				"countPlural"
+			],
 			"match": {
 				"countPlural=one": "{count} endorsement",
 				"countPlural=other": "{count} endorsements"
@@ -538,7 +543,7 @@
 	"brisk_lush_finch_secure": "Passkeys",
 	"snug_brave_otter_explain": "Passkeys let you sign in securely without a password, using your device's biometrics or PIN.",
 	"merry_lone_swan_falter": "We couldn't add that passkey. Please try again.",
-	"swift_warm_vole_cancel": "Passkey registration was cancelled.",
+	"swift_warm_vole_cancel": "Passkey registration was unsuccessful",
 	"calm_tidy_owl_label": "Label",
 	"plump_neat_crow_device": "Device",
 	"kind_warm_dove_added": "Added",

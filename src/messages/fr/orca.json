@@ -84,8 +84,13 @@
 	"calm_steady_lynx_pause": "Non accepté",
 	"calm_steady_lynx_endorse": [
 		{
-			"declarations": ["input count", "local countPlural = count: plural"],
-			"selectors": ["countPlural"],
+			"declarations": [
+				"input count",
+				"local countPlural = count: plural"
+			],
+			"selectors": [
+				"countPlural"
+			],
 			"match": {
 				"countPlural=one": "{count} approbation",
 				"countPlural=other": "{count} approbations"
@@ -538,7 +543,7 @@
 	"brisk_lush_finch_secure": "Clés d'accès",
 	"snug_brave_otter_explain": "Les clés d'accès vous permettent de vous connecter en toute sécurité sans mot de passe, à l'aide de la biométrie ou du code PIN de votre appareil.",
 	"merry_lone_swan_falter": "Nous n'avons pas pu ajouter cette clé d'accès. Veuillez réessayer.",
-	"swift_warm_vole_cancel": "L'enregistrement de la clé d'accès a été annulé.",
+	"swift_warm_vole_cancel": "L'enregistrement de la clé d'accès a échoué.",
 	"calm_tidy_owl_label": "Libellé",
 	"plump_neat_crow_device": "Appareil",
 	"kind_warm_dove_added": "Ajoutée",

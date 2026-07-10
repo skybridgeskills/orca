@@ -62,7 +62,11 @@ export async function verifyRegistration(args: {
 		response: args.response,
 		expectedChallenge: args.expectedChallenge,
 		expectedOrigin: args.rp.expectedOrigin,
-		expectedRPID: args.rp.rpID
+		expectedRPID: args.rp.rpID,
+		// Keep in sync with `authenticatorSelection.userVerification: 'preferred'` in
+		// buildRegistrationOptions: accept credentials whose UV flag is unset (e.g.
+		// Dashlane skips UV under `preferred`) instead of rejecting them.
+		requireUserVerification: false
 	});
 	if (!verification.verified || !verification.registrationInfo) return null;
 	const info = verification.registrationInfo;
@@ -108,7 +112,10 @@ export async function verifyAuthentication(args: {
 			publicKey: base64urlToBytes(args.passkey.credential.publicKey),
 			counter: args.passkey.credential.counter,
 			transports: asTransports(args.passkey.credential.transports)
-		}
+		},
+		// Keep in sync with `userVerification: 'preferred'` in buildAuthenticationOptions:
+		// accept assertions whose UV flag is unset instead of rejecting them.
+		requireUserVerification: false
 	});
 	if (!verification.verified) return null;
 	return { newCounter: verification.authenticationInfo.newCounter };
