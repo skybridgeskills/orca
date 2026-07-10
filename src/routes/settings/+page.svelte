@@ -22,13 +22,16 @@
 	// Passkeys are authenticators, never contact/identity: exclude PASSKEY rows from the
 	// contact Identifiers table + the contact-visibility control. They appear only in the
 	// Passkeys section below.
-	$: contactIdentifiers = (data.session?.user?.identifiers ?? []).filter(
-		(i) => i.type !== 'PASSKEY'
-	);
+	function contactIdentifiersFrom(identifiers: App.UserData['identifiers'] | undefined) {
+		return (identifiers ?? []).filter((i) => i.type !== 'PASSKEY');
+	}
+	$: contactIdentifiers = contactIdentifiersFrom(data.session?.user?.identifiers);
 	let formData = {
 		givenName: data.session?.user?.givenName ?? '',
 		familyName: data.session?.user?.familyName ?? '',
-		identifierVisibility: contactIdentifiers.find(() => true)?.visibility ?? 'COMMUNITY',
+		identifierVisibility:
+			contactIdentifiersFrom(data.session?.user?.identifiers).find(() => true)?.visibility ??
+			'COMMUNITY',
 		defaultVisibility: data.session?.user?.defaultVisibility ?? 'COMMUNITY',
 		profileVisibility: data.session?.user?.profileVisibility ?? 'COMMUNITY',
 		emailNotifications: data.emailNotifications ?? true
