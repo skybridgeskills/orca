@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import * as m from '$lib/i18n/messages';
+	import { isAdmin, isGeneralAdmin } from '$lib/permissions/isAdmin';
 	import { getSession } from '$lib/session/context';
 
 	import type { PageProps } from './$types';
@@ -11,7 +12,7 @@
 	const session = getSession();
 </script>
 
-{#if $session?.user?.orgRole === 'GENERAL_ADMIN'}
+{#if isGeneralAdmin($session?.user)}
 	<div class="max-w-2xl flex justify-between items-center">
 		<h1 class="inline-flex mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white">
 			{m.mellow_elegant_parrot_ask()}
@@ -30,7 +31,7 @@
 	</h1>
 {/if}
 
-{#if ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes($session?.user?.orgRole ?? '')}
+{#if isAdmin($session?.user)}
 	<p class="max-w-2xl mt-3 text-sm">
 		<a
 			class="text-blue-600 dark:text-blue-400 hover:underline"

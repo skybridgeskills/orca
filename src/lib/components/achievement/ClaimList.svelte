@@ -11,6 +11,7 @@
 	import StatusTag from '$lib/components/StatusTag.svelte';
 	import Tabs from '$lib/components/Tabs.svelte';
 	import * as m from '$lib/i18n/messages';
+	import { isAdmin } from '$lib/permissions/isAdmin';
 	import { getSession } from '$lib/session/context';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
 	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
@@ -57,9 +58,7 @@
 	// so the endorsement/invite-creator name links to the profile only for the creator
 	// themselves or an admin. Admins may open any user's (incl. a non-member's) profile;
 	// broader member→member linking here is deferred to the moderation fast-follow.
-	const viewerIsAdmin = $derived(
-		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes($session?.user?.orgRole || 'none')
-	);
+	const viewerIsAdmin = $derived(isAdmin($session?.user));
 
 	const getFetchUrl = (pageToFetch: number) => {
 		if (category == 'AchievementClaim')
@@ -282,7 +281,7 @@
 								{invite.createdAt}
 							</td>
 							<td class="px-6 py-4">
-								{#if $session?.user?.id === invite.creatorId || ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes($session?.user?.orgRole || 'none')}
+								{#if $session?.user?.id === invite.creatorId || viewerIsAdmin}
 									<IconButton
 										id="trash-button"
 										src={FaSolidTrash}

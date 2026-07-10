@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ url, request, params, locals }) => {
 	// P5 moderation: one batched suspension query for the page (no N+1). Non-admins
 	// never receive suspended achievements; admins get every row with a `suspended`
 	// flag so the list UI can mark them.
-	const viewerIsAdmin = isAdmin({ user: locals.session?.user ?? undefined });
+	const viewerIsAdmin = isAdmin(locals.session?.user);
 	const annotated = await annotateSuspensions(locals.org.id, achievements, (a) => ({
 		targetType: 'ACHIEVEMENT',
 		targetId: a.id

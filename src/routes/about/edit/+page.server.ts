@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ValidationError } from 'yup';
 
 import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { getUploadUrl } from '$lib/server/media';
 
 import stripTags from '../../../lib/utils/stripTags';
@@ -21,14 +22,12 @@ const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
 
 export const load: PageServerLoad = ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
-	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		redirect(302, '/');
+	if (!isAdmin(locals.session?.user)) redirect(302, '/');
 };
 
 export const actions: Actions = {
 	default: async ({ locals, request }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			error(403, m.lower_home_cow_view());
+		if (!isAdmin(locals.session?.user)) error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const imageUpdated = requestData.get('imageEdited') === 'true';

@@ -37,7 +37,7 @@ export const GET = async ({ url, locals }: RequestEvent) => {
 
 	// P5 moderation: one batched suspension query for the page (no N+1). Suspended
 	// endorsements are hidden from non-admins and flagged for admins.
-	const viewerIsAdmin = isAdmin({ user: locals.session?.user ?? undefined });
+	const viewerIsAdmin = isAdmin(locals.session?.user);
 	const annotated = await annotateSuspensions(locals.org.id, endorsements, (e) => ({
 		targetType: 'ENDORSEMENT',
 		targetId: e.id

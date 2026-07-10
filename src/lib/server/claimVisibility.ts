@@ -1,15 +1,12 @@
 import type { AchievementClaim, Prisma, Visibility } from '@prisma/client';
 
 import type { ViewerRole } from '$lib/claimViewModel';
+import { isAdmin } from '$lib/permissions/isAdmin';
 
 // Re-export so existing server-side consumers can keep importing the type from
 // here. The canonical declaration lives in the client-safe `$lib/claimViewModel`
 // module so the browser bundle can share it (see P3).
 export type { ViewerRole };
-
-// Admins per existing convention (lib/permissions/isAdmin.ts):
-//   GENERAL_ADMIN, CONTENT_ADMIN. BILLING_ADMIN is NOT an admin here.
-const ADMIN_ROLES = ['GENERAL_ADMIN', 'CONTENT_ADMIN'];
 
 // Visibilities a non-owner community member may see. ACHIEVEMENT is treated as
 // COMMUNITY for now (D2: deferred), so community members can see it. Exported so the
@@ -28,7 +25,7 @@ export function viewerRole(
 	const user = session?.user;
 	if (!user?.id) return 'public';
 	if (user.id === claim.userId) return 'owner';
-	if (ADMIN_ROLES.includes(user.orgRole || 'none')) return 'admin';
+	if (isAdmin(user)) return 'admin';
 	return 'community';
 }
 
@@ -69,7 +66,7 @@ export function claimVisibilityWhere(
 	if (!user?.id) return { visibility: 'PUBLIC' };
 
 	// admin: any visibility (no restriction).
-	if (ADMIN_ROLES.includes(user.orgRole || 'none')) return {};
+	if (isAdmin(user)) return {};
 
 	// owner-or-community: see community-visible claims plus all of one's own.
 	return {

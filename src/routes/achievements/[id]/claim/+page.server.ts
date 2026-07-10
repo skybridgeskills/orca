@@ -8,6 +8,7 @@ import { getAchievement } from '$lib/data/achievement';
 import { getUserClaim, getValidUserClaim } from '$lib/data/achievementClaim';
 import { resultsFromEndorsementJson, reviewIsCurrent } from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { isSuspended } from '$lib/server/moderation/suspension';
 import { notifyStewardsForReview, stewardIdsFor } from '$lib/server/stewards';
 import { isVisibility } from '$lib/server/visibility';
@@ -179,7 +180,7 @@ export const actions = {
 			}
 		} else if (achievement.json?.reviewsRequired && achievement.json.reviewsRequired > 0) {
 			// Admin review required - check if current user is an admin
-			if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none')) {
+			if (isAdmin(locals.session?.user)) {
 				// Current user is an admin, so they can make the claim immediately valid
 				data.validFrom = new Date();
 			}

@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import * as m from '$lib/i18n/messages';
+import { isGeneralAdmin } from '$lib/permissions/isAdmin';
 import {
 	ConfidentialClientError,
 	createConfidentialClient,
@@ -12,14 +13,10 @@ import { API_SCOPES } from '$lib/server/oauth/scopes';
 
 import type { Actions, PageServerLoad } from './$types';
 
-function isGeneralAdmin(locals: App.Locals): boolean {
-	return locals.session?.user?.orgRole === 'GENERAL_ADMIN';
-}
-
 export const load: PageServerLoad = async ({ locals }) => {
 	// These are sensitive integration credentials — gate on GENERAL_ADMIN only
 	// (not the broader isAdmin helper, which also allows CONTENT_ADMIN).
-	if (!isGeneralAdmin(locals)) {
+	if (!isGeneralAdmin(locals.session?.user)) {
 		redirect(302, '/');
 	}
 
@@ -44,7 +41,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	create: async ({ request, locals }) => {
-		if (!isGeneralAdmin(locals)) {
+		if (!isGeneralAdmin(locals.session?.user)) {
 			error(403, m.stern_lunar_bear_deny());
 		}
 
@@ -80,7 +77,7 @@ export const actions: Actions = {
 	},
 
 	disable: async ({ request, locals }) => {
-		if (!isGeneralAdmin(locals)) {
+		if (!isGeneralAdmin(locals.session?.user)) {
 			error(403, m.stern_lunar_bear_deny());
 		}
 
@@ -98,7 +95,7 @@ export const actions: Actions = {
 	},
 
 	delete: async ({ request, locals }) => {
-		if (!isGeneralAdmin(locals)) {
+		if (!isGeneralAdmin(locals.session?.user)) {
 			error(403, m.stern_lunar_bear_deny());
 		}
 

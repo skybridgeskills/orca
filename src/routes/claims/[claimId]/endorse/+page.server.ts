@@ -5,6 +5,7 @@ import { prisma } from '$lib/../prisma/client';
 import { getValidUserClaim } from '$lib/data/achievementClaim';
 import { buildResults, getRubricForReview } from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { isStewardUser } from '$lib/server/stewards';
 import stripTags from '$lib/utils/stripTags';
 
@@ -108,8 +109,7 @@ export const actions: Actions = {
 		// check the cases where we should make the claim valid
 		if (
 			!claim.validFrom &&
-			(['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none') ||
-				endorserIsSteward)
+			(isAdmin(locals.session?.user) || endorserIsSteward)
 		) {
 			// If the current user is an admin or an assigned steward, the claim becomes valid.
 			shouldMakeClaimValid = true;

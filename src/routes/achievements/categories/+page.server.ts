@@ -1,6 +1,7 @@
 import { redirect, error } from '@sveltejs/kit';
 
 import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
 
 import parseIntData from '../../../lib/utils/parseIntData';
 import stripTags from '../../../lib/utils/stripTags';
@@ -10,14 +11,12 @@ import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = ({ locals }) => {
 	// Don't include edit controls if not an admin
-	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		redirect(302, `/achievements`);
+	if (!isAdmin(locals.session?.user)) redirect(302, `/achievements`);
 };
 
 export const actions: Actions = {
 	create: async ({ locals, request }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			error(403, 'Unauthorized');
+		if (!isAdmin(locals.session?.user)) error(403, 'Unauthorized');
 
 		const requestData = await request.formData();
 		const formData = {
@@ -42,8 +41,7 @@ export const actions: Actions = {
 	},
 
 	update: async ({ locals, request }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			error(403, m.lower_home_cow_view());
+		if (!isAdmin(locals.session?.user)) error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const categoryId = stripTags(requestData.get('update_categoryId')?.toString()) || '';
@@ -70,8 +68,7 @@ export const actions: Actions = {
 	},
 
 	delete: async ({ locals, request }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			error(403, m.lower_home_cow_view());
+		if (!isAdmin(locals.session?.user)) error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const categoryId = stripTags(requestData.get('delete_categoryId')?.toString()) || '';

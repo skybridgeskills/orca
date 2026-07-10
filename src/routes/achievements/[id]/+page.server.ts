@@ -47,7 +47,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	// P5 moderation: a suspended achievement is hidden from non-admins (treat as removed)
 	// and shown to admins with a `suspension` flag. Origin org for an org-owned
 	// achievement is its own org (== locals.org here).
-	const viewerIsAdmin = isAdmin({ user: locals.session?.user ?? undefined });
+	const viewerIsAdmin = isAdmin(locals.session?.user);
 	const suspension = await activeSuspensionFor({
 		originOrgId: locals.org.id,
 		targetType: 'ACHIEVEMENT',
@@ -146,8 +146,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
 	delete: async ({ locals, params }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			error(403, m.lower_home_cow_view());
+		if (!isAdmin(locals.session?.user)) error(403, m.lower_home_cow_view());
 
 		// TODO: require confirmation for delete
 		// TODO: ensure can't delete non-org achievement

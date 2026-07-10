@@ -131,7 +131,7 @@
 				text={m.sharp_clear_fox_edit()}
 			/>
 		{/if}
-		{#if isAdmin({ user: $session?.user || undefined })}
+		{#if isAdmin($session?.user)}
 			<Button
 				submodule="danger"
 				onclick={() => {
@@ -382,9 +382,7 @@
 	description={`${m.vivid_best_bat_soar({
 		count: data.achievement._count.achievementClaims
 	})} ${
-		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes($session?.user?.orgRole || 'none')
-			? m.bad_mad_jackdaw_tap()
-			: m.great_merry_boar_ascend()
+		isAdmin($session?.user) ? m.bad_mad_jackdaw_tap() : m.great_merry_boar_ascend()
 	}`}
 />
 

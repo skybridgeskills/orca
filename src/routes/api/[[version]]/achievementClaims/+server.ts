@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client';
 import { error } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { claimVisibilityWhere, COMMUNITY_VISIBLE } from '$lib/server/claimVisibility';
 import { resolveApiAuth } from '$lib/server/oauth/apiAuth';
 import { SCOPE_ACHIEVEMENTCLAIM_READONLY } from '$lib/server/oauth/scopes';
@@ -29,9 +30,7 @@ export const GET = async ({ request, url, params, locals }: RequestEvent) => {
 		error(400, 'Missing achievementId query parameter');
 	}
 
-	const viewerIsAdmin = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
-		locals.session?.user?.orgRole || 'none'
-	);
+	const viewerIsAdmin = isAdmin(locals.session?.user);
 	const editAchievementCapability = viewerIsAdmin;
 
 	// P4: when a membership achievement is configured, the claims/earners list is

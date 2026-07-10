@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
 	const membershipId = membershipAchievementId(locals.org);
 	const gatingActive = membershipId !== null;
-	const viewerIsAdmin = isAdmin({ user: viewer });
+	const viewerIsAdmin = isAdmin(viewer);
 
 	// When gated, a non-member (non-admin) viewer may not see the directory at all.
 	if (gatingActive && !(await isMember({ user: viewer, org: locals.org }))) {

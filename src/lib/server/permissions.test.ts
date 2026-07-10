@@ -116,10 +116,13 @@ describe('isMember', () => {
 			true
 		);
 		expect(prisma.achievementClaim.findFirst).toHaveBeenCalledWith({
-			where: {
+			where: expect.objectContaining({
 				userId: 'user-1',
-				...validMembershipClaimWhere('ach-member', 'org-1')
-			}
+				achievementId: 'ach-member',
+				organizationId: 'org-1',
+				validFrom: { not: null },
+				claimStatus: 'ACCEPTED'
+			})
 		});
 	});
 

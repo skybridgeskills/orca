@@ -2,6 +2,7 @@ import { MessageType } from '@prisma/client';
 
 import { prisma } from '$lib/../prisma/client';
 import * as m from '$lib/i18n/messages';
+import { ADMIN_ROLES } from '$lib/permissions/isAdmin';
 import { REPORT_NOTIFY_THROTTLE_MS } from '$lib/server/messaging/constants';
 import { sendUserMessage, type SendUserMessageEmail } from '$lib/server/messaging/sendUserMessage';
 import { superadminOrgId } from '$lib/server/moderation/superadminOrg';
@@ -38,8 +39,6 @@ function buildReportEmail(params: {
 		text: `${intro}\n\n${url}`
 	};
 }
-
-const ADMIN_ROLES = ['GENERAL_ADMIN', 'CONTENT_ADMIN'] as const;
 
 /**
  * Fan out a `CONTENT_REPORTED` Message (+ throttled email) to every admin who should

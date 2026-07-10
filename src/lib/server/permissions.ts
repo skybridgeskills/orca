@@ -1,4 +1,5 @@
 import { prisma } from '$lib/../prisma/client';
+import { isAdmin } from '$lib/permissions/isAdmin';
 
 interface CanEditAchievementsParams {
 	user: {
@@ -21,7 +22,7 @@ export async function canEditAchievements({
 	org
 }: CanEditAchievementsParams): Promise<boolean> {
 	// Admins always have permission
-	if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(user.orgRole || 'none')) {
+	if (isAdmin(user)) {
 		return true;
 	}
 
@@ -106,7 +107,7 @@ interface IsMemberParams {
  */
 export async function isMember({ user, org }: IsMemberParams): Promise<boolean> {
 	// Admins are always members
-	if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(user.orgRole || 'none')) {
+	if (isAdmin(user)) {
 		return true;
 	}
 
@@ -147,7 +148,7 @@ export async function canInviteToAchievement({
 	user,
 	achievement
 }: CanInviteToAchievementParams): Promise<boolean> {
-	if (['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(user.orgRole || 'none')) {
+	if (isAdmin(user)) {
 		return true;
 	}
 

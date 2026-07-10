@@ -54,7 +54,7 @@ export const load: PageServerLoad = async ({ url, locals, params }) => {
 	const viewer = locals.session.user;
 	if (
 		membershipAchievementId(locals.org) !== null &&
-		!isAdmin({ user: viewer }) &&
+		!isAdmin(viewer) &&
 		params.id !== viewer.id
 	) {
 		// Non-admin, non-self viewer under gating: allow only when both viewer and

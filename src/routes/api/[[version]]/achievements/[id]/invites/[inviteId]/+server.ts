@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { apiResponse } from '$lib/utils/api';
 
 export const DELETE = async ({ params, locals }) => {
@@ -12,9 +13,7 @@ export const DELETE = async ({ params, locals }) => {
 
 	const { id: achievementId, inviteId } = params;
 	const userId = locals.session.user.id;
-	const isAdmin = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
-		locals.session.user.orgRole || 'none'
-	);
+	const viewerIsAdmin = isAdmin(locals.session.user);
 
 	// Find the invite to verify ownership
 	const invite = await prisma.claimEndorsement.findUnique({
@@ -31,7 +30,7 @@ export const DELETE = async ({ params, locals }) => {
 	}
 
 	// Authorization check - only creator or admin can delete
-	if (invite.creatorId !== userId && !isAdmin) {
+	if (invite.creatorId !== userId && !viewerIsAdmin) {
 		error(403, m.red_teary_eagle_drip());
 	}
 

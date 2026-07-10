@@ -1,11 +1,10 @@
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { isMember } from '$lib/server/permissions';
 
 // Reporter status is computed from the live session at submit time and SNAPSHOTTED on
 // the Report. Org admins are shown this status but never the reporter's identity.
 
 export type ReporterStatusValue = 'ANONYMOUS' | 'USER' | 'MEMBER' | 'ADMIN';
-
-const ADMIN_ROLES = ['GENERAL_ADMIN', 'CONTENT_ADMIN'];
 
 /**
  * Classify the reporter relative to the origin org:
@@ -18,7 +17,7 @@ export async function computeReporterStatus(args: {
 }): Promise<ReporterStatusValue> {
 	const user = args.session?.user;
 	if (!user?.id) return 'ANONYMOUS';
-	if (ADMIN_ROLES.includes(user.orgRole || 'none')) return 'ADMIN';
+	if (isAdmin(user)) return 'ADMIN';
 	if (await isMember({ user, org: args.org })) return 'MEMBER';
 	return 'USER';
 }

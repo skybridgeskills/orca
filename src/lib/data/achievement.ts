@@ -116,16 +116,12 @@ export const inviteToClaim = async ({
 		error(403, m.tiny_dark_ostrich_jump());
 	}
 
-	if (!isAdmin({ user: session?.user }) && !achievement.json?.capabilities?.inviteRequires) {
+	if (!isAdmin(session?.user) && !achievement.json?.capabilities?.inviteRequires) {
 		// NON ADMIN USERS for a badge that is only inviteable by admins
 		error(403, m.patchy_aqua_turtle_support());
 	}
 
-	if (
-		!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none') &&
-		session.user.id &&
-		achievement.json?.capabilities?.inviteRequires
-	) {
+	if (!isAdmin(session?.user) && session.user.id && achievement.json?.capabilities?.inviteRequires) {
 		const inviteQualificationClaim = await prisma.achievementClaim.findFirst({
 			where: {
 				achievementId: achievement.json?.capabilities?.inviteRequires,
