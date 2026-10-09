@@ -121,7 +121,11 @@ export const inviteToClaim = async ({
 		error(403, m.patchy_aqua_turtle_support());
 	}
 
-	if (!isAdmin(session?.user) && session.user.id && achievement.json?.capabilities?.inviteRequires) {
+	if (
+		!isAdmin(session?.user) &&
+		session.user.id &&
+		achievement.json?.capabilities?.inviteRequires
+	) {
 		const inviteQualificationClaim = await prisma.achievementClaim.findFirst({
 			where: {
 				achievementId: achievement.json?.capabilities?.inviteRequires,

@@ -107,10 +107,7 @@ export const actions: Actions = {
 			isStewardUser(claim.achievement, locals.session.user.id) &&
 			claim.userId !== locals.session.user.id;
 		// check the cases where we should make the claim valid
-		if (
-			!claim.validFrom &&
-			(isAdmin(locals.session?.user) || endorserIsSteward)
-		) {
+		if (!claim.validFrom && (isAdmin(locals.session?.user) || endorserIsSteward)) {
 			// If the current user is an admin or an assigned steward, the claim becomes valid.
 			shouldMakeClaimValid = true;
 		} else if (!claim.validFrom && claim.achievement.reviewRequiresId) {

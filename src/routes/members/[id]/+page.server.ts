@@ -52,11 +52,7 @@ export const load: PageServerLoad = async ({ url, locals, params }) => {
 	// When unset, behavior is unchanged (any logged-in same-org user). Not-found /
 	// cross-org keep the 404 above; gated-out viewers are redirected to /members.
 	const viewer = locals.session.user;
-	if (
-		membershipAchievementId(locals.org) !== null &&
-		!isAdmin(viewer) &&
-		params.id !== viewer.id
-	) {
+	if (membershipAchievementId(locals.org) !== null && !isAdmin(viewer) && params.id !== viewer.id) {
 		// Non-admin, non-self viewer under gating: allow only when both viewer and
 		// target are members and the target's profile is community-visible. Short-circuit
 		// on viewer membership and target visibility to keep this to O(1) queries.

@@ -381,9 +381,7 @@
 	level="h3"
 	description={`${m.vivid_best_bat_soar({
 		count: data.achievement._count.achievementClaims
-	})} ${
-		isAdmin($session?.user) ? m.bad_mad_jackdaw_tap() : m.great_merry_boar_ascend()
-	}`}
+	})} ${isAdmin($session?.user) ? m.bad_mad_jackdaw_tap() : m.great_merry_boar_ascend()}`}
 />
 
 {#if data.canViewClaimsList}
