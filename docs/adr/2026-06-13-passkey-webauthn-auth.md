@@ -45,7 +45,10 @@ transports, deviceType, backedUp, label, lastUsedAt }`). This advances a future
    `…/webauthn/2fa/verify`. The two factors are bound to the same cookie session; neither
    can be skipped (2FA verify requires `emailVerifiedAt`) or swapped (the asserted
    credential must belong to the session's user). A superadmin with no passkey logs in
-   with email alone.
+   with email alone. On the superadmin org's host,
+   usernameless (passkey-only) login is refused (`authenticate/options` and
+   `authenticate/verify` return 403, and `/login` hides the button), so the email
+   factor can't be skipped.
 
 ## Consequences
 

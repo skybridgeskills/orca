@@ -16,7 +16,7 @@ credentials, members, OAuth, and API surfaces.
 
 1. Do the setup once: **[00-setup.md](./00-setup.md)** (environment, accounts, and the
    optional superadmin + passkey tracks).
-2. Run the journeys in order (01 → 10). Each file states its **preconditions** (state from
+2. Run the journeys in order (01 → 11). Each file states its **preconditions** (state from
    earlier journeys), then numbered checkable steps with **expected results**, then the
    **state it produces** (named entities later journeys reuse), then an **e2e candidate**
    call-out.
@@ -43,6 +43,7 @@ across the journey files.
 | 8   | [Settings & passkeys](./08-settings-and-passkeys.md)        | _Member user_; passkey authenticator (setup)              | _Member user_ has a passkey                                                                                          | P2           |
 | 9   | [Reporting & moderation](./09-reporting-moderation.md)      | Content from j2–j5; _Superadmin_ + superadmin org (setup) | Suspended content; moderation actions                                                                                | P1           |
 | 10  | [OAuth & API](./10-oauth-and-api.md)                        | _Admin_; an achievement                                   | OAuth clients/tokens (validates)                                                                                     | P2           |
+| 11  | [Bulk award](./11-bulk-award.md)                            | _Admin_, _Invite-only_, _Member user_, _Invitee user_     | _Member user_ holds _Invite-only_; bulk invites (one deleted)                                                        | P2           |
 
 ## Conventions used by every journey file
 

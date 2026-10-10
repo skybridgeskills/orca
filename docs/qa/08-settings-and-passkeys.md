@@ -67,6 +67,9 @@ ADR: [`../adr/2026-06-13-passkey-webauthn-auth.md`](../adr/2026-06-13-passkey-we
 
 ### D. Usernameless passkey login (actor: _Member user_; **passkey track**)
 
+Run this on a normal org. On the **superadmin org's** host the button is hidden and
+passkey-only login is refused (passkey ADR §5); journey 9 covers its email + passkey login.
+
 12. - [ ] **Log out**. Go to **`/login`**.
 13. - [ ] Click **"Sign in with a passkey"** (the secondary button, no email typed).
           The browser runs a **discoverable-credential** authentication ceremony.

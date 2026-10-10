@@ -90,6 +90,9 @@ modal (reason select + optional description → **"Submit report"**). It posts t
           activate the session. A superadmin with **no** passkey logs in with **email alone**.
           Nothing auto-logs-in from a notification email; the superadmin authenticates into
           their own org first.
+          On the superadmin org's `/login` there is **no "Sign in with a passkey"** button:
+          passkey-only login is refused there (`POST /api/webauthn/authenticate/options`
+          returns 403), so the email step can't be skipped.
 13. - [ ] In the superadmin org's **`/messages`** inbox, open the **cross-org report**
           Message (it carries a **"Cross-community review"** badge). Expected: here the
           **reporter identity** IS shown (the superadmin/cross-org branch loads it,
