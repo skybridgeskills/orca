@@ -10,11 +10,13 @@
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import ResultDescriptionInput from '$lib/components/forms/ResultDescriptionInput.svelte';
+	import UserMultiSelect from '$lib/components/forms/UserMultiSelect.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
 	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import { achievementFormSchema, SELF_REQUIREMENT } from '$lib/data/achievementForm';
 	import type { Alignment } from '$lib/data/alignment';
+	import type { UserSummary } from '$lib/data/userSummary';
 	import * as m from '$lib/i18n/messages';
 	import {
 		achievementsLoading,
@@ -45,29 +47,18 @@
 		capabilities_inviteRequires?: string | null;
 		claimTemplate?: string | null;
 		alignments?: Array<Alignment>;
-		stewards?: string[];
 		resultDescriptions?: Array<{ id?: string; name: string; allowedValue: string[] }>;
-	}
-
-	// Stewards are an additive overlay: org members who can approve a claim directly,
-	// shown alongside any review requirement (not a separate review type).
-	interface Member {
-		id: string;
-		givenName: string | null;
-		familyName: string | null;
 	}
 
 	interface Props {
 		categories: Array<AchievementCategory>;
 		initialData: InitialData;
 		achievementId?: string;
-		members?: Array<Member>;
+		/** Saved stewards (edit). */
+		selectedStewards?: UserSummary[];
 	}
 
-	let { categories, initialData, achievementId = '', members = [] }: Props = $props();
-
-	const stewardName = (member: Member): string =>
-		`${member.givenName ?? ''} ${member.familyName ?? ''}`.trim() || member.id;
+	let { categories, initialData, achievementId = '', selectedStewards = [] }: Props = $props();
 
 	// Edit hydration: an already-saved "this badge" requirement comes back as the
 	// badge's own id; present it as the self sentinel so the picker reads "This badge".
@@ -90,7 +81,6 @@
 		inviteRequires: initialData.inviteRequires ?? null,
 		capabilities_inviteRequires: selfOr(initialData.capabilities_inviteRequires),
 		claimTemplate: initialData.claimTemplate ?? '',
-		stewards: initialData.stewards ?? [],
 		resultDescriptions: initialData.resultDescriptions ?? [],
 		alignments: initialData.alignments || [],
 		// claim template toggle: enabled when there is an initial template
@@ -110,6 +100,12 @@
 	});
 
 	let formData = $state(initialFormData());
+
+	// Stewards are an additive overlay: org users who can approve a claim directly,
+	// shown alongside any review requirement (not a separate review type). Seeded once,
+	// like `formData`.
+	const initialStewards = () => [...selectedStewards];
+	let stewards = $state<UserSummary[]>(initialStewards());
 
 	let noErrors = {
 		name: '',
@@ -600,36 +596,13 @@
 							<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
 								{m.swift_kind_eagle_steward()}
 							</p>
-							{#if members.length === 0}
-								<p class="text-sm text-gray-500 dark:text-gray-400">
-									{m.calm_proud_finch_empty()}
-								</p>
-							{:else}
-								<div
-									id="achievementEdit_stewards"
-									class="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-gray-300 p-2 dark:border-gray-600"
-								>
-									{#each members as member (member.id)}
-										<label class="flex items-center gap-2 text-sm text-gray-900 dark:text-white">
-											<input
-												type="checkbox"
-												name="stewards"
-												value={member.id}
-												checked={formData.stewards.includes(member.id)}
-												onchange={(e) => {
-													if (e.currentTarget.checked) {
-														if (!formData.stewards.includes(member.id))
-															formData.stewards = [...formData.stewards, member.id];
-													} else {
-														formData.stewards = formData.stewards.filter((s) => s !== member.id);
-													}
-												}}
-											/>
-											<span>{stewardName(member)}</span>
-										</label>
-									{/each}
-								</div>
-							{/if}
+							<UserMultiSelect
+								bind:selected={stewards}
+								inputName="stewards"
+								inputId="achievementEdit_stewards"
+								label={m.brisk_mellow_otter_assign()}
+								addLabel={m.steady_kind_heron_enlist()}
+							/>
 						</div>
 					{/if}
 				</div>
@@ -732,8 +705,8 @@
 				<input type="hidden" name="reviewRequires" bind:value={formData.reviewRequires} />
 				<input type="hidden" name="reviewsRequired" bind:value={formData.reviewsRequired} />
 				{#if formData.reviewableSelectedOption != 'none'}
-					{#each formData.stewards as stewardId (stewardId)}
-						<input type="hidden" name="stewards" value={stewardId} />
+					{#each stewards as steward (steward.id)}
+						<input type="hidden" name="stewards" value={steward.id} />
 					{/each}
 				{/if}
 

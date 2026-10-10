@@ -8,3 +8,11 @@ export interface UserSummary {
 	/** Present only when the caller may see emails (admins). */
 	email?: string | null;
 }
+
+/** Name, else email, else null (the caller shows a "Member without a name" message). */
+export function userLabel(
+	u: Pick<UserSummary, 'givenName' | 'familyName' | 'email'>
+): string | null {
+	const name = `${u.givenName ?? ''} ${u.familyName ?? ''}`.trim();
+	return name || u.email || null;
+}

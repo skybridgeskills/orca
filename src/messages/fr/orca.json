@@ -446,7 +446,6 @@
 	"mellow_brisk_otter_amend": "Modifier l’acceptation",
 	"brisk_mellow_otter_assign": "Référents",
 	"swift_kind_eagle_steward": "Ces membres peuvent approuver une demande directement, en plus de toute exigence d'examen ci-dessus.",
-	"calm_proud_finch_empty": "Aucun autre membre à désigner pour l'instant.",
 	"gentle_warm_heron_review": "ou examen par un référent désigné",
 	"noble_swift_otter_review": "Une demande de badge nécessite votre examen",
 	"bright_calm_heron_await": "Demande en attente d'examen",
@@ -590,5 +589,12 @@
 	"glad_neat_robin_settle": "Visibilité mise à jour",
 	"sore_slow_crane_retry": "Impossible de modifier qui peut voir ce badge. Réessayez.",
 	"proud_open_puffin_earn": "Vous avez obtenu ce badge le {createdOn}. Toute personne disposant du lien peut le voir. Vous pouvez documenter et ajouter des détails à votre badge. Vous pouvez également modifier votre acceptation si vous ne souhaitez plus conserver ce badge.",
-	"proud_quiet_vole_earn": "Vous avez obtenu ce badge le {createdOn}. Seuls vous et les administrateurs de cette communauté pouvez le voir. Vous pouvez documenter et ajouter des détails à votre badge. Vous pouvez également modifier votre acceptation si vous ne souhaitez plus conserver ce badge."
+	"proud_quiet_vole_earn": "Vous avez obtenu ce badge le {createdOn}. Seuls vous et les administrateurs de cette communauté pouvez le voir. Vous pouvez documenter et ajouter des détails à votre badge. Vous pouvez également modifier votre acceptation si vous ne souhaitez plus conserver ce badge.",
+	"steady_kind_heron_enlist": "Ajouter un référent",
+	"mild_eager_lynx_seek": "Rechercher des membres par nom ou e-mail",
+	"tidy_quiet_mole_miss": "Aucun membre trouvé.",
+	"broad_calm_tern_narrow": "{shown} sur {total} affichés. Continuez à saisir pour affiner la liste.",
+	"shy_plain_badger_lack": "Membre sans nom",
+	"frail_tense_crow_falter": "Impossible de rechercher des membres. Réessayez.",
+	"lively_brief_hare_hunt": "Recherche…"
 }

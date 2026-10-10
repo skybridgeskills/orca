@@ -446,7 +446,6 @@
 	"mellow_brisk_otter_amend": "Change acceptance",
 	"brisk_mellow_otter_assign": "Stewards",
 	"swift_kind_eagle_steward": "These members can approve a claim directly, in addition to any review requirement above.",
-	"calm_proud_finch_empty": "No other members to assign yet.",
 	"gentle_warm_heron_review": "or review by a designated steward",
 	"noble_swift_otter_review": "A badge claim needs your review",
 	"bright_calm_heron_await": "Claim awaiting review",
@@ -590,5 +589,12 @@
 	"glad_neat_robin_settle": "Visibility updated",
 	"sore_slow_crane_retry": "Couldn't update who can see this badge. Try again.",
 	"proud_open_puffin_earn": "You earned this achievement on {createdOn}. Anyone with the link can see it. You can add additional details to your claim. Or you can change your acceptance if you do not want to hold this badge any longer.",
-	"proud_quiet_vole_earn": "You earned this achievement on {createdOn}. Only you and this community's admins can see it. You can add additional details to your claim. Or you can change your acceptance if you do not want to hold this badge any longer."
+	"proud_quiet_vole_earn": "You earned this achievement on {createdOn}. Only you and this community's admins can see it. You can add additional details to your claim. Or you can change your acceptance if you do not want to hold this badge any longer.",
+	"steady_kind_heron_enlist": "Add steward",
+	"mild_eager_lynx_seek": "Search members by name or email",
+	"tidy_quiet_mole_miss": "No members found.",
+	"broad_calm_tern_narrow": "Showing {shown} of {total}. Keep typing to narrow the list.",
+	"shy_plain_badger_lack": "Member without a name",
+	"frail_tense_crow_falter": "Couldn't search members. Try again.",
+	"lively_brief_hare_hunt": "Searching…"
 }

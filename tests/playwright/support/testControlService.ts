@@ -45,6 +45,7 @@ export interface TestControlService {
 		opts: CreateAchievementOptions
 	): Promise<{ achievementId: string }>;
 	createClaim(orgId: string, opts: CreateClaimOptions): Promise<{ claimId: string }>;
+	getAchievement(orgId: string, achievementId: string): Promise<{ json: unknown } | null>;
 	getLatestOtp(opts: { orgId: string; email: string }): Promise<string | null>;
 	getInviteFor(opts: {
 		orgId: string;
@@ -133,6 +134,13 @@ export function createPrismaTestControlService(): TestControlService {
 				}
 			});
 			return { achievementId: achievement.id };
+		},
+
+		async getAchievement(orgId, achievementId) {
+			return prisma.achievement.findFirst({
+				where: { id: achievementId, organizationId: orgId },
+				select: { json: true }
+			});
 		},
 
 		async createClaim(orgId, opts) {

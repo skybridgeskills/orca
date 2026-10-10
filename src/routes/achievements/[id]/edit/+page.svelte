@@ -29,7 +29,6 @@
 		reviewRequires: data.achievement.reviewRequiresId,
 		capabilities_inviteRequires: data.achievement.json?.capabilities?.inviteRequires || '',
 		claimTemplate: data.achievement.json?.claimTemplate || '',
-		stewards: data.achievement.json?.stewards ?? [],
 		resultDescriptions: (data.achievement.json?.resultDescriptions ?? []).map((rd) => ({
 			id: rd.id,
 			name: rd.name,
@@ -52,4 +51,9 @@
 	{m.ok_direct_kite_gaze()}
 </p>
 
-<AchievementForm achievementId={data.achievement.id} initialData={formData} {categories} />
+<AchievementForm
+	achievementId={data.achievement.id}
+	initialData={formData}
+	{categories}
+	selectedStewards={data.selectedStewards}
+/>
