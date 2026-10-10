@@ -51,7 +51,7 @@ export const actions: Actions = {
 		const defaultVisibilityRaw = requestData.get('defaultVisibility')?.toString();
 		const defaultVisibility: Visibility = isVisibility(defaultVisibilityRaw)
 			? defaultVisibilityRaw
-			: 'COMMUNITY';
+			: 'PUBLIC';
 		const identifierVisibilityRaw = requestData.get('identifierVisibility')?.toString();
 		const identifierVisibility: Visibility = isVisibility(identifierVisibilityRaw)
 			? identifierVisibilityRaw

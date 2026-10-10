@@ -126,7 +126,9 @@
 	};
 
 	// --- Actions-as-data: map each derived ClaimActionId to a render descriptor ---
-	const actionView = $derived(claimActions(claim.claimStatus, viewer, exchangeEnabled));
+	const actionView = $derived(
+		claimActions(claim.claimStatus, viewer, exchangeEnabled, claim.visibility)
+	);
 
 	const describe = (id: ClaimActionId): ClaimActionDescriptor => {
 		switch (id) {

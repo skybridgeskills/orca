@@ -104,3 +104,27 @@ describe('settings save: contact-identifier visibility excludes PASSKEY', () => 
 		});
 	});
 });
+
+describe('settings save: defaultVisibility fallback', () => {
+	beforeEach(() => vi.clearAllMocks());
+
+	it('saves PUBLIC (the column default) when defaultVisibility is absent or invalid', async () => {
+		mockUserUpdate.mockResolvedValue({ id: 'user-1', identifiers: [] });
+
+		for (const value of [undefined, 'BANANA']) {
+			mockUserUpdate.mockClear();
+			const fd = new FormData();
+			fd.set('givenName', 'A');
+			fd.set('familyName', 'B');
+			if (value) fd.set('defaultVisibility', value);
+
+			await actions.save(saveEvent(fd));
+
+			expect(mockUserUpdate).toHaveBeenCalledWith(
+				expect.objectContaining({
+					data: expect.objectContaining({ defaultVisibility: 'PUBLIC' })
+				})
+			);
+		}
+	});
+});

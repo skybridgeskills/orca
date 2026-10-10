@@ -2,13 +2,14 @@ import { ClaimStatus, Visibility } from '@prisma/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockFindUnique = vi.hoisted(() => vi.fn());
+const mockUpdate = vi.hoisted(() => vi.fn());
 const mockEndorsementFindFirst = vi.hoisted(() => vi.fn());
 const mockEndorsementCount = vi.hoisted(() => vi.fn());
 const mockIsMemberOrOpen = vi.hoisted(() => vi.fn());
 
 vi.mock('$lib/../prisma/client', () => ({
 	prisma: {
-		achievementClaim: { findUnique: mockFindUnique },
+		achievementClaim: { findUnique: mockFindUnique, update: mockUpdate },
 		claimEndorsement: { findFirst: mockEndorsementFindFirst, count: mockEndorsementCount }
 	}
 }));
@@ -27,7 +28,7 @@ vi.mock('$lib/server/transactionService/config', () => ({
 
 vi.mock('$lib/server/permissions', () => ({ isMemberOrOpen: mockIsMemberOrOpen }));
 
-import { load } from './+page.server';
+import { actions, load } from './+page.server';
 
 const ORG = { id: 'org-1', json: {} } as App.Organization;
 const OWNER_ID = 'user-owner';
@@ -134,4 +135,88 @@ describe('load', () => {
 		expect(await loadStatus(null)).toBe(307);
 		expect(mockFindUnique).not.toHaveBeenCalled();
 	});
+});
+
+describe('setVisibility', () => {
+	const ownedClaim = (over: Record<string, unknown> = {}) => ({
+		id: 'claim-1',
+		userId: OWNER_ID,
+		organizationId: 'org-1',
+		...over
+	});
+
+	function actionEvent(s: App.SessionData | null, visibility?: string) {
+		const fd = new FormData();
+		if (visibility !== undefined) fd.set('visibility', visibility);
+		return {
+			locals: { org: ORG, session: s },
+			params: { claimId: 'claim-1' },
+			request: { formData: async () => fd }
+		} as unknown as Parameters<typeof actions.setVisibility>[0];
+	}
+
+	async function run(s: App.SessionData | null, visibility?: string) {
+		try {
+			return { result: await actions.setVisibility(actionEvent(s, visibility)) };
+		} catch (e) {
+			return { status: (e as { status: number }).status };
+		}
+	}
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mockUpdate.mockResolvedValue({});
+	});
+
+	for (const visibility of ['PUBLIC', 'COMMUNITY', 'PRIVATE']) {
+		it(`the owner sets ${visibility}; only visibility is written`, async () => {
+			mockFindUnique.mockResolvedValue(ownedClaim());
+			const { result } = await run(session(OWNER_ID), visibility);
+			expect(result).toEqual({ visibilityUpdated: true });
+			expect(mockUpdate).toHaveBeenCalledTimes(1);
+			expect(mockUpdate).toHaveBeenCalledWith({
+				where: { id: 'claim-1' },
+				data: { visibility }
+			});
+		});
+	}
+
+	it('a non-owner community user gets 404 and nothing is written', async () => {
+		mockFindUnique.mockResolvedValue(ownedClaim());
+		expect((await run(session(VIEWER_ID), 'PRIVATE')).status).toBe(404);
+		expect(mockUpdate).not.toHaveBeenCalled();
+	});
+
+	it('a non-owner admin gets 404 and nothing is written', async () => {
+		mockFindUnique.mockResolvedValue(ownedClaim());
+		expect((await run(session(ADMIN_ID, 'GENERAL_ADMIN'), 'PRIVATE')).status).toBe(404);
+		expect(mockUpdate).not.toHaveBeenCalled();
+	});
+
+	it('a claim in another org gets 404 and nothing is written', async () => {
+		mockFindUnique.mockResolvedValue(ownedClaim({ organizationId: 'org-other' }));
+		expect((await run(session(OWNER_ID), 'PRIVATE')).status).toBe(404);
+		expect(mockUpdate).not.toHaveBeenCalled();
+	});
+
+	it('an unknown claim gets 404', async () => {
+		mockFindUnique.mockResolvedValue(null);
+		expect((await run(session(OWNER_ID), 'PRIVATE')).status).toBe(404);
+		expect(mockUpdate).not.toHaveBeenCalled();
+	});
+
+	it('signed out gets 401', async () => {
+		expect((await run(null, 'PRIVATE')).status).toBe(401);
+		expect(mockFindUnique).not.toHaveBeenCalled();
+		expect(mockUpdate).not.toHaveBeenCalled();
+	});
+
+	for (const visibility of ['BANANA', undefined, 'ACHIEVEMENT']) {
+		it(`rejects ${visibility ?? 'a missing value'} with 400 and writes nothing`, async () => {
+			mockFindUnique.mockResolvedValue(ownedClaim());
+			const { result } = await run(session(OWNER_ID), visibility);
+			expect(result).toMatchObject({ status: 400, data: { visibilityInvalid: true } });
+			expect(mockUpdate).not.toHaveBeenCalled();
+		});
+	}
 });

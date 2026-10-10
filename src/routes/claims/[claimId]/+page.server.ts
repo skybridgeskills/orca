@@ -1,4 +1,5 @@
-import { error, redirect } from '@sveltejs/kit';
+import type { Visibility } from '@prisma/client';
+import { error, fail, redirect } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
@@ -8,8 +9,9 @@ import { canViewClaim, viewerRole } from '$lib/server/claimVisibility';
 import { activeSuspensionFor } from '$lib/server/moderation/suspension';
 import { isMemberOrOpen } from '$lib/server/permissions';
 import { isExchangeEnabled } from '$lib/server/transactionService/config';
+import { isVisibility } from '$lib/server/visibility';
 
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 const throwRedirect = (url: URL) => {
 	redirect(307, `${url}/public`);
@@ -87,4 +89,35 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		prerequisiteClaim,
 		exchangeEnabled: isExchangeEnabled(locals.org)
 	};
+};
+
+// Values an owner may pick on the claim page. ACHIEVEMENT is not offered: it behaves as
+// COMMUNITY until it has a policy of its own (claim-visibility ADR, D2).
+const OWNER_SETTABLE: Visibility[] = ['PUBLIC', 'COMMUNITY', 'PRIVATE'];
+
+export const actions: Actions = {
+	// Change only this claim's visibility. Deliberately separate from `updateClaim`,
+	// whose ACCEPTED path rewrites the narrative and evidence from the form.
+	setVisibility: async ({ locals, params, request }) => {
+		if (!locals.session?.user) error(401, m.fuzzy_brave_otter_guard());
+
+		const claim = await prisma.achievementClaim.findUnique({
+			where: { id: params.claimId },
+			select: { id: true, userId: true, organizationId: true }
+		});
+		// Owner-only. Anyone else, admins included, gets the same 404 as a missing claim.
+		// A suspended claim's owner may still change it: suspension keeps it hidden anyway.
+		if (!claim || claim.organizationId !== locals.org.id || claim.userId !== locals.session.user.id)
+			error(404, m.best_sharp_lamb_enchant());
+
+		const raw = (await request.formData()).get('visibility')?.toString();
+		if (!isVisibility(raw) || !OWNER_SETTABLE.includes(raw))
+			return fail(400, { visibilityInvalid: true });
+
+		await prisma.achievementClaim.update({
+			where: { id: claim.id },
+			data: { visibility: raw }
+		});
+		return { visibilityUpdated: true };
+	}
 };

@@ -1,4 +1,4 @@
-import type { ClaimStatus } from '@prisma/client';
+import type { ClaimStatus, Visibility } from '@prisma/client';
 
 /**
  * Viewer's role relative to a single claim. The authoritative computation lives
@@ -68,7 +68,12 @@ export interface ClaimActionsView {
 
 /**
  * Pure view-model: derive the set of allowed actions from
- * (claimStatus, viewerRole, exchangeEnabled).
+ * (claimStatus, viewerRole, exchangeEnabled, visibility).
+ *
+ * Sharing goes through the public `/ob2/a/<id>` link, which only serves `PUBLIC`
+ * claims, so the share list is empty for any other visibility. The manage actions
+ * (download, send to wallet, exchange) hand the owner their own credential and
+ * don't depend on visibility.
  *
  * Behavior-preservation note (P3): in the pre-refactor UI, accept / reject /
  * edit / download / share were ONLY ever shown to the badge owner. Admins,
@@ -81,7 +86,8 @@ export interface ClaimActionsView {
 export function claimActions(
 	claimStatus: ClaimStatus,
 	viewer: ViewerRole,
-	exchangeEnabled: boolean
+	exchangeEnabled: boolean,
+	visibility: Visibility
 ): ClaimActionsView {
 	const empty: ClaimActionsView = { manage: [], share: [] };
 	if (viewer !== 'owner') return empty;
@@ -97,9 +103,12 @@ export function claimActions(
 			const manage: ClaimActionId[] = exchangeEnabled
 				? ['exchange', 'editClaim', 'rejectClaim']
 				: ['download', 'sendToWallet', 'editClaim', 'rejectClaim'];
-			const share: ClaimActionId[] = exchangeEnabled
-				? ['copyLink', 'shareLinkedin']
-				: ['copyLink', 'shareQr', 'shareLinkedin'];
+			const share: ClaimActionId[] =
+				visibility !== 'PUBLIC'
+					? []
+					: exchangeEnabled
+						? ['copyLink', 'shareLinkedin']
+						: ['copyLink', 'shareQr', 'shareLinkedin'];
 			return { manage, share };
 		}
 		case 'REJECTED': {

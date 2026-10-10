@@ -34,7 +34,7 @@
 		identifierVisibility:
 			contactIdentifiersFrom($session?.user?.identifiers).find(() => true)?.visibility ??
 			'COMMUNITY',
-		defaultVisibility: $session?.user?.defaultVisibility ?? 'COMMUNITY',
+		defaultVisibility: $session?.user?.defaultVisibility ?? 'PUBLIC',
 		profileVisibility: $session?.user?.profileVisibility ?? 'COMMUNITY',
 		emailNotifications: data.emailNotifications ?? true
 	};
