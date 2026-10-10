@@ -74,7 +74,7 @@
 	</section>
 
 	<main class="app-main bg-gray-100 dark:bg-gray-900">
-		<Nav org={data.org} />
+		<Nav org={data.org} showMembersNav={data.showMembersNav} />
 		<section class="max-w-7xl mx-auto py-4 px-4">
 			{@render children()}
 		</section>

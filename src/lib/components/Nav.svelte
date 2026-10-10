@@ -17,9 +17,10 @@
 
 	interface Props {
 		org: App.SanitizedOrganization;
+		showMembersNav?: boolean;
 	}
 
-	let { org }: Props = $props();
+	let { org, showMembersNav = true }: Props = $props();
 	const session = getSession();
 	let mobileMenuExpanded = $state(false);
 	let profileDropdownExpanded = $state(false);
@@ -134,11 +135,13 @@
 					{:else}
 						<!-- For authenticated users -->
 						<NavItem href="/backpack" title={m.bold_petty_dog_march()} onclick={closeMobileMenu} />
-						<NavItem
-							href="/members"
-							title={m.steady_plane_cuckoo_fry()}
-							onclick={closeMobileMenu}
-						/>
+						{#if showMembersNav}
+							<NavItem
+								href="/members"
+								title={m.steady_plane_cuckoo_fry()}
+								onclick={closeMobileMenu}
+							/>
+						{/if}
 						<NavItem
 							href="/messages"
 							title={m.plain_calm_otter_inbox()}

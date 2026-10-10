@@ -131,6 +131,16 @@ export function membershipAchievementId(org: { json: App.OrganizationConfig }): 
 	return org.json?.permissions?.membershipAchievement?.requiresAchievement ?? null;
 }
 
+/**
+ * Whether a logged-in user may open the members directory: always when no membership
+ * achievement is configured (gating inactive), otherwise only members (admins or
+ * holders of the membership achievement).
+ */
+export async function canViewMemberDirectory({ user, org }: IsMemberParams): Promise<boolean> {
+	if (membershipAchievementId(org) === null) return true;
+	return isMember({ user, org });
+}
+
 interface CanInviteToAchievementParams {
 	user: {
 		id: string;

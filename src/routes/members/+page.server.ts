@@ -4,7 +4,7 @@ import { redirect } from '@sveltejs/kit';
 import { isAdmin } from '$lib/permissions/isAdmin';
 import { COMMUNITY_VISIBLE } from '$lib/server/claimVisibility';
 import {
-	isMember,
+	canViewMemberDirectory,
 	membershipAchievementId,
 	validMembershipClaimWhere
 } from '$lib/server/permissions';
@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	const viewerIsAdmin = isAdmin(viewer);
 
 	// When gated, a non-member (non-admin) viewer may not see the directory at all.
-	if (gatingActive && !(await isMember({ user: viewer, org: locals.org }))) {
+	if (!(await canViewMemberDirectory({ user: viewer, org: locals.org }))) {
 		redirect(302, `/`);
 	}
 

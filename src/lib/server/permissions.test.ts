@@ -4,6 +4,7 @@ import { prisma } from '$lib/../prisma/client';
 
 import {
 	canInviteToAchievement,
+	canViewMemberDirectory,
 	isMember,
 	membershipAchievementId,
 	validMembershipClaimWhere
@@ -159,5 +160,37 @@ describe('membershipAchievementId', () => {
 	it('returns the configured id, or null when unset', () => {
 		expect(membershipAchievementId(ORG_GATED)).toBe('ach-member');
 		expect(membershipAchievementId(ORG_OPEN)).toBeNull();
+	});
+});
+
+describe('canViewMemberDirectory', () => {
+	beforeEach(() => {
+		vi.mocked(prisma.achievementClaim.findFirst).mockReset();
+	});
+
+	it('allows any logged-in user when no membership achievement is configured', async () => {
+		expect(
+			await canViewMemberDirectory({ user: { id: 'user-1', orgRole: 'MEMBER' }, org: ORG_OPEN })
+		).toBe(true);
+		expect(prisma.achievementClaim.findFirst).not.toHaveBeenCalled();
+	});
+
+	it('under gating, allows admins and badge holders and refuses non-members', async () => {
+		expect(
+			await canViewMemberDirectory({
+				user: { id: 'admin-1', orgRole: 'GENERAL_ADMIN' },
+				org: ORG_GATED
+			})
+		).toBe(true);
+
+		vi.mocked(prisma.achievementClaim.findFirst).mockResolvedValue({ id: 'claim-1' } as never);
+		expect(
+			await canViewMemberDirectory({ user: { id: 'user-1', orgRole: 'MEMBER' }, org: ORG_GATED })
+		).toBe(true);
+
+		vi.mocked(prisma.achievementClaim.findFirst).mockResolvedValue(null);
+		expect(
+			await canViewMemberDirectory({ user: { id: 'user-2', orgRole: 'MEMBER' }, org: ORG_GATED })
+		).toBe(false);
 	});
 });
