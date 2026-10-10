@@ -44,7 +44,7 @@ model User {
   familyName                String?
   organizationId            String
   orgRole                   RoleType?
-  defaultVisibility         Visibility               @default(COMMUNITY)
+  defaultVisibility         Visibility               @default(PUBLIC)
   profileVisibility         Visibility               @default(COMMUNITY)
   json                      Json                     @default("{}")
   messages                  Message[]
@@ -210,7 +210,7 @@ model AchievementClaim {
   creatorId      String?
   validFrom      DateTime?
   validUntil     DateTime?
-  visibility     Visibility             @default(COMMUNITY)
+  visibility     Visibility             @default(PUBLIC)
   achievement    Achievement            @relation(fields: [achievementId], references: [id])
   creator        User?                  @relation("CreatedAchievementClaims", fields: [creatorId], references: [id])
   credential     AchievementCredential? @relation(fields: [credentialId], references: [id])

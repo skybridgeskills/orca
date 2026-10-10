@@ -113,7 +113,7 @@ export const actions = {
 			user: { connect: { id: locals.session.user.id } },
 			claimStatus: ClaimStatus.ACCEPTED,
 			// Snapshot the claimant's default visibility at creation time.
-			visibility: locals.session.user.defaultVisibility ?? 'COMMUNITY',
+			visibility: locals.session.user.defaultVisibility ?? 'PUBLIC',
 
 			json: JSON.stringify(
 				Object.fromEntries(

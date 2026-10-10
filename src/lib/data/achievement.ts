@@ -167,6 +167,8 @@ export const inviteToClaim = async ({
 				organization: { connect: { id: org.id } },
 				achievement: { connect: { id: achievementId } },
 				claimStatus: isSelfClaim ? 'ACCEPTED' : 'UNACCEPTED',
+				// Snapshot the recipient's default, as self-claims do.
+				visibility: identifier.user.defaultVisibility,
 
 				// If the achievement requires review, the claim is not valid until reviewed.
 				validFrom: !achievement.reviewRequiresId ? new Date() : null,
