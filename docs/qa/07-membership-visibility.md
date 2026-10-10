@@ -32,8 +32,10 @@ ADR: [`../adr/2026-06-12-membership-achievement-gating.md`](../adr/2026-06-12-me
 ### A. Member viewer (actor: _Member user_)
 
 1. - [ ] As _Member user_, go to **`/members`**. Expected: the page loads (no redirect);
-         you see yourself plus other **community-visible members**. Non-members do **not**
-         appear. Each listed member card has a clickable name + "View profile" link.
+         you see yourself plus other **community-visible badge holders**. Non-members do
+         **not** appear, and neither does an _Admin_ who doesn't hold _Member_ (the
+         directory lists badge holders only; see the ADR). Each listed member card has a
+         clickable name + "View profile" link.
 2. - [ ] Click a member card → lands on **`/members/[id]`** for that member; their profile
          (name, visible identifiers, visible claims) renders.
 3. - [ ] Open your own profile from `/members` (or the "Edit profile" affordance). Expected:
@@ -45,8 +47,9 @@ ADR: [`../adr/2026-06-12-membership-achievement-gating.md`](../adr/2026-06-12-me
 
 ### B. Non-member viewer (actor: _Invitee_)
 
-5. - [ ] As _Invitee_ (logged in, not a member), go to **`/members`**. Expected: you are
-         **redirected to `/`** — the directory is member-only when gating is active.
+5. - [ ] As _Invitee_ (logged in, not a member), confirm the header has **no "Members"**
+         item, then go to **`/members`** by URL. Expected: you are **redirected to `/`** —
+         the directory is member-only when gating is active.
 6. - [ ] Navigate directly to a **member's** `/members/[id]`. Expected: redirected to
          `/members` (which itself redirects you to `/`), i.e. no profile access.
 

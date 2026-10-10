@@ -46,6 +46,14 @@ control over appearing in the directory.
    gate and, as _viewers_, see everyone (members + non-members); admin-only rows render
    as non-clickable plain text rather than being hidden.
 
+   The **directory** a non-admin member sees lists **badge holders only**: an admin who
+   does not hold the membership achievement passes every gate but is not listed (nor
+   linkable) for other members. Being an admin grants access, not a directory entry.
+
+   The **Members** nav item follows the same gate: it is shown when gating is inactive
+   or the viewer is a member (badge holder or admin), and hidden from non-members, who
+   would otherwise be redirected away from `/members`.
+
 5. **Claims-list profile-linkability computed per page, cheaply.** The
    `achievementClaims` API gains a `profileLinkable: boolean` per row, computed for the
    current page with **one** batched `IN` membership query plus the claimant's

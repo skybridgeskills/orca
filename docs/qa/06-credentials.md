@@ -86,8 +86,10 @@ application/json"`). Expected: an **OB2 BadgeClass assertion** JSON
 Performed by the **_Member user_**.
 
 - [ ] 9. Open **`/backpack`**. Expected: your claimed badges list (ACCEPTED + valid claims),
-     any outstanding **invites** as alerts, plus per-claim **Share** (the share modal copies
-     the `…/ob2/a/<id>` URL and offers a LinkedIn "Add to Profile" link). The backpack uses
+     any outstanding **invites** as alerts, plus per-claim **Share**. Where the browser
+     supports the Web Share API (e.g. Safari, Brave/Chrome on macOS, mobile), Share opens the
+     **system share sheet** with the `…/ob2/a/<id>` URL; otherwise it opens the share modal,
+     which copies that URL and offers a LinkedIn "Add to Profile" link. The backpack uses
      the **OB2** hosted URL for sharing.
 - [ ] 10. **Send to wallet (CHAPI).** On the owner's **`/claims/<id>`** (when wallet
       **exchange is not** enabled), the **"Send to wallet"** action opens a modal that uses
