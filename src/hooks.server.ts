@@ -81,9 +81,12 @@ const getAuthHeaderTokenValue = function (authHeader: string | null) {
 	return parts[1];
 };
 
+// Org-less endpoints: health checks, and Vercel Cron (which calls the *.vercel.app host).
+const ORGLESS_PATH = /^\/(?:healthz$|api\/(?:v\d+\/)?cron\/)/;
+
 export const handle: Handle = ({ event, resolve }) => {
-	// Short-circuit for healthcheck - no org validation needed
-	if (event.url.pathname === '/healthz') {
+	// Short-circuit: no org lookup, session or paraglide for org-less endpoints.
+	if (ORGLESS_PATH.test(event.url.pathname)) {
 		return resolve(event);
 	}
 
