@@ -26,7 +26,8 @@ Represents a user within an organization.
 - `organizationId`: Foreign key to Organization (required)
 - `givenName`, `familyName`: User's name
 - `orgRole`: Role within the org (`GENERAL_ADMIN`, `BILLING_ADMIN`, `CONTENT_ADMIN`)
-- `defaultVisibility`: Default visibility setting for user's data
+- `defaultVisibility`: Visibility copied into the user's new claims (default
+  `PUBLIC`; see [Claim visibility](#claim-visibility))
 - `json`: JSON field for user preferences, including
   `notifications.email` (email notifications on/off; default on when unset)
 
@@ -73,7 +74,8 @@ A user's request to earn a badge for an achievement.
 - `claimStatus`: `ACCEPTED`, `REJECTED`, or `UNACCEPTED`
 - `json`: JSON field for claim narrative and evidence
 - `validFrom`, `validUntil`: Optional validity period
-- `visibility`: Who can see this claim
+- `visibility`: Who can see this claim (default `PUBLIC`; see
+  [Claim visibility](#claim-visibility))
 
 **Unique constraint**: `(userId, achievementId)` - a user can only have one claim per achievement.
 
@@ -143,6 +145,35 @@ User session for authentication.
 - `valid`: Whether the session is valid
 - `expiresAt`: Expiration timestamp
 - `inviteId`: Optional foreign key to ClaimEndorsement (for invite-based sessions)
+
+## Claim visibility
+
+Each `AchievementClaim` has a `visibility`. The rule lives in
+`src/lib/server/claimVisibility.ts` (see ADR
+`2026-06-09-claim-visibility-authorization`), and every claim read surface uses it.
+
+| Viewer                                                     | Sees                                                             |
+| ---------------------------------------------------------- | ---------------------------------------------------------------- |
+| The claim's owner                                          | All of their own claims, including `PRIVATE`                     |
+| An org admin                                               | Every claim in the org                                           |
+| A signed-in community member                               | `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`                          |
+| An org app (`client_credentials` token)                    | `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`, like a community member |
+| Anyone else (signed out, OB2 assertion links, share pages) | `PUBLIC` only; anything else is a 404                            |
+
+`ACHIEVEMENT` is treated as `COMMUNITY` until it gets a policy of its own.
+
+**New claims snapshot the claimant's `User.defaultVisibility`,** both on a
+self-claim and when an admin or inviter awards the badge to an existing member.
+Changing the default later doesn't change existing claims. New users default to
+`PUBLIC`, and so does the column itself.
+
+**At the release that started enforcing visibility, existing claims and user
+defaults were moved from `COMMUNITY` to `PUBLIC`**
+(migration `backfill_claim_visibility_public`). Before then, visibility was stored
+but never enforced, and every row carried the old column default `COMMUNITY`.
+Without the backfill, enforcement would have 404'd every issued OB2 assertion and
+share link to outsiders. Rows explicitly set to `PRIVATE` or `ACHIEVEMENT` were
+left alone. Privacy is opt-in: members choose it in their settings.
 
 ## IDs
 

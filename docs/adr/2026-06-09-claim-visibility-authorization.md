@@ -84,3 +84,22 @@ community > public` relative to a claim, in that precedence order. "Admin"
   and requires a new ADR.
 - When `ACHIEVEMENT` gains a distinct policy, the helper and this ADR must be
   revisited together.
+
+## Amendment (release, 2026-10)
+
+Before this release, visibility was stored but never enforced, so every row
+carried the column default `COMMUNITY`. Enforcing the rules above as is would
+have hidden every issued badge from outsiders. At the release:
+
+- **Existing claims and user defaults were backfilled `COMMUNITY → PUBLIC`**
+  (migration `backfill_claim_visibility_public`). Rows set to `PRIVATE` or
+  `ACHIEVEMENT` were left alone.
+- **New users and new claims default to `PUBLIC`.** Both column defaults are now
+  `PUBLIC`, awarded claims snapshot the recipient's `defaultVisibility` (as
+  self-claims already did), and the self-claim fallback is `PUBLIC`.
+- **`client_credentials` app tokens are classified as community viewers.** They
+  have no session user, so `claimVisibilityWhere` would treat them as public. The
+  `achievementClaims` API gives them `COMMUNITY_VISIBLE` from the same module:
+  `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`, never `PRIVATE`.
+
+The decisions above otherwise stand.
