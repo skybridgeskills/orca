@@ -17,7 +17,7 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 	if (isHtml && locals.session?.user?.id) redirect(302, `/claims/${params.claimId}`);
 	else if (isHtml) redirect(302, `/claims/${params.claimId}/public`);
 	else {
-		const claim = await prisma.achievementClaim.findUniqueOrThrow({
+		const claim = await prisma.achievementClaim.findUnique({
 			where: {
 				id: params.claimId
 			},
