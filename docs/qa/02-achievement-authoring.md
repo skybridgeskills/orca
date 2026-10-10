@@ -74,8 +74,10 @@ a tester can spot-check them.
           (self-relation / "this badge" requirement).
 11. - [ ] Set **"How many reviews are required?"** to **`1`** (or more). Expected: the field is
           enabled only when the badge-reviewer option is selected.
-12. - [ ] **Stewards**: with a review rule selected, a **steward checklist** of org members
-          appears. Check the **_Admin_** as a steward. A steward can approve a claim directly,
+12. - [ ] **Stewards**: with a review rule selected, a **Stewards** list with an **Add
+          steward** button appears. Click it, search for the _Admin_ (by name or email), click
+          **Add** (the row then reads **Added**), and close the picker. Expected: _Admin_ shows
+          under **Stewards** with a **Remove** link. A steward can approve a claim directly,
           alongside the review requirement. Cite ADR
           [`../adr/2026-06-09-steward-review-and-messaging.md`](../adr/2026-06-09-steward-review-and-messaging.md).
 13. - [ ] Open the **"Rubric"** collapsible pane. Click **"+ Add a result"** to add a

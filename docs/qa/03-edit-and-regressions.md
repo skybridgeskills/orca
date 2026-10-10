@@ -61,11 +61,17 @@ the same `AchievementForm` used by create, hydrated from the saved badge.
           without changes → still gated by _Prereq_ (claimRequires not clobbered).
 12. - [ ] Open **_Reviewed_**. Confirm the **review** config round-trips: reviewer rule =
           **"This badge"** (self) preselected (the picker re-presents the self-reference as
-          "This badge"), **reviewsRequired** = your journey-02 value, and the **_Admin_** steward
-          checkbox is **checked**. Save without changes → all preserved.
+          "This badge"), **reviewsRequired** = your journey-02 value, and **_Admin_** is listed
+          under **Stewards**. Save without changes → all preserved.
+    - [ ] Picker checks (add and then **Remove** each, so the saved stewards stay as they
+          were): **Add steward**, search the _Admin_ **by email** → found; the _Admin_ row reads
+          **Added** (already chosen); a user with no name (if your org has one) is shown by
+          their email, never by an id.
 13. - [ ] **Rubric re-mint:** on **_Reviewed_**, open the **Rubric** pane and **edit a result
-          row** (change a name or an allowed value), then Submit. Expected: that row's **id is
-          re-minted** (changed) because its content changed. Cite ADR
+          row** (change a name or an allowed value). Leave **"Claim and review settings"
+          collapsed**, then Submit. Expected: that row's **id is re-minted** (changed) because
+          its content changed, and the stewards are **kept**: `json.stewards` still includes
+          _Admin_ and the detail page still says "or review by a designated steward". Cite ADR
           [`../adr/2026-06-09-achievement-rubrics-results.md`](../adr/2026-06-09-achievement-rubrics-results.md).
 14. - [ ] **Rubric stable:** edit _Reviewed_ again and Submit with the rubric **unchanged**.
           Expected: the result-row **ids stay stable** (no re-mint when content is identical).

@@ -73,9 +73,13 @@ ADR: [`../adr/2026-06-12-membership-achievement-gating.md`](../adr/2026-06-12-me
 11. - [ ] As a **different member** (if you have a second member; otherwise note it), open
           `/members`. Expected: the now-`PRIVATE` member is **hidden** from the directory and
           their `/members/[id]` redirects you away.
+    - [ ] Search `/members` for the `PRIVATE` member's given name. Expected: **not found**
+          ("No members match …").
 12. - [ ] As _Admin_, open `/members`. Expected: the `PRIVATE` member is **still visible**
           to the admin (rendered per step 8: clickable if a member). Restore the member's
           visibility to **Community** afterward so later journeys see them.
+    - [ ] Before restoring: search `/members` for the `PRIVATE` member's given name.
+          Expected: **found**.
 
 ### E. Claims list on an achievement (actors: _Member user_, then _Admin_)
 
@@ -124,6 +128,27 @@ non-members.
           community?". Expected: it reads **"Everyone with an account in this community"**.
 22. - [ ] As _Member user_, set the claim from step 17 back to **Public**.
 
+### H. Searching the directory (actors: _Member user_, then _Admin_)
+
+`/members` has a search box in the page header. Search follows the same rules as the list:
+whoever you can't see in the directory, you can't find. Only admins can search by email.
+
+23. - [ ] As _Member user_, open `/members`. Expected: the search box placeholder reads
+          **"Search by name"**. Search another member's **given name**. Expected: they are
+          found; the box keeps the query; a line reads "1 member matches …" (or "N members
+          match …"); there is **no pager**; a **Clear** button shows.
+24. - [ ] Still as _Member user_, search the **non-member**'s name (_Invitee_). Expected:
+          **not found** ("No members match …"). Search a member's **email address**.
+          Expected: **not found** (members can't search by email).
+25. - [ ] Click **Clear**. Expected: back to the normal paged `/members` directory, empty
+          search box.
+26. - [ ] As _Admin_, open `/members`. Expected: the placeholder reads **"Search by name or
+          email"**. Search the non-member's name → **found**. Search a member's **email
+          address** → **found**.
+27. - [ ] (If the org has more than 20 users) search a common letter such as `a`. Expected:
+          "Showing 20 of N members matching …. Refine your search to see others." and no
+          pager.
+
 ## State produced
 
 Member visibility states exercised (member / non-member / admin views; `PRIVATE` profile
@@ -144,7 +169,8 @@ named entities; the claim from section G ends **Public** again.
 ## Citations
 
 - ADR: [`../adr/2026-06-12-membership-achievement-gating.md`](../adr/2026-06-12-membership-achievement-gating.md)
-- Routes: `/members` (`src/routes/members/+page.{svelte,server.ts}`),
+- Routes: `/members` (`src/routes/members/+page.{svelte,server.ts}`; the list and search
+  rules are in `src/lib/server/userDirectory.ts`, shared with `GET /api/v1/users`),
   `/members/[id]` (`src/routes/members/[id]/+page.{svelte,server.ts}`),
   the claims list (`src/lib/components/achievement/ClaimList.svelte`) backed by
   `GET /api/v1/achievementClaims`.
