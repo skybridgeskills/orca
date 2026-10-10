@@ -11,10 +11,9 @@
 		};
 		viewer: ViewerRole;
 		/**
-		 * P4 seam: an authorized-viewer "why is this visible" indicator and (for the
-		 * owner) the `VisibilityControl` editor mount here, beneath the title. P3
-		 * leaves this region empty; P4 drops its UI in via this snippet without
-		 * touching `ClaimDetail`'s layout.
+		 * Rendered beneath the title and lede. The claim route supplies the owner's
+		 * `VisibilityControl` (via `ClaimDetail`); other viewers get nothing here. A
+		 * non-owner "why is this visible" indicator could later use the same slot.
 		 */
 		visibility?: Snippet;
 		/**

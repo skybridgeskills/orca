@@ -580,5 +580,15 @@
 	"keen_amber_lynx_updated": "Already invited (updated)",
 	"broad_steady_bear_breakdown": "{newCount} awarded, {existingCount} updated, {failedCount} failed out of {total}",
 	"steady_amber_heron_insist": "On this site, sign in with your email first. You'll then be asked for your passkey.",
-	"open_wide_heron_welcome": "Everyone with an account in this community"
+	"open_wide_heron_welcome": "Everyone with an account in this community",
+	"keen_plain_heron_watch": "Who can see this badge",
+	"open_broad_gull_reach": "Anyone with the link can see it, including people outside this community. You can share it.",
+	"snug_quiet_otter_gather": "Only members of this community and its admins can see it.",
+	"still_close_wren_guard": "Only you and this community's admins can see it.",
+	"wary_late_finch_break": "Links you've already shared, such as on LinkedIn, by QR code or by copying the link, will stop working.",
+	"plain_lone_ibex_share": "Only public badges can be shared. Make this badge public to share it.",
+	"glad_neat_robin_settle": "Visibility updated",
+	"sore_slow_crane_retry": "Couldn't update who can see this badge. Try again.",
+	"proud_open_puffin_earn": "You earned this achievement on {createdOn}. Anyone with the link can see it. You can add additional details to your claim. Or you can change your acceptance if you do not want to hold this badge any longer.",
+	"proud_quiet_vole_earn": "You earned this achievement on {createdOn}. Only you and this community's admins can see it. You can add additional details to your claim. Or you can change your acceptance if you do not want to hold this badge any longer."
 }

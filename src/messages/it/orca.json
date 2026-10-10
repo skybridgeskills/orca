@@ -580,5 +580,15 @@
 	"keen_amber_lynx_updated": "Già invitato (aggiornato)",
 	"broad_steady_bear_breakdown": "{newCount} assegnati, {existingCount} aggiornati, {failedCount} non riusciti su {total}",
 	"steady_amber_heron_insist": "Su questo sito, accedi prima con la tua email. Ti verrà poi chiesta la tua passkey.",
-	"open_wide_heron_welcome": "Chiunque abbia un account in questa comunità"
+	"open_wide_heron_welcome": "Chiunque abbia un account in questa comunità",
+	"keen_plain_heron_watch": "Chi può vedere questo badge",
+	"open_broad_gull_reach": "Chiunque abbia il link può vederlo, anche chi non fa parte di questa comunità. Puoi condividerlo.",
+	"snug_quiet_otter_gather": "Solo i membri di questa comunità e i suoi amministratori possono vederlo.",
+	"still_close_wren_guard": "Solo tu e gli amministratori di questa comunità potete vederlo.",
+	"wary_late_finch_break": "I link che hai già condiviso, ad esempio su LinkedIn, tramite codice QR o copiando il link, smetteranno di funzionare.",
+	"plain_lone_ibex_share": "Solo i badge pubblici possono essere condivisi. Rendi pubblico questo badge per condividerlo.",
+	"glad_neat_robin_settle": "Visibilità aggiornata",
+	"sore_slow_crane_retry": "Impossibile modificare chi può vedere questo badge. Riprova.",
+	"proud_open_puffin_earn": "Hai ottenuto questo risultato il {createdOn}. Chiunque abbia il link può vederlo. Puoi aggiungere ulteriori dettagli alla tua richiesta. Oppure puoi modificare la tua accettazione se non vuoi più questo badge.",
+	"proud_quiet_vole_earn": "Hai ottenuto questo risultato il {createdOn}. Solo tu e gli amministratori di questa comunità potete vederlo. Puoi aggiungere ulteriori dettagli alla tua richiesta. Oppure puoi modificare la tua accettazione se non vuoi più questo badge."
 }

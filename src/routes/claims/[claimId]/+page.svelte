@@ -8,6 +8,7 @@
 	import EndorsementList from '$lib/components/EndorsementList.svelte';
 	import * as m from '$lib/i18n/messages';
 	import ClaimDetail from '$lib/partials/achievementClaim/ClaimDetail.svelte';
+	import VisibilityControl from '$lib/partials/achievementClaim/VisibilityControl.svelte';
 	import { getSession } from '$lib/session/context';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
 
@@ -53,11 +54,21 @@
 	</div>
 {/if}
 
+{#snippet visibilityControl()}
+	<!-- Re-seed the control's selection whenever the saved value changes (after a save). -->
+	{#key data.claim.visibility}
+		<VisibilityControl saved={data.claim.visibility} />
+	{/key}
+{/snippet}
+
+<!-- Owner-only, decided by the server-resolved role: an admin viewing someone else's
+     claim gets no control (and the action 404s for them). -->
 <ClaimDetail
 	claim={data.claim}
 	achievement={achievementForDetail}
 	viewer={data.viewer}
 	exchangeEnabled={data.exchangeEnabled}
+	visibility={data.viewer === 'owner' ? visibilityControl : undefined}
 />
 
 <div class="max-w-2xl mt-2">

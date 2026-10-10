@@ -50,9 +50,9 @@
 		viewer: ViewerRole;
 		exchangeEnabled?: boolean;
 		/**
-		 * P4 seam: forwarded to `ClaimHeader`. P4 mounts the owner `VisibilityControl`
-		 * and the authorized-viewer "why visible" indicator here without altering this
-		 * component's layout or prop contract.
+		 * Forwarded to `ClaimHeader`, beneath the title. The claim route supplies the
+		 * owner's `VisibilityControl` here; a non-owner "why is this visible" indicator
+		 * could later use the same slot.
 		 */
 		visibility?: Snippet;
 	}
@@ -231,8 +231,14 @@
 	// Owner created-date / status copy, by status.
 	const ownerStatusCopy = $derived.by(() => {
 		switch (claim.claimStatus) {
-			case 'ACCEPTED':
-				return m.sunny_bright_goat_view({ createdOn: claim.createdOn?.toString() ?? '' });
+			case 'ACCEPTED': {
+				// Says who can see the badge, following its saved visibility (ACHIEVEMENT
+				// behaves as COMMUNITY).
+				const createdOn = claim.createdOn?.toString() ?? '';
+				if (claim.visibility === 'PUBLIC') return m.proud_open_puffin_earn({ createdOn });
+				if (claim.visibility === 'PRIVATE') return m.proud_quiet_vole_earn({ createdOn });
+				return m.sunny_bright_goat_view({ createdOn });
+			}
 			case 'UNACCEPTED':
 				return m.grand_steady_panther_relish({ createdOn: claim.createdOn?.toString() ?? '' });
 			case 'REJECTED':
@@ -338,7 +344,15 @@
 
 		{#if claim.claimStatus === 'ACCEPTED'}
 			<AchievementClaimEvidence {claim} />
-			<ShareActions actions={shareActions} />
+			{#if claim.visibility === 'PUBLIC'}
+				<ShareActions actions={shareActions} />
+			{:else}
+				<!-- Sharing uses the public /ob2/a link, which only serves PUBLIC claims. -->
+				<div class="max-w-2xl mt-6 border-t border-b py-5">
+					<h2 class="text-l sm:text-xl mb-2 dark:text-white">{m.early_fancy_boar_file()}</h2>
+					<p class="text-sm text-gray-500 dark:text-gray-400">{m.plain_lone_ibex_share()}</p>
+				</div>
+			{/if}
 		{/if}
 
 		{#if showClaimForm && !formInModal}

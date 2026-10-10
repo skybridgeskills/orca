@@ -580,5 +580,15 @@
 	"keen_amber_lynx_updated": "Déjà invité (mis à jour)",
 	"broad_steady_bear_breakdown": "{newCount} attribués, {existingCount} mis à jour, {failedCount} échoués sur {total}",
 	"steady_amber_heron_insist": "Sur ce site, connectez-vous d'abord avec votre adresse e-mail. Votre clé d'accès vous sera ensuite demandée.",
-	"open_wide_heron_welcome": "Toute personne ayant un compte dans cette communauté"
+	"open_wide_heron_welcome": "Toute personne ayant un compte dans cette communauté",
+	"keen_plain_heron_watch": "Qui peut voir ce badge",
+	"open_broad_gull_reach": "Toute personne disposant du lien peut le voir, y compris en dehors de cette communauté. Vous pouvez le partager.",
+	"snug_quiet_otter_gather": "Seuls les membres de cette communauté et ses administrateurs peuvent le voir.",
+	"still_close_wren_guard": "Seuls vous et les administrateurs de cette communauté pouvez le voir.",
+	"wary_late_finch_break": "Les liens que vous avez déjà partagés, par exemple sur LinkedIn, par code QR ou en copiant le lien, cesseront de fonctionner.",
+	"plain_lone_ibex_share": "Seuls les badges publics peuvent être partagés. Rendez ce badge public pour le partager.",
+	"glad_neat_robin_settle": "Visibilité mise à jour",
+	"sore_slow_crane_retry": "Impossible de modifier qui peut voir ce badge. Réessayez.",
+	"proud_open_puffin_earn": "Vous avez obtenu ce badge le {createdOn}. Toute personne disposant du lien peut le voir. Vous pouvez documenter et ajouter des détails à votre badge. Vous pouvez également modifier votre acceptation si vous ne souhaitez plus conserver ce badge.",
+	"proud_quiet_vole_earn": "Vous avez obtenu ce badge le {createdOn}. Seuls vous et les administrateurs de cette communauté pouvez le voir. Vous pouvez documenter et ajouter des détails à votre badge. Vous pouvez également modifier votre acceptation si vous ne souhaitez plus conserver ce badge."
 }

@@ -147,23 +147,26 @@
 									<span class="sr-only">View details</span>
 									<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
 								</a>
-								<button
-									class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
-									tabindex="0"
-									on:click={(e) => {
-										handleShare({ ...claim, achievement });
-										e.preventDefault();
-										e.stopPropagation();
-									}}
-									on:keypress={(e) => {
-										handleShare({ ...claim, achievement });
-										e.preventDefault();
-										e.stopPropagation();
-									}}
-								>
-									<span class="sr-only">{m.happy_sparse_lemur_clasp()}</span>
-									<Icon src={FaShareSquare} size="20" color="currentColor" />
-								</button>
+								<!-- Share uses the public /ob2/a link, which only serves PUBLIC claims. -->
+								{#if claim.visibility === 'PUBLIC'}
+									<button
+										class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
+										tabindex="0"
+										on:click={(e) => {
+											handleShare({ ...claim, achievement });
+											e.preventDefault();
+											e.stopPropagation();
+										}}
+										on:keypress={(e) => {
+											handleShare({ ...claim, achievement });
+											e.preventDefault();
+											e.stopPropagation();
+										}}
+									>
+										<span class="sr-only">{m.happy_sparse_lemur_clasp()}</span>
+										<Icon src={FaShareSquare} size="20" color="currentColor" />
+									</button>
+								{/if}
 							</div>
 						{/if}
 					{/snippet}
