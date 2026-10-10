@@ -37,7 +37,6 @@ imperative steps and copy-paste commands as-is.
   - `DATABASE_SERVERLESS=true`
   - `PUBLIC_HTTP_PROTOCOL=https`
   - `USE_SECURE_COOKIES=true`
-  - `ORG_CONFIG_ENCRYPTION_KEY`
   - Mail vars as used in production: `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`,
     `MAILGUN_HOST` (or `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` /
     `SMTP_SECURE`).
@@ -45,6 +44,10 @@ imperative steps and copy-paste commands as-is.
     `S3_BUCKET_NAME`, `S3_REGION`, `S3_URL`, `PUBLIC_MEDIA_DOMAIN`.
   - Optional: `SUPERADMIN_ORG_ID` (the superadmin org; see
     `docs/adr/2026-06-13-superadmin-org-boundary.md`).
+  - Optional: `ORG_CONFIG_ENCRYPTION_KEY` (32 random bytes, base64; see `.env.example`).
+    Needed only if an org uses the transaction-service issuer: it encrypts that org's
+    API key. Without it, saving a transaction-service API key on the issuer settings
+    page fails with a 500.
   - Optional: `CRON_SECRET`. Vercel Cron sends it as
     `Authorization: Bearer <CRON_SECRET>` to `/api/cron/purge-messages`, daily at
     03:00 UTC (the `crons` entry in `vercel.json`). Without it, the cleanup job
