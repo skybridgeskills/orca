@@ -16,8 +16,8 @@ and run after [04 — Claiming](./04-claiming.md) / [05](./05-invites-awards-rev
 - The org's **issuer signing key** exists (journey 0 `createKeypair`); without it,
   download/issue returns a 503 "issuer signing key is no longer available".
 - To exercise the **public** OB2/OB3 emitter URLs, the claim's **visibility must be
-  `PUBLIC`** (the public JSON surfaces 404 a non-public claim). Set claim visibility on the
-  owner's `/claims/<id>` view if needed.
+  `PUBLIC`** (the public JSON surfaces 404 a non-public claim). On the owner's
+  `/claims/<id>`, **Who can see this badge** must be **Public** (the default).
 
 ## A. View & download the OB3 VC — **member-only** (owner) for download
 
@@ -80,6 +80,16 @@ application/json"`). Expected: an **OB2 BadgeClass assertion** JSON
      `/claims/<id>/public`; non-HTML → the OB2 assertion JSON under the same
      PUBLIC/accepted/not-suspended/same-org gate. (Per the source `TODO`, `/c/` returns the
      **OB2** JSON today — the OB3 JSON variant is not yet served there.)
+- [ ] 8a. As the owner, on **`/claims/<id>`**, choose **Private (admins only)** under **Who
+      can see this badge**. Expected: before saving, a warning that links already shared
+      will stop working. **Save**. Expected: "Visibility updated" (it goes away after a few
+      seconds), the status text says only you and the admins can see it, and the share
+      actions are replaced by "Only public badges can be shared. Make this badge public to
+      share it."
+- [ ] 8b. Repeat step 6's `curl` (and `/c/<id>`). Expected: **404**. Signed out,
+      **`/claims/<id>/public`** → **404**.
+- [ ] 8c. Choose **Public** again and **Save**. Expected: the share actions are back, and
+      step 6 returns **200** again.
 
 ## D. Backpack / CHAPI wallet — **member-only**; **manual / dev-limited**
 
@@ -90,7 +100,7 @@ Performed by the **_Member user_**.
      supports the Web Share API (e.g. Safari, Brave/Chrome on macOS, mobile), Share opens the
      **system share sheet** with the `…/ob2/a/<id>` URL; otherwise it opens the share modal,
      which copies that URL and offers a LinkedIn "Add to Profile" link. The backpack uses
-     the **OB2** hosted URL for sharing.
+     the **OB2** hosted URL for sharing, so **Share** appears only on **public** badges.
 - [ ] 10. **Send to wallet (CHAPI).** On the owner's **`/claims/<id>`** (when wallet
       **exchange is not** enabled), the **"Send to wallet"** action opens a modal that uses
       the **Credential Handler API (CHAPI)** polyfill: it `POST`s `/claims/<id>/download`,

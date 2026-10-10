@@ -174,7 +174,8 @@ defaults were moved from `COMMUNITY` to `PUBLIC`**
 but never enforced, and every row carried the old column default `COMMUNITY`.
 Without the backfill, enforcement would have 404'd every issued OB2 assertion and
 share link to outsiders. Rows explicitly set to `PRIVATE` or `ACHIEVEMENT` were
-left alone. Privacy is opt-in: members choose it in their settings.
+left alone. Privacy is opt-in: members choose it in their settings (the default for new
+badges) or per badge on the claim page.
 
 ## IDs
 

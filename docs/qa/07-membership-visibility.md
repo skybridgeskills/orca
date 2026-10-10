@@ -1,11 +1,13 @@
 # 07 — Membership & visibility
 
-How the community surfaces (`/members`, `/members/[id]`, and the achievement claims list)
-behave for a **member**, a **non-member**, and an **admin** once an org has configured a
+How the community surfaces (`/members`, `/members/[id]`, the achievement claims list, and a
+single claim's page) behave for a **member**, a **non-member**, and an **admin** once an org has configured a
 membership achievement. See the [README](./README.md) for conventions and
 [`00-setup.md`](./00-setup.md) for accounts. Do not reset between journeys.
 
-ADR: [`../adr/2026-06-12-membership-achievement-gating.md`](../adr/2026-06-12-membership-achievement-gating.md).
+ADR: [`../adr/2026-06-12-membership-achievement-gating.md`](../adr/2026-06-12-membership-achievement-gating.md)
+(and, for section G, the membership amendment in
+[`../adr/2026-06-09-claim-visibility-authorization.md`](../adr/2026-06-09-claim-visibility-authorization.md)).
 
 ## Preconditions
 
@@ -102,10 +104,31 @@ ADR: [`../adr/2026-06-12-membership-achievement-gating.md`](../adr/2026-06-12-me
           profile. **Re-set the membership achievement to _Member_ afterward** so journeys
           8–10 keep the gated state.
 
+### G. Claim visibility and membership (actors: _Member user_, _Invitee_, _Admin_)
+
+With the membership achievement set to _Member_ (the state from the preconditions), a
+**Community members only** badge is visible to members and admins, not to signed-in
+non-members.
+
+17. - [ ] As _Member user_, open one of your claims at **`/claims/<id>`**. Under **Who can see
+          this badge**, choose **Community members only** and **Save**. Expected: "Visibility
+          updated". Copy the page URL.
+18. - [ ] As _Invitee_ (signed in, not a member), open that URL. Expected: **404**.
+19. - [ ] As another member (if you have one) or _Admin_, open it. Expected: the claim renders,
+          with **no** "Who can see this badge" control (only the owner gets it).
+20. - [ ] _Optional, mutates org config_: as _Admin_, clear the membership achievement on
+          **`/about/edit`**. Then as _Invitee_, reload the URL. Expected: the claim renders
+          (unset means every signed-in user is a member). **Re-set the membership
+          achievement to _Member_ afterward.**
+21. - [ ] On **`/about/edit`**, check the unset option under "Who is a member of this
+          community?". Expected: it reads **"Everyone with an account in this community"**.
+22. - [ ] As _Member user_, set the claim from step 17 back to **Public**.
+
 ## State produced
 
 Member visibility states exercised (member / non-member / admin views; `PRIVATE` profile
-hide-from-members-not-admins). No new named entities.
+hide-from-members-not-admins; a Community-only claim hidden from a non-member). No new
+named entities; the claim from section G ends **Public** again.
 
 ## e2e candidate
 

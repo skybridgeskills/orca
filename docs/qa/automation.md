@@ -9,18 +9,19 @@ Priorities: **P0** = critical regression (a real bug we shipped + fixed; guard i
 
 ## Existing coverage (don't duplicate)
 
-| Existing spec                                                       | Covers (journey)                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `critical/achievements-list.spec.ts`                                | Public achievements list, no admin controls when logged out  |
-| `critical/admin-create-achievement.spec.ts`                         | Admin creates an open-claim achievement (journey 2 baseline) |
-| `critical/admin-invite-by-email.spec.ts`                            | Admin invite-by-email + invite resolves (journey 5)          |
-| `critical/auth-open-claim-no-invite.spec.ts`                        | Authenticated member claims an open badge (journey 4)        |
-| `critical/endorse-claim.spec.ts`                                    | A member endorses another member's claim (journey 5)         |
-| `critical/public-open-claim-and-login.spec.ts`                      | Public self-claim → login → register → claim (journey 4)     |
-| `claim-badge.spec.ts`                                               | Claim flow (older)                                           |
-| `oauth-connect.spec.ts`                                             | OAuth DCR + authorization_code + PKCE (journey 10)           |
-| `oauth-client-credentials.spec.ts`                                  | OAuth client_credentials (journey 10)                        |
-| unit: `tests/vitest/lib/credentials/achievementCredentials.spec.ts` | OB3 proof shape / eddsa-rdfc-2022 (journey 6)                |
+| Existing spec                                                       | Covers (journey)                                                                                      |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `critical/achievements-list.spec.ts`                                | Public achievements list, no admin controls when logged out                                           |
+| `critical/admin-create-achievement.spec.ts`                         | Admin creates an open-claim achievement (journey 2 baseline)                                          |
+| `critical/admin-invite-by-email.spec.ts`                            | Admin invite-by-email + invite resolves (journey 5)                                                   |
+| `critical/auth-open-claim-no-invite.spec.ts`                        | Authenticated member claims an open badge (journey 4)                                                 |
+| `critical/endorse-claim.spec.ts`                                    | A member endorses another member's claim (journey 5)                                                  |
+| `critical/claim-visibility.spec.ts`                                 | Owner sets a badge Private and back; `/ob2/a/<id>` follows (journey 6); no control for another member |
+| `critical/public-open-claim-and-login.spec.ts`                      | Public self-claim → login → register → claim (journey 4)                                              |
+| `claim-badge.spec.ts`                                               | Claim flow (older)                                                                                    |
+| `oauth-connect.spec.ts`                                             | OAuth DCR + authorization_code + PKCE (journey 10)                                                    |
+| `oauth-client-credentials.spec.ts`                                  | OAuth client_credentials (journey 10)                                                                 |
+| unit: `tests/vitest/lib/credentials/achievementCredentials.spec.ts` | OB3 proof shape / eddsa-rdfc-2022 (journey 6)                                                         |
 
 So the **open-claim, invite, endorse, OAuth, and OB3-proof-shape** paths are already
 guarded. Everything below is **new** coverage the spike features warrant.
