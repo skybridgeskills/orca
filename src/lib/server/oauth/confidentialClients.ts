@@ -189,7 +189,8 @@ export async function rotateConfidentialClientSecret(
 // back to a null creatorId. The enforcement point is the org-membership /
 // role-change and user-deletion paths, which should call
 // disableConfidentialClient (or block) for the owner's confidential clients.
-// TODO(security): wire this hook into the membership/role-change and
-// user-deletion flows (Phase 7+). Those paths are out of scope for Phase 2
-// (this module owns no routes), so the rule is documented here and surfaced in
-// the phase summary rather than implemented across unrelated files.
+// If the owner row is deleted, `createdByUserId` becomes null and
+// authenticateBearer rejects the app's tokens.
+// TODO(security): auto-disable on admin demote or delete is deferred until
+// those flows exist in the app. Until then, ops disable the owner's apps by hand
+// at /about/settings/apps.

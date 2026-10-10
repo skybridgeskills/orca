@@ -155,9 +155,9 @@ export interface AuthenticatedToken {
  * Authenticate a raw Bearer access token. Valid only if not revoked, unexpired,
  * and the owning client is not disabled. Updates lastUsedAt on success.
  *
- * `actingUserId = token.userId ?? token.client.createdByUserId`. For a
- * confidential client `createdByUserId` is always set (Phase 2/7 invariant), so
- * `actingUserId` is non-null for any usable token. Read endpoints ignore it;
+ * `actingUserId = token.userId ?? token.client.createdByUserId`. A confidential
+ * (service) client whose creator is gone (`createdByUserId` null) is rejected
+ * here, so `actingUserId` is non-null for any usable token. Read endpoints ignore it;
  * write endpoints use it as `creatorId`.
  */
 export async function authenticateBearer(
@@ -172,6 +172,8 @@ export async function authenticateBearer(
 	if (row.revokedAt) return null;
 	if (row.accessTokenExpiresAt.getTime() <= Date.now()) return null;
 	if (row.client.disabledAt) return null;
+	// A service app acts as its creator; with no creator it must not authenticate.
+	if (row.client.clientType === 'CONFIDENTIAL_SERVICE' && !row.client.createdByUserId) return null;
 
 	await prisma.oAuthAccessToken.update({
 		where: { id: row.id },
