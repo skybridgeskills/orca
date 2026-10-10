@@ -110,7 +110,7 @@
 		{text ?? m.shy_plain_badger_lack()}
 	</span>
 	{#if user.email && user.email !== text}
-		<span class="block text-sm text-gray-500 dark:text-gray-400">{user.email}</span>
+		<span class="block text-sm break-all text-gray-500 dark:text-gray-400">{user.email}</span>
 	{/if}
 {/snippet}
 
@@ -176,13 +176,16 @@
 			{#each results as user (user.id)}
 				<li class="flex items-center justify-between gap-3 py-2">
 					<div class="min-w-0">{@render userText(user)}</div>
-					{#if selectedIds.has(user.id)}
-						<Button submodule="secondary" disabled={true}>{m.glad_neat_robin_done()}</Button>
-					{:else}
-						<Button submodule="secondary" onclick={() => add(user)}>
-							{m.brisk_warm_lark_add()}
-						</Button>
-					{/if}
+					<!-- `Button` is full-width below `sm`; keep it at its natural width. -->
+					<div class="shrink-0">
+						{#if selectedIds.has(user.id)}
+							<Button submodule="secondary" disabled={true}>{m.glad_neat_robin_done()}</Button>
+						{:else}
+							<Button submodule="secondary" onclick={() => add(user)}>
+								{m.brisk_warm_lark_add()}
+							</Button>
+						{/if}
+					</div>
 				</li>
 			{/each}
 		</ul>
