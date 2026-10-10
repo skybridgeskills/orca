@@ -23,8 +23,18 @@
 		submodule = 'primary'
 	}: Props = $props();
 
+	let errorMessage = $state('');
+
 	const download = async () => {
+		errorMessage = '';
 		const response = await fetch(sourceUrl, { method: 'POST', body: '' });
+
+		// A refusal (e.g. 403 for suspended content) must not be saved as the file.
+		if (!response.ok) {
+			const body = await response.json().catch(() => null);
+			errorMessage = body?.message || response.statusText || String(response.status);
+			return;
+		}
 
 		const responseBlob = await response.blob();
 		const href = URL.createObjectURL(responseBlob);
@@ -40,3 +50,6 @@
 
 <Button {id} {buttonType} {submodule} {...moreProps} onclick={download} class={klass}>{text}</Button
 >
+{#if errorMessage}
+	<p class="mt-2 text-sm text-red-600 dark:text-red-500" role="alert">{errorMessage}</p>
+{/if}
