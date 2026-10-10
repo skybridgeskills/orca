@@ -144,4 +144,59 @@ describe('sendUserMessage', () => {
 		expect(sendOrcaMail).not.toHaveBeenCalled();
 		expect(prisma.message.create).not.toHaveBeenCalled();
 	});
+
+	describe('alwaysRecord (inbox-first, e.g. content reports)', () => {
+		const reportArgs = (over: Partial<SendUserMessageArgs> = {}) =>
+			args({
+				type: MessageType.CONTENT_REPORTED,
+				achievementId: undefined,
+				claimId: undefined,
+				reportId: 'report-1',
+				throttleMs: 24 * 60 * 60 * 1000,
+				alwaysRecord: true,
+				...over
+			});
+
+		it('records the Message but sends no email when throttled', async () => {
+			vi.mocked(prisma.message.findFirst).mockResolvedValue({ id: 'm-0' } as never);
+			const result = await sendUserMessage(reportArgs());
+			expect(result).toBe('suppressed_throttle');
+			expect(sendOrcaMail).not.toHaveBeenCalled();
+			expect(vi.mocked(prisma.message.create).mock.calls[0][0]).toMatchObject({
+				data: { type: 'CONTENT_REPORTED', reportId: 'report-1' }
+			});
+		});
+
+		it('records the Message when email is off by preference or the send fails', async () => {
+			await sendUserMessage(
+				reportArgs({
+					user: {
+						id: 'user-1',
+						json: { notifications: { email: false } },
+						identifiers: [verifiedEmail()]
+					}
+				})
+			);
+			vi.mocked(prisma.message.findFirst).mockResolvedValue(null as never);
+			vi.mocked(sendOrcaMail).mockResolvedValue({ success: false, error: { message: 'x' } });
+			expect(await sendUserMessage(reportArgs())).toBe('failed');
+			expect(prisma.message.create).toHaveBeenCalledTimes(2);
+		});
+
+		it('throttles on a fixed window starting at a multiple of throttleMs', async () => {
+			const day = 24 * 60 * 60 * 1000;
+			vi.useFakeTimers();
+			vi.setSystemTime(new Date(10 * day + 5 * 60 * 60 * 1000));
+			try {
+				vi.mocked(prisma.message.findFirst).mockResolvedValue(null as never);
+				vi.mocked(sendOrcaMail).mockResolvedValue({ success: true });
+				expect(await sendUserMessage(reportArgs())).toBe('sent');
+				expect(vi.mocked(prisma.message.findFirst).mock.calls[0][0]).toMatchObject({
+					where: { achievementId: null, createdAt: { gt: new Date(10 * day) } }
+				});
+			} finally {
+				vi.useRealTimers();
+			}
+		});
+	});
 });

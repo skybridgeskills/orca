@@ -85,6 +85,7 @@ async function fanOut(params: { recipientOrg: NotifyOrg; reportId: string }): Pr
 				type: MessageType.CONTENT_REPORTED,
 				reportId,
 				throttleMs: REPORT_NOTIFY_THROTTLE_MS,
+				alwaysRecord: true,
 				email: (messageId) => buildReportEmail({ recipientOrg, messageId })
 			});
 			// Audit: log each fan-out (recipient org + user + report).

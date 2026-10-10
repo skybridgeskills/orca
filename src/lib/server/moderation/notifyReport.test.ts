@@ -55,6 +55,8 @@ describe('notifyReport', () => {
 			expect(call[0].org).toBe(originOrg);
 			expect(call[0].type).toBe('CONTENT_REPORTED');
 			expect(call[0].reportId).toBe('report-1');
+			// Every report reaches the inbox; only the email is throttled.
+			expect(call[0].alwaysRecord).toBe(true);
 		}
 	});
 
