@@ -12,6 +12,8 @@ Follow the repo [`README.md`](../../README.md) "Getting started" steps; the esse
 - [ ] **Env**: `cp .env.example .env`; set `DATABASE_URL`, `PUBLIC_HTTP_PROTOCOL="http"`,
       and `DEFAULT_ORG_DOMAIN="localhost:5173"` (with `DEFAULT_ORG_ENABLED` per your
       preference). Leave `MAILGUN_API_KEY` unset/`none` for dev (see "Reading login codes").
+      Set `ORG_CONFIG_ENCRYPTION_KEY` (32 random bytes, base64; the command is in
+      `.env.example`) — saving a transaction-service API key (journey 10) fails without it.
 - [ ] **Migrate**: `pnpm install` then `pnpm run migrate:dev`.
 - [ ] **Create the org**: `pnpm run createOrganization` — set the domain to `localhost:5173`
       (no `http://`; must match `DEFAULT_ORG_DOMAIN`). This is the **primary org** for the
