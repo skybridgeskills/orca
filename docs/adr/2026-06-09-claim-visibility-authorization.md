@@ -103,3 +103,14 @@ have hidden every issued badge from outsiders. At the release:
   `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`, never `PRIVATE`.
 
 The decisions above otherwise stand.
+
+## Amendment (membership, 2026-10)
+
+"Community" in Decisions 2 and 5 now means a **member** of the org, per the
+membership-achievement ADR: an admin or a holder of a valid claim of the org's
+membership achievement; when none is configured every signed-in org user is a member.
+A signed-in non-member sees `PUBLIC` claims and their own, like the public. The
+helpers take `{ viewerIsMember }` (from `isMemberOrOpen`) as a required argument so
+every surface decides explicitly; `viewerRole` is unchanged. Org apps
+(`client_credentials`) still see `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`, and the
+`achievementClaims` API's membership gate applies to session callers only.

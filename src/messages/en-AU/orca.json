@@ -579,5 +579,6 @@
 	"warm_calm_otter_bulk": "Award in bulk",
 	"keen_amber_lynx_updated": "Already invited (updated)",
 	"broad_steady_bear_breakdown": "{newCount} awarded, {existingCount} updated, {failedCount} failed out of {total}",
-	"steady_amber_heron_insist": "On this site, sign in with your email first. You'll then be asked for your passkey."
+	"steady_amber_heron_insist": "On this site, sign in with your email first. You'll then be asked for your passkey.",
+	"open_wide_heron_welcome": "Everyone with an account in this community"
 }

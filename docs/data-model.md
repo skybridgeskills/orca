@@ -152,13 +152,14 @@ Each `AchievementClaim` has a `visibility`. The rule lives in
 `src/lib/server/claimVisibility.ts` (see ADR
 `2026-06-09-claim-visibility-authorization`), and every claim read surface uses it.
 
-| Viewer                                                     | Sees                                                             |
-| ---------------------------------------------------------- | ---------------------------------------------------------------- |
-| The claim's owner                                          | All of their own claims, including `PRIVATE`                     |
-| An org admin                                               | Every claim in the org                                           |
-| A signed-in community member                               | `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`                          |
-| An org app (`client_credentials` token)                    | `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`, like a community member |
-| Anyone else (signed out, OB2 assertion links, share pages) | `PUBLIC` only; anything else is a 404                            |
+| Viewer                                                                                        | Sees                                                   |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| The claim's owner                                                                             | All of their own claims, including `PRIVATE`           |
+| An org admin                                                                                  | Every claim in the org                                 |
+| A member (an admin, a holder of the membership badge, or any signed-in user when none is set) | `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`                |
+| A signed-in non-member (membership badge set)                                                 | `PUBLIC` and their own                                 |
+| An org app (`client_credentials` token)                                                       | `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`, like a member |
+| Anyone else (signed out, OB2 assertion links, share pages)                                    | `PUBLIC` only; anything else is a 404                  |
 
 `ACHIEVEMENT` is treated as `COMMUNITY` until it gets a policy of its own.
 

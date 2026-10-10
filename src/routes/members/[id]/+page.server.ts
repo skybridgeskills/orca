@@ -19,11 +19,14 @@ export const load: PageServerLoad = async ({ url, locals, params }) => {
 
 	// Visibility filter ANDed into both the list and its count so the header
 	// number matches the visible rows. Org-scoping is preserved below.
+	// `viewerIsMember: true` because reaching the return below implies the viewer is a
+	// member, an admin, or viewing themselves: the membership gate further down
+	// redirects anyone else (and when no membership achievement is set, all are members).
 	const visibleClaimsWhere = {
 		claimStatus: {
 			in: ['ACCEPTED', 'UNACCEPTED']
 		},
-		...claimVisibilityWhere(locals.session)
+		...claimVisibilityWhere(locals.session, { viewerIsMember: true })
 	} satisfies Prisma.AchievementClaimWhereInput;
 
 	const member = await prisma.user.findUniqueOrThrow({

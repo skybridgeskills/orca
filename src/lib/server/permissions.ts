@@ -126,6 +126,18 @@ export async function isMember({ user, org }: IsMemberParams): Promise<boolean> 
 	return !!claim;
 }
 
+/**
+ * Whether `user` counts as a member for community claim visibility. Unlike `isMember`, an
+ * org with no membership achievement is open: every signed-in user counts. Admins always
+ * do. At most one query, and only when a membership achievement is set and `user` is not
+ * an admin.
+ */
+export async function isMemberOrOpen({ user, org }: IsMemberParams): Promise<boolean> {
+	if (isAdmin(user)) return true;
+	if (membershipAchievementId(org) === null) return true;
+	return isMember({ user, org });
+}
+
 /** The configured membership achievement id, or null when unset. */
 export function membershipAchievementId(org: { json: App.OrganizationConfig }): string | null {
 	return org.json?.permissions?.membershipAchievement?.requiresAchievement ?? null;
@@ -137,8 +149,7 @@ export function membershipAchievementId(org: { json: App.OrganizationConfig }): 
  * holders of the membership achievement).
  */
 export async function canViewMemberDirectory({ user, org }: IsMemberParams): Promise<boolean> {
-	if (membershipAchievementId(org) === null) return true;
-	return isMember({ user, org });
+	return isMemberOrOpen({ user, org });
 }
 
 interface CanInviteToAchievementParams {

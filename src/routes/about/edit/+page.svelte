@@ -379,7 +379,7 @@
 					bind:selectedOption={formData.membershipAchievement}
 					value="admin"
 					name="membershipAchievement"
-					label="Only administrators"
+					label={m.open_wide_heron_welcome()}
 					id="orgEdit_membershipAchievement_admin"
 				/>
 				<RadioOption

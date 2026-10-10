@@ -121,7 +121,7 @@ export const actions: Actions = {
 				}
 			};
 		} else {
-			// Clear the membership setting (default to admins only)
+			// Clear the membership setting. Unset means open: every signed-in user counts as a member.
 			if (updatedJson.permissions?.membershipAchievement) {
 				delete updatedJson.permissions.membershipAchievement;
 			}

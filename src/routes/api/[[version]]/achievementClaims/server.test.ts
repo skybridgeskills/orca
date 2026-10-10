@@ -321,6 +321,26 @@ describe('GET /api/achievementClaims membership gating + profileLinkable', () =>
 		expect(mockFindMany).not.toHaveBeenCalled();
 	});
 
+	it('gated org: an app (client_credentials) token skips the membership gate and keeps COMMUNITY_VISIBLE', async () => {
+		mockResolveApiAuth.mockResolvedValue({
+			via: 'client_credentials',
+			userId: null,
+			actingUserId: 'app-owner',
+			scopes: []
+		});
+		mockFindMany
+			.mockResolvedValueOnce([gatedRow('c1', 'u1', Visibility.COMMUNITY)])
+			.mockResolvedValueOnce([{ userId: 'u1' }]);
+
+		const data = (await GET(gatedEvent(null))) as unknown as Array<{ id: string }>;
+
+		expect(mockIsMember).not.toHaveBeenCalled();
+		const where = mockFindMany.mock.calls[0][0].where;
+		expect(where.visibility).toEqual({ in: ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'] });
+		expect(where.OR).toBeUndefined();
+		expect(data.map((r) => r.id)).toEqual(['c1']);
+	});
+
 	it('gated anonymous caller → 403', async () => {
 		mockIsMember.mockResolvedValue(false);
 		await expect(GET(gatedEvent(null))).rejects.toMatchObject({ status: 403 });

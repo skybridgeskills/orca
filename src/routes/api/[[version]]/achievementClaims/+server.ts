@@ -35,11 +35,13 @@ export const GET = async ({ request, url, params, locals }: RequestEvent) => {
 
 	// P4: when a membership achievement is configured, the claims/earners list is
 	// members-only (admins always count as members). Defense-in-depth alongside the
-	// page-level gate: a gated non-member gets a 403 and no rows. When unset, the
-	// endpoint behaves exactly as before.
+	// page-level gate: a gated non-member session gets a 403 and no rows. When unset,
+	// the endpoint behaves exactly as before. Skipped for client_credentials callers: they
+	// have no session user, and org apps are classified as community viewers
+	// (claim-visibility ADR, membership amendment), so they keep COMMUNITY_VISIBLE below.
 	const membershipId = membershipAchievementId(locals.org);
 	const gatingActive = membershipId !== null;
-	if (gatingActive) {
+	if (gatingActive && auth.via !== 'client_credentials') {
 		const callerIsMember =
 			!!locals.session?.user &&
 			(await isMember({
@@ -65,9 +67,11 @@ export const GET = async ({ request, url, params, locals }: RequestEvent) => {
 			? { in: ['ACCEPTED', 'UNACCEPTED', 'REJECTED'] }
 			: { in: ['ACCEPTED', 'UNACCEPTED'] },
 		// An org app (client_credentials) sees what a community member sees: never PRIVATE.
+		// A session caller that got here passed the membership gate above (or gating is
+		// unset), so it counts as a member.
 		...(auth.via === 'client_credentials'
 			? { visibility: { in: COMMUNITY_VISIBLE } }
-			: claimVisibilityWhere(locals.session))
+			: claimVisibilityWhere(locals.session, { viewerIsMember: true }))
 	} satisfies Prisma.AchievementClaimWhereInput;
 
 	const claims = await prisma.achievementClaim.findMany({

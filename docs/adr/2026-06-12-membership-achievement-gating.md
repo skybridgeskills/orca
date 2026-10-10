@@ -75,6 +75,9 @@ control over appearing in the directory.
   `COMMUNITY`) — existing rows backfill to `COMMUNITY`.
 - **Query cost is bounded.** Gating adds at most one constant query per list page
   (members list for admin viewers; claims list when gated); no per-row N+1.
+- **Claim visibility follows membership.** `COMMUNITY` / `ACHIEVEMENT` claims are
+  visible to members only (see the membership amendment in
+  `2026-06-09-claim-visibility-authorization`).
 - **Endorsement tab is conservatively gated.** The invite-creator name in the
   endorsements tab links to a profile only for the creator themselves or an admin
   (the invites endpoint does not compute membership); broader member→member linking

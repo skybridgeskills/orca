@@ -6,6 +6,7 @@ import {
 	canInviteToAchievement,
 	canViewMemberDirectory,
 	isMember,
+	isMemberOrOpen,
 	membershipAchievementId,
 	validMembershipClaimWhere
 } from './permissions';
@@ -139,6 +140,44 @@ describe('isMember', () => {
 	it('treats a null orgRole as a non-admin', async () => {
 		vi.mocked(prisma.achievementClaim.findFirst).mockResolvedValue(null);
 		expect(await isMember({ user: { id: 'user-1', orgRole: null }, org: ORG_OPEN })).toBe(false);
+	});
+});
+
+describe('isMemberOrOpen', () => {
+	beforeEach(() => {
+		vi.mocked(prisma.achievementClaim.findFirst).mockReset();
+	});
+
+	it('returns true for any user when no membership achievement is configured (no query)', async () => {
+		expect(await isMemberOrOpen({ user: { id: 'user-1', orgRole: 'MEMBER' }, org: ORG_OPEN })).toBe(
+			true
+		);
+		expect(await isMemberOrOpen({ user: { id: 'user-1', orgRole: null }, org: ORG_OPEN })).toBe(
+			true
+		);
+		expect(prisma.achievementClaim.findFirst).not.toHaveBeenCalled();
+	});
+
+	it('returns true for an admin under gating (no query)', async () => {
+		expect(
+			await isMemberOrOpen({ user: { id: 'admin-1', orgRole: 'GENERAL_ADMIN' }, org: ORG_GATED })
+		).toBe(true);
+		expect(prisma.achievementClaim.findFirst).not.toHaveBeenCalled();
+	});
+
+	it('under gating, returns true for a holder of a valid membership claim', async () => {
+		vi.mocked(prisma.achievementClaim.findFirst).mockResolvedValue({ id: 'claim-1' } as never);
+		expect(
+			await isMemberOrOpen({ user: { id: 'user-1', orgRole: 'MEMBER' }, org: ORG_GATED })
+		).toBe(true);
+		expect(prisma.achievementClaim.findFirst).toHaveBeenCalledTimes(1);
+	});
+
+	it('under gating, returns false without a valid membership claim', async () => {
+		vi.mocked(prisma.achievementClaim.findFirst).mockResolvedValue(null);
+		expect(
+			await isMemberOrOpen({ user: { id: 'user-1', orgRole: 'MEMBER' }, org: ORG_GATED })
+		).toBe(false);
 	});
 });
 

@@ -42,6 +42,10 @@ const claim = (visibility: Visibility, userId = OWNER_ID) => ({ userId, visibili
 
 const VISIBILITIES: Visibility[] = ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT', 'PRIVATE'];
 
+// Membership only matters for the community role; owner/admin/public ignore it.
+const MEMBER = { viewerIsMember: true };
+const NON_MEMBER = { viewerIsMember: false };
+
 describe('viewerRole', () => {
 	it('returns public for no session', () => {
 		expect(viewerRole({ userId: OWNER_ID }, publicSession)).toBe('public');
@@ -73,51 +77,65 @@ describe('viewerRole', () => {
 describe('canViewClaim', () => {
 	it('owner can view every visibility', () => {
 		for (const v of VISIBILITIES) {
-			expect(canViewClaim(claim(v), ownerSession)).toBe(true);
+			expect(canViewClaim(claim(v), ownerSession, MEMBER)).toBe(true);
 		}
 	});
 
 	it('admin can view every visibility', () => {
 		for (const v of VISIBILITIES) {
-			expect(canViewClaim(claim(v), adminSession)).toBe(true);
-			expect(canViewClaim(claim(v), contentAdminSession)).toBe(true);
+			expect(canViewClaim(claim(v), adminSession, MEMBER)).toBe(true);
+			expect(canViewClaim(claim(v), contentAdminSession, MEMBER)).toBe(true);
 		}
 	});
 
-	it('community can view PUBLIC, COMMUNITY, and ACHIEVEMENT but not PRIVATE', () => {
-		expect(canViewClaim(claim('PUBLIC'), communitySession)).toBe(true);
-		expect(canViewClaim(claim('COMMUNITY'), communitySession)).toBe(true);
-		expect(canViewClaim(claim('ACHIEVEMENT'), communitySession)).toBe(true);
-		expect(canViewClaim(claim('PRIVATE'), communitySession)).toBe(false);
+	it('a member can view PUBLIC, COMMUNITY, and ACHIEVEMENT but not PRIVATE', () => {
+		expect(canViewClaim(claim('PUBLIC'), communitySession, MEMBER)).toBe(true);
+		expect(canViewClaim(claim('COMMUNITY'), communitySession, MEMBER)).toBe(true);
+		expect(canViewClaim(claim('ACHIEVEMENT'), communitySession, MEMBER)).toBe(true);
+		expect(canViewClaim(claim('PRIVATE'), communitySession, MEMBER)).toBe(false);
 	});
 
 	it('BILLING_ADMIN behaves as community (cannot view PRIVATE)', () => {
-		expect(canViewClaim(claim('COMMUNITY'), billingAdminSession)).toBe(true);
-		expect(canViewClaim(claim('PRIVATE'), billingAdminSession)).toBe(false);
+		expect(canViewClaim(claim('COMMUNITY'), billingAdminSession, MEMBER)).toBe(true);
+		expect(canViewClaim(claim('PRIVATE'), billingAdminSession, MEMBER)).toBe(false);
+	});
+
+	it('a non-member community viewer can view PUBLIC only', () => {
+		expect(canViewClaim(claim('PUBLIC'), communitySession, NON_MEMBER)).toBe(true);
+		expect(canViewClaim(claim('COMMUNITY'), communitySession, NON_MEMBER)).toBe(false);
+		expect(canViewClaim(claim('ACHIEVEMENT'), communitySession, NON_MEMBER)).toBe(false);
+		expect(canViewClaim(claim('PRIVATE'), communitySession, NON_MEMBER)).toBe(false);
+	});
+
+	it('owner and admin are unaffected by viewerIsMember: false', () => {
+		for (const v of VISIBILITIES) {
+			expect(canViewClaim(claim(v), ownerSession, NON_MEMBER)).toBe(true);
+			expect(canViewClaim(claim(v), adminSession, NON_MEMBER)).toBe(true);
+		}
 	});
 
 	it('public can view PUBLIC only', () => {
-		expect(canViewClaim(claim('PUBLIC'), publicSession)).toBe(true);
-		expect(canViewClaim(claim('COMMUNITY'), publicSession)).toBe(false);
-		expect(canViewClaim(claim('ACHIEVEMENT'), publicSession)).toBe(false);
-		expect(canViewClaim(claim('PRIVATE'), publicSession)).toBe(false);
+		expect(canViewClaim(claim('PUBLIC'), publicSession, MEMBER)).toBe(true);
+		expect(canViewClaim(claim('COMMUNITY'), publicSession, MEMBER)).toBe(false);
+		expect(canViewClaim(claim('ACHIEVEMENT'), publicSession, MEMBER)).toBe(false);
+		expect(canViewClaim(claim('PRIVATE'), publicSession, MEMBER)).toBe(false);
 	});
 });
 
 describe('claimVisibilityWhere', () => {
 	it('owner/admin gets no visibility restriction', () => {
-		expect(claimVisibilityWhere(adminSession)).toEqual({});
-		expect(claimVisibilityWhere(contentAdminSession)).toEqual({});
+		expect(claimVisibilityWhere(adminSession, MEMBER)).toEqual({});
+		expect(claimVisibilityWhere(contentAdminSession, MEMBER)).toEqual({});
 	});
 
 	it('community ORs in own claims plus community-visible visibilities', () => {
-		expect(claimVisibilityWhere(communitySession)).toEqual({
+		expect(claimVisibilityWhere(communitySession, MEMBER)).toEqual({
 			OR: [{ userId: OTHER_ID }, { visibility: { in: ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'] } }]
 		});
 	});
 
 	it('BILLING_ADMIN gets the community fragment (own claims OR community-visible)', () => {
-		expect(claimVisibilityWhere(billingAdminSession)).toEqual({
+		expect(claimVisibilityWhere(billingAdminSession, MEMBER)).toEqual({
 			OR: [{ userId: OTHER_ID }, { visibility: { in: ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'] } }]
 		});
 	});
@@ -125,13 +143,23 @@ describe('claimVisibilityWhere', () => {
 	it('owner (non-admin, viewing own list) keeps own PRIVATE claims via OR', () => {
 		// A plain authenticated user viewing a shared list still sees their own
 		// PRIVATE claims because of the userId OR branch.
-		const where = claimVisibilityWhere(ownerSession);
+		const where = claimVisibilityWhere(ownerSession, MEMBER);
 		expect(where).toEqual({
 			OR: [{ userId: OWNER_ID }, { visibility: { in: ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'] } }]
 		});
 	});
 
+	it('a non-member ORs in own claims plus PUBLIC only', () => {
+		expect(claimVisibilityWhere(communitySession, NON_MEMBER)).toEqual({
+			OR: [{ userId: OTHER_ID }, { visibility: 'PUBLIC' }]
+		});
+	});
+
+	it('admin gets no restriction even with viewerIsMember: false', () => {
+		expect(claimVisibilityWhere(adminSession, NON_MEMBER)).toEqual({});
+	});
+
 	it('public gets PUBLIC only', () => {
-		expect(claimVisibilityWhere(publicSession)).toEqual({ visibility: 'PUBLIC' });
+		expect(claimVisibilityWhere(publicSession, MEMBER)).toEqual({ visibility: 'PUBLIC' });
 	});
 });

@@ -579,5 +579,6 @@
 	"warm_calm_otter_bulk": "Attribuer en masse",
 	"keen_amber_lynx_updated": "Déjà invité (mis à jour)",
 	"broad_steady_bear_breakdown": "{newCount} attribués, {existingCount} mis à jour, {failedCount} échoués sur {total}",
-	"steady_amber_heron_insist": "Sur ce site, connectez-vous d'abord avec votre adresse e-mail. Votre clé d'accès vous sera ensuite demandée."
+	"steady_amber_heron_insist": "Sur ce site, connectez-vous d'abord avec votre adresse e-mail. Votre clé d'accès vous sera ensuite demandée.",
+	"open_wide_heron_welcome": "Toute personne ayant un compte dans cette communauté"
 }
