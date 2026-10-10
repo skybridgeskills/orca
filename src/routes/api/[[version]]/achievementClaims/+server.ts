@@ -64,7 +64,10 @@ export const GET = async ({ request, url, params, locals }: RequestEvent) => {
 		claimStatus: editAchievementCapability
 			? { in: ['ACCEPTED', 'UNACCEPTED', 'REJECTED'] }
 			: { in: ['ACCEPTED', 'UNACCEPTED'] },
-		...claimVisibilityWhere(locals.session)
+		// An org app (client_credentials) sees what a community member sees: never PRIVATE.
+		...(auth.via === 'client_credentials'
+			? { visibility: { in: COMMUNITY_VISIBLE } }
+			: claimVisibilityWhere(locals.session))
 	} satisfies Prisma.AchievementClaimWhereInput;
 
 	const claims = await prisma.achievementClaim.findMany({

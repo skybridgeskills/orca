@@ -78,6 +78,10 @@ function applyWhere(where: Record<string, unknown>) {
 				return false;
 			});
 		}
+		// app token: a flat visibility list, no OR
+		if (where.visibility && typeof where.visibility === 'object') {
+			return (where.visibility as { in: Visibility[] }).in.includes(r.visibility);
+		}
 		// admin / no visibility restriction
 		return true;
 	});
@@ -152,6 +156,36 @@ describe('GET /api/achievementClaims visibility filtering', () => {
 		for (const r of data) {
 			expect(r.visibility).toBeDefined();
 		}
+	});
+
+	it('app (client_credentials) token sees community-visible rows, never PRIVATE', async () => {
+		mockResolveApiAuth.mockResolvedValue({
+			via: 'client_credentials',
+			userId: null,
+			actingUserId: 'app-owner',
+			scopes: []
+		});
+		const data = (await GET(makeEvent(null))) as unknown as Array<{ id: string }>;
+		const where = mockFindMany.mock.calls[0][0].where;
+		expect(where.visibility).toEqual({ in: ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'] });
+		expect(where.OR).toBeUndefined();
+		expect(data.map((r) => r.id)).toEqual(['c-public', 'c-community', 'c-achievement']);
+	});
+
+	it('session caller still gets the claimVisibilityWhere fragment', async () => {
+		mockResolveApiAuth.mockResolvedValue({
+			via: 'session',
+			userId: OTHER_ID,
+			actingUserId: OTHER_ID,
+			scopes: []
+		});
+		await GET(makeEvent(session(OTHER_ID, 'MEMBER')));
+		const where = mockFindMany.mock.calls[0][0].where;
+		expect(where.visibility).toBeUndefined();
+		expect(where.OR).toEqual([
+			{ userId: OTHER_ID },
+			{ visibility: { in: ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'] } }
+		]);
 	});
 
 	it('ANDs the visibility fragment with org and status scoping', async () => {
