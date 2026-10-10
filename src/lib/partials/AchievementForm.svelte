@@ -725,11 +725,16 @@
 
 				<input
 					type="hidden"
-					name="config_reviewable"
+					name="reviewableSelectedOption"
 					bind:value={formData.reviewableSelectedOption}
 				/>
 				<input type="hidden" name="reviewRequires" bind:value={formData.reviewRequires} />
 				<input type="hidden" name="reviewsRequired" bind:value={formData.reviewsRequired} />
+				{#if formData.reviewableSelectedOption != 'none'}
+					{#each formData.stewards as stewardId (stewardId)}
+						<input type="hidden" name="stewards" value={stewardId} />
+					{/each}
+				{/if}
 
 				<input
 					type="hidden"
