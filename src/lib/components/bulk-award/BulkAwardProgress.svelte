@@ -1,25 +1,35 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
+
 	import Button from '$lib/components/Button.svelte';
-	import BulkAwardStatusIcon from './BulkAwardStatusIcon.svelte';
 	import { waitForBulkAwardRequestInterval } from '$lib/config/bulkAward';
+	import * as m from '$lib/i18n/messages';
+
+	import BulkAwardStatusIcon from './BulkAwardStatusIcon.svelte';
 	import type { BulkAwardApiMeta, BulkAwardRow, BulkAwardRowStatus } from './bulkAwardTypes';
 
-	export let rows: BulkAwardRow[];
-	export let achievementId: string;
-	export let autoStart = true;
+	import { resolve } from '$app/paths';
 
-	const dispatch = createEventDispatcher<{ done: void }>();
+	interface Props {
+		rows: BulkAwardRow[];
+		achievementId: string;
+		autoStart?: boolean;
+		ondone?: () => void;
+	}
 
-	let rowStatuses: BulkAwardRowStatus[] = rows.map(() => ({ status: 'pending' }));
-	let processing = false;
+	let { rows, achievementId, autoStart = true, ondone }: Props = $props();
 
-	$: newCount = rowStatuses.filter((row) => row.status === 'success_new').length;
-	$: existingCount = rowStatuses.filter((row) => row.status === 'success_existing').length;
-	$: errorCount = rowStatuses.filter((row) => row.status === 'error').length;
-	$: processedCount = newCount + existingCount + errorCount;
-	$: percent = rows.length ? Math.round((processedCount / rows.length) * 100) : 0;
+	// One status per CSV row, reset whenever `rows` changes; updated by reassignment.
+	let rowStatuses = $derived<BulkAwardRowStatus[]>(rows.map(() => ({ status: 'pending' })));
+	let processing = $state(false);
+
+	const newCount = $derived(rowStatuses.filter((row) => row.status === 'success_new').length);
+	const existingCount = $derived(
+		rowStatuses.filter((row) => row.status === 'success_existing').length
+	);
+	const errorCount = $derived(rowStatuses.filter((row) => row.status === 'error').length);
+	const processedCount = $derived(newCount + existingCount + errorCount);
+	const percent = $derived(rows.length ? Math.round((processedCount / rows.length) * 100) : 0);
 
 	onMount(() => {
 		if (autoStart) {
@@ -63,6 +73,10 @@
 		return { claimId, endorsementId };
 	}
 
+	function setRowStatus(index: number, status: BulkAwardRowStatus) {
+		rowStatuses = rowStatuses.map((row, i) => (i === index ? status : row));
+	}
+
 	function buildDetailHref(params: {
 		claimId?: string;
 		endorsementId?: string;
@@ -78,8 +92,7 @@
 	}
 
 	async function awardRow(index: number) {
-		rowStatuses[index] = { status: 'processing' };
-		rowStatuses = rowStatuses;
+		setRowStatus(index, { status: 'processing' });
 
 		try {
 			const response = await fetch(`/api/v1/achievements/${achievementId}/award`, {
@@ -97,17 +110,17 @@
 				const errorData = await response.json().catch(() => null);
 				const message =
 					typeof errorData?.message === 'string' ? errorData.message : `HTTP ${response.status}`;
-				rowStatuses[index] = {
+				setRowStatus(index, {
 					status: 'error',
 					error: message,
 					processedAt: new Date().toISOString()
-				};
+				});
 			} else {
 				const body = await response.json();
 				const award = parseAwardMeta(body);
 				const { claimId, endorsementId } = resolveAwardIds(body);
 				const created = award?.created ?? true;
-				rowStatuses[index] = {
+				setRowStatus(index, {
 					status: created ? 'success_new' : 'success_existing',
 					created,
 					invited: award?.invited,
@@ -119,17 +132,15 @@
 						email: rows[index].email
 					}),
 					processedAt: new Date().toISOString()
-				};
+				});
 			}
 		} catch (err) {
-			rowStatuses[index] = {
+			setRowStatus(index, {
 				status: 'error',
 				error: err instanceof Error ? err.message : 'Network error',
 				processedAt: new Date().toISOString()
-			};
+			});
 		}
-
-		rowStatuses = rowStatuses;
 	}
 
 	async function processRows(indices?: number[]) {
@@ -145,7 +156,7 @@
 		}
 
 		processing = false;
-		dispatch('done');
+		ondone?.();
 	}
 
 	async function retryFailed() {
@@ -206,7 +217,7 @@
 		<div
 			class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
 			style="width: {percent}%"
-		/>
+		></div>
 	</div>
 </div>
 
@@ -222,7 +233,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each rows as row, index}
+			{#each rows as row, index (index)}
 				<tr class="{rowClass(rowStatuses[index].status)} border-b dark:border-gray-700">
 					<td class="px-4 py-2 align-middle text-gray-900 dark:text-white">{index + 1}</td>
 					<td class="px-4 py-2 align-middle min-w-[10rem]">
@@ -242,7 +253,10 @@
 					</td>
 					<td class="px-4 py-2 align-middle">
 						{#if rowStatuses[index].detailHref}
-							<a href={rowStatuses[index].detailHref} class="text-blue-700 hover:underline">
+							<a
+								href={resolve(rowStatuses[index].detailHref)}
+								class="text-blue-700 hover:underline"
+							>
 								{row.email}
 							</a>
 						{:else}
@@ -269,7 +283,7 @@
 		</p>
 		{#if errorCount > 0}
 			<div class="mt-3">
-				<Button text={m.brave_red_fox_retry()} submodule="secondary" on:click={retryFailed} />
+				<Button text={m.brave_red_fox_retry()} submodule="secondary" onclick={retryFailed} />
 			</div>
 		{/if}
 	</div>

@@ -135,7 +135,7 @@
 
 		<p class="mb-4 text-sm">
 			<a
-				href="/achievements/{data.achievement.id}/award/bulk"
+				href={resolve(`/achievements/${data.achievement.id}/award/bulk`)}
 				class="text-blue-700 hover:underline"
 			>
 				{m.warm_calm_otter_bulk()}

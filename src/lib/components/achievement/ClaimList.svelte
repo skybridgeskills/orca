@@ -262,7 +262,7 @@
 								scope="row"
 								class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
 							>
-								<a href="/invites/{invite.id}" class="hover:underline">
+								<a href={resolve(`/invites/${invite.id}`)} class="hover:underline">
 									{invite.inviteeEmail}
 								</a>
 							</th>

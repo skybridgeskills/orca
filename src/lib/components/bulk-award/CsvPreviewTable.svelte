@@ -1,12 +1,16 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { createEventDispatcher } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
+	import * as m from '$lib/i18n/messages';
+
 	import type { BulkAwardRow } from './bulkAwardTypes';
 
-	export let rows: BulkAwardRow[];
+	interface Props {
+		rows: BulkAwardRow[];
+		onstart?: () => void;
+		onback?: () => void;
+	}
 
-	const dispatch = createEventDispatcher<{ start: void; back: void }>();
+	let { rows, onstart, onback }: Props = $props();
 </script>
 
 <div class="mb-4">
@@ -26,7 +30,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each rows as row, index}
+			{#each rows as row, index (index)}
 				<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
 					<td class="px-4 py-3 text-gray-900 dark:text-white">{index + 1}</td>
 					<td class="px-4 py-3">{row.email}</td>
@@ -39,6 +43,6 @@
 </div>
 
 <div class="flex gap-2">
-	<Button text={m.quiet_soft_hare_turn()} submodule="secondary" on:click={() => dispatch('back')} />
-	<Button text={m.bold_warm_eagle_begin()} submodule="primary" on:click={() => dispatch('start')} />
+	<Button text={m.quiet_soft_hare_turn()} submodule="secondary" onclick={() => onback?.()} />
+	<Button text={m.bold_warm_eagle_begin()} submodule="primary" onclick={() => onstart?.()} />
 </div>
