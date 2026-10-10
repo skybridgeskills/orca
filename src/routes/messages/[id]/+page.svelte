@@ -1,5 +1,6 @@
 <script lang="ts">
 	import dayjs from 'dayjs';
+	import localizedFormat from 'dayjs/plugin/localizedFormat.js';
 
 	import Badge from '$lib/components/Badge.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
@@ -13,6 +14,9 @@
 	import { enhance } from '$app/forms';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
+
+	// 'lll' (e.g. "Oct 10, 2026 7:01 PM") needs the localizedFormat plugin.
+	dayjs.extend(localizedFormat);
 
 	const breadcrumbItems = [
 		{ text: m.plain_calm_otter_inbox(), href: '/messages' },
