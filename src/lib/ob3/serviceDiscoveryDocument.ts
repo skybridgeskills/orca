@@ -10,8 +10,6 @@ import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 export const DEFAULT_SCOPES = {
 	'https://purl.imsglobal.org/spec/ob/v3p0/scope/credential.readonly':
 		'Permission to read AchievementCredentials for the authenticated entity.',
-	'https://purl.imsglobal.org/spec/ob/v3p0/scope/credential.upsert':
-		'Permission to create or update AchievementCredentials for the authenticated entity.',
 	'https://purl.imsglobal.org/spec/ob/v3p0/scope/profile.readonly':
 		'Permission to read the profile for the authenticated entity.',
 	'https://purl.imsglobal.org/spec/ob/v3p0/scope/profile.update':
@@ -38,7 +36,7 @@ const SERVICE_DISCOVERY_DOCUMENT = {
 		'x-model-pid': 'org.1edtech.ob.v3p0.model',
 		'x-service-pid': 'org.1edtech.ob.v3p0.rest.servicemodel',
 		'x-src-operation-count': 5,
-		'x-oas-operation-count': 5
+		'x-oas-operation-count': 4
 	},
 	servers: [
 		{
@@ -209,163 +207,6 @@ const SERVICE_DISCOVERY_DOCUMENT = {
 					}
 				],
 				'x-operation-pid': 'org.1edtech.ob.v3p0.rest.getcredentials.operation'
-			},
-			post: {
-				tags: ['OpenBadgeCredentials'],
-				summary: 'The REST POST operation for the upsertCredential() API call.',
-				description:
-					'Create or replace an AchievementCredential on the [=resource server=], appending it to the list of credentials for the subject, or replacing an existing entry in that list. The [=resource server=] SHOULD use the [=credential equality and comparison=] algorithm to compare and determine initial equality. The response code makes clear whether the operation resulted in a replacement or an insertion.',
-				operationId: 'upsertCredential',
-				requestBody: {
-					description: 'The request body for the upsertCredential operation.',
-					content: {
-						'application/json': {
-							schema: {
-								$ref: '#/components/schemas/AchievementCredential'
-							}
-						},
-						'text/plain': {
-							schema: {
-								pattern: '^[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]*\\.[a-zA-Z0-9_-]+$',
-								type: 'string',
-								description: 'A `String` in Compact JWS format [[RFC7515]].'
-							}
-						}
-					},
-					required: true
-				},
-				responses: {
-					'200': {
-						description:
-							'The AchievementCredential was successfully replaced on the [=resource server=]. The response body MUST be the AchievementCredential in the request.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/AchievementCredential'
-								}
-							},
-							'text/plain': {
-								schema: {
-									pattern: '^[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]*\\.[a-zA-Z0-9_-]+$',
-									type: 'string',
-									description: 'A `String` in Compact JWS format [[RFC7515]].'
-								}
-							}
-						}
-					},
-					'201': {
-						description:
-							'The AchievementCredential was successfully created on the [=resource server=]. The response body MUST be the AchievementCredential in the request.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/AchievementCredential'
-								}
-							},
-							'text/plain': {
-								schema: {
-									pattern: '^[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]*\\.[a-zA-Z0-9_-]+$',
-									type: 'string',
-									description: 'A `String` in Compact JWS format [[RFC7515]].'
-								}
-							}
-						}
-					},
-					'304': {
-						description:
-							'As defined in [[rfc9110]], indicating that there is no need for the server to transfer a representation of the target resource because the request indicates that the client, which made the request conditional, already has a valid representation.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/Imsx_StatusInfo'
-								}
-							}
-						}
-					},
-					'400': {
-						description:
-							'As defined in [[rfc9110]], indicating that the server cannot or will not process the request due to something that is perceived to be a client error.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/Imsx_StatusInfo'
-								}
-							}
-						}
-					},
-					'401': {
-						description:
-							'As defined in [[rfc9110]], indicating that the request has not been applied because it lacks valid authentication credentials for the target resource.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/Imsx_StatusInfo'
-								}
-							}
-						}
-					},
-					'403': {
-						description:
-							'As defined in [[rfc9110]], indicating that the server understood the request but refuses to fulfill it. The exact reason SHOULD be explained in the response payload.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/Imsx_StatusInfo'
-								}
-							}
-						}
-					},
-					'404': {
-						description:
-							'As defined in [[rfc9110]], indicating that the origin server did not find a current representation for the target resource or is not willing to disclose that one exists.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/Imsx_StatusInfo'
-								}
-							}
-						}
-					},
-					'405': {
-						description:
-							'As defined in [[rfc9110]], indicating that the server does not allow the method.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/Imsx_StatusInfo'
-								}
-							}
-						}
-					},
-					'500': {
-						description:
-							'As defined in [[rfc9110]]. Implementations SHOULD avoid using this error code - use only if there is catastrophic error and there is not a more appropriate code.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/Imsx_StatusInfo'
-								}
-							}
-						}
-					},
-					default: {
-						description:
-							'The request was invalid or cannot be served. The exact error SHOULD be explained in the response payload.',
-						content: {
-							'application/json': {
-								schema: {
-									$ref: '#/components/schemas/Imsx_StatusInfo'
-								}
-							}
-						}
-					}
-				},
-				security: [
-					{
-						OAuth2ACG: ['https://purl.imsglobal.org/spec/ob/v3p0/scope/credential.upsert']
-					}
-				],
-				'x-operation-pid': 'org.1edtech.ob.v3p0.rest.upsertcredential.operation'
 			}
 		},
 		'/profile': {
