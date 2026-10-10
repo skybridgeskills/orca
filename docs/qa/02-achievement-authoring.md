@@ -110,11 +110,11 @@ a tester can spot-check them.
 19. - [ ] Confirm the page is **admin-gated**: a non-permitted user is redirected to
           `/achievements` (same `canEditAchievements` gate as create).
 20. - [ ] Pick one skill and click **"Add"**. Expected: the button shows a loading state then
-          **"Done"** and becomes **disabled**. This creates a **`Competency`-type** achievement
+          **"Added"** and becomes **disabled**. This creates a **`Competency`-type** achievement
           (no uploaded image — it uses the book-check icon) with a **seeded rubric** (one result
           description whose allowed values are the skill's levels), `claimable = off`.
 21. - [ ] Confirm an **already-added** skill (its label already matches an existing achievement
-          name) shows as **"Done" / disabled** on load — prevents duplicate competencies.
+          name) shows as **"Added" / disabled** on load — prevents duplicate competencies.
 22. - [ ] Treat the skill you added as **_Competency_** for the rest of the guide. Open its
           detail page from `/achievements` and confirm the **book-check icon** renders (not an
           uploaded image).
