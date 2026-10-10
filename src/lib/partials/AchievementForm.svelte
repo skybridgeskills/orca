@@ -433,7 +433,8 @@
 							<AchievementSelect
 								badgeId={formData.claimRequires}
 								onunselected={() => {
-									formData.claimable = 'off';
+									// Leave `claimable` to the radio (see the $effect): this also fires on
+									// mount when no badge is chosen, and must not un-claim a public badge.
 									formData.claimRequires = null;
 								}}
 								onselected={(id) => {
