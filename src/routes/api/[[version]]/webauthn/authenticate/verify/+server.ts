@@ -2,6 +2,7 @@ import { error, json } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
 import * as m from '$lib/i18n/messages';
+import { isSuperadminOrg } from '$lib/server/moderation/superadminOrg';
 import { verifyAuthentication } from '$lib/server/webauthn/ceremonies';
 import { consumeChallenge } from '$lib/server/webauthn/challenge';
 import { findPasskeyByCredentialId, updatePasskeyCounter } from '$lib/server/webauthn/passkeys';
@@ -15,6 +16,9 @@ import type { RequestHandler } from './$types';
 // trusted for identity: the user is whoever owns the stored credential the assertion
 // verifies against.
 export const POST: RequestHandler = async ({ locals, cookies, request }) => {
+	// The superadmin org requires email first, then the passkey (passkey ADR §5).
+	if (isSuperadminOrg(locals.org.id)) error(403, m.steady_amber_heron_insist());
+
 	const body = await request.json();
 	const response = body?.response;
 	const sessionId = cookies.get('sessionId');
@@ -48,11 +52,6 @@ export const POST: RequestHandler = async ({ locals, cookies, request }) => {
 
 	// Persist the rolling signature counter (+ lastUsedAt) for replay detection.
 	await updatePasskeyCounter(passkey.identifierId, passkey.credential, result.newCounter);
-
-	// P4 seam: superadmin-org users will require an already-email-verified session before
-	// this passkey assertion completes login. That second-factor gate belongs here —
-	// branch on the resolved user's org/role and reject (or require email verification)
-	// before activating the session below. Not implemented in P3.
 
 	// Activate the session for the credential's owner. The challenge was already cleared
 	// by consumeChallenge, so the activated session carries no passkey state.

@@ -1,6 +1,8 @@
-import { json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
+import * as m from '$lib/i18n/messages';
+import { isSuperadminOrg } from '$lib/server/moderation/superadminOrg';
 import { buildAuthenticationOptions } from '$lib/server/webauthn/ceremonies';
 import { issueChallenge } from '$lib/server/webauthn/challenge';
 import { rpForOrg } from '$lib/server/webauthn/rp';
@@ -15,6 +17,9 @@ import { USE_SECURE_COOKIES } from '$env/static/private';
 // so no email is typed). The challenge is stored on a fresh pre-auth Session row (never
 // the client) so verify can check it single-use, bound to this request's cookie.
 export const POST: RequestHandler = async ({ locals, cookies }) => {
+	// The superadmin org requires email first, then the passkey (passkey ADR §5).
+	if (isSuperadminOrg(locals.org.id)) error(403, m.steady_amber_heron_insist());
+
 	const rp = rpForOrg(locals.org);
 	const options = await buildAuthenticationOptions({ rp });
 

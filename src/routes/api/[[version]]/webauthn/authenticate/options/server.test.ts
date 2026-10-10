@@ -27,6 +27,10 @@ vi.mock('$env/static/private', () => ({
 	USE_SECURE_COOKIES: 'true'
 }));
 
+// The real isSuperadminOrg reads SUPERADMIN_ORG_ID from here; tests set it per case.
+const mockEnv = vi.hoisted(() => ({ env: {} as Record<string, string | undefined> }));
+vi.mock('$env/dynamic/private', () => mockEnv);
+
 import { POST } from './+server';
 
 const ORG = { id: 'org-1', domain: 'example.test', name: 'Example', json: {} };
@@ -43,6 +47,7 @@ function makeEvent() {
 describe('webauthn/authenticate/options endpoint', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		mockEnv.env = {};
 		mockBuildAuthOptions.mockResolvedValue({ challenge: 'chal-123', allowCredentials: [] });
 		mockSessionCreate.mockImplementation(async ({ data }) => ({
 			id: 'sess-1',
@@ -76,5 +81,21 @@ describe('webauthn/authenticate/options endpoint', () => {
 		// The options JSON is returned for startAuthentication.
 		expect(payload.challenge).toBe('chal-123');
 		expect(payload.allowCredentials).toEqual([]);
+	});
+
+	it('refuses with 403 on the superadmin org host and creates no session', async () => {
+		mockEnv.env = { SUPERADMIN_ORG_ID: 'org-1' };
+		const { event, cookieSet } = makeEvent();
+		await expect(POST(event)).rejects.toMatchObject({ status: 403 });
+		expect(mockBuildAuthOptions).not.toHaveBeenCalled();
+		expect(mockSessionCreate).not.toHaveBeenCalled();
+		expect(cookieSet).not.toHaveBeenCalled();
+	});
+
+	it('is unchanged when SUPERADMIN_ORG_ID names a different org', async () => {
+		mockEnv.env = { SUPERADMIN_ORG_ID: 'org-other' };
+		const { event } = makeEvent();
+		await POST(event);
+		expect(mockSessionCreate).toHaveBeenCalledTimes(1);
 	});
 });

@@ -370,14 +370,16 @@
 				<Button id="loginFormSubmit" buttonType="submit" text={m.early_next_seahorse_change()} />
 			</div>
 		</form>
-		<div class="mt-5">
-			<Button
-				id="passkeyLoginButton"
-				submodule="secondary"
-				disabled={passkeyPending}
-				text={m.proud_swift_eagle_signin()}
-				onclick={signInWithPasskey}
-			/>
-		</div>
+		{#if !data.superadminHost}
+			<div class="mt-5">
+				<Button
+					id="passkeyLoginButton"
+					submodule="secondary"
+					disabled={passkeyPending}
+					text={m.proud_swift_eagle_signin()}
+					onclick={signInWithPasskey}
+				/>
+			</div>
+		{/if}
 	{/if}
 </div>

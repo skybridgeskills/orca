@@ -53,7 +53,7 @@ vi.mock('$lib/email/sendEmail', () => ({ sendOrcaMail: vi.fn() }));
 vi.mock('$lib/email/template', () => ({ renderOrcaEmail: vi.fn() }));
 vi.mock('$env/static/private', () => ({ USE_SECURE_COOKIES: 'false' }));
 
-import { actions } from './+page.server';
+import { actions, load } from './+page.server';
 
 const ORG = { id: 'org-1', domain: 'example.test', name: 'Example' };
 
@@ -135,5 +135,21 @@ describe('login verify action: superadmin-org 2FA gate', () => {
 		expect(activated).toBeDefined();
 		expect(mockUserHasPasskey).not.toHaveBeenCalled();
 		expect(mockBuildAuthOptions).not.toHaveBeenCalled();
+	});
+});
+
+describe('login load: superadminHost', () => {
+	function loadEvent() {
+		return {
+			locals: { org: ORG, session: null },
+			url: new URL('https://example.test/login')
+		} as unknown as Parameters<typeof load>[0];
+	}
+
+	it.each([true, false])('returns superadminHost = isSuperadminOrg(org) (%s)', async (isSuper) => {
+		mockIsSuperadminOrg.mockReturnValue(isSuper);
+		const data = (await load(loadEvent())) as { superadminHost: boolean };
+		expect(mockIsSuperadminOrg).toHaveBeenCalledWith('org-1');
+		expect(data.superadminHost).toBe(isSuper);
 	});
 });

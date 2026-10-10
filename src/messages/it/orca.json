@@ -578,5 +578,6 @@
 	"plain_gray_hawk_state": "Stato",
 	"warm_calm_otter_bulk": "Assegna in blocco",
 	"keen_amber_lynx_updated": "Già invitato (aggiornato)",
-	"broad_steady_bear_breakdown": "{newCount} assegnati, {existingCount} aggiornati, {failedCount} non riusciti su {total}"
+	"broad_steady_bear_breakdown": "{newCount} assegnati, {existingCount} aggiornati, {failedCount} non riusciti su {total}",
+	"steady_amber_heron_insist": "Su questo sito, accedi prima con la tua email. Ti verrà poi chiesta la tua passkey."
 }

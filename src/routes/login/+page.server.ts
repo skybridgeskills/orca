@@ -43,7 +43,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	return {
 		inviteId,
 		inviteeEmail,
-		nextPath
+		nextPath,
+		// The superadmin org has no passkey-only login (passkey ADR §5).
+		superadminHost: isSuperadminOrg(locals.org.id)
 	};
 };
 

@@ -41,6 +41,10 @@ vi.mock('$lib/server/webauthn/rp', () => ({
 	})
 }));
 
+// The real isSuperadminOrg reads SUPERADMIN_ORG_ID from here; tests set it per case.
+const mockEnv = vi.hoisted(() => ({ env: {} as Record<string, string | undefined> }));
+vi.mock('$env/dynamic/private', () => mockEnv);
+
 import { POST } from './+server';
 
 const ORG = { id: 'org-1', domain: 'example.test', name: 'Example', json: {} };
@@ -63,6 +67,7 @@ function makeEvent(body: unknown, sessionId: string | undefined = 'sess-1') {
 describe('webauthn/authenticate/verify endpoint', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		mockEnv.env = {};
 		mockSessionFindFirst.mockResolvedValue({
 			id: 'sess-1',
 			passkeyChallenge: 'chal',
@@ -146,5 +151,21 @@ describe('webauthn/authenticate/verify endpoint', () => {
 		});
 		expect(mockUpdateCounter).not.toHaveBeenCalled();
 		expect(mockSessionUpdate).not.toHaveBeenCalled();
+	});
+
+	it('refuses with 403 on the superadmin org host before any DB work, never activating', async () => {
+		mockEnv.env = { SUPERADMIN_ORG_ID: 'org-1' };
+		await expect(POST(makeEvent({ response: { id: 'cred-abc' } }))).rejects.toMatchObject({
+			status: 403
+		});
+		expect(mockSessionFindFirst).not.toHaveBeenCalled();
+		expect(mockVerifyAuthentication).not.toHaveBeenCalled();
+		expect(mockSessionUpdate).not.toHaveBeenCalled();
+	});
+
+	it('is unchanged when SUPERADMIN_ORG_ID names a different org', async () => {
+		mockEnv.env = { SUPERADMIN_ORG_ID: 'org-other' };
+		const res = await POST(makeEvent({ response: { id: 'cred-abc' } }));
+		expect((await res.json()).ok).toBe(true);
 	});
 });

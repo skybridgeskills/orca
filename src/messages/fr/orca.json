@@ -578,5 +578,6 @@
 	"plain_gray_hawk_state": "Statut",
 	"warm_calm_otter_bulk": "Attribuer en masse",
 	"keen_amber_lynx_updated": "Déjà invité (mis à jour)",
-	"broad_steady_bear_breakdown": "{newCount} attribués, {existingCount} mis à jour, {failedCount} échoués sur {total}"
+	"broad_steady_bear_breakdown": "{newCount} attribués, {existingCount} mis à jour, {failedCount} échoués sur {total}",
+	"steady_amber_heron_insist": "Sur ce site, connectez-vous d'abord avec votre adresse e-mail. Votre clé d'accès vous sera ensuite demandée."
 }

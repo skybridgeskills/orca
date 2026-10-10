@@ -578,5 +578,6 @@
 	"plain_gray_hawk_state": "Status",
 	"warm_calm_otter_bulk": "Award in bulk",
 	"keen_amber_lynx_updated": "Already invited (updated)",
-	"broad_steady_bear_breakdown": "{newCount} awarded, {existingCount} updated, {failedCount} failed out of {total}"
+	"broad_steady_bear_breakdown": "{newCount} awarded, {existingCount} updated, {failedCount} failed out of {total}",
+	"steady_amber_heron_insist": "On this site, sign in with your email first. You'll then be asked for your passkey."
 }
