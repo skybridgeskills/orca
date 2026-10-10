@@ -1,13 +1,10 @@
-import type { Prisma, User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { redirect } from '@sveltejs/kit';
 
 import { isAdmin } from '$lib/permissions/isAdmin';
 import { COMMUNITY_VISIBLE } from '$lib/server/claimVisibility';
-import {
-	canViewMemberDirectory,
-	membershipAchievementId,
-	validMembershipClaimWhere
-} from '$lib/server/permissions';
+import { membershipAchievementId, validMembershipClaimWhere } from '$lib/server/permissions';
+import { userDirectoryWhere } from '$lib/server/userDirectory';
 import { calculatePageAndSize } from '$lib/utils/pagination';
 
 import { prisma } from '../../prisma/client';
@@ -25,22 +22,11 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	const gatingActive = membershipId !== null;
 	const viewerIsAdmin = isAdmin(viewer);
 
-	// When gated, a non-member (non-admin) viewer may not see the directory at all.
-	if (!(await canViewMemberDirectory({ user: viewer, org: locals.org }))) {
-		redirect(302, `/`);
-	}
-
-	// The list `where`, identical for findMany + count so the pagination header
-	// matches the visible rows. Org-scoped in every branch.
-	let where: Prisma.UserWhereInput = { organizationId: locals.org.id };
-	if (gatingActive && !viewerIsAdmin) {
-		// Member (non-admin) viewer: only visible members, plus self (never hide self).
-		where = {
-			organizationId: locals.org.id,
-			receivedAchievementClaims: { some: validMembershipClaimWhere(membershipId, locals.org.id) },
-			OR: [{ id: viewer.id }, { profileVisibility: { in: COMMUNITY_VISIBLE } }]
-		};
-	}
+	// The directory rules as a list `where` (shared with `GET /api/v1/users`), identical
+	// for findMany + count so the pagination header matches the visible rows. Null when
+	// gated and the viewer is a non-admin non-member: they may not see the directory.
+	const where = await userDirectoryWhere({ viewer, org: locals.org });
+	if (!where) redirect(302, `/`);
 
 	const users = await prisma.user.findMany({
 		where,

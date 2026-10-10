@@ -16,8 +16,10 @@ import {
 	parseRubricFromFormData
 } from '$lib/data/resultDescription';
 import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { getUploadUrl } from '$lib/server/media';
 import { canEditAchievements } from '$lib/server/permissions';
+import { getUserSummaries } from '$lib/server/userDirectory';
 
 import stripTags from '../../../../lib/utils/stripTags';
 import { prisma } from '../../../../prisma/client';
@@ -97,17 +99,19 @@ export const load = async ({ locals, params }) => {
 		}
 	});
 
-	const members = await prisma.user.findMany({
-		where: { organizationId: locals.org.id },
-		select: { id: true, givenName: true, familyName: true },
-		orderBy: [{ familyName: 'asc' }, { givenName: 'asc' }]
+	// Every saved steward who is still a user of the org, whatever the directory
+	// rules, so a save by a non-admin editor never drops one an admin chose.
+	const selectedStewards = await getUserSummaries({
+		orgId: locals.org.id,
+		ids: achievement.json?.stewards ?? [],
+		includeEmail: isAdmin(locals.session.user)
 	});
 
 	return {
 		organization: locals.org,
 		achievement: achievement,
 		categories: categories,
-		members
+		selectedStewards
 	};
 };
 

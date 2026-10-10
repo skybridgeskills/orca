@@ -52,9 +52,4 @@
 	{m.ok_direct_kite_gaze()}
 </p>
 
-<AchievementForm
-	achievementId={data.achievement.id}
-	initialData={formData}
-	{categories}
-	members={data.members}
-/>
+<AchievementForm achievementId={data.achievement.id} initialData={formData} {categories} />

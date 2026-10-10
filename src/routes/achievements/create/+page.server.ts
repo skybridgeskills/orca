@@ -89,16 +89,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	});
 
-	const members = await prisma.user.findMany({
-		where: { organizationId: locals.org.id },
-		select: { id: true, givenName: true, familyName: true },
-		orderBy: [{ familyName: 'asc' }, { givenName: 'asc' }]
-	});
-
 	return {
 		organization: locals.org,
-		categories: categories,
-		members
+		categories: categories
 	};
 };
 
