@@ -25,9 +25,9 @@ const GATED_ORG = {
 };
 const OPEN_ORG = { id: 'org-1', json: {} };
 
-function makeEvent(org: unknown, user: unknown) {
+function makeEvent(org: unknown, user: unknown, query = '') {
 	return {
-		url: new URL('https://x.test/members'),
+		url: new URL(`https://x.test/members${query}`),
 		locals: { org, session: user ? { user } : null }
 	} as unknown as Parameters<typeof load>[0];
 }
@@ -139,5 +139,65 @@ describe('members list load: membership + visibility gating', () => {
 			'm-hidden': false, // member but not visible and not self
 			'non-member': false // visible but not a member
 		});
+	});
+});
+
+describe('members list load: search (?q=)', () => {
+	type Group = { OR: Record<string, unknown>[] };
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mockUserFindMany.mockResolvedValue([]);
+		mockUserCount.mockResolvedValue(0);
+		mockClaimFindMany.mockResolvedValue([]);
+		mockClaimFindFirst.mockResolvedValue(null);
+	});
+
+	it('no q → directory where alone, paged as before; q is empty', async () => {
+		const result = (await load(makeEvent(OPEN_ORG, user('viewer'), '?page=2&pageSize=10'))) as {
+			q: string;
+		};
+		const args = mockUserFindMany.mock.calls[0][0];
+		expect(args.where).toEqual({ organizationId: 'org-1' });
+		expect(args).toMatchObject({ skip: 10, take: 10 });
+		expect(result.q).toBe('');
+	});
+
+	it('q (open org, non-admin) → directory AND names only; first 20, page ignored', async () => {
+		const result = (await load(makeEvent(OPEN_ORG, user('viewer'), '?q=jane&page=3'))) as {
+			q: string;
+		};
+		const args = mockUserFindMany.mock.calls[0][0];
+		expect(args.where.AND[0]).toEqual({ organizationId: 'org-1' });
+		expect(JSON.stringify(args.where.AND[1])).not.toContain('identifiers');
+		expect(args).toMatchObject({ skip: 0, take: 20 });
+		expect(mockUserCount.mock.calls[0][0].where).toEqual(args.where);
+		expect(result.q).toBe('jane');
+	});
+
+	it('admin + q → search matches emails in this org', async () => {
+		await load(makeEvent(OPEN_ORG, user('admin', { orgRole: 'GENERAL_ADMIN' }), '?q=jane@'));
+		const search = mockUserFindMany.mock.calls[0][0].where.AND[1] as { AND: Group[] };
+		expect(search.AND[0].OR[2]).toMatchObject({
+			identifiers: { some: { organizationId: 'org-1', type: 'EMAIL' } }
+		});
+	});
+
+	it('gated member + q → directory part keeps the visible-or-self filter', async () => {
+		mockClaimFindFirst.mockResolvedValue({ id: 'claim-1' });
+		await load(makeEvent(GATED_ORG, user('viewer'), '?q=jane'));
+		const directory = mockUserFindMany.mock.calls[0][0].where.AND[0];
+		expect(directory.OR).toEqual([
+			{ id: 'viewer' },
+			{ profileVisibility: { in: ['PUBLIC', 'COMMUNITY', 'ACHIEVEMENT'] } }
+		]);
+	});
+
+	it('gated non-member + q → redirected to /', async () => {
+		await expect(load(makeEvent(GATED_ORG, user('viewer'), '?q=jane'))).rejects.toMatchObject({
+			status: 302,
+			location: '/'
+		});
+		expect(mockUserFindMany).not.toHaveBeenCalled();
 	});
 });

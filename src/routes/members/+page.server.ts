@@ -1,11 +1,11 @@
-import type { User } from '@prisma/client';
+import type { Prisma, User } from '@prisma/client';
 import { redirect } from '@sveltejs/kit';
 
 import { isAdmin } from '$lib/permissions/isAdmin';
 import { COMMUNITY_VISIBLE } from '$lib/server/claimVisibility';
 import { membershipAchievementId, validMembershipClaimWhere } from '$lib/server/permissions';
-import { userDirectoryWhere } from '$lib/server/userDirectory';
-import { calculatePageAndSize } from '$lib/utils/pagination';
+import { userDirectoryWhere, userSearchWhere } from '$lib/server/userDirectory';
+import { calculatePageAndSize, MAX_PAGE_SIZE } from '$lib/utils/pagination';
 
 import { prisma } from '../../prisma/client';
 
@@ -25,13 +25,26 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	// The directory rules as a list `where` (shared with `GET /api/v1/users`), identical
 	// for findMany + count so the pagination header matches the visible rows. Null when
 	// gated and the viewer is a non-admin non-member: they may not see the directory.
-	const where = await userDirectoryWhere({ viewer, org: locals.org });
-	if (!where) redirect(302, `/`);
+	const directoryWhere = await userDirectoryWhere({ viewer, org: locals.org });
+	if (!directoryWhere) redirect(302, `/`);
+
+	// Search (`?q=`) narrows the same directory; emails are matched for admins only. While
+	// searching there is no pager: the first page of results only, plus the total count.
+	const q = (url.searchParams.get('q') ?? '').trim().slice(0, 100);
+	const searching = q.length > 0;
+	const where: Prisma.UserWhereInput = searching
+		? {
+				AND: [
+					directoryWhere,
+					userSearchWhere(q, { orgId: locals.org.id, includeEmail: viewerIsAdmin })
+				]
+			}
+		: directoryWhere;
 
 	const users = await prisma.user.findMany({
 		where,
-		skip: (page - 1) * pageSize,
-		take: pageSize,
+		skip: searching ? 0 : (page - 1) * pageSize,
+		take: searching ? MAX_PAGE_SIZE : pageSize,
 		orderBy: [
 			{
 				orgRole: 'asc'
@@ -74,6 +87,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
 	return {
 		members,
-		count
+		count,
+		q,
+		viewerIsAdmin
 	};
 };

@@ -596,5 +596,13 @@
 	"broad_calm_tern_narrow": "Visualizzati {shown} di {total}. Continua a digitare per restringere l'elenco.",
 	"shy_plain_badger_lack": "Membro senza nome",
 	"frail_tense_crow_falter": "Impossibile cercare i membri. Riprova.",
-	"lively_brief_hare_hunt": "Ricerca in corso…"
+	"lively_brief_hare_hunt": "Ricerca in corso…",
+	"neat_quiet_finch_look": "Cerca membri",
+	"pale_swift_gecko_probe": "Cerca per nome o email",
+	"calm_dry_newt_probe": "Cerca per nome",
+	"bold_fresh_kite_seek": "Cerca",
+	"lone_glad_ibis_match": "1 membro corrisponde a \"{q}\".",
+	"many_glad_ibis_match": "{count} membri corrispondono a \"{q}\".",
+	"brief_wide_heron_trim": "Visualizzati {shown} di {total} membri che corrispondono a \"{q}\". Affina la ricerca per vedere gli altri.",
+	"empty_still_ibis_miss": "Nessun membro corrisponde a \"{q}\"."
 }

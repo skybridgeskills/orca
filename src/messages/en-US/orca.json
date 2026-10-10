@@ -596,5 +596,13 @@
 	"broad_calm_tern_narrow": "Showing {shown} of {total}. Keep typing to narrow the list.",
 	"shy_plain_badger_lack": "Member without a name",
 	"frail_tense_crow_falter": "Couldn't search members. Try again.",
-	"lively_brief_hare_hunt": "Searching…"
+	"lively_brief_hare_hunt": "Searching…",
+	"neat_quiet_finch_look": "Search members",
+	"pale_swift_gecko_probe": "Search by name or email",
+	"calm_dry_newt_probe": "Search by name",
+	"bold_fresh_kite_seek": "Search",
+	"lone_glad_ibis_match": "1 member matches \"{q}\".",
+	"many_glad_ibis_match": "{count} members match \"{q}\".",
+	"brief_wide_heron_trim": "Showing {shown} of {total} members matching \"{q}\". Refine your search to see others.",
+	"empty_still_ibis_miss": "No members match \"{q}\"."
 }
