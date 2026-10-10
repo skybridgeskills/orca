@@ -40,6 +40,7 @@ export interface InviteArgs {
 	inviteeEmail: string;
 	json: Prisma.JsonObject | string;
 	session: App.SessionData | null;
+	emailIfNew?: boolean;
 }
 
 export const inviteToClaim = async ({
@@ -47,7 +48,8 @@ export const inviteToClaim = async ({
 	org,
 	inviteeEmail,
 	json,
-	session
+	session,
+	emailIfNew
 }: InviteArgs): Promise<{
 	status: 201;
 	type: 'success';
@@ -94,7 +96,7 @@ export const inviteToClaim = async ({
 					}
 				},
 				create: data,
-				update: {}
+				update: { json: data.json }
 			});
 
 		// This will always claim it's created, even if not. Attacker won't be able to tell that the account
@@ -191,6 +193,17 @@ export const inviteToClaim = async ({
 		}
 
 		// Ensure there is an endorsement for this claim, on behalf of this admin, if not self-awarding
+		let existingEndorsement: ClaimEndorsement | null = null;
+		if (!isSelfClaim && emailIfNew) {
+			existingEndorsement = await prisma.claimEndorsement.findFirst({
+				where: {
+					creatorId: session.user.id,
+					achievementId,
+					inviteeEmail
+				}
+			});
+		}
+
 		const endorsement = isSelfClaim
 			? { id: '', claim, createdAt: new Date() }
 			: await prisma.claimEndorsement.upsert({
@@ -202,39 +215,41 @@ export const inviteToClaim = async ({
 						}
 					},
 					create: { ...data, claim: { connect: { id: claim.id } } },
-					update: {} // We don't replace previous invite content, maybe we should though.
+					update: { json: data.json }
 				});
 
 		// Notify user of claim
-		const badgeUrl = `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/login?e=${encodeURIComponent(
-			data.inviteeEmail
-		)}&next=${encodeURIComponent('/claims/' + claim.id)}`;
-		const awardedText = m.gentle_brave_falcon_awardeddesc({
-			achievementName: achievement.name,
-			communityName: org.name,
-			badgeUrl
-		});
-		const emailResult = await sendOrcaMail({
-			from: org.email,
-			to: data.inviteeEmail,
-			subject: m.warm_tangy_deer_awarded(),
-			text: awardedText,
-			html: renderOrcaEmail({
-				org,
-				title: m.warm_tangy_deer_awarded(),
-				intro: awardedText.replace(badgeUrl, '').trim(),
-				cta: { label: m.bright_swift_eagle_login(), url: badgeUrl }
-			})
-		});
-		if (!emailResult.success) {
-			error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
+		if (!emailIfNew || !existingEndorsement) {
+			const badgeUrl = `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/login?e=${encodeURIComponent(
+				data.inviteeEmail
+			)}&next=${encodeURIComponent('/claims/' + claim.id)}`;
+			const awardedText = m.gentle_brave_falcon_awardeddesc({
+				achievementName: achievement.name,
+				communityName: org.name,
+				badgeUrl
+			});
+			const emailResult = await sendOrcaMail({
+				from: org.email,
+				to: data.inviteeEmail,
+				subject: m.warm_tangy_deer_awarded(),
+				text: awardedText,
+				html: renderOrcaEmail({
+					org,
+					title: m.warm_tangy_deer_awarded(),
+					intro: awardedText.replace(badgeUrl, '').trim(),
+					cta: { label: m.bright_swift_eagle_login(), url: badgeUrl }
+				})
+			});
+			if (!emailResult.success) {
+				error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
+			}
 		}
 
 		return {
 			status: 201,
 			type: 'success',
 			data: {
-				created: true,
+				created: emailIfNew && !isSelfClaim ? !existingEndorsement : true,
 				invited: false,
 				selfClaim: isSelfClaim,
 				endorsement,
@@ -243,6 +258,16 @@ export const inviteToClaim = async ({
 		};
 	} else {
 		// If there is not a member, create a claimEndorsement without a claim connected
+		const existingEndorsement = emailIfNew
+			? await prisma.claimEndorsement.findFirst({
+					where: {
+						creatorId: session.user.id,
+						achievementId,
+						inviteeEmail
+					}
+				})
+			: null;
+
 		const endorsement: ClaimEndorsement & { claim?: AchievementClaim; achievement?: Achievement } =
 			await prisma.claimEndorsement.upsert({
 				where: {
@@ -253,41 +278,41 @@ export const inviteToClaim = async ({
 					}
 				},
 				create: data,
-				update: {}
+				update: { json: data.json }
 			});
 
 		// If there isn't already a user, we'll invite them to join by email
-		const inviteLink = `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/achievements/${
-			endorsement.achievementId
-		}/claim?i=${endorsement.id}&e=${encodeURIComponent(data.inviteeEmail)}`;
-		const inviteText = m.grand_lucky_kite_climb({
-			achievementName: endorsement.achievement?.name ?? '',
-			orgName: org.name,
-			inviteLink
-		});
-		const emailResult = await sendOrcaMail({
-			from: org.email,
-			to: data.inviteeEmail,
-			subject: m.male_active_turtle_view({ orgName: org.name }),
-			text: inviteText,
-			html: renderOrcaEmail({
-				org,
-				title: m.male_active_turtle_view({ orgName: org.name }),
-				intro: inviteText.replace(inviteLink, '').trim(),
-				cta: { label: m.bold_swift_eagle_claim(), url: inviteLink }
-			})
-		});
-		if (!emailResult.success) {
-			error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
+		if (!emailIfNew || !existingEndorsement) {
+			const inviteLink = `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/achievements/${
+				endorsement.achievementId
+			}/claim?i=${endorsement.id}&e=${encodeURIComponent(data.inviteeEmail)}`;
+			const inviteText = m.grand_lucky_kite_climb({
+				achievementName: endorsement.achievement?.name ?? achievement.name,
+				orgName: org.name,
+				inviteLink
+			});
+			const emailResult = await sendOrcaMail({
+				from: org.email,
+				to: data.inviteeEmail,
+				subject: m.male_active_turtle_view({ orgName: org.name }),
+				text: inviteText,
+				html: renderOrcaEmail({
+					org,
+					title: m.male_active_turtle_view({ orgName: org.name }),
+					intro: inviteText.replace(inviteLink, '').trim(),
+					cta: { label: m.bold_swift_eagle_claim(), url: inviteLink }
+				})
+			});
+			if (!emailResult.success) {
+				error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
+			}
 		}
 
-		// TODO: we can't actually tell whether created. Consider adopting a createdAt, updatedAt approach,
-		// but for now detect based on whether JSON is the same in the result as it was in the request?
 		return {
 			type: 'success',
 			status: 201,
 			data: {
-				created: true,
+				created: emailIfNew ? !existingEndorsement : true,
 				invited: !identifier?.verifiedAt,
 				selfClaim: false,
 				endorsement,

@@ -54,6 +54,7 @@
 		"@types/node": "^24",
 		"@types/nodemailer": "^6.4.7",
 		"@types/nodemailer-mailgun-transport": "^1.4.3",
+		"@types/papaparse": "^5.5.2",
 		"@types/polka": "^0.5.4",
 		"@types/qrcode": "^1.5.5",
 		"@types/sanitize-html": "^2.8.0",
@@ -128,6 +129,7 @@
 		"marked": "^9.1.6",
 		"mime-types": "^2.1.35",
 		"nodemailer-mailgun-transport": "^2.1.5",
+		"papaparse": "^5.5.3",
 		"qrcode": "^1.5.3",
 		"ws": "^8.16.0"
 	},
