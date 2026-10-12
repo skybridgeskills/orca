@@ -1,19 +1,19 @@
-import * as m from '$lib/i18n/messages';
 import { error } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
+import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { apiResponse } from '$lib/utils/api';
 
 export const DELETE = async ({ params, locals }) => {
 	// Authentication check
 	if (!locals.session?.user) {
-		throw error(401, m.lower_home_cow_view());
+		error(401, m.lower_home_cow_view());
 	}
 
 	const { id: achievementId, inviteId } = params;
 	const userId = locals.session.user.id;
-	const isAdmin = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
-		locals.session.user.orgRole || 'none'
-	);
+	const viewerIsAdmin = isAdmin(locals.session.user);
 
 	// Find the invite to verify ownership
 	const invite = await prisma.claimEndorsement.findUnique({
@@ -26,12 +26,12 @@ export const DELETE = async ({ params, locals }) => {
 	});
 
 	if (!invite) {
-		throw error(404, m.lucky_alert_penguin_fry());
+		error(404, m.lucky_alert_penguin_fry());
 	}
 
 	// Authorization check - only creator or admin can delete
-	if (invite.creatorId !== userId && !isAdmin) {
-		throw error(403, m.red_teary_eagle_drip());
+	if (invite.creatorId !== userId && !viewerIsAdmin) {
+		error(403, m.red_teary_eagle_drip());
 	}
 
 	// Delete the invite

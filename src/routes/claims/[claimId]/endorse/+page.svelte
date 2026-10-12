@@ -1,22 +1,33 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import Alert from '$lib/components/Alert.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
-	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import type { PageData } from './$types';
 	import ActionHeading from '$lib/components/ActionHeading.svelte';
-	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
-	import { evidenceItem } from '$lib/utils/evidenceItem';
+	import Alert from '$lib/components/Alert.svelte';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
+	import { getRubricForReview } from '$lib/data/resultDescription';
+	import * as m from '$lib/i18n/messages';
+	import { evidenceItem } from '$lib/utils/evidenceItem';
+
+	import type { PageData } from './$types';
+
+	import { resolve } from '$app/paths';
 
 	export let data: PageData;
 	export let form;
 	let endorsementJson: {
 		narrative?: string;
 		id?: string;
+		results?: App.Result[];
 	} = JSON.parse(data.myEndorsements[0]?.json?.toString() || '{}');
+
+	// The rubric the reviewer rates against: the achievement's current criteria, or a
+	// default Pass/Fail when none is configured.
+	const rubric = getRubricForReview(data.claim.achievement.json);
+	const existingPick = (rdId: string): string | undefined =>
+		(endorsementJson.results ?? []).find((r) => r.resultDescription === rdId)?.value;
 	let endorsementNarrative = endorsementJson.narrative || '';
 	let endorsementUrl = endorsementJson.id || '';
 
@@ -29,10 +40,13 @@
 
 	const breadcrumbItems = [
 		{ text: m.each_fluffy_fox_view(), href: '/' },
-		{ text: data.achievement.name, href: `/achievements/${data.achievement.id}` },
+		{
+			text: data.achievement.name,
+			href: `/achievements/${data.achievement.id}`
+		},
 		{
 			text: `${data.claim.user.givenName} ${data.claim.user.familyName}`,
-			href: `../${data.claim.id}`
+			href: `/claims/${data.claim.id}`
 		},
 		{ text: m.warm_tangy_deer_endorseform() }
 	];
@@ -62,14 +76,18 @@
 				<p class="font-bold max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 					{m.fancy_flat_kite_relish()}:
 				</p>
-				<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
+				<div class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 					<MarkdownRender value={endorsementJson.narrative} />
-				</p>
+				</div>
 			{/if}
 			{#if endorsementJson?.id}
 				<p>
 					<span class="font-bold">{m.calm_steady_lynx_evidence()}:</span>
-					<a href={endorsementJson.id} class="text-blue-700 text-underline hover:no-underline">
+					<a
+						href={endorsementJson.id}
+						rel="external"
+						class="text-blue-700 text-underline hover:no-underline"
+					>
 						{endorsementJson.id}
 					</a>
 				</p>
@@ -77,7 +95,7 @@
 		</div>
 	{/if}
 
-	<a href="../{data.claim.id}"><Button text="Done" /></a>
+	<a href={resolve(`/claims/${data.claim.id}`)}><Button text="Done" /></a>
 {:else}
 	<!-- Submission form -->
 	<h1 class="text-2xl sm:text-3xl font-bold mb-4 dark:text-white">
@@ -96,7 +114,9 @@
 		<ActionHeading
 			text={`${data.claim.user.givenName} ${data.claim.user.familyName} claimed this badge`}
 		>
-			<span slot="actions">{data.claim.createdOn.toDateString()}</span>
+			{#snippet actions()}
+				<span>{data.claim.createdOn.toDateString()}</span>
+			{/snippet}
 		</ActionHeading>
 
 		<EvidenceItem item={evidenceItem(data.claim)} />
@@ -110,7 +130,8 @@
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>{m.patchy_crazy_marten_march()}</label
 			>
-			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative} />
+			<textarea id="narrative" name="narrative" class="hidden" bind:value={endorsementNarrative}
+			></textarea>
 			<MarkdownEditor inputName="narrative" bind:value={endorsementNarrative} />
 		</div>
 		<div class="mb-6">
@@ -129,9 +150,35 @@
 			/>
 		</div>
 
+		<div class="mb-6">
+			<h2 class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+				{m.pure_lush_wren_assess()}
+			</h2>
+			{#each rubric as rd (rd.id)}
+				<fieldset class="mb-4">
+					<legend class="text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">
+						{rd.name}
+					</legend>
+					<div class="flex flex-wrap gap-3">
+						{#each rd.allowedValue as value (value)}
+							<label class="inline-flex items-center gap-1 text-sm text-gray-900 dark:text-white">
+								<input
+									type="radio"
+									name={`result[${rd.id}]`}
+									{value}
+									checked={existingPick(rd.id) === value}
+								/>
+								{value}
+							</label>
+						{/each}
+					</div>
+				</fieldset>
+			{/each}
+		</div>
+
 		<div class="inline-flex items-center">
 			<Button buttonType="submit" text={m.bold_swift_eagle_submit()} />
-			<a href="../{data.claim.id}"
+			<a href={resolve(`/claims/${data.claim.id}`)}
 				><Button submodule="secondary" text={m.calm_steady_lynx_cancel()} /></a
 			>
 		</div>

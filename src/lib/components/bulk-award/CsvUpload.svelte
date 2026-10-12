@@ -1,17 +1,22 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { createEventDispatcher } from 'svelte';
 	import Papa from 'papaparse';
+
 	import Alert from '$lib/components/Alert.svelte';
+	import * as m from '$lib/i18n/messages';
+
 	import type { BulkAwardRow } from './bulkAwardTypes';
 
-	const dispatch = createEventDispatcher<{ parsed: BulkAwardRow[] }>();
+	interface Props {
+		onparsed?: (rows: BulkAwardRow[]) => void;
+	}
+
+	let { onparsed }: Props = $props();
 
 	const REQUIRED_COLUMNS = ['email', 'narrative', 'evidenceUrl'];
 	const MAX_ROWS = 500;
 
-	let error = '';
-	let fileInput: HTMLInputElement;
+	let error = $state('');
+	let fileInput: HTMLInputElement | undefined = $state();
 
 	function normalizeRow(row: Record<string, unknown>): BulkAwardRow {
 		const normalized: Record<string, string> = {};
@@ -56,7 +61,7 @@
 					return;
 				}
 
-				dispatch('parsed', rows);
+				onparsed?.(rows);
 			},
 			error() {
 				error = m.sunny_grand_lemur_race();
@@ -108,25 +113,25 @@
 		class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 dark:hover:border-blue-400"
 		role="button"
 		tabindex="0"
-		on:click={openFilePicker}
-		on:keydown={(event) => {
+		onclick={openFilePicker}
+		onkeydown={(event) => {
 			if (event.key === 'Enter' || event.key === ' ') openFilePicker();
 		}}
-		on:drop={handleDrop}
-		on:dragover={handleDragOver}
+		ondrop={handleDrop}
+		ondragover={handleDragOver}
 	>
 		<input
 			bind:this={fileInput}
 			type="file"
 			accept=".csv,text/csv"
 			class="hidden"
-			on:change={handleFileChange}
+			onchange={handleFileChange}
 		/>
 		<p class="text-sm text-gray-600 dark:text-gray-400">{m.bright_calm_falcon_upload()}</p>
 	</div>
 
 	<p class="text-sm">
-		<button type="button" class="text-blue-700 hover:underline" on:click={downloadExample}>
+		<button type="button" class="text-blue-700 hover:underline" onclick={downloadExample}>
 			{m.quick_soft_badger_example()}
 		</button>
 	</p>

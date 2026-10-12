@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData, PageData } from './$types';
-	import RadioOption from '$lib/components/forms/RadioOption.svelte';
-	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
+	import RadioOption from '$lib/components/forms/RadioOption.svelte';
+
+	import type { ActionData, PageData } from './$types';
+
+	import { enhance } from '$app/forms';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -60,7 +62,7 @@
 		<h2 class="text-lg font-medium text-gray-800 dark:text-white">Issuer</h2>
 		{#if data.missingActiveKey}
 			<div
-				class="border border-yellow-300 bg-yellow-50 text-yellow-900 dark:bg-yellow-900/30 dark:text-yellow-200 p-3 rounded text-sm mb-3"
+				class="border border-yellow-300 bg-yellow-50 text-yellow-900 dark:bg-yellow-900/30 dark:text-yellow-200 p-3 rounded-sm text-sm mb-3"
 				role="status"
 			>
 				Your previously selected signing key ({truncateId(data.missingActiveKey.id)}) is no longer

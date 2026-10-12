@@ -1,13 +1,20 @@
-import { sveltekit } from '@sveltejs/kit/vite';
-import { nodeLoaderPlugin } from '@vavite/node-loader/plugin';
-import basicSsl from '@vitejs/plugin-basic-ssl';
-import { defineConfig } from 'vite';
-import { paraglideVitePlugin } from '@inlang/paraglide-js';
-import * as dotenv from 'dotenv';
 import fs from 'fs';
+import { fileURLToPath } from 'node:url';
 import path from 'path';
 
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
+import { nodeLoaderPlugin } from '@vavite/node-loader/plugin';
+import basicSsl from '@vitejs/plugin-basic-ssl';
+import { playwright } from '@vitest/browser-playwright';
+import * as dotenv from 'dotenv';
+import { defineConfig } from 'vitest/config';
+
 dotenv.config();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Plugin to fix SvelteKit-generated tsconfig.json with deprecated TypeScript options
 const fixTsconfig = () => {
@@ -40,6 +47,7 @@ const fixTsconfigPlugin = () => ({
 
 export default defineConfig(({ mode }) => {
 	let plugins = [
+		tailwindcss(),
 		sveltekit(),
 		fixTsconfigPlugin(),
 		paraglideVitePlugin({
@@ -62,9 +70,47 @@ export default defineConfig(({ mode }) => {
 			devSourcemap: true
 		},
 		test: {
-			include: [
-				'**/tests/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-				'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
+			projects: [
+				// Existing node-based unit tests (run via `pnpm test:unit`). Keep the
+				// include globs and node environment exactly as before.
+				{
+					extends: true,
+					test: {
+						name: 'unit',
+						environment: 'node',
+						include: [
+							'**/tests/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+							'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
+						]
+					}
+				},
+				// Headless-browser Storybook story smoke tests (run via
+				// `pnpm test:storybook`). Modeled on skills-verifier/vite.config.ts.
+				{
+					extends: true,
+					plugins: [
+						// The plugin will run tests for the stories defined in your Storybook config
+						// See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+						storybookTest({
+							configDir: path.join(__dirname, '.storybook')
+						})
+					],
+					test: {
+						name: 'storybook',
+						testTimeout: 60000,
+						browser: {
+							enabled: true,
+							headless: true,
+							provider: playwright(),
+							instances: [
+								{
+									browser: 'chromium'
+								}
+							]
+						},
+						setupFiles: ['.storybook/vitest.setup.ts']
+					}
+				}
 			]
 		},
 		plugins,

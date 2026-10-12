@@ -1,16 +1,19 @@
-import * as m from '$lib/i18n/messages';
 import { error, redirect } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import type { RequestEvent } from './$types';
-import { prisma } from '../../../../prisma/client';
+
+import * as m from '$lib/i18n/messages';
 import { badgeClassFromAchievement } from '$lib/ob2/badgeClass';
+
+import { prisma } from '../../../../prisma/client';
+
+import type { RequestEvent } from './$types';
 
 export const GET = async ({ request, params, locals }: RequestEvent) => {
 	const accept = request.headers.get('Accept') ?? '';
 	const acceptPieces = accept.split(',');
 	const isHtml = acceptPieces.includes('text/html'); // TODO replace with a more glamorous priority check
 
-	if (isHtml) throw redirect(302, `/achievements/${params.achievementId}`);
+	if (isHtml) redirect(302, `/achievements/${params.achievementId}`);
 	else {
 		const achievement = await prisma.achievement.findUniqueOrThrow({
 			where: {
@@ -22,6 +25,6 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 		});
 		if (achievement?.organizationId === locals.org.id)
 			return json(badgeClassFromAchievement(achievement));
-		else throw error(404, m.fresh_bright_sparrow_notfound());
+		else error(404, m.fresh_bright_sparrow_notfound());
 	}
 };

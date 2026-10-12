@@ -1,18 +1,19 @@
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
+
 import { prisma } from '$lib/../prisma/client';
-import type { RequestEvent } from './$types';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { apiResponse } from '$lib/utils/api';
 import { calculatePageAndSize } from '$lib/utils/pagination';
 
+import type { RequestEvent } from './$types';
+
 export const GET = async ({ url, params, locals }: RequestEvent) => {
 	if (!locals.session?.user) {
-		throw error(401, 'Unauthorized');
+		error(401, 'Unauthorized');
 	}
 
 	const achievementId = params.id;
-	const isAdmin = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
-		locals.session?.user?.orgRole || 'none'
-	);
+	const viewerIsAdmin = isAdmin(locals.session.user);
 	const { page, pageSize, includeCount } = calculatePageAndSize(url);
 
 	const invites = await prisma.claimEndorsement.findMany({
@@ -21,7 +22,7 @@ export const GET = async ({ url, params, locals }: RequestEvent) => {
 			organizationId: locals.org.id,
 			claimId: null,
 			// Admins may view all invites, other users may only view their own.
-			...(isAdmin ? {} : { creatorId: locals.session.user.id })
+			...(viewerIsAdmin ? {} : { creatorId: locals.session.user.id })
 		},
 		include: {
 			creator: true
@@ -43,7 +44,7 @@ export const GET = async ({ url, params, locals }: RequestEvent) => {
 						achievementId: achievementId,
 						organizationId: locals.org.id,
 						claimId: null,
-						...(isAdmin ? {} : { creatorId: locals.session?.user?.id })
+						...(viewerIsAdmin ? {} : { creatorId: locals.session?.user?.id })
 					}
 				});
 			},

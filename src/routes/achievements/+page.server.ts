@@ -1,15 +1,16 @@
-import { prisma } from '../../prisma/client';
-import type { PageServerLoad } from './$types';
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { canEditAchievements } from '$lib/server/permissions';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+import { prisma } from '../../prisma/client';
+
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ locals }) => {
 	// Check if user has permission to edit achievements
 	let editAchievementCapability = false;
 	let editCategoriesCapability = false;
 	if (locals.session?.user?.id) {
-		editCategoriesCapability = ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(
-			locals.session.user.orgRole || 'none'
-		);
+		editCategoriesCapability = isAdmin(locals.session.user);
 		editAchievementCapability = await canEditAchievements({
 			user: {
 				id: locals.session.user.id,
@@ -22,14 +23,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		});
 	}
 
-	const achievements = await prisma.achievement.findMany({
-		where: {
-			organizationId: locals.org.id
-		},
-		include: {
-			achievementConfig: true
-		}
-	});
 	const categories = await prisma.achievementCategory.findMany({
 		where: {
 			organizationId: locals.org.id
@@ -42,7 +35,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	return {
 		editAchievementCapability,
 		editCategoriesCapability,
-		achievements,
 		categories
 	};
 };

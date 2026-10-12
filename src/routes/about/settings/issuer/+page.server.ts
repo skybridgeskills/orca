@@ -1,15 +1,17 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
 import { ValidationError } from 'yup';
-import { prisma } from '../../../../prisma/client';
+
+import { isAdmin } from '$lib/permissions/isAdmin';
 import { encrypt } from '$lib/server/secrets/orgConfigCrypto';
+
+import { prisma } from '../../../../prisma/client';
+
+import type { Actions, PageServerLoad } from './$types';
 import { setIssuerSchema, setTransactionServiceSchema, removeApiKeySchema } from './schema';
 
-const ALLOWED_ROLES = ['GENERAL_ADMIN', 'CONTENT_ADMIN'];
-
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!ALLOWED_ROLES.includes(locals.session?.user?.orgRole ?? 'none')) {
-		throw redirect(302, '/about');
+	if (!isAdmin(locals.session?.user)) {
+		redirect(302, '/about');
 	}
 
 	const jsonData = readOrgJson(locals.org);
@@ -199,7 +201,7 @@ function readOrgJson(org: App.Organization): App.OrganizationConfig {
 }
 
 function assertAdmin(locals: App.Locals) {
-	if (!ALLOWED_ROLES.includes(locals.session?.user?.orgRole ?? 'none')) {
-		throw error(403, 'Forbidden');
+	if (!isAdmin(locals.session?.user)) {
+		error(403, 'Forbidden');
 	}
 }

@@ -14,7 +14,30 @@ declare namespace App {
 		orgRole: string?;
 		identifiers: import('@prisma/client').Identifier[];
 		defaultVisibility: import('@prisma/client').Visibility;
+		profileVisibility: import('@prisma/client').Visibility;
+		json: import('@prisma/client').Prisma.JsonValue;
 	}
+
+	// User `json` blob. Notification prefs default to email-on when unset (P6 toggle).
+	type UserConfig = import('@prisma/client').Prisma.JsonObject & {
+		notifications?: {
+			email?: boolean; // default true when unset
+		};
+	};
+
+	// A WebAuthn passkey credential, stored on a PASSKEY-type `Identifier.json`
+	// (`identifier` = the credentialId). `publicKey` is base64url(Uint8Array). The
+	// signature `counter` is updated on every assertion (clone detection). See
+	// ADR 2026-06-13-passkey-webauthn-auth.
+	type PasskeyCredential = import('@prisma/client').Prisma.JsonObject & {
+		publicKey: string; // base64url
+		counter: number;
+		transports?: string[];
+		deviceType?: string;
+		backedUp?: boolean;
+		label: string;
+		lastUsedAt?: string; // ISO
+	};
 
 	interface SessionData {
 		id: string;
@@ -42,6 +65,9 @@ declare namespace App {
 		orgStatus?: OrgStatus;
 		permissions?: {
 			editAchievementCapability?: {
+				requiresAchievement: string | null;
+			};
+			membershipAchievement?: {
 				requiresAchievement: string | null;
 			};
 		};
@@ -86,21 +112,57 @@ declare namespace App {
 	interface EvidenceItem {
 		id?: string;
 		narrative?: string;
+		results?: Result[]; // per-RD review picks recorded on a ClaimEndorsement
 	}
 
-	type AchievementConfigJson = import('@prisma/client').Prisma.JsonObject & {
-		capabilities: {
+	// OB3 ResultDescription (spec B.1.17) — a rubric criterion. Stored on
+	// `Achievement.json.resultDescriptions`; the current rubric only (re-minted id on
+	// content change). See ADR 2026-06-09-achievement-rubrics-results.
+	interface ResultDescription {
+		id: string; // 'urn:uuid:…' (stable; re-minted on content change)
+		type: ['ResultDescription'];
+		name: string;
+		resultType: string; // default 'Result'
+		allowedValue: string[]; // ordered low→high
+		requiredValue?: string; // optional pass threshold (recorded, not enforced)
+	}
+
+	// OB3 Result (spec B.1.16) — a reviewer's chosen value for one RD, self-describing
+	// (snapshots `name`) so a stale/retired RD still renders.
+	interface Result {
+		type: ['Result'];
+		resultDescription: string; // RD id this result is for (may be the default sentinel)
+		value: string; // chosen allowedValue
+		name: string; // RD label snapshotted at review time
+	}
+
+	// The achievement `json` blob, carrying the config fields that were flattened
+	// out of the former `AchievementConfig` satellite (plus pre-existing `alignment`).
+	// `json.reviewsRequired` is the source of truth for reviews required (it has no
+	// column). See ADR 2026-06-09-achievement-config-merge.
+	type AchievementJson = import('@prisma/client').Prisma.JsonObject & {
+		capabilities?: {
 			inviteRequires: string | null;
 		};
-		claimTemplate: string;
-	};
-	type AchievementConfig = import('@prisma/client').AchievementConfig & {
-		json: AchievementConfigJson;
+		claimTemplate?: string;
+		reviewsRequired?: number;
+		alignment?: unknown[];
+		stewards?: string[]; // user IDs; validated on write, member-filtered on read
+		resultDescriptions?: ResultDescription[]; // current rubric only (rubrics plan)
 	};
 
-	interface ConfigWithRelations extends AchievementConfig {
-		claimRequires?: Achievement | null;
-		reviewRequires?: Achievement | null;
+	type AchievementWithJson = import('@prisma/client').Achievement & {
+		json: AchievementJson;
+	};
+
+	// Replaces ConfigWithRelations: an achievement with its config-derived relations.
+	interface AchievementWithRelations extends AchievementWithJson {
+		claimRequires?: import('@prisma/client').Achievement | null;
+		reviewRequires?: import('@prisma/client').Achievement | null;
+		category?: import('@prisma/client').AchievementCategory | null;
+		// P5 moderation: present on list rows for admins (the API flags suspended
+		// achievements; non-admins never receive suspended rows).
+		suspended?: boolean;
 	}
 
 	// Design System
@@ -119,6 +181,7 @@ declare namespace App {
 		type: string[];
 		proof?: {
 			type: string;
+			cryptosuite?: string; // present for DataIntegrityProof (e.g. 'eddsa-rdfc-2022')
 			created: string;
 			proofPurpose: string;
 			proofValue: string;
@@ -158,15 +221,26 @@ declare namespace App {
 	}
 }
 
-declare global {
-	interface Window {
-		credentialHandlerPolyfill: {
-			loadOnce: () => Promise<void>;
-		};
-		WebCredential: {
-			new (type: string, data: any): Credential;
-		};
-	}
+// app.d.ts is an ambient (non-module) declaration file, so the Window
+// augmentation is declared at top level rather than inside `declare global`
+// (which only takes effect inside modules). This makes the CHAPI globals
+// visible to .svelte/.ts consumers under whole-app type-checking.
+interface Window {
+	credentialHandlerPolyfill: {
+		loadOnce: () => Promise<void>;
+	};
+	WebCredential: {
+		new (type: string, data: unknown): Credential;
+	};
+}
+
+declare module '$app/paths' {
+	/**
+	 * Fallback for resolve() when the argument is a string variable or TS
+	 * cannot distribute ResolveArgs over the large generated RouteId union.
+	 * String literals still prefer the generic overload (full route safety).
+	 */
+	export function resolve(pathname: string): string;
 }
 
 /**

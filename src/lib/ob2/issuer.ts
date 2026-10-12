@@ -1,7 +1,9 @@
 import type { Organization } from '@prisma/client';
+
 import { OrganizationDID } from '$lib/credentials/did';
 import { OB2_CONTEXT_URL, OB_VERSION_DESCRIPTORS, type OB_VERSION } from '$lib/ob2/constants';
 import { OB3_NAMESPACE } from '$lib/ob3/constants';
+
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 import {} from './constants';
 

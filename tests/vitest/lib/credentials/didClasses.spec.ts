@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest';
+import { expect, test } from 'vitest';
 
 import {
 	CredentialSubjectDID,
@@ -7,6 +7,7 @@ import {
 	OrganizationDID,
 	KeyDID
 } from '$lib/credentials/did';
+
 import { testSigningKey, testOrganization, testUser } from '../../testObjects';
 
 const orgWithPort = {

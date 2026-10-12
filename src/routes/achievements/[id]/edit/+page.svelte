@@ -1,19 +1,20 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
-	import AchievementForm from '$lib/partials/AchievementForm.svelte';
-	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import { imageExtension } from '$lib/utils/imageUrl';
 	import type { Achievement } from '@prisma/client';
+
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
+	import * as m from '$lib/i18n/messages';
+	import AchievementForm from '$lib/partials/AchievementForm.svelte';
+	import { imageExtension } from '$lib/utils/imageUrl';
+
+	import type { PageProps } from './$types';
 
 	const alignmentsFromJson = (json: Achievement['json']) => alignmentRowsFromAchievementJson(json);
 
-	// export let form: ActionData;
-	export let data: PageData;
-	const categories = data.categories;
+	let { data }: PageProps = $props();
+	const categories = $derived(data.categories);
 
-	let formData = {
+	const formData = $derived({
 		name: data.achievement.name,
 		description: data.achievement.description,
 		criteriaId: data.achievement.criteriaId,
@@ -22,21 +23,25 @@
 		imageExtension: data.achievement.image ? imageExtension(data.achievement.image) : null,
 		category: data.achievement.categoryId || 'uncategorized',
 
-		claimable: data.achievement.achievementConfig?.claimable || false,
-		claimRequires: data.achievement.achievementConfig?.claimRequiresId,
-		reviewsRequired: data.achievement.achievementConfig?.reviewsRequired || 0,
-		reviewRequires: data.achievement.achievementConfig?.reviewRequiresId,
-		capabilities_inviteRequires:
-			data.achievement.achievementConfig?.json?.capabilities?.inviteRequires || '',
-		claimTemplate: data.achievement.achievementConfig?.json?.claimTemplate || '',
+		claimable: data.achievement.claimable || false,
+		claimRequires: data.achievement.claimRequiresId,
+		reviewsRequired: data.achievement.json?.reviewsRequired || 0,
+		reviewRequires: data.achievement.reviewRequiresId,
+		capabilities_inviteRequires: data.achievement.json?.capabilities?.inviteRequires || '',
+		claimTemplate: data.achievement.json?.claimTemplate || '',
+		resultDescriptions: (data.achievement.json?.resultDescriptions ?? []).map((rd) => ({
+			id: rd.id,
+			name: rd.name,
+			allowedValue: rd.allowedValue
+		})),
 		alignments: alignmentsFromJson(data.achievement.json)
-	};
+	});
 
-	let breadcrumbItems = [
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name }
-	];
+	]);
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
@@ -46,4 +51,9 @@
 	{m.ok_direct_kite_gaze()}
 </p>
 
-<AchievementForm achievementId={data.achievement.id} initialData={formData} {categories} />
+<AchievementForm
+	achievementId={data.achievement.id}
+	initialData={formData}
+	{categories}
+	selectedStewards={data.selectedStewards}
+/>

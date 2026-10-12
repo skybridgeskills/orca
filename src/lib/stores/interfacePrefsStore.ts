@@ -1,12 +1,12 @@
 import { writable, get } from 'svelte/store';
-import { browser } from '$app/environment';
+
 import { updateCookie } from '$lib/utils/themeUtils';
+
+import { browser } from '$app/environment';
 
 const getInitialDarkModePref = (initialValue: string): string => {
 	const userBrowserPrefersDark =
 		browser && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-	const userBrowserPrefersLight =
-		browser && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
 
 	const previouslyStoredSetting = browser
 		? window.localStorage.getItem('preferredTheme') || initialValue
@@ -33,7 +33,7 @@ const preferredThemeStore = () => {
 			window.localStorage.setItem('preferredTheme', newValue);
 
 			updateCookie(newValue);
-			update((n) => newValue);
+			update(() => newValue);
 		},
 
 		initialize: (initialValue: string) => {

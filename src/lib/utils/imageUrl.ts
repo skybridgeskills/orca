@@ -1,5 +1,6 @@
-import { PUBLIC_HTTP_PROTOCOL, PUBLIC_MEDIA_DOMAIN } from '$env/static/public';
 import type { Achievement, Organization } from '@prisma/client';
+
+import { PUBLIC_HTTP_PROTOCOL, PUBLIC_MEDIA_DOMAIN } from '$env/static/public';
 
 /**
  * This function takes an achievement with its organization data and returns a url to our server that
@@ -19,10 +20,13 @@ export function staticImageUrlForAchievement(
 /**
  * Only use this within the app and not for providing urls to external services that requrie a full url.
  *
- * @param src: string - the image path or data URI
+ * Absolute URLs (`http://`, `https://`) and data URIs are returned as-is; only
+ * relative media paths get the `PUBLIC_MEDIA_DOMAIN` prefix.
+ *
+ * @param src: string - the image path, absolute URL, or data URI
  */
 export function imageUrl(src: string): string {
-	return !src || src.startsWith('data:')
+	return !src || src.startsWith('data:') || /^https?:\/\//i.test(src)
 		? src
 		: `${PUBLIC_MEDIA_DOMAIN}/${src.replace(/^\/+/, '')}`;
 }

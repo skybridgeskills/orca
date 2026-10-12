@@ -1,20 +1,25 @@
-import * as m from '$lib/i18n/messages';
+import { Prisma } from '@prisma/client';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
 import * as dotenv from 'dotenv';
-import { ValidationError } from 'yup';
-import { achievementFormSchema } from '$lib/data/achievementForm';
-import { prisma } from '$lib/../prisma/client';
-import { Prisma } from '@prisma/client';
-import type { PageServerLoad } from './$types';
-//import { getUploadUrl } from '$lib/server/media';
-import stripTags from '$lib/utils/stripTags';
 import { v4 as uuidv4 } from 'uuid';
-import { connect } from 'http2';
-import { getUploadUrl } from '$lib/server/media';
+import { ValidationError } from 'yup';
+
+import { prisma } from '$lib/../prisma/client';
 import { getAchievement } from '$lib/data/achievement';
-import { canEditAchievements } from '$lib/server/permissions';
+import {
+	achievementFormSchema,
+	resolveSelfRequirement,
+	SELF_REQUIREMENT
+} from '$lib/data/achievementForm';
 import type { Alignment } from '$lib/data/alignment';
+import { diffAndApplyRubric, parseRubricFromFormData } from '$lib/data/resultDescription';
+import * as m from '$lib/i18n/messages';
+import { getUploadUrl } from '$lib/server/media';
+import { canEditAchievements } from '$lib/server/permissions';
+import stripTags from '$lib/utils/stripTags';
+
+import type { PageServerLoad } from './$types';
 
 dotenv.config();
 
@@ -57,7 +62,7 @@ function parseAlignmentsFromFormData(formData: FormData): Alignment[] {
 export const load: PageServerLoad = async ({ locals }) => {
 	// redirect user if logged out or doesn't have permission to create achievements
 	if (!locals.session?.user?.id) {
-		throw redirect(302, '/achievements');
+		redirect(302, '/achievements');
 	}
 
 	const hasPermission = await canEditAchievements({
@@ -72,7 +77,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	});
 
 	if (!hasPermission) {
-		throw redirect(302, '/achievements');
+		redirect(302, '/achievements');
 	}
 
 	const categories = await prisma.achievementCategory.findMany({
@@ -91,9 +96,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, cookies, request }) => {
+	default: async ({ locals, request }) => {
 		if (!locals.session?.user?.id) {
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 		}
 
 		const hasPermission = await canEditAchievements({
@@ -108,7 +113,7 @@ export const actions: Actions = {
 		});
 
 		if (!hasPermission) {
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 		}
 
 		const newIdentifier = uuidv4();
@@ -138,22 +143,25 @@ export const actions: Actions = {
 			capabilities_inviteRequires:
 				requestData.get('capabilities_inviteRequires')?.toString() || null,
 			claimTemplate: claimTemplate_enabled ? rawClaimTemplate : '',
+			// OB3 achievementType: strip/trim, empty -> undefined (cleared column).
+			achievementType:
+				stripTags(requestData.get('achievementType')?.toString())?.trim() || undefined,
 			alignments: rawAlignments
 		};
 
 		try {
 			await achievementFormSchema.validate(formData);
 		} catch (err) {
-			if (err instanceof ValidationError) throw error(400, err.message);
+			if (err instanceof ValidationError) error(400, err.message);
 		}
 
-		if (formData.capabilities_inviteRequires) {
+		if (
+			formData.capabilities_inviteRequires &&
+			formData.capabilities_inviteRequires !== SELF_REQUIREMENT
+		) {
 			try {
-				const relatedInviteRequiresAchievement = await getAchievement(
-					formData.capabilities_inviteRequires,
-					locals.org.id
-				);
-			} catch (e) {
+				await getAchievement(formData.capabilities_inviteRequires, locals.org.id);
+			} catch {
 				return fail(400, {
 					code: 'inviteRequires',
 					message: m.swift_steady_falcon_notfound()
@@ -161,62 +169,95 @@ export const actions: Actions = {
 			}
 		}
 
+		// "Reviewed by an admin requires only one review, no matter what."
+		const reviewsRequired =
+			formData.reviewableSelectedOption == 'admin' ? 1 : formData.reviewsRequired;
+
+		// Stewards (additive overlay): persisted only when review is required, and
+		// filtered to current org members (non-member IDs from a tampered request are
+		// dropped). Does not affect reviewsRequired / reviewRequires.
+		const requestedStewards = [
+			...new Set(requestData.getAll('stewards').map(String).filter(Boolean))
+		];
+		const stewardMembers = requestedStewards.length
+			? await prisma.user.findMany({
+					where: { organizationId: locals.org.id, id: { in: requestedStewards } },
+					select: { id: true }
+				})
+			: [];
+		const stewards =
+			formData.reviewableSelectedOption !== 'none' && stewardMembers.length
+				? stewardMembers.map((u) => u.id)
+				: undefined;
+
+		// Rubric: parse the submitted result descriptions and mint ids (no existing
+		// rubric on create).
+		const submittedRubric = parseRubricFromFormData(requestData).map((rd) => ({
+			...rd,
+			name: stripTags(rd.name),
+			allowedValue: rd.allowedValue.map((v) => stripTags(v))
+		}));
+		const resultDescriptions = diffAndApplyRubric(submittedRubric, []);
+
 		const achievementData = {
 			id: newIdentifier,
 			identifier: `urn:uuid:${newIdentifier}`,
 			name: formData.name,
-			organization: { connect: { id: locals.org.id } },
+			// Scalar FKs (unchecked input) so the "This badge" review requirement can be a
+			// self-reference at create time — the row does not exist yet, so a nested
+			// `connect` is impossible, but a self-referencing FK is valid within a single-row
+			// INSERT. `resolveSelfRequirement` maps the 'self' sentinel to the new id.
+			organizationId: locals.org.id,
 			description: formData.description,
 			criteriaId: formData.criteriaId,
 			criteriaNarrative: formData.criteriaNarrative,
+			achievementType: formData.achievementType ?? null,
 			image: imageKey,
-			json: (formData.alignments.length > 0
-				? { alignment: formData.alignments }
-				: {}) as unknown as Prisma.InputJsonObject,
-			category:
-				formData.category != 'uncategorized' ? { connect: { id: formData.category } } : undefined,
-			achievementConfig: {
-				create: {
-					organization: { connect: { id: locals.org.id } },
-					claimable: formData.claimable == 'on',
-					claimRequires:
-						formData.claimable == 'on' && formData.claimRequires
-							? { connect: { id: formData.claimRequires } }
-							: undefined,
-					reviewRequires: formData.reviewRequires
-						? { connect: { id: formData.reviewRequires } }
-						: undefined,
-					reviewsRequired: formData.reviewsRequired,
-					json: {
-						capabilities: {
-							inviteRequires: formData.capabilities_inviteRequires
-						},
-						claimTemplate: formData.claimTemplate
-					}
-				}
-			}
+			claimable: formData.claimable == 'on',
+			claimRequiresId:
+				formData.claimable == 'on' && formData.claimRequires ? formData.claimRequires : undefined,
+			reviewRequiresId: resolveSelfRequirement(formData.reviewRequires, newIdentifier) ?? undefined,
+			json: {
+				...(formData.alignments.length > 0 ? { alignment: formData.alignments } : {}),
+				capabilities: {
+					inviteRequires: resolveSelfRequirement(
+						formData.capabilities_inviteRequires,
+						newIdentifier
+					)
+				},
+				claimTemplate: formData.claimTemplate,
+				reviewsRequired,
+				...(stewards ? { stewards } : {}),
+				...(resultDescriptions.length ? { resultDescriptions } : {})
+			} as unknown as Prisma.InputJsonObject,
+			// Treat a missing/empty category (e.g. the add-skills picker omits it) the same
+			// as 'uncategorized' — an empty string here would be used as a (nonexistent)
+			// categoryId and violate the FK.
+			categoryId:
+				formData.category && formData.category != 'uncategorized' ? formData.category : undefined
 		};
 
-		// "Reviewed by an admin requires only one review, no matter what."
-		if (formData.reviewableSelectedOption == 'admin')
-			achievementData.achievementConfig.create['reviewsRequired'] = 1;
-
-		if (achievementData.achievementConfig.create?.json.capabilities.inviteRequires) {
+		if (
+			formData.capabilities_inviteRequires &&
+			formData.capabilities_inviteRequires !== SELF_REQUIREMENT
+		) {
 			const inviteRequiresAchievement = await prisma.achievement.findFirst({
 				where: {
 					organizationId: locals.org.id,
-					id: achievementData.achievementConfig.create.json.capabilities.inviteRequires
+					id: formData.capabilities_inviteRequires
 				}
 			});
 			if (!inviteRequiresAchievement) {
-				throw error(400, m.sharp_quiet_panther_invitereq());
+				error(400, m.sharp_quiet_panther_invitereq());
 			}
 		}
 
 		const achievement = await prisma.achievement.create({
 			data: achievementData,
 			include: {
-				achievementConfig: true
+				category: true,
+				claimRequires: true,
+				reviewRequires: true
 			}
 		});
 

@@ -1,5 +1,6 @@
 import type { AchievementCategory } from '@prisma/client';
 import { get, writable } from 'svelte/store';
+
 import { LoadingStatus } from './common';
 import { notifications, Notification } from './notificationStore';
 

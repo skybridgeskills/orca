@@ -26,7 +26,10 @@ Represents a user within an organization.
 - `organizationId`: Foreign key to Organization (required)
 - `givenName`, `familyName`: User's name
 - `orgRole`: Role within the org (`GENERAL_ADMIN`, `BILLING_ADMIN`, `CONTENT_ADMIN`)
-- `defaultVisibility`: Default visibility setting for user's data
+- `defaultVisibility`: Visibility copied into the user's new claims (default
+  `PUBLIC`; see [Claim visibility](#claim-visibility))
+- `json`: JSON field for user preferences, including
+  `notifications.email` (email notifications on/off; default on when unset)
 
 ### Achievement
 
@@ -39,9 +42,26 @@ A badge template that can be claimed or awarded.
 - `criteriaNarrative`: Text describing what qualifies for this achievement
 - `image`: Image URL for the badge
 - `achievementStatus`: `ACTIVE` or `ARCHIVED`
-- `json`: JSON field for additional metadata
+- `claimable`: Whether the achievement can be claimed
+- `claimRequiresId`: Optional self-relation FK to a prerequisite Achievement
+  (`claimRequires` / `claimRequiredBy`, relation `ClaimPrereq`)
+- `reviewRequiresId`: Optional self-relation FK to the Achievement a reviewer must
+  hold (`reviewRequires` / `reviewEnabledBy`, relation `ReviewBadge`)
+- `json`: JSON field for additional metadata, including `alignment`,
+  `reviewsRequired` (number of reviews needed, 0-5),
+  `capabilities.inviteRequires` (achievement that gates who may invite),
+  `claimTemplate`, `stewards` (array of user IDs who can approve a claim
+  directly — an additive overlay on any review rule; see ADR
+  `2026-06-09-steward-review-and-messaging`), and `resultDescriptions` (the current
+  review rubric — OB3 `ResultDescription`s; see ADR
+  `2026-06-09-achievement-rubrics-results`)
 
 **Unique constraint**: `(organizationId, identifier)` - ensures achievements are unique within an org.
+
+> Claim/review configuration was previously held in a separate 1:1
+> `AchievementConfig` satellite. It was flattened into `Achievement` (queryable
+> fields as columns; the rest in `json`); see ADR
+> `2026-06-09-achievement-config-merge`.
 
 ### AchievementClaim
 
@@ -54,7 +74,8 @@ A user's request to earn a badge for an achievement.
 - `claimStatus`: `ACCEPTED`, `REJECTED`, or `UNACCEPTED`
 - `json`: JSON field for claim narrative and evidence
 - `validFrom`, `validUntil`: Optional validity period
-- `visibility`: Who can see this claim
+- `visibility`: Who can see this claim (default `PUBLIC`; see
+  [Claim visibility](#claim-visibility))
 
 **Unique constraint**: `(userId, achievementId)` - a user can only have one claim per achievement.
 
@@ -85,18 +106,21 @@ An invitation sent to an email to claim a specific achievement. Also used for cl
 
 **Unique constraint**: `(creatorId, achievementId, inviteeEmail)` - prevents duplicate invites.
 
-### AchievementConfig
+### Message
 
-Configuration for how an achievement can be claimed and reviewed.
+A log of user-directed messages (e.g. steward review notifications). A row is written
+only on a successful send; used for notification throttling and 30-day retention. See
+ADR `2026-06-09-steward-review-and-messaging`.
 
 - `id`: UUID primary key
 - `organizationId`: Foreign key to Organization (required)
-- `achievementId`: Foreign key to Achievement (one-to-one)
-- `claimable`: Whether the achievement can be claimed
-- `claimRequiresId`: Optional foreign key to Achievement (prerequisite)
-- `reviewRequiresId`: Optional foreign key to Achievement (required for reviewers)
-- `reviewsRequired`: Number of reviews needed (0-5)
-- `json`: JSON field for additional config (claim template, etc.)
+- `userId`: Foreign key to User (the recipient)
+- `type`: `MessageType` enum (`REVIEW_NEEDED`)
+- `achievementId`, `claimId`: Optional loose references (no FK) for context + throttling
+- `createdAt`: Timestamp (used for the 3-day throttle window and 30-day GC)
+
+**Indexes**: `(userId, type, achievementId, createdAt)` for throttle queries;
+`(organizationId, createdAt)` for GC.
 
 ### Profile
 
@@ -121,6 +145,37 @@ User session for authentication.
 - `valid`: Whether the session is valid
 - `expiresAt`: Expiration timestamp
 - `inviteId`: Optional foreign key to ClaimEndorsement (for invite-based sessions)
+
+## Claim visibility
+
+Each `AchievementClaim` has a `visibility`. The rule lives in
+`src/lib/server/claimVisibility.ts` (see ADR
+`2026-06-09-claim-visibility-authorization`), and every claim read surface uses it.
+
+| Viewer                                                                                        | Sees                                                   |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| The claim's owner                                                                             | All of their own claims, including `PRIVATE`           |
+| An org admin                                                                                  | Every claim in the org                                 |
+| A member (an admin, a holder of the membership badge, or any signed-in user when none is set) | `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`                |
+| A signed-in non-member (membership badge set)                                                 | `PUBLIC` and their own                                 |
+| An org app (`client_credentials` token)                                                       | `PUBLIC`, `COMMUNITY` and `ACHIEVEMENT`, like a member |
+| Anyone else (signed out, OB2 assertion links, share pages)                                    | `PUBLIC` only; anything else is a 404                  |
+
+`ACHIEVEMENT` is treated as `COMMUNITY` until it gets a policy of its own.
+
+**New claims snapshot the claimant's `User.defaultVisibility`,** both on a
+self-claim and when an admin or inviter awards the badge to an existing member.
+Changing the default later doesn't change existing claims. New users default to
+`PUBLIC`, and so does the column itself.
+
+**At the release that started enforcing visibility, existing claims and user
+defaults were moved from `COMMUNITY` to `PUBLIC`**
+(migration `backfill_claim_visibility_public`). Before then, visibility was stored
+but never enforced, and every row carried the old column default `COMMUNITY`.
+Without the backfill, enforcement would have 404'd every issued OB2 assertion and
+share link to outsiders. Rows explicitly set to `PRIVATE` or `ACHIEVEMENT` were
+left alone. Privacy is opt-in: members choose it in their settings (the default for new
+badges) or per badge on the claim page.
 
 ## IDs
 

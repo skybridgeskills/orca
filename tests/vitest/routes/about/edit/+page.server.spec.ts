@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { actions } from '../../../../../src/routes/about/edit/+page.server';
+
 import { prisma } from '../../../../../src/prisma/client';
+import { actions } from '../../../../../src/routes/about/edit/+page.server';
 import { testOrganization } from '../../../testObjects';
 
 vi.mock('../../../../../src/prisma/client', () => ({

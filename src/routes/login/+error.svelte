@@ -1,4 +1,5 @@
 <script>
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 </script>
 
@@ -6,7 +7,8 @@
 <p class="my-4 text-sm text-gray-500 dark:text-gray-400">{$page?.error?.message}</p>
 
 <p class="my-4 text-sm text-gray-500 dark:text-gray-400">
-	Return to <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href="/login"
-		>log in</a
+	Return to <a
+		class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+		href={resolve('/login')}>log in</a
 	> again.
 </p>

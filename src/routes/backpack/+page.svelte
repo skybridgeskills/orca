@@ -1,25 +1,28 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { page } from '$app/stores';
-	import Icon from 'svelte-icons-pack/Icon.svelte';
-	import FaShareSquare from 'svelte-icons-pack/fa/FaShareSquare.js';
-	import FaSolidInfoCircle from 'svelte-icons-pack/fa/FaSolidInfoCircle.js';
+	import type { Achievement, AchievementClaim } from '@prisma/client';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime.js';
-	import Alert from '$lib/components/Alert.svelte';
+	import { onMount } from 'svelte';
+	import { Icon } from 'svelte-icons-pack';
+	import { FaShareFromSquare as FaShareSquare } from 'svelte-icons-pack/fa';
+	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
+
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import type { PageData } from './$types';
 	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 	import Heading from '$lib/components/Heading.svelte';
-	import Backpack from '$lib/illustrations/Backpack.svelte';
-	import RightArrow from '$lib/illustrations/RightArrow.svelte';
-	import type { Achievement, AchievementClaim } from '@prisma/client';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
-	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 	import Pagination from '$lib/components/Pagination.svelte';
-	import { calculatePageAndSize } from '$lib/utils/pagination';
+	import * as m from '$lib/i18n/messages';
+	import Backpack from '$lib/illustrations/Backpack.svelte';
+	import { getSession } from '$lib/session/context';
+	import {
+		achievementsLoading,
+		fetchAchievements,
+		getAchievementById
+	} from '$lib/stores/achievementStore';
 	import {
 		backpackClaims,
 		backpackClaimsLoading,
@@ -28,17 +31,19 @@
 		fetchOutstandingInvites
 	} from '$lib/stores/backpackStore';
 	import { LoadingStatus, ensureLoaded } from '$lib/stores/common';
-	import { onMount } from 'svelte';
-	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
-	import {
-		achievementsLoading,
-		fetchAchievements,
-		getAchievementById
-	} from '$lib/stores/achievementStore';
+	import { calculatePageAndSize } from '$lib/utils/pagination';
+	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
+
+	import type { PageData } from './$types';
+
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
+	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	dayjs.extend(relativeTime);
 	export let data: PageData;
-	let { page: currentPageNum, pageSize } = calculatePageAndSize($page.url);
+	const session = getSession();
+	let { page: currentPageNum, pageSize } = calculatePageAndSize(page.url);
 	$: currentPageData = $backpackClaims.slice(
 		(currentPageNum - 1) * pageSize,
 		currentPageNum * pageSize
@@ -73,7 +78,7 @@
 	};
 
 	onMount(() => {
-		ensureLoaded(backpackClaimsLoading, fetchBackpackClaims);
+		ensureLoaded(backpackClaimsLoading, () => fetchBackpackClaims(!!$session?.user));
 		ensureLoaded(outstandingInvitesLoading, fetchOutstandingInvites);
 		ensureLoaded(achievementsLoading, fetchAchievements);
 	});
@@ -86,14 +91,16 @@
 {#if [LoadingStatus.NotStarted, LoadingStatus.Loading].includes($backpackClaimsLoading)}
 	<LoadingSpinner />
 {/if}
-{#each data.outstandingInvites as invite}
+{#each data.outstandingInvites as invite (invite.id)}
 	<div class="my-2">
 		<Alert>
 			{m.kind_dry_panther_bask()}
 			<a
-				href={`/achievements/${invite.achievementId}/claim?i=${invite.id}&e=${encodeURIComponent(
-					invite.inviteeEmail
-				)}`}
+				href={resolve(
+					`/achievements/${invite.achievementId}/claim?i=${invite.id}&e=${encodeURIComponent(
+						invite.inviteeEmail
+					)}`
+				)}
 				class="font-bold underline hover:no-underline"
 				>{invite.achievement.name}
 			</a>
@@ -120,58 +127,65 @@
 					{claim}
 					{achievement}
 					isClickable={true}
-					href={`/claims/${claim.id}`}
+					href={resolve(`/claims/${claim.id}`)}
 					linkAchievement={false}
 				>
-					<div slot="moredescription">
+					{#snippet moredescription()}
 						<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
 							{m.equal_active_parrot_march()}
 							{dayjs(claim.createdOn).fromNow()}
 						</p>
-					</div>
-					<div slot="actions">
+					{/snippet}
+					{#snippet actions()}
 						{#if claim.claimStatus === 'ACCEPTED' && claim.validFrom}
 							<div class="p-2 flex flex-row space-x-3">
 								<a
 									class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
 									tabindex="0"
-									href={`/claims/${claim.id}`}
+									href={resolve(`/claims/${claim.id}`)}
 								>
 									<span class="sr-only">View details</span>
 									<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
 								</a>
-								<button
-									class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
-									tabindex="0"
-									on:click={(e) => {
-										handleShare({ ...claim, achievement });
-										e.preventDefault();
-										e.stopPropagation();
-									}}
-									on:keypress={(e) => {
-										handleShare({ ...claim, achievement });
-										e.preventDefault();
-										e.stopPropagation();
-									}}
-								>
-									<span class="sr-only">{m.happy_sparse_lemur_clasp()}</span>
-									<Icon src={FaShareSquare} size="20" color="currentColor" />
-								</button>
+								<!-- Share uses the public /ob2/a link, which only serves PUBLIC claims. -->
+								{#if claim.visibility === 'PUBLIC'}
+									<button
+										class="icon text-gray-600 hover:text-blue-600 w-4 h-4 cursor-pointer"
+										tabindex="0"
+										on:click={(e) => {
+											handleShare({ ...claim, achievement });
+											e.preventDefault();
+											e.stopPropagation();
+										}}
+										on:keypress={(e) => {
+											handleShare({ ...claim, achievement });
+											e.preventDefault();
+											e.stopPropagation();
+										}}
+									>
+										<span class="sr-only">{m.happy_sparse_lemur_clasp()}</span>
+										<Icon src={FaShareSquare} size="20" color="currentColor" />
+									</button>
+								{/if}
 							</div>
 						{/if}
-					</div>
+					{/snippet}
 				</AchievementSummary>
 			</div>
 		{/if}
 	{:else}
 		<EmptyStateZone title="You haven't claimed any badges yet.">
-			<Backpack slot="image" />
-			<p slot="description">
-				{m.male_serious_pug_link()}
-				<br /><a href="/achievements" class="font-bold underline hover:no-underline"
-					>{m.arable_aqua_deer_scribe()}</a
-				>.
-			</p>
+			{#snippet image()}
+				<Backpack />
+			{/snippet}
+			{#snippet descriptionSnippet()}
+				<p>
+					{m.male_serious_pug_link()}
+					<br /><a href={resolve('/achievements')} class="font-bold underline hover:no-underline"
+						>{m.arable_aqua_deer_scribe()}</a
+					>.
+				</p>
+			{/snippet}
 		</EmptyStateZone>
 	{/each}
 {/if}
@@ -180,7 +194,7 @@
 	id="share-modal"
 	title="Share your {currentShareIntent?.achievement.name} badge"
 	visible={!!currentShareIntent}
-	on:close={() => {
+	onclose={() => {
 		currentShareIntent = null;
 	}}
 	actions={[]}
@@ -212,8 +226,8 @@
 				achievement: { ...currentShareIntent.achievement, organization: data.org }
 			}).toString()}
 			target={`linkedin-${currentShareIntent.achievement.id}`}
-			rel="noopener noreferrer"
-			class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-none"
+			rel="external noopener noreferrer"
+			class="flex items-center focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus-visible:outline-hidden"
 			><img src="/linkedin-add-to-profile-button.png" alt="LinkedIn Add to Profile button" /></a
 		>{/if}
 </Modal>

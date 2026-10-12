@@ -1,20 +1,24 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
-	import type { ActionData, PageData } from './$types';
-	import { formSchema } from './schema';
-	import type * as yup from 'yup';
-	import { deserialize } from '$app/forms';
-	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { imageExtension } from '$lib/utils/imageUrl';
+	import type * as yup from 'yup';
+
 	import AchievementSelect from '$lib/components/forms/AchievementSelect.svelte';
-	import RadioOption from '$lib/components/forms/RadioOption.svelte';
 	import FormFieldLabel from '$lib/components/forms/FormFieldLabel.svelte';
+	import RadioOption from '$lib/components/forms/RadioOption.svelte';
+	import ImageFileDrop from '$lib/components/ImageFileDrop.svelte';
+	import * as m from '$lib/i18n/messages';
+	import { locales } from '$lib/i18n/runtime';
 	import { achievementsLoading, fetchAchievements } from '$lib/stores/achievementStore';
 	import { ensureLoaded } from '$lib/stores/common';
-	import { locales } from '$lib/i18n/runtime';
+	import { imageExtension } from '$lib/utils/imageUrl';
+
+	import type { ActionData, PageData } from './$types';
+	import { formSchema } from './schema';
+
+	import { deserialize } from '$app/forms';
+	import { goto, invalidateAll } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 
 	export const form: ActionData | undefined = undefined;
 	export let data: PageData;
@@ -33,7 +37,12 @@
 			? 'achievement'
 			: 'admin',
 		editAchievementRequires:
-			data.org.json?.permissions?.editAchievementCapability?.requiresAchievement || null
+			data.org.json?.permissions?.editAchievementCapability?.requiresAchievement || null,
+		membershipAchievement: data.org.json?.permissions?.membershipAchievement?.requiresAchievement
+			? 'achievement'
+			: 'admin',
+		membershipAchievementRequires:
+			data.org.json?.permissions?.membershipAchievement?.requiresAchievement || null
 	};
 	const noErrors: { [key: string]: string | null } = {
 		name: null,
@@ -44,7 +53,9 @@
 		tagline: null,
 		defaultLanguage: null,
 		editAchievementCapability: null,
-		editAchievementRequires: null
+		editAchievementRequires: null,
+		membershipAchievement: null,
+		membershipAchievementRequires: null
 	};
 	let errors = { ...noErrors };
 
@@ -67,8 +78,8 @@
 
 	const handleSubmit = async (e: SubmitEvent) => {
 		try {
-			const validationResults = await formSchema.validate(formData);
-		} catch (err) {
+			await formSchema.validate(formData);
+		} catch {
 			validate();
 		}
 		const formsData = new FormData(e.target as HTMLFormElement);
@@ -80,7 +91,7 @@
 
 		if (formData['imageExtension']) formsData.append('imageExtension', formData.imageExtension);
 
-		const response = await fetch($page.url, { method: 'POST', body: formsData });
+		const response = await fetch(page.url, { method: 'POST', body: formsData });
 		const result = deserialize(await response.text());
 		switch (result.type) {
 			case 'failure':
@@ -98,10 +109,12 @@
 						}
 					});
 				}
-				window.location.replace(`/about`); // force page reload so header gets updated
+				// Refresh server data (org header, session) without a full reload, then navigate.
+				await invalidateAll();
+				await goto(resolve('/about'));
 				break;
 			case 'redirect':
-				goto(result.location);
+				goto(resolve(result.location));
 				break;
 			case 'error':
 				console.error(result.error);
@@ -152,7 +165,7 @@
 			class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 			placeholder={m.elegant_free_cow_cherish()}
 			bind:value={formData.description}
-		/>
+		></textarea>
 		{#if errors.description}<p class="mt-2 text-sm text-red-600 dark:text-red-500">
 				{errors.description}
 			</p>{/if}
@@ -207,7 +220,7 @@
 			on:blur={validate}
 		>
 			<option value="">{m.calm_swift_eagle_rest()}</option>
-			{#each locales as lang}
+			{#each locales as lang (lang)}
 				<option value={lang}>
 					{#if lang === 'en-US'}
 						{m.flat_known_oryx_view()}
@@ -301,12 +314,12 @@
 					<span class="inline">{m.due_fit_guppy_surge()}</span>
 					<AchievementSelect
 						badgeId={formData.editAchievementRequires || ''}
-						on:unselected={() => {
+						onunselected={() => {
 							formData.editAchievementCapability = 'admin';
 							formData.editAchievementRequires = null;
 						}}
-						on:selected={(e) => {
-							formData.editAchievementRequires = e.detail;
+						onselected={(id) => {
+							formData.editAchievementRequires = id;
 						}}
 						disabled={formData.editAchievementCapability != 'achievement'}
 						label={m.fuzzy_nimble_squirrel_approve()}
@@ -315,24 +328,26 @@
 						inputName="editAchievementRequires"
 						errorMessage={errors.editAchievementRequires || ''}
 					>
-						<span slot="invoker" class="inline" let:handler>
-							{#if !formData.editAchievementRequires}
-								<button
-									on:click|preventDefault={() => {
-										formData.editAchievementCapability = 'achievement';
-										handler();
-									}}
-									class={`font-medium${
-										formData.editAchievementCapability == 'achievement'
-											? ' underline hover:no-underline'
-											: 'text-gray-700 dark:text-gray-500 cursor-auto'
-									}`}
-									tabindex={formData.editAchievementCapability == 'achievement' ? 0 : -1}
-								>
-									{m.bright_swift_eagle_choose()}
-								</button>
-							{/if}
-						</span>
+						{#snippet invoker(handler)}
+							<span class="inline">
+								{#if !formData.editAchievementRequires}
+									<button
+										on:click|preventDefault={() => {
+											formData.editAchievementCapability = 'achievement';
+											handler();
+										}}
+										class={`font-medium${
+											formData.editAchievementCapability == 'achievement'
+												? ' underline hover:no-underline'
+												: 'text-gray-700 dark:text-gray-500 cursor-auto'
+										}`}
+										tabindex={formData.editAchievementCapability == 'achievement' ? 0 : -1}
+									>
+										{m.bright_swift_eagle_choose()}
+									</button>
+								{/if}
+							</span>
+						{/snippet}
 					</AchievementSelect>
 				</RadioOption>
 			</div>
@@ -344,35 +359,114 @@
 		</div>
 	</div>
 
+	<!-- Membership -->
+	<div class="mb-6">
+		<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+			{m.gentle_brisk_heron_gather()}
+		</h3>
+		<p class="text-sm mb-2 text-gray-900">
+			{m.keen_warm_lynx_settle()}
+		</p>
+		<div class:isError={errors.membershipAchievement}>
+			<FormFieldLabel for="membershipAchievement">{m.merry_calm_otter_belong()}</FormFieldLabel>
+			<input
+				type="hidden"
+				name="membershipAchievement"
+				bind:value={formData.membershipAchievement}
+			/>
+			<div class="space-y-2">
+				<RadioOption
+					bind:selectedOption={formData.membershipAchievement}
+					value="admin"
+					name="membershipAchievement"
+					label={m.open_wide_heron_welcome()}
+					id="orgEdit_membershipAchievement_admin"
+				/>
+				<RadioOption
+					bind:selectedOption={formData.membershipAchievement}
+					value="achievement"
+					name="membershipAchievement"
+					id="orgEdit_membershipAchievement_achievement"
+				>
+					<span class="inline">{m.due_fit_guppy_surge()}</span>
+					<AchievementSelect
+						badgeId={formData.membershipAchievementRequires || ''}
+						onunselected={() => {
+							formData.membershipAchievement = 'admin';
+							formData.membershipAchievementRequires = null;
+						}}
+						onselected={(id) => {
+							formData.membershipAchievementRequires = id;
+						}}
+						disabled={formData.membershipAchievement != 'achievement'}
+						label={m.fuzzy_nimble_squirrel_approve()}
+						description={m.keen_warm_lynx_settle()}
+						inputId="orgEdit_membershipAchievementRequires"
+						inputName="membershipAchievementRequires"
+						errorMessage={errors.membershipAchievementRequires || ''}
+					>
+						{#snippet invoker(handler)}
+							<span class="inline">
+								{#if !formData.membershipAchievementRequires}
+									<button
+										on:click|preventDefault={() => {
+											formData.membershipAchievement = 'achievement';
+											handler();
+										}}
+										class={`font-medium${
+											formData.membershipAchievement == 'achievement'
+												? ' underline hover:no-underline'
+												: 'text-gray-700 dark:text-gray-500 cursor-auto'
+										}`}
+										tabindex={formData.membershipAchievement == 'achievement' ? 0 : -1}
+									>
+										{m.bright_swift_eagle_choose()}
+									</button>
+								{/if}
+							</span>
+						{/snippet}
+					</AchievementSelect>
+				</RadioOption>
+			</div>
+			{#if errors.membershipAchievement}
+				<p class="mt-2 text-sm text-red-600 dark:text-red-500">
+					{errors.membershipAchievement}
+				</p>
+			{/if}
+		</div>
+	</div>
+
 	<div class="flex items-center lg:order-2">
 		<button
 			type="submit"
-			class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+			class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 			>{m.bold_swift_eagle_submit()}</button
 		>
 		<a
-			href="/about"
-			class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
+			href={resolve('/about')}
+			class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-hidden dark:focus:ring-gray-800"
 			>{m.calm_steady_lynx_cancel()}</a
 		>
 	</div>
 </form>
 
 <style lang="postcss">
+	@reference '../../../app.css';
+
 	.isError label {
 		@apply text-red-700;
 	}
-	.dark .isError label {
+	:global(.dark) .isError label {
 		@apply text-red-500;
 	}
 
 	.isError input {
-		@apply bg-red-50 border-red-500 text-red-900 placeholder-red-700;
+		@apply bg-red-50 border-red-500 text-red-900 placeholder:text-red-700;
 	}
 	.isError input:focus {
 		@apply border-red-500;
 	}
-	.dark .isError input {
+	:global(.dark) .isError input {
 		@apply bg-red-100 border-red-400;
 	}
 </style>

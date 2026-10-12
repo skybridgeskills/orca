@@ -1,18 +1,21 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import { MetaTags } from 'svelte-meta-tags';
-	import type { PageData } from './$types';
-	import { page } from '$app/stores';
-	import PublicClaimDetail from '$lib/partials/achievementClaim/PublicClaimDetail.svelte';
+
+	import * as m from '$lib/i18n/messages';
+	import ClaimDetail from '$lib/partials/achievementClaim/ClaimDetail.svelte';
 	import { staticImageUrlForAchievement } from '$lib/utils/imageUrl';
 
-	export let data: PageData;
-	const achievementWithOrgData = {
+	import type { PageProps } from './$types';
+
+	import { page } from '$app/stores';
+
+	let { data }: PageProps = $props();
+	const achievementWithOrgData = $derived({
 		...data.claim.achievement,
 		organization: data.org
-	};
+	});
 
-	const derivedImageUrl = staticImageUrlForAchievement(achievementWithOrgData);
+	const derivedImageUrl = $derived(staticImageUrlForAchievement(achievementWithOrgData));
 </script>
 
 <MetaTags
@@ -42,9 +45,15 @@
 	}}
 />
 
-<PublicClaimDetail
-	existingBadgeClaim={{
-		...data.claim,
-		achievement: achievementWithOrgData
+<!-- Public surface: reuse the shared ClaimDetail with viewer='public'. The
+	view-model yields an empty action set, so no owner affordances are exposed.
+	The public loader's achievement carries a loosely-typed `json`; the public view
+	never opens the claim form (owner-only), so we present it to ClaimDetail's typed
+	contract via a localized cast. -->
+<ClaimDetail
+	claim={data.claim}
+	achievement={achievementWithOrgData as unknown as App.AchievementWithRelations & {
+		organization: App.Organization;
 	}}
+	viewer="public"
 />

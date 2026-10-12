@@ -1,23 +1,34 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import DarkModeToggle from './DarkModeToggle.svelte';
-	import LanguageSelector from './LanguageSelector.svelte';
-	import PopupMenu from './PopupMenu.svelte';
-	import FaUserCircle from 'svelte-icons-pack/fa/FaUserCircle.js';
-	import IconButton from './IconButton.svelte';
-	import NavItem from './NavItem.svelte';
-	import { session } from '$lib/stores/sessionStore';
-	import { SvelteComponent, onDestroy, onMount } from 'svelte';
-	import { imageUrl } from '$lib/utils/imageUrl';
-	import { browser } from '$app/environment';
+	import { onDestroy, onMount } from 'svelte';
+	import { FaCircleUser as FaUserCircle } from 'svelte-icons-pack/fa';
 
-	export let org: App.SanitizedOrganization;
-	let mobileMenuExpanded = false;
+	import * as m from '$lib/i18n/messages';
+	import { getSession } from '$lib/session/context';
+	import { imageUrl } from '$lib/utils/imageUrl';
+
+	import DarkModeToggle from './DarkModeToggle.svelte';
+	import IconButton from './IconButton.svelte';
+	import LanguageSelector from './LanguageSelector.svelte';
+	import NavItem from './NavItem.svelte';
+	import PopupMenu from './PopupMenu.svelte';
+
+	import { browser } from '$app/environment';
+	import { resolve } from '$app/paths';
+
+	interface Props {
+		org: App.SanitizedOrganization;
+		showMembersNav?: boolean;
+	}
+
+	let { org, showMembersNav = true }: Props = $props();
+	const session = getSession();
+	let mobileMenuExpanded = $state(false);
+	let profileDropdownExpanded = $state(false);
+	let languageSelectorExpanded = $state(false);
 	const closeMobileMenu = () => {
 		mobileMenuExpanded = false;
 	};
 
-	let profileDropdownExpanded = false;
 	const toggleDropdownExpanded = (e: Event | KeyboardEvent) => {
 		e.stopPropagation();
 		e.preventDefault();
@@ -26,12 +37,11 @@
 		// If that's the case, we'll let this function handle it on the click event only.
 		if (!(e instanceof KeyboardEvent) || e.key != ' ')
 			profileDropdownExpanded = !profileDropdownExpanded;
-		if (profileDropdownMenu && profileDropdownMenu.handleOpen) profileDropdownMenu.handleOpen();
 	};
 	const closeDropdown = () => {
 		profileDropdownExpanded = false;
+		languageSelectorExpanded = false;
 	};
-	let profileDropdownMenu: SvelteComponent;
 	onMount(() => {
 		if (browser) document.addEventListener('click', closeDropdown);
 	});
@@ -40,16 +50,16 @@
 	});
 </script>
 
-<nav class="bg-white border-gray-200 rounded dark:bg-gray-800">
+<nav class="bg-white border-gray-200 rounded-sm dark:bg-gray-800">
 	{#if org.primaryColor}
-		<div class="w-full h-2" style="background-color: {org.primaryColor}" />
+		<div class="w-full h-2" style="background-color: {org.primaryColor}"></div>
 	{/if}
 	<div class="max-w-7xl mx-auto">
 		<div class="flex flex-wrap justify-between items-center mx-auto">
 			<div class="max-sm:container w-full md:w-auto max-md:mx-auto px-2 sm:px-4 py-2.5">
 				<div class="flex justify-between">
 					<a
-						href="/"
+						href={resolve('/')}
 						class="flex items-center md:items-start focus:ring-2 focus:ring-gray-200 rounded-lg dark:focus:ring-gray-600"
 					>
 						<img
@@ -64,10 +74,10 @@
 					</a>
 					<button
 						type="button"
-						class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+						class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
 						aria-controls="navbar-default"
 						aria-expanded={mobileMenuExpanded}
-						on:click={() => {
+						onclick={() => {
 							mobileMenuExpanded = !mobileMenuExpanded;
 						}}
 					>
@@ -89,10 +99,15 @@
 				</div>
 			</div>
 
-			<button
+			<!-- Mobile-menu container: closes the menu when its empty space is
+			     activated. Must not be a <button> — it wraps interactive nav
+			     controls (links, LanguageSelector/DarkModeToggle buttons), which
+			     is invalid HTML and breaks hydration under Svelte 5. -->
+			<div
 				class="w-full md:block md:w-auto px-2 sm:px-4 py-0 bg-gray-100 md:bg-transparent dark:bg-gray-900 md:dark:bg-transparent"
-				on:keypress={closeMobileMenu}
-				on:click={closeMobileMenu}
+				role="presentation"
+				onkeypress={closeMobileMenu}
+				onclick={closeMobileMenu}
 				id="navbar-default"
 			>
 				<ul
@@ -101,33 +116,44 @@
 					} container mx-auto flex flex-col p-4 mt-0 rounded-lg border border-gray-100 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 bg-white dark:bg-gray-800 md:dark:bg-gray-800 dark:border-gray-700`}
 				>
 					<NavItem href="/achievements" title={m.antsy_grand_rabbit_gaze()} />
-					<NavItem href="/about" title={m.mellow_elegant_parrot_ask()} on:click on:keypress />
+					<NavItem href="/about" title={m.mellow_elegant_parrot_ask()} onclick={closeMobileMenu} />
 					{#if !$session?.id}
 						<!-- No user is logged in, but they might try to log in -->
 						<li>
 							<a
-								href="/login"
-								class="block py-2 pr-4 pl-3 leading-8 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+								href={resolve('/login')}
+								class="block py-2 pr-4 pl-3 leading-8 text-gray-700 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
 								>{m.bright_swift_eagle_login()}</a
 							>
 						</li>
 						<li>
-							<DarkModeToggle on:click on:keypress />
+							<DarkModeToggle />
 						</li>
 						<li>
-							<LanguageSelector />
+							<LanguageSelector bind:open={languageSelectorExpanded} />
 						</li>
 					{:else}
 						<!-- For authenticated users -->
-						<NavItem href="/backpack" title={m.bold_petty_dog_march()} on:click on:keypress />
-						<NavItem href="/members" title={m.steady_plane_cuckoo_fry()} on:click on:keypress />
+						<NavItem href="/backpack" title={m.bold_petty_dog_march()} onclick={closeMobileMenu} />
+						{#if showMembersNav}
+							<NavItem
+								href="/members"
+								title={m.steady_plane_cuckoo_fry()}
+								onclick={closeMobileMenu}
+							/>
+						{/if}
+						<NavItem
+							href="/messages"
+							title={m.plain_calm_otter_inbox()}
+							onclick={closeMobileMenu}
+						/>
 						<li class="hidden md:block">
 							<IconButton
 								id="profile-menu-button"
 								src={FaUserCircle}
 								size="24"
-								on:click={toggleDropdownExpanded}
-								on:keypress={toggleDropdownExpanded}
+								onclick={toggleDropdownExpanded}
+								onkeypress={toggleDropdownExpanded}
 								text={m.dull_cuddly_jackdaw_intend()}
 							/>
 
@@ -135,8 +161,7 @@
 							<PopupMenu
 								menuId="profileDropdownNavbar"
 								buttonId="profile-menu-button"
-								hidden={!profileDropdownExpanded}
-								bind:this={profileDropdownMenu}
+								open={profileDropdownExpanded}
 							>
 								<ul
 									class="py-2 text-sm text-gray-700 dark:text-gray-400"
@@ -144,16 +169,23 @@
 								>
 									<li>
 										<a
-											href="/members/{$session?.user?.id}"
+											href={resolve(`/members/${$session?.user?.id}`)}
 											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 											>{m.dull_cuddly_jackdaw_intend()}</a
 										>
 									</li>
 									<li>
 										<a
-											href="/settings"
+											href={resolve('/settings')}
 											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 											>{m.piquant_weary_okapi_enchant()}</a
+										>
+									</li>
+									<li>
+										<a
+											href={resolve('/apps')}
+											class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+											>{m.breezy_amber_lynx_connect()}</a
 										>
 									</li>
 								</ul>
@@ -170,8 +202,8 @@
 								</div>
 								<li class="py-2">
 									<div class="flex flex-row mx-auto">
-										<DarkModeToggle on:click on:keypress />
-										<LanguageSelector />
+										<DarkModeToggle />
+										<LanguageSelector bind:open={languageSelectorExpanded} />
 									</div>
 								</li>
 							</PopupMenu>
@@ -182,11 +214,12 @@
 							class="md:hidden"
 						/>
 						<NavItem href="/settings" title={m.piquant_weary_okapi_enchant()} class="md:hidden" />
+						<NavItem href="/apps" title={m.breezy_amber_lynx_connect()} class="md:hidden" />
 						<li class="md:hidden">
-							<DarkModeToggle on:click on:keypress />
+							<DarkModeToggle />
 						</li>
 						<li class="md:hidden">
-							<LanguageSelector />
+							<LanguageSelector bind:open={languageSelectorExpanded} />
 						</li>
 						<li class="md:hidden">
 							<form
@@ -201,7 +234,7 @@
 						</li>
 					{/if}
 				</ul>
-			</button>
+			</div>
 		</div>
 	</div>
 </nav>

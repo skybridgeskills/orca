@@ -1,26 +1,29 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { goto } from '$app/navigation';
-	import type { PageData } from './$types';
+	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import EvidenceItem from '$lib/components/EvidenceItem.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import * as m from '$lib/i18n/messages';
 	import { notifications, Notification } from '$lib/stores/notificationStore';
 	import { evidenceItem } from '$lib/utils/evidenceItem';
 
-	export let data: PageData;
+	import type { PageData } from './$types';
 
-	let deleteModalVisible = false;
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
-	const breadcrumbItems = [
+	let { data }: { data: PageData } = $props();
+
+	let deleteModalVisible = $state(false);
+
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name, href: `/achievements/${data.achievement.id}` },
 		{ text: data.invite.inviteeEmail }
-	];
+	]);
 
 	const closeDeleteModal = () => {
 		deleteModalVisible = false;
@@ -43,7 +46,7 @@
 
 			notifications.add(new Notification(m.frail_kind_mule_enchant(), true, 'success'));
 			closeDeleteModal();
-			await goto(`/achievements/${data.achievement.id}`);
+			await goto(resolve(`/achievements/${data.achievement.id}`));
 		} catch {
 			notifications.add(new Notification(m.bad_ok_jackdaw_link(), false, 'error'));
 		}
@@ -71,7 +74,7 @@
 	<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 		<span class="font-bold">{m.sleek_true_oryx_spin()}:</span>
 		{#if data.invite.creator}
-			<a href="/members/{data.invite.creatorId}" class="text-blue-700 hover:underline">
+			<a href={resolve(`/members/${data.invite.creatorId}`)} class="text-blue-700 hover:underline">
 				{data.invite.creator.givenName ?? ''}
 				{data.invite.creator.familyName ?? ''}
 			</a>
@@ -95,7 +98,7 @@
 		<Button
 			submodule="danger"
 			text={m.wide_acidic_racoon_read()}
-			on:click={() => {
+			onclick={() => {
 				deleteModalVisible = true;
 			}}
 		/>
@@ -105,7 +108,7 @@
 <Modal
 	visible={deleteModalVisible}
 	title={m.calm_weird_robin_startle()}
-	on:close={closeDeleteModal}
+	onclose={closeDeleteModal}
 	actions={[
 		{
 			label: m.calm_steady_lynx_cancel(),

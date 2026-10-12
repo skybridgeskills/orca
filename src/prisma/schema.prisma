@@ -10,43 +10,56 @@ datasource db {
 }
 
 model Organization {
-  id                    String                  @id @default(uuid())
-  createdAt             DateTime                @default(now())
-  name                  String
-  description           String
-  email                 String
-  json                  Json                    @default("{}")
-  url                   String?
-  domain                String                  @unique @default(uuid())
-  logo                  String?
-  primaryColor          String?
-  achievements          Achievement[]
-  achievementCategories AchievementCategory[]
-  claims                AchievementClaim[]
-  achievementConfigs    AchievementConfig[]
-  credentials           AchievementCredential[]
-  claimInvitations      ClaimEndorsement[]
-  identifiers           Identifier[]
-  profiles              Profile[]
-  userSessions          Session[]
-  signingKeys           SigningKey[]
-  users                 User[]
+  id                      String                   @id @default(uuid())
+  createdAt               DateTime                 @default(now())
+  name                    String
+  description             String
+  email                   String
+  json                    Json                     @default("{}")
+  url                     String?
+  domain                  String                   @unique @default(uuid())
+  logo                    String?
+  primaryColor            String?
+  achievements            Achievement[]
+  achievementCategories   AchievementCategory[]
+  claims                  AchievementClaim[]
+  credentials             AchievementCredential[]
+  claimInvitations        ClaimEndorsement[]
+  identifiers             Identifier[]
+  profiles                Profile[]
+  userSessions            Session[]
+  signingKeys             SigningKey[]
+  users                   User[]
+  oauthClients            OAuthClient[]
+  oauthAuthorizationCodes OAuthAuthorizationCode[]
+  oauthAccessTokens       OAuthAccessToken[]
+  messages                Message[]
+  reports                 Report[]
+  moderationActions       ModerationAction[]
 }
 
 model User {
-  id                        String                  @id @default(uuid())
+  id                        String                   @id @default(uuid())
   givenName                 String?
   familyName                String?
   organizationId            String
   orgRole                   RoleType?
-  defaultVisibility         Visibility              @default(COMMUNITY)
-  createdAchievementClaims  AchievementClaim[]      @relation("CreatedAchievementClaims")
-  receivedAchievementClaims AchievementClaim[]      @relation("AchievementClaims")
+  defaultVisibility         Visibility               @default(PUBLIC)
+  profileVisibility         Visibility               @default(COMMUNITY)
+  json                      Json                     @default("{}")
+  messages                  Message[]
+  createdAchievementClaims  AchievementClaim[]       @relation("CreatedAchievementClaims")
+  receivedAchievementClaims AchievementClaim[]       @relation("AchievementClaims")
   createdCredentials        AchievementCredential[]
-  createdEndorsements       ClaimEndorsement[]      @relation("CreatedEndorsements")
+  createdEndorsements       ClaimEndorsement[]       @relation("CreatedEndorsements")
   identifiers               Identifier[]
   sessions                  Session[]
-  organization              Organization            @relation(fields: [organizationId], references: [id])
+  organization              Organization             @relation(fields: [organizationId], references: [id])
+  oauthAuthorizationCodes   OAuthAuthorizationCode[]
+  oauthAccessTokens         OAuthAccessToken[]
+  createdOAuthClients       OAuthClient[]            @relation("CreatedOAuthClients")
+  reportsFiled              Report[]                 @relation("ReportReporter")
+  moderationActions         ModerationAction[]       @relation("ModerationActor")
 }
 
 model Identifier {
@@ -57,10 +70,74 @@ model Identifier {
   organizationId String
   userId         String
   visibility     Visibility     @default(COMMUNITY)
+  json           Json           @default("{}")
   organization   Organization   @relation(fields: [organizationId], references: [id])
   user           User           @relation(fields: [userId], references: [id])
 
   @@unique([organizationId, identifier])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String
+  type           MessageType
+  achievementId  String?
+  claimId        String?
+  reportId       String?
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+  report         Report?      @relation(fields: [reportId], references: [id])
+
+  @@index([userId, type, achievementId, createdAt])
+  @@index([organizationId, createdAt])
+  @@index([reportId])
+}
+
+// A user-submitted report against a piece of content (achievement, claim, or
+// endorsement). Lives logically in the origin org (`originOrgId`). Reporter identity
+// (`reporterUserId`) is stored but MUST NOT be exposed to org admins — only to
+// superadmin-org viewers. `reporterStatus` is snapshotted at submit time.
+model Report {
+  id             String           @id @default(uuid())
+  originOrgId    String
+  targetType     ReportTargetType
+  targetId       String
+  reporterUserId String?
+  reporterStatus ReporterStatus
+  reason         String
+  description    String?
+  createdAt      DateTime         @default(now())
+  originOrg      Organization     @relation(fields: [originOrgId], references: [id])
+  reporter       User?            @relation("ReportReporter", fields: [reporterUserId], references: [id])
+  messages       Message[]
+
+  @@index([originOrgId, targetType, targetId])
+}
+
+// A moderation action (suspension) against a content target. `tier` distinguishes an
+// org-admin (ORG) action from a superadmin (SITE) action; a SITE suspension cannot be
+// lifted by an ORG-tier actor. An active suspension = an unlifted SUSPEND row. Doubles
+// as an audit log.
+model ModerationAction {
+  id             String               @id @default(uuid())
+  originOrgId    String
+  targetType     ReportTargetType
+  targetId       String
+  action         ModerationActionType @default(SUSPEND)
+  tier           ModerationTier
+  actorUserId    String
+  actorOrgId     String
+  reason         String?
+  createdAt      DateTime             @default(now())
+  liftedAt       DateTime?
+  liftedByUserId String?
+  liftedTier     ModerationTier?
+  originOrg      Organization         @relation(fields: [originOrgId], references: [id])
+  actor          User                 @relation("ModerationActor", fields: [actorUserId], references: [id])
+
+  @@index([originOrgId, targetType, targetId, liftedAt])
 }
 
 model Achievement {
@@ -77,32 +154,21 @@ model Achievement {
   image             String?
   achievementStatus AchievementStatus       @default(ACTIVE)
   categoryId        String?
+  claimable         Boolean                 @default(false)
+  claimRequiresId   String?
+  reviewRequiresId  String?
   category          AchievementCategory?    @relation(fields: [categoryId], references: [id])
   creator           Profile?                @relation(fields: [creatorProfileId], references: [id])
   organization      Organization            @relation(fields: [organizationId], references: [id])
   achievementClaims AchievementClaim[]
-  achievementConfig AchievementConfig?      @relation("AchievementConfig")
-  claimRequiredBy   AchievementConfig[]     @relation("EnablesClaimOf")
-  reviewEnabledBy   AchievementConfig[]     @relation("EnablesReviewOf")
+  claimRequires     Achievement?            @relation("ClaimPrereq", fields: [claimRequiresId], references: [id])
+  claimRequiredBy   Achievement[]           @relation("ClaimPrereq")
+  reviewRequires    Achievement?            @relation("ReviewBadge", fields: [reviewRequiresId], references: [id])
+  reviewEnabledBy   Achievement[]           @relation("ReviewBadge")
   credentials       AchievementCredential[]
   claimEndorsements ClaimEndorsement[]
 
   @@unique([organizationId, identifier])
-}
-
-model AchievementConfig {
-  id               String       @id @default(uuid())
-  organizationId   String
-  achievementId    String       @unique
-  claimable        Boolean      @default(false)
-  claimRequiresId  String?
-  json             Json         @default("{}")
-  reviewRequiresId String?
-  reviewsRequired  Int          @default(0)
-  achievement      Achievement  @relation("AchievementConfig", fields: [achievementId], references: [id])
-  claimRequires    Achievement? @relation("EnablesClaimOf", fields: [claimRequiresId], references: [id])
-  organization     Organization @relation(fields: [organizationId], references: [id])
-  reviewRequires   Achievement? @relation("EnablesReviewOf", fields: [reviewRequiresId], references: [id])
 }
 
 model AchievementCategory {
@@ -144,7 +210,7 @@ model AchievementClaim {
   creatorId      String?
   validFrom      DateTime?
   validUntil     DateTime?
-  visibility     Visibility             @default(COMMUNITY)
+  visibility     Visibility             @default(PUBLIC)
   achievement    Achievement            @relation(fields: [achievementId], references: [id])
   creator        User?                  @relation("CreatedAchievementClaims", fields: [creatorId], references: [id])
   credential     AchievementCredential? @relation(fields: [credentialId], references: [id])
@@ -193,17 +259,20 @@ model Profile {
 }
 
 model Session {
-  id             String            @id @default(uuid())
-  code           String
-  createdAt      DateTime          @default(now())
-  expiresAt      DateTime
-  userId         String?
-  organizationId String
-  valid          Boolean           @default(false)
-  inviteId       String?
-  invite         ClaimEndorsement? @relation(fields: [inviteId], references: [id])
-  organization   Organization      @relation(fields: [organizationId], references: [id])
-  user           User?             @relation(fields: [userId], references: [id])
+  id                        String            @id @default(uuid())
+  code                      String
+  createdAt                 DateTime          @default(now())
+  expiresAt                 DateTime
+  userId                    String?
+  organizationId            String
+  valid                     Boolean           @default(false)
+  inviteId                  String?
+  passkeyChallenge          String?
+  passkeyChallengeExpiresAt DateTime?
+  emailVerifiedAt           DateTime?
+  invite                    ClaimEndorsement? @relation(fields: [inviteId], references: [id])
+  organization              Organization      @relation(fields: [organizationId], references: [id])
+  user                      User?             @relation(fields: [userId], references: [id])
 }
 
 model SigningKey {
@@ -213,6 +282,80 @@ model SigningKey {
   privateKeyMultibase String
   organizationId      String
   organization        Organization @relation(fields: [organizationId], references: [id])
+}
+
+model OAuthClient {
+  id                      String                   @id @default(uuid())
+  organizationId          String
+  clientId                String                   @unique
+  clientSecretHash        String // scrypt string for secrets (see Phase 2); not sha256
+  clientType              OAuthClientType          @default(USER_DELEGATED)
+  clientName              String
+  clientUri               String
+  logoUri                 String
+  tosUri                  String
+  policyUri               String
+  softwareId              String?
+  softwareVersion         String?
+  contacts                String[]
+  redirectUris            String[] // empty for CONFIDENTIAL_SERVICE clients
+  scopes                  String[]
+  grantTypes              String[]
+  responseTypes           String[]
+  tokenEndpointAuthMethod String                   @default("client_secret_basic")
+  clientSecretExpiresAt   DateTime?
+  disabledAt              DateTime? // admin soft-disable; blocks token issuance, stays in the list
+  deletedAt               DateTime? // admin soft-delete; hidden from the list, history retained
+  createdByUserId         String? // the app's OWNER / accountable actor. Nullable at the DB
+  // level (USER_DELEGATED clients have none) but REQUIRED for
+  // CONFIDENTIAL_SERVICE clients (enforced in app code, Phase 2/7).
+  createdAt               DateTime                 @default(now())
+  organization            Organization             @relation(fields: [organizationId], references: [id])
+  createdByUser           User?                    @relation("CreatedOAuthClients", fields: [createdByUserId], references: [id])
+  authorizationCodes      OAuthAuthorizationCode[]
+  accessTokens            OAuthAccessToken[]
+
+  @@index([organizationId])
+}
+
+model OAuthAuthorizationCode {
+  id                  String       @id @default(uuid())
+  organizationId      String
+  clientId            String
+  userId              String
+  codeHash            String       @unique
+  redirectUri         String
+  scopes              String[]
+  codeChallenge       String
+  codeChallengeMethod String       @default("S256")
+  expiresAt           DateTime
+  consumedAt          DateTime?
+  createdAt           DateTime     @default(now())
+  client              OAuthClient  @relation(fields: [clientId], references: [id])
+  user                User         @relation(fields: [userId], references: [id])
+  organization        Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([userId])
+}
+
+model OAuthAccessToken {
+  id                    String       @id @default(uuid())
+  organizationId        String
+  clientId              String
+  userId                String? // null for CONFIDENTIAL_SERVICE (client_credentials) tokens
+  accessTokenHash       String       @unique
+  refreshTokenHash      String?      @unique
+  scopes                String[]
+  accessTokenExpiresAt  DateTime
+  refreshTokenExpiresAt DateTime?
+  revokedAt             DateTime?
+  lastUsedAt            DateTime?
+  createdAt             DateTime     @default(now())
+  client                OAuthClient  @relation(fields: [clientId], references: [id])
+  user                  User?        @relation(fields: [userId], references: [id])
+  organization          Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([userId, organizationId])
 }
 
 enum Visibility {
@@ -232,6 +375,7 @@ enum IdentifierType {
   EMAIL
   DID
   URL
+  PASSKEY
 }
 
 enum AchievementStatus {
@@ -243,4 +387,36 @@ enum ClaimStatus {
   ACCEPTED
   REJECTED
   UNACCEPTED
+}
+
+enum OAuthClientType {
+  USER_DELEGATED // DCR + authorization_code + PKCE; tokens owned by a User
+  CONFIDENTIAL_SERVICE // admin-registered; client_credentials grant; org-level; userless tokens
+}
+
+enum MessageType {
+  REVIEW_NEEDED
+  CONTENT_REPORTED
+}
+
+enum ReportTargetType {
+  ACHIEVEMENT
+  CLAIM
+  ENDORSEMENT
+}
+
+enum ReporterStatus {
+  ANONYMOUS
+  USER
+  MEMBER
+  ADMIN
+}
+
+enum ModerationTier {
+  ORG
+  SITE
+}
+
+enum ModerationActionType {
+  SUSPEND
 }

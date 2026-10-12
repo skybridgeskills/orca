@@ -18,7 +18,7 @@ export const calculatePageAndSize = (url: URL): PaginationData => {
 			MAX_PAGE_SIZE
 		);
 		includeCount = url.searchParams.get('includeCount') === 'true';
-	} catch (_) {
+	} catch {
 		page = 1;
 		pageSize = MAX_PAGE_SIZE;
 		includeCount = false;

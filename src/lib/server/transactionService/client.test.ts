@@ -4,9 +4,9 @@ import { encrypt } from '$lib/server/secrets/orgConfigCrypto';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 
 import { createExchange, TransactionServiceUpstreamError } from './client';
+import redactedFetch from './redactedFetch';
 
 vi.mock('./redactedFetch', () => ({ default: vi.fn() }));
-import redactedFetch from './redactedFetch';
 
 const mockFetch = vi.mocked(redactedFetch);
 

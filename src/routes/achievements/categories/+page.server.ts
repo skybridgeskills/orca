@@ -1,20 +1,22 @@
-import * as m from '$lib/i18n/messages';
-import { prisma } from '../../../prisma/client';
 import { redirect, error } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
-import stripTags from '../../../lib/utils/stripTags';
-import parseIntData from '../../../lib/utils/parseIntData';
 
-export const load: PageServerLoad = ({ params, locals }) => {
+import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
+
+import parseIntData from '../../../lib/utils/parseIntData';
+import stripTags from '../../../lib/utils/stripTags';
+import { prisma } from '../../../prisma/client';
+
+import type { PageServerLoad, Actions } from './$types';
+
+export const load: PageServerLoad = ({ locals }) => {
 	// Don't include edit controls if not an admin
-	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		throw redirect(302, `/achievements`);
+	if (!isAdmin(locals.session?.user)) redirect(302, `/achievements`);
 };
 
 export const actions: Actions = {
 	create: async ({ locals, request }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, 'Unauthorized');
+		if (!isAdmin(locals.session?.user)) error(403, 'Unauthorized');
 
 		const requestData = await request.formData();
 		const formData = {
@@ -38,9 +40,8 @@ export const actions: Actions = {
 		return { ...category, _count: { achievements: 0 } };
 	},
 
-	update: async ({ locals, cookies, request, params }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.lower_home_cow_view());
+	update: async ({ locals, request }) => {
+		if (!isAdmin(locals.session?.user)) error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const categoryId = stripTags(requestData.get('update_categoryId')?.toString()) || '';
@@ -48,7 +49,7 @@ export const actions: Actions = {
 		const categoryWeight = parseIntData(requestData.get('update_weight')?.toString() || '');
 
 		// Can only search by unique inputs on update, so verify first this category is in this org
-		const existingCategory = await prisma.achievementCategory.findFirstOrThrow({
+		await prisma.achievementCategory.findFirstOrThrow({
 			where: {
 				organizationId: locals.org.id,
 				id: categoryId
@@ -66,15 +67,14 @@ export const actions: Actions = {
 		return updatedCategory;
 	},
 
-	delete: async ({ locals, cookies, request, params }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.lower_home_cow_view());
+	delete: async ({ locals, request }) => {
+		if (!isAdmin(locals.session?.user)) error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const categoryId = stripTags(requestData.get('delete_categoryId')?.toString()) || '';
 
 		// Can only search by unique inputs on update, so verify first this category is in this org
-		const existingCategory = await prisma.achievementCategory.findFirstOrThrow({
+		await prisma.achievementCategory.findFirstOrThrow({
 			where: {
 				organizationId: locals.org.id,
 				id: categoryId

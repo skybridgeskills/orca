@@ -1,19 +1,23 @@
-import * as m from '$lib/i18n/messages';
 import { error, redirect } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import type { RequestEvent } from './$types';
-import { prisma } from '../../../../prisma/client';
+
+import * as m from '$lib/i18n/messages';
 import { badgeAssertionFromAchievementClaim } from '$lib/ob2/badgeAssertion';
+import { isSuspended } from '$lib/server/moderation/suspension';
+
+import { prisma } from '../../../../prisma/client';
+
+import type { RequestEvent } from './$types';
 
 export const GET = async ({ request, params, locals }: RequestEvent) => {
 	const accept = request.headers.get('Accept') ?? '';
 	const acceptPieces = accept.split(',');
 	const isHtml = acceptPieces.includes('text/html'); // TODO replace with a more glamorous priority check
 
-	if (isHtml && locals.session?.user?.id) throw redirect(302, `/claims/${params.claimId}`);
-	else if (isHtml) throw redirect(302, `/claims/${params.claimId}/public`);
+	if (isHtml && locals.session?.user?.id) redirect(302, `/claims/${params.claimId}`);
+	else if (isHtml) redirect(302, `/claims/${params.claimId}/public`);
 	else {
-		const claim = await prisma.achievementClaim.findUniqueOrThrow({
+		const claim = await prisma.achievementClaim.findUnique({
 			where: {
 				id: params.claimId
 			},
@@ -31,9 +35,27 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 			}
 		});
 		if (!claim?.validFrom || claim?.claimStatus !== 'ACCEPTED')
-			throw error(404, m.sharp_flat_kite_clasp());
+			error(404, m.sharp_flat_kite_clasp());
+		// Public JSON surface: only PUBLIC claims are served. 404 (not 403) avoids
+		// confirming a non-public claim exists.
+		else if (claim.visibility !== 'PUBLIC') error(404, m.sharp_flat_kite_clasp());
+		// P5 moderation: never emit a public OB2 assertion for suspended content (the
+		// claim itself or its underlying achievement).
+		else if (
+			(await isSuspended({
+				originOrgId: claim.organizationId,
+				targetType: 'CLAIM',
+				targetId: claim.id
+			})) ||
+			(await isSuspended({
+				originOrgId: claim.organizationId,
+				targetType: 'ACHIEVEMENT',
+				targetId: claim.achievementId
+			}))
+		)
+			error(404, m.sharp_flat_kite_clasp());
 		else if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
-		else throw error(404, m.fresh_bright_sparrow_notfound());
+		else error(404, m.fresh_bright_sparrow_notfound());
 	}
 };

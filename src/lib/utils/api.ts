@@ -1,6 +1,8 @@
-import { arrayOf } from '$lib/utils/arrayOf';
-import type { PaginationData } from './pagination';
 import { error, json } from '@sveltejs/kit';
+
+import { arrayOf } from '$lib/utils/arrayOf';
+
+import type { PaginationData } from './pagination';
 
 export type ApiAwardMeta = {
 	created: boolean;
@@ -99,5 +101,5 @@ const v1MetaWithRequestedCounts = async (
  */
 export const apiResponse: ApiFunction<Partial<{ id: string }>> = async ({ params, data, meta }) => {
 	if (params.version === 'v1') return json(await v1({ data, meta }));
-	throw error(500, 'Unsupported API version');
+	error(500, 'Unsupported API version');
 };

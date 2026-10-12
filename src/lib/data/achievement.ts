@@ -1,6 +1,3 @@
-import * as m from '$lib/i18n/messages';
-import { error } from '@sveltejs/kit';
-import { prisma } from '$lib/../prisma/client';
 import type {
 	Achievement,
 	AchievementClaim,
@@ -10,10 +7,17 @@ import type {
 	User
 } from '@prisma/client';
 import { Prisma } from '@prisma/client';
+import { error } from '@sveltejs/kit';
+
+import { prisma } from '$lib/../prisma/client';
 import { sendOrcaMail } from '$lib/email/sendEmail';
-import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
-import { validateEmailAddress } from '$lib/utils/email';
+import { renderOrcaEmail } from '$lib/email/template';
+import * as m from '$lib/i18n/messages';
 import { isAdmin } from '$lib/permissions/isAdmin';
+import { notifyStewardsForReview, stewardIdsFor } from '$lib/server/stewards';
+import { validateEmailAddress } from '$lib/utils/email';
+
+import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 export const getAchievement = async (achievementId: string, orgId: string) => {
 	const achievement = (await prisma.achievement.findFirstOrThrow({
@@ -23,17 +27,11 @@ export const getAchievement = async (achievementId: string, orgId: string) => {
 		},
 		include: {
 			category: true,
-			achievementConfig: {
-				include: { claimRequires: true, reviewRequires: true }
-			}
+			claimRequires: true,
+			reviewRequires: true
 		}
 	})) as unknown; // Force application of the type including JSON fields.
-	return achievement as Achievement & {
-		achievementConfig?: App.AchievementConfig & {
-			claimRequires?: Achievement;
-			reviewRequires?: Achievement;
-		};
-	};
+	return achievement as App.AchievementWithRelations;
 };
 
 export interface InviteArgs {
@@ -73,24 +71,19 @@ export const inviteToClaim = async ({
 	};
 
 	if (!inviteeEmail) {
-		throw error(400, {
+		error(400, {
 			code: 'recipientEmail',
 			message: m.sharp_ok_jackdaw_cook()
 		});
 	}
 	if (!validateEmailAddress(inviteeEmail)) {
-		throw error(400, m.sunny_grand_lemur_race());
+		error(400, m.sunny_grand_lemur_race());
 	}
 
 	const achievement = await getAchievement(achievementId, org.id);
-	const achievementConfig = achievement.achievementConfig;
 
 	// UNAUTHENTICATED USERS: can create an invite for open-claim achievements only.
-	if (
-		!session?.user?.id &&
-		achievement.achievementConfig?.claimable &&
-		!achievement?.achievementConfig?.claimRequiresId
-	) {
+	if (!session?.user?.id && achievement.claimable && !achievement.claimRequiresId) {
 		// achievement is claimable without any prerequisite. Unauthenticated
 		// user will create a self-endorsement (with null creator) and then use it as an invite-code.
 		const endorsement: ClaimEndorsement & { claim?: AchievementClaim } =
@@ -122,27 +115,27 @@ export const inviteToClaim = async ({
 		};
 	} else if (!session?.user?.id) {
 		// Not an open claim achievement, and not authenticated.
-		throw error(403, m.tiny_dark_ostrich_jump());
+		error(403, m.tiny_dark_ostrich_jump());
 	}
 
-	if (!isAdmin({ user: session?.user }) && !achievementConfig?.json?.capabilities?.inviteRequires) {
+	if (!isAdmin(session?.user) && !achievement.json?.capabilities?.inviteRequires) {
 		// NON ADMIN USERS for a badge that is only inviteable by admins
-		throw error(403, m.patchy_aqua_turtle_support());
+		error(403, m.patchy_aqua_turtle_support());
 	}
 
 	if (
-		!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none') &&
+		!isAdmin(session?.user) &&
 		session.user.id &&
-		achievementConfig?.json?.capabilities?.inviteRequires
+		achievement.json?.capabilities?.inviteRequires
 	) {
 		const inviteQualificationClaim = await prisma.achievementClaim.findFirst({
 			where: {
-				achievementId: achievementConfig?.json?.capabilities?.inviteRequires,
+				achievementId: achievement.json?.capabilities?.inviteRequires,
 				userId: session.user.id
 			}
 		});
 		if (!inviteQualificationClaim || inviteQualificationClaim.validFrom === null) {
-			throw error(403, m.tense_raw_cuckoo_dart());
+			error(403, m.tense_raw_cuckoo_dart());
 		}
 	}
 
@@ -176,14 +169,28 @@ export const inviteToClaim = async ({
 				organization: { connect: { id: org.id } },
 				achievement: { connect: { id: achievementId } },
 				claimStatus: isSelfClaim ? 'ACCEPTED' : 'UNACCEPTED',
+				// Snapshot the recipient's default, as self-claims do.
+				visibility: identifier.user.defaultVisibility,
 
 				// If the achievement requires review, the claim is not valid until reviewed.
-				validFrom: !achievement.achievementConfig?.reviewRequiresId ? new Date() : null,
+				validFrom: !achievement.reviewRequiresId ? new Date() : null,
 				creator: { connect: { id: session.user.id } },
 				json: isSelfClaim ? data.json : '{}'
 			},
 			update: {}
 		});
+
+		// If the awarded claim needs review and the achievement has stewards, notify
+		// them (throttled, so repeat awards don't re-spam). Skips the claimant.
+		if (!claim.validFrom && stewardIdsFor(achievement).length) {
+			await notifyStewardsForReview({
+				achievement,
+				org,
+				achievementId,
+				claimId: claim.id,
+				claimantUserId: identifier.userId
+			});
+		}
 
 		// Ensure there is an endorsement for this claim, on behalf of this admin, if not self-awarding
 		let existingEndorsement: ClaimEndorsement | null = null;
@@ -213,23 +220,28 @@ export const inviteToClaim = async ({
 
 		// Notify user of claim
 		if (!emailIfNew || !existingEndorsement) {
+			const badgeUrl = `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/login?e=${encodeURIComponent(
+				data.inviteeEmail
+			)}&next=${encodeURIComponent('/claims/' + claim.id)}`;
+			const awardedText = m.gentle_brave_falcon_awardeddesc({
+				achievementName: achievement.name,
+				communityName: org.name,
+				badgeUrl
+			});
 			const emailResult = await sendOrcaMail({
 				from: org.email,
 				to: data.inviteeEmail,
 				subject: m.warm_tangy_deer_awarded(),
-				text: m.gentle_brave_falcon_awardeddesc({
-					achievementName: achievement.name,
-					communityName: org.name,
-					badgeUrl: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/login?e=${encodeURIComponent(
-						data.inviteeEmail
-					)}&next=${encodeURIComponent('/claims/' + claim.id)}`
+				text: awardedText,
+				html: renderOrcaEmail({
+					org,
+					title: m.warm_tangy_deer_awarded(),
+					intro: awardedText.replace(badgeUrl, '').trim(),
+					cta: { label: m.bright_swift_eagle_login(), url: badgeUrl }
 				})
 			});
 			if (!emailResult.success) {
-				throw error(
-					500,
-					m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
-				);
+				error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
 			}
 		}
 
@@ -271,23 +283,28 @@ export const inviteToClaim = async ({
 
 		// If there isn't already a user, we'll invite them to join by email
 		if (!emailIfNew || !existingEndorsement) {
+			const inviteLink = `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/achievements/${
+				endorsement.achievementId
+			}/claim?i=${endorsement.id}&e=${encodeURIComponent(data.inviteeEmail)}`;
+			const inviteText = m.grand_lucky_kite_climb({
+				achievementName: endorsement.achievement?.name ?? achievement.name,
+				orgName: org.name,
+				inviteLink
+			});
 			const emailResult = await sendOrcaMail({
 				from: org.email,
 				to: data.inviteeEmail,
 				subject: m.male_active_turtle_view({ orgName: org.name }),
-				text: m.grand_lucky_kite_climb({
-					achievementName: endorsement.achievement?.name ?? achievement.name,
-					orgName: org.name,
-					inviteLink: `${PUBLIC_HTTP_PROTOCOL}://${org.domain}/achievements/${
-						endorsement.achievementId
-					}/claim?i=${endorsement.id}&e=${encodeURIComponent(data.inviteeEmail)}`
+				text: inviteText,
+				html: renderOrcaEmail({
+					org,
+					title: m.male_active_turtle_view({ orgName: org.name }),
+					intro: inviteText.replace(inviteLink, '').trim(),
+					cta: { label: m.bold_swift_eagle_claim(), url: inviteLink }
 				})
 			});
 			if (!emailResult.success) {
-				throw error(
-					500,
-					m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
-				);
+				error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
 			}
 		}
 

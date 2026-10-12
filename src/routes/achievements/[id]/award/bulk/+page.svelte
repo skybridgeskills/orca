@@ -1,29 +1,32 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
-	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import Heading from '$lib/components/Heading.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
-	import CsvUpload from '$lib/components/bulk-award/CsvUpload.svelte';
-	import CsvPreviewTable from '$lib/components/bulk-award/CsvPreviewTable.svelte';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import BulkAwardProgress from '$lib/components/bulk-award/BulkAwardProgress.svelte';
 	import type { BulkAwardRow } from '$lib/components/bulk-award/bulkAwardTypes';
+	import CsvPreviewTable from '$lib/components/bulk-award/CsvPreviewTable.svelte';
+	import CsvUpload from '$lib/components/bulk-award/CsvUpload.svelte';
+	import Heading from '$lib/components/Heading.svelte';
+	import * as m from '$lib/i18n/messages';
 
-	export let data: PageData;
+	import type { PageData } from './$types';
 
-	let rows: BulkAwardRow[] = [];
-	let phase: 'upload' | 'preview' | 'processing' | 'done' = 'upload';
-	let processingKey = 0;
+	import { resolve } from '$app/paths';
 
-	const breadcrumbItems = [
+	let { data }: { data: PageData } = $props();
+
+	let rows: BulkAwardRow[] = $state([]);
+	let phase: 'upload' | 'preview' | 'processing' | 'done' = $state('upload');
+	let processingKey = $state(0);
+
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement?.name, href: `/achievements/${data.achievement.id}` },
 		{ text: m.gentle_brave_falcon_award(), href: `/achievements/${data.achievement.id}/award` }
-	];
+	]);
 
-	function handleParsed(event: CustomEvent<BulkAwardRow[]>) {
-		rows = event.detail;
+	function handleParsed(parsedRows: BulkAwardRow[]) {
+		rows = parsedRows;
 		phase = 'preview';
 	}
 
@@ -50,17 +53,17 @@
 
 	<div class="mt-6">
 		{#if phase === 'upload'}
-			<CsvUpload on:parsed={handleParsed} />
+			<CsvUpload onparsed={handleParsed} />
 		{:else if phase === 'preview'}
-			<CsvPreviewTable {rows} on:start={handleStart} on:back={handleBack} />
+			<CsvPreviewTable {rows} onstart={handleStart} onback={handleBack} />
 		{:else if phase === 'processing' || phase === 'done'}
 			{#key processingKey}
-				<BulkAwardProgress {rows} achievementId={data.achievement.id} on:done={handleDone} />
+				<BulkAwardProgress {rows} achievementId={data.achievement.id} ondone={handleDone} />
 			{/key}
 			{#if phase === 'done'}
 				<div class="mt-4">
 					<a
-						href="/achievements/{data.achievement.id}"
+						href={resolve(`/achievements/${data.achievement.id}`)}
 						class="text-blue-700 hover:underline text-sm"
 					>
 						{m.soft_blue_deer_return()}

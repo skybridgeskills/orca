@@ -4,7 +4,7 @@ declare module 'svelte-droplet' {
 	export interface FileDropProps {
 		handleFiles: (files: File[]) => void;
 		max?: number;
-		[key: string]: any;
+		[key: string]: unknown;
 	}
 
 	export class FileDrop extends SvelteComponent<FileDropProps> {}

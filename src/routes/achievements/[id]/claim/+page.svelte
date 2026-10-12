@@ -1,16 +1,20 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+
+	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import * as m from '$lib/i18n/messages';
 	import ClaimForm from '$lib/partials/achievementClaim/ClaimForm.svelte';
 	import { claimEmail, inviteId, inviteCreatedAt } from '$lib/stores/activeClaimStore';
 
-	export let data: PageData;
-	const config = data.achievement.achievementConfig;
+	import type { PageProps } from './$types';
+
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+
+	let { data }: PageProps = $props();
+	const config = $derived(data.achievement);
 
 	onMount(() => {
 		if (data.inviteId) $inviteId = data.inviteId;
@@ -21,12 +25,15 @@
 	// initially show claim form if user is eligible to self-claim a fresh claim now.
 	let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
 
-	const breadcrumbItems = [
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
-		{ text: data.achievement.name, href: `../${data.achievement.id}` },
+		{
+			text: data.achievement.name,
+			href: `/achievements/${data.achievement.id}`
+		},
 		{ text: m.bold_swift_eagle_claim() }
-	];
+	]);
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />
@@ -35,11 +42,10 @@
 	<AchievementSummary achievement={data.achievement} />
 	<ClaimForm
 		achievement={data.achievement}
-		achievementConfig={config}
 		existingBadgeClaim={data.existingBadgeClaim}
 		{claimIntent}
 		handleCancel={() => {
-			goto(`/achievements/${data.achievement.id}`);
+			goto(resolve(`/achievements/${data.achievement.id}`));
 		}}
 	/>
 {:else if config?.claimable && config?.claimRequiresId}
@@ -52,7 +58,7 @@
 		<Alert level="warning">
 			{m.sharp_quiet_panther_requires()}
 			<a
-				href={`/achievements/${config?.claimRequiresId}`}
+				href={resolve(`/achievements/${config?.claimRequiresId}`)}
 				class="font-bold underline hover:no-underline">{config?.claimRequires?.name}</a
 			>. {m.sharp_clear_fox_notmeets()}
 		</Alert>

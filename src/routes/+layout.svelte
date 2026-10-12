@@ -1,26 +1,45 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { MetaTags } from 'svelte-meta-tags';
-	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
 	import { onMount } from 'svelte';
-	import { session, sessionStatus } from '$lib/stores/sessionStore';
+	import { MetaTags } from 'svelte-meta-tags';
+
+	import Alert from '$lib/components/Alert.svelte';
+	import Nav from '$lib/components/Nav.svelte';
+	import * as m from '$lib/i18n/messages';
+	import { setLocale } from '$lib/i18n/runtime';
+	import { setSessionContext } from '$lib/session/context';
+	import { preferredTheme } from '$lib/stores/interfacePrefsStore';
 	import { notifications } from '$lib/stores/notificationStore';
 	import '../app.css';
-	import Nav from '$lib/components/Nav.svelte';
-	import Alert from '$lib/components/Alert.svelte';
-	import type { PageData } from './$types';
-	import { setLocale } from '$lib/i18n/runtime';
-	import { LoadingStatus } from '$lib/stores/common';
 	import { getFooterUrl } from '$lib/utils/footer-links';
 
-	export let data: PageData;
+	import type { LayoutProps } from './$types';
+
+	import { resolve } from '$app/paths';
+
+	let { children, data }: LayoutProps = $props();
+	const privacyUrl = getFooterUrl('privacy', '/privacy');
+	const termsUrl = getFooterUrl('terms', '/terms');
+	const contactUrl = getFooterUrl('contact', '/contact');
+	// One-time init side-effects intentionally use the initial `data`;
+	// preferredTheme is re-initialized in onMount below.
+	// svelte-ignore state_referenced_locally
 	preferredTheme.initialize(data.cookieTheme || 'light');
+	// svelte-ignore state_referenced_locally
 	setLocale(data.locale);
+
+	// Per-request session store provided via context. Seeded synchronously so SSR
+	// renders auth-gated UI correctly, then kept in sync with `data.session` below.
+	// svelte-ignore state_referenced_locally
+	const sessionCtx = setSessionContext(data.session ?? undefined);
 
 	onMount(() => {
 		preferredTheme.initialize(data.cookieTheme || 'light'); // reinitialize but with the ability to set document.cookie
-		if (data.session) $session = data.session;
-		$sessionStatus = LoadingStatus.Complete;
+	});
+
+	// Keep the context session in sync with the authoritative server session
+	// (refreshed via invalidateAll after login/mutations).
+	$effect(() => {
+		sessionCtx.set(data.session ?? undefined);
 	});
 </script>
 
@@ -40,12 +59,14 @@
 					message={n.message}
 					dismissable={n.dismissable}
 					level={n.level}
-					on:close={() => {
+					onclose={() => {
 						notifications.dismiss(n.id);
 					}}
 				>
-					{#each n.actions as action}
-						<a href={action.href} class="underline hover:no-underline font-bold">{action.label}</a>
+					{#each n.actions as action (action.href)}
+						<a href={action.href} rel="external" class="underline hover:no-underline font-bold"
+							>{action.label}</a
+						>
 					{/each}
 				</Alert>
 			{/each}
@@ -53,35 +74,55 @@
 	</section>
 
 	<main class="app-main bg-gray-100 dark:bg-gray-900">
-		<Nav org={data.org} />
+		<Nav org={data.org} showMembersNav={data.showMembersNav} />
 		<section class="max-w-7xl mx-auto py-4 px-4">
-			<slot />
+			{@render children()}
 		</section>
 	</main>
 
-	<footer class="app-footer p-4 bg-white shadow md:px-6 md:py-8 dark:bg-gray-800">
+	<footer class="app-footer p-4 bg-white shadow-sm md:px-6 md:py-8 dark:bg-gray-800">
 		<div class="max-w-7xl mx-auto">
 			<div class="sm:flex sm:items-end sm:justify-between">
 				<ul
 					class="flex flex-wrap items-center mb-6 text-sm text-gray-500 sm:mb-0 dark:text-gray-400"
 				>
 					<li>
-						<a href="/" class="mr-4 hover:underline md:mr-6">{m.each_fluffy_fox_view()}</a>
-					</li>
-					<li>
-						<a href={getFooterUrl('privacy', '/privacy')} class="mr-4 hover:underline md:mr-6"
-							>{m.warm_tangy_deer_privacy()}</a
+						<a href={resolve('/')} class="mr-4 hover:underline md:mr-6"
+							>{m.each_fluffy_fox_view()}</a
 						>
 					</li>
 					<li>
-						<a href={getFooterUrl('terms', '/terms')} class="mr-4 hover:underline md:mr-6"
-							>{m.gentle_brave_falcon_terms()}</a
-						>
+						{#if privacyUrl.startsWith('http')}
+							<a href={privacyUrl} rel="external" class="mr-4 hover:underline md:mr-6"
+								>{m.warm_tangy_deer_privacy()}</a
+							>
+						{:else}
+							<a href={resolve(privacyUrl)} class="mr-4 hover:underline md:mr-6"
+								>{m.warm_tangy_deer_privacy()}</a
+							>
+						{/if}
 					</li>
 					<li>
-						<a href={getFooterUrl('contact', '/contact')} class="hover:underline"
-							>{m.calm_steady_lynx_contact()}</a
-						>
+						{#if termsUrl.startsWith('http')}
+							<a href={termsUrl} rel="external" class="mr-4 hover:underline md:mr-6"
+								>{m.gentle_brave_falcon_terms()}</a
+							>
+						{:else}
+							<a href={resolve(termsUrl)} class="mr-4 hover:underline md:mr-6"
+								>{m.gentle_brave_falcon_terms()}</a
+							>
+						{/if}
+					</li>
+					<li>
+						{#if contactUrl.startsWith('http')}
+							<a href={contactUrl} rel="external" class="hover:underline"
+								>{m.calm_steady_lynx_contact()}</a
+							>
+						{:else}
+							<a href={resolve(contactUrl)} class="hover:underline"
+								>{m.calm_steady_lynx_contact()}</a
+							>
+						{/if}
 					</li>
 				</ul>
 			</div>
@@ -93,11 +134,8 @@
 	</footer>
 </div>
 
-<style lang="postcss" global>
-	html,
-	body {
-		height: 100%;
-	}
+<style lang="postcss">
+	@reference '../app.css';
 
 	.app-wrapper {
 		min-height: 100%;

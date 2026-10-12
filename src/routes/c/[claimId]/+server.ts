@@ -1,15 +1,19 @@
-import * as m from '$lib/i18n/messages';
 import { error, redirect } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import type { RequestEvent } from './$types';
-import { prisma } from '../../../prisma/client';
+
+import * as m from '$lib/i18n/messages';
 import { badgeAssertionFromAchievementClaim } from '$lib/ob2/badgeAssertion';
+import { isSuspended } from '$lib/server/moderation/suspension';
 import { prefersHtml } from '$lib/utils/contentNegotiation';
 
+import { prisma } from '../../../prisma/client';
+
+import type { RequestEvent } from './$types';
+
 export const GET = async ({ request, params, locals }: RequestEvent) => {
-	if (prefersHtml(request)) throw redirect(302, `/claims/${params.claimId}/public`);
+	if (prefersHtml(request)) redirect(302, `/claims/${params.claimId}/public`);
 	else {
-		const claim = await prisma.achievementClaim.findUniqueOrThrow({
+		const claim = await prisma.achievementClaim.findUnique({
 			where: {
 				id: params.claimId
 			},
@@ -27,10 +31,29 @@ export const GET = async ({ request, params, locals }: RequestEvent) => {
 			}
 		});
 		if (!claim?.validFrom || claim?.claimStatus !== 'ACCEPTED')
-			throw error(404, m.sharp_flat_kite_clasp());
+			error(404, m.sharp_flat_kite_clasp());
+		// Public JSON surface: only PUBLIC claims are served. 404 (not 403) avoids
+		// confirming a non-public claim exists.
+		if (claim.visibility !== 'PUBLIC') error(404, m.sharp_flat_kite_clasp());
+		// P5 moderation: never emit a public OB2 assertion for suspended content (the
+		// claim itself or its underlying achievement).
+		if (
+			(await isSuspended({
+				originOrgId: claim.organizationId,
+				targetType: 'CLAIM',
+				targetId: claim.id
+			})) ||
+			(await isSuspended({
+				originOrgId: claim.organizationId,
+				targetType: 'ACHIEVEMENT',
+				targetId: claim.achievementId
+			}))
+		) {
+			error(404, m.sharp_flat_kite_clasp());
+		}
 		if (claim?.organizationId === locals.org.id)
 			return json(badgeAssertionFromAchievementClaim(claim));
 		// TODO return the OB3 version, once access control is properly implemented
-		else throw error(404, m.fresh_bright_sparrow_notfound());
+		else error(404, m.fresh_bright_sparrow_notfound());
 	}
 };

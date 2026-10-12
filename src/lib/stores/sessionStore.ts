@@ -1,6 +1,5 @@
-import { derived, writable } from 'svelte/store';
-import { LoadingStatus } from './common';
+import { writable } from 'svelte/store';
 
-export const session = writable<App.SessionData | undefined>();
-export const sessionStatus = writable<LoadingStatus>(LoadingStatus.NotStarted);
+// Post-login redirect target, preserved across the unauthenticated → authenticated
+// transition. The session itself is provided per request via `$lib/session/context`.
 export const nextPath = writable<string | undefined>(undefined);

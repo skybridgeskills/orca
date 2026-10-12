@@ -19,6 +19,9 @@ src/**/*.js.map
 /playwright/.cache/
 .vercel
 
+# Storybook build output
+storybook-static
+
 # Local development notes
 docs/plans
 docs/libraries

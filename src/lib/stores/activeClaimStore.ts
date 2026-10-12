@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 // TODO reset the claim data if the user goes to a claim form for a different badge after filling out some of the form.
 export const claimId = writable(''); // Which Badge ID (uuid) is being claimed?

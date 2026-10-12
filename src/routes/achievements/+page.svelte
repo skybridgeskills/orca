@@ -1,55 +1,58 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
+	import type { AchievementCategory, Achievement } from '@prisma/client';
+	import { onMount } from 'svelte';
+
+	import AchievementIcon from '$lib/components/achievement/AchievementIcon.svelte';
+	import Alert from '$lib/components/Alert.svelte';
+	import Badge from '$lib/components/Badge.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import Card from '$lib/components/Card.svelte';
-	import {
-		achievements,
-		achievementsLoading,
-		fetchAchievements
-	} from '$lib/stores/achievementStore';
+	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
+	import Heading from '$lib/components/Heading.svelte';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+	import * as m from '$lib/i18n/messages';
 	import {
 		achievementCategories,
 		acLoading,
 		fetchAchievementCategories
 	} from '$lib/stores/achievementCategoryStore';
-	import type { AchievementCategory, Achievement, AchievementConfig } from '@prisma/client';
-	import { session } from '$lib/stores/sessionStore';
-	import Heading from '$lib/components/Heading.svelte';
-	import { imageUrl } from '$lib/utils/imageUrl';
-	import { onMount, tick } from 'svelte';
+	import {
+		achievements,
+		achievementsLoading,
+		fetchAchievements
+	} from '$lib/stores/achievementStore';
 	import { ensureLoaded, LoadingStatus } from '$lib/stores/common';
-	import Alert from '$lib/components/Alert.svelte';
-	import EmptyStateZone from '$lib/components/EmptyStateZone.svelte';
 
-	export let data: PageData;
-	const U = {
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+	const U = $derived({
 		id: 'uncategorized',
 		organizationId: data.org.id,
 		name: m.light_early_owl_shrine(),
 		weight: -1
-	};
+	});
 
 	const categoryAchievements: {
-		[key: string]: Array<Achievement & { achievementConfig: AchievementConfig | null }>;
-	} = {};
-	const mapCategories = () => {
+		[key: string]: App.AchievementWithRelations[];
+	} = $derived.by(() => {
+		const map: {
+			[key: string]: App.AchievementWithRelations[];
+		} = {};
 		[...$achievementCategories, U].map(
 			(c: AchievementCategory) =>
-				(categoryAchievements[c.id] = $achievements.filter(
+				(map[c.id] = $achievements.filter(
 					(a: Achievement) => a.categoryId == c.id || (!a.categoryId && c.id == 'uncategorized')
 				))
 		);
-	};
+		return map;
+	});
 
 	onMount(async () => {
 		await Promise.all([
 			ensureLoaded(achievementsLoading, fetchAchievements),
 			ensureLoaded(acLoading, fetchAchievementCategories)
 		]);
-		mapCategories();
 	});
 </script>
 
@@ -58,6 +61,11 @@
 <div class="flex items-center mb-9">
 	{#if data.editAchievementCapability}
 		<Button href="/achievements/create" text={m.fresh_bright_sparrow_create()} />
+		<Button
+			href="/achievements/add-skills"
+			text={m.plump_brisk_heron_gather()}
+			submodule="secondary"
+		/>
 	{/if}
 	{#if data.editCategoriesCapability}
 		<Button
@@ -81,26 +89,25 @@
 	{#if categoryAchievements[category.id]?.length}
 		<h2 class="text-l sm:text-xl font-bold mt-6 mb-4 dark:text-white">{category.name}</h2>
 		<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
-			{#each categoryAchievements[category.id] as achievement}
+			{#each categoryAchievements[category.id] as achievement (achievement.id)}
 				<Card maxWidth="" hoverEffect={true} href="/achievements/{achievement.id}">
 					<div class="grid grid-cols-4 gap-2">
 						<div class="m-auto">
-							{#if achievement.image}
-								<img
-									src={imageUrl(achievement.image)}
-									class=""
-									alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
-								/>
-							{:else}
-								<div class="text-gray-400 dark:text-gray-700">
-									<Ribbon />
-								</div>
-							{/if}
+							<AchievementIcon
+								image={achievement.image}
+								achievementType={achievement.achievementType}
+								name={achievement.name}
+							/>
 						</div>
 
 						<div class="col-span-3">
-							<h3 class="mb-2 text-base font-bold tracking-tight text-gray-900 dark:text-white">
+							<h3
+								class="mb-2 text-base font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2 flex-wrap"
+							>
 								{achievement.name}
+								{#if achievement.suspended}
+									<Badge text={m.flat_grey_moth_flag()} variant="danger" />
+								{/if}
 							</h3>
 
 							<p class="mb-3 text-xs font-normal text-gray-700 dark:text-gray-400">

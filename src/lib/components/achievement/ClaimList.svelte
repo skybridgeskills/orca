@@ -1,41 +1,64 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import StatusTag from '$lib/components/StatusTag.svelte';
-
-	import FaSolidTrash from 'svelte-icons-pack/fa/FaSolidTrash.js';
-	import Button from '$lib/components/Button.svelte';
-	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
-	import Tabs from '$lib/components/Tabs.svelte';
-	import { notifications, Notification } from '$lib/stores/notificationStore';
-	import { getContext, onMount } from 'svelte';
 	import type { AchievementClaim, ClaimEndorsement, User } from '@prisma/client';
-	import Pagination from '$lib/components/Pagination.svelte';
-	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
+	import { getContext, onMount } from 'svelte';
+	import { FaSolidTrash } from 'svelte-icons-pack/fa';
+
+	import Button from '$lib/components/Button.svelte';
 	import IconButton from '$lib/components/IconButton.svelte';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import Pagination from '$lib/components/Pagination.svelte';
+	import StatusTag from '$lib/components/StatusTag.svelte';
+	import Tabs from '$lib/components/Tabs.svelte';
+	import * as m from '$lib/i18n/messages';
+	import { isAdmin } from '$lib/permissions/isAdmin';
+	import { getSession } from '$lib/session/context';
+	import { notifications, Notification } from '$lib/stores/notificationStore';
+	import { MAX_PAGE_SIZE, PAGE_QUERY_PARAM, PAGE_SIZE_QUERY_PARAM } from '$lib/utils/pagination';
+
+	import { resolve } from '$app/paths';
 
 	type AchievementClaimTableData = AchievementClaim & {
 		user: User;
 		_count: {
 			endorsements: number;
 		};
+		// P4: server-computed per row — whether this viewer may follow the claimant's
+		// name to their member profile. Governs only the profile link, never whether
+		// the row or its claim-detail affordance is shown.
+		profileLinkable: boolean;
 	};
 
-	export let pageSize: number = MAX_PAGE_SIZE;
-	export let page: number = 1;
-	export let totalCount: number;
-	export let enableInvites: boolean = false;
+	interface Props {
+		pageSize?: number;
+		page?: number;
+		totalCount: number;
+		enableInvites?: boolean;
+	}
 
-	let claims: AchievementClaimTableData[] = [];
-	let outstandingInvites: (ClaimEndorsement & { creator: User })[] = [];
-	let inviteCount: number | undefined = undefined;
-	let category: 'AchievementClaim' | 'ClaimEndorsement' = 'AchievementClaim';
-	let loading = true;
-	let deleteModalVisible = false;
-	let inviteToDelete: (ClaimEndorsement & { creator: User }) | null = null;
+	let {
+		pageSize = $bindable(MAX_PAGE_SIZE),
+		page = $bindable(1),
+		totalCount,
+		enableInvites = false
+	}: Props = $props();
 
-	const session: App.SessionData | undefined = getContext('session');
+	let claims: AchievementClaimTableData[] = $state([]);
+	let outstandingInvites: (ClaimEndorsement & { creator: User })[] = $state([]);
+	let inviteCount: number | undefined = $state(undefined);
+	let category: 'AchievementClaim' | 'ClaimEndorsement' = $state('AchievementClaim');
+	let loading = $state(true);
+	let deleteModalVisible = $state(false);
+	let inviteToDelete: (ClaimEndorsement & { creator: User }) | null = $state(null);
+
+	const session = getSession();
 	const achievementId: string = getContext('achievementId');
+
+	// The invites API doesn't supply a per-row `profileLinkable` (membership/visibility),
+	// so the endorsement/invite-creator name links to the profile only for the creator
+	// themselves or an admin. Admins may open any user's (incl. a non-member's) profile;
+	// broader member→member linking here is deferred to the moderation fast-follow.
+	const viewerIsAdmin = $derived(isAdmin($session?.user));
 
 	const getFetchUrl = (pageToFetch: number) => {
 		if (category == 'AchievementClaim')
@@ -122,7 +145,7 @@
 			notifications.add(new Notification(m.frail_kind_mule_enchant(), true, 'success'));
 			// Refresh the data after successful deletion
 			getData(page);
-		} catch (err) {
+		} catch {
 			notifications.add(new Notification(m.bad_ok_jackdaw_link(), false, 'error'));
 		} finally {
 			closeDeleteModal();
@@ -179,11 +202,16 @@
 									scope="row"
 									class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
 								>
-									<a href={`/claims/${memberClaim.id}`} class="hover:underline">
+									{#if memberClaim.profileLinkable}
+										<a href={resolve(`/members/${memberClaim.userId}`)} class="hover:underline">
+											{memberClaim.user?.givenName}
+											{memberClaim.user?.familyName}
+										</a>
+									{:else}
 										{memberClaim.user?.givenName}
 										{memberClaim.user?.familyName}
-										{#if session?.user?.id == memberClaim.user.id}({m.red_aqua_mule_jest()}){/if}
-									</a>
+									{/if}
+									{#if $session?.user?.id == memberClaim.user.id}({m.red_aqua_mule_jest()}){/if}
 								</th>
 								<td class="px-6 py-4">
 									<StatusTag
@@ -196,8 +224,8 @@
 									{memberClaim._count.endorsements}
 								</td>
 								<td class="px-6 py-4">
-									{#if session?.user?.id}
-										<a href={`/claims/${memberClaim.id}`}>
+									{#if $session?.user?.id}
+										<a href={resolve(`/claims/${memberClaim.id}`)}>
 											<Button text={m.happy_next_robin_clasp()} />
 										</a>
 									{/if}
@@ -234,31 +262,34 @@
 								scope="row"
 								class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
 							>
-								<a href="/invites/{invite.id}" class="hover:underline">
+								<a href={resolve(`/invites/${invite.id}`)} class="hover:underline">
 									{invite.inviteeEmail}
 								</a>
 							</th>
 							<td class="px-6 py-4">
-								{#if invite.creator}
-									<a href="/members/{invite.creatorId}" class="hover:underline">
+								{#if invite.creator && ($session?.user?.id === invite.creatorId || viewerIsAdmin)}
+									<a href={resolve(`/members/${invite.creatorId}`)} class="hover:underline">
 										{invite.creator?.givenName ?? ''}
 										{invite.creator?.familyName ?? ''}
 									</a>
+								{:else if invite.creator}
+									{invite.creator?.givenName ?? ''}
+									{invite.creator?.familyName ?? ''}
 								{/if}
-								{#if session?.user?.id == invite.creatorId}({m.red_aqua_mule_jest()}){/if}
+								{#if $session?.user?.id == invite.creatorId}({m.red_aqua_mule_jest()}){/if}
 								{#if !invite.creator}N/A{/if}
 							</td>
 							<td class="px-6 py-4">
 								{invite.createdAt}
 							</td>
 							<td class="px-6 py-4">
-								{#if session?.user?.id === invite.creatorId || ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(session?.user?.orgRole || 'none')}
+								{#if $session?.user?.id === invite.creatorId || viewerIsAdmin}
 									<IconButton
 										id="trash-button"
 										src={FaSolidTrash}
 										text={m.wide_acidic_racoon_read()}
 										size="16"
-										on:click={() => showDeleteModal(invite)}
+										onclick={() => showDeleteModal(invite)}
 									/>
 								{/if}
 							</td>
@@ -281,7 +312,7 @@
 <Modal
 	visible={deleteModalVisible}
 	title={m.calm_weird_robin_startle()}
-	on:close={closeDeleteModal}
+	onclose={closeDeleteModal}
 	actions={[
 		{
 			label: m.calm_steady_lynx_cancel(),

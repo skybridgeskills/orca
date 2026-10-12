@@ -1,14 +1,23 @@
-import * as m from '$lib/i18n/messages';
-import { sendOrcaMail, transporter } from '$lib/email/sendEmail';
+import type { Session, User } from '@prisma/client';
+import type { ClaimEndorsement } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
 import * as dotenv from 'dotenv';
+
 import { prisma } from '$lib/../prisma/client';
-import type { Session, User } from '@prisma/client';
-import stripTags from '$lib/utils/stripTags';
-import type { ClaimEndorsement } from '@prisma/client';
-import type { PageServerLoad } from './$types';
+import { sendOrcaMail } from '$lib/email/sendEmail';
+import { renderOrcaEmail } from '$lib/email/template';
+import * as m from '$lib/i18n/messages';
+import { isSuperadminOrg } from '$lib/server/moderation/superadminOrg';
+import { buildAuthenticationOptions } from '$lib/server/webauthn/ceremonies';
+import { issueChallenge } from '$lib/server/webauthn/challenge';
+import { getUserPasskeys, userHasPasskey } from '$lib/server/webauthn/passkeys';
+import { rpForOrg } from '$lib/server/webauthn/rp';
 import { INVITE_SESSION_VALIDITY_MS } from '$lib/utils/session';
+import stripTags from '$lib/utils/stripTags';
+
+import type { PageServerLoad } from './$types';
+
 import { USE_SECURE_COOKIES } from '$env/static/private';
 
 dotenv.config();
@@ -18,7 +27,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	// redirect user if logged in
 	if (locals.session) {
-		throw redirect(302, nextPath ?? '/');
+		redirect(302, nextPath ?? '/');
 	}
 
 	const inviteId = url.searchParams.get('i');
@@ -28,13 +37,15 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 		// If invite is not found, doesn't match email, or is already claimed: Error
 		if (!invite || inviteeEmail != invite?.inviteeEmail || invite?.claimId)
-			throw error(404, m.curly_male_rabbit_lead());
+			error(404, m.curly_male_rabbit_lead());
 	}
 
 	return {
 		inviteId,
 		inviteeEmail,
-		nextPath
+		nextPath,
+		// The superadmin org has no passkey-only login (passkey ADR §5).
+		superadminHost: isSuperadminOrg(locals.org.id)
 	};
 };
 
@@ -47,10 +58,10 @@ export const actions: Actions = {
 		const requestData = await request.formData();
 		const email = stripTags(requestData.get('email')?.toString());
 		const inviteId = stripTags(requestData.get('inviteId')?.toString());
-		if (!email || !email.toString().includes('@')) throw error(400, m.each_pink_fish_grin());
+		if (!email || !email.toString().includes('@')) error(400, m.each_pink_fish_grin());
 
 		// Validate org and ensure user exists
-		let userIdentifier = await prisma.identifier.findFirst({
+		const userIdentifier = await prisma.identifier.findFirst({
 			where: {
 				type: 'EMAIL',
 				identifier: email,
@@ -65,9 +76,9 @@ export const actions: Actions = {
 		let outstandingInvite: ClaimEndorsement | null = null;
 		if (inviteId) {
 			outstandingInvite = await prisma.claimEndorsement.findUnique({ where: { id: inviteId } });
-			if (!outstandingInvite) throw error(400, m.dark_deft_cow_march());
+			if (!outstandingInvite) error(400, m.dark_deft_cow_march());
 		} else if (!userIdentifier) {
-			throw error(400, m.dark_deft_cow_march());
+			error(400, m.dark_deft_cow_march());
 		}
 
 		const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -85,13 +96,15 @@ export const actions: Actions = {
 			from: locals.org.email,
 			to: email,
 			subject: m.active_antsy_panther_view({ orgName: locals.org.name }),
-			text: m.alert_soft_honeybadger_lead({ code })
+			text: m.alert_soft_honeybadger_lead({ code }),
+			html: renderOrcaEmail({
+				org: locals.org,
+				title: m.active_antsy_panther_view({ orgName: locals.org.name }),
+				intro: m.alert_soft_honeybadger_lead({ code })
+			})
 		});
 		if (!emailResult.success) {
-			throw error(
-				500,
-				m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' })
-			);
+			error(500, m.moving_true_panther_delight({ message: emailResult.error?.message ?? '' }));
 		}
 
 		cookies.set('sessionId', session.id, {
@@ -107,19 +120,36 @@ export const actions: Actions = {
 		locals,
 		cookies,
 		request
-	}): Promise<{
-		sessionId?: string;
-		session?: Omit<Session, 'code' | 'createdAt' | 'userId'> & { user: User | null };
-		location?: string;
-		register?: boolean;
-		success?: boolean;
-	}> => {
+	}): Promise<
+		| {
+				sessionId?: string;
+				session?: Omit<
+					Session,
+					| 'code'
+					| 'createdAt'
+					| 'userId'
+					| 'passkeyChallenge'
+					| 'passkeyChallengeExpiresAt'
+					| 'emailVerifiedAt'
+				> & { user: User | null };
+				location?: string;
+				register?: boolean;
+				success?: boolean;
+		  }
+		| {
+				// Superadmin-org 2FA: the email factor is satisfied but the session is NOT yet
+				// valid. The client must complete a passkey assertion (P4) before login finishes.
+				needsPasskey: true;
+				options: Awaited<ReturnType<typeof buildAuthenticationOptions>>;
+				location?: string;
+		  }
+	> => {
 		const requestData = await request.formData();
 		const vcode = requestData.get('verificationCode')?.toString();
 		const sessionId = cookies.get('sessionId');
 		const nextPath = requestData.get('nextPath')?.toString();
 
-		if (!vcode) throw error(400, m.funny_serious_mouse_nurture());
+		if (!vcode) error(400, m.funny_serious_mouse_nurture());
 		// Validate sessionid and ensure code matches
 		// TODO: use unique indexed query for session somehow
 		// TODO: prevent brute force guessing
@@ -135,10 +165,41 @@ export const actions: Actions = {
 				invite: true
 			}
 		});
-		if (!session) throw error(401, m.alert_tired_ray_march());
+		if (!session) error(401, m.alert_tired_ray_march());
 
 		// Advance user to next step in invite claim: user account creation.
 		if (!session.userId && session.invite?.inviteeEmail) return { success: true, register: true };
+
+		// The destination once login fully completes (after 2FA, if required).
+		const intendedLocation = session.invite
+			? `/achievements/${session.invite.achievementId}/claim?i=${
+					session.invite.id
+				}&e=${encodeURIComponent(session.invite.inviteeEmail ?? '')}`
+			: nextPath && nextPath?.startsWith('/')
+				? nextPath
+				: '/';
+
+		// Superadmin-org 2FA gate: if this is the superadmin org AND the known user has at
+		// least one passkey, the email code is only the FIRST factor. Do NOT activate yet —
+		// mark the email factor done (`emailVerifiedAt`), issue a fresh challenge bound to
+		// THIS session, and return authentication options for the client to assert against.
+		// The passkey step (…/webauthn/2fa/verify) is bound to this same cookie session and
+		// requires `emailVerifiedAt`, so neither factor can be skipped or swapped. A
+		// superadmin with no passkey (and every other org) falls through to email-only login.
+		if (
+			session.userId &&
+			isSuperadminOrg(locals.org.id) &&
+			(await userHasPasskey(session.userId, locals.org.id))
+		) {
+			const allowed = await getUserPasskeys(session.userId, locals.org.id);
+			const options = await buildAuthenticationOptions({ rp: rpForOrg(locals.org), allowed });
+			await prisma.session.update({
+				where: { id: session.id },
+				data: { emailVerifiedAt: new Date() }
+			});
+			await issueChallenge(session.id, options.challenge);
+			return { needsPasskey: true, options, location: intendedLocation };
+		}
 
 		const activatedSession = await prisma.session.update({
 			where: {
@@ -178,7 +239,15 @@ export const actions: Actions = {
 		request
 	}): Promise<{
 		sessionId?: string;
-		session?: Omit<Session, 'code' | 'createdAt' | 'userId'> & { user: User | null };
+		session?: Omit<
+			Session,
+			| 'code'
+			| 'createdAt'
+			| 'userId'
+			| 'passkeyChallenge'
+			| 'passkeyChallengeExpiresAt'
+			| 'emailVerifiedAt'
+		> & { user: User | null };
 		location?: string;
 		register?: boolean;
 		success?: boolean;
@@ -191,8 +260,8 @@ export const actions: Actions = {
 		const familyName = stripTags(requestData.get('familyName')?.toString()) || '';
 		const agreeTerms = stripTags(requestData.get('agreeTerms')?.toString()) || 'no';
 
-		if (!vcode && !inviteId) throw error(400, m.alert_tired_ray_march());
-		if (agreeTerms == 'no') throw error(400, m.brave_weary_ostrich_visit());
+		if (!vcode && !inviteId) error(400, m.alert_tired_ray_march());
+		if (agreeTerms == 'no') error(400, m.brave_weary_ostrich_visit());
 
 		let session;
 		let currentInvite;
@@ -210,7 +279,7 @@ export const actions: Actions = {
 				Date.now() > currentInvite.createdAt.getTime() + INVITE_SESSION_VALIDITY_MS
 			) {
 				// User will be required to login by email if their invite is stale.
-				throw error(401, { message: m.quick_clear_owl_unauth(), code: 'invite_expired' });
+				error(401, { message: m.quick_clear_owl_unauth(), code: 'invite_expired' });
 			}
 		}
 
@@ -229,14 +298,13 @@ export const actions: Actions = {
 				}
 			});
 
-			if (!session) throw error(401, m.alert_tired_ray_march());
+			if (!session) error(401, m.alert_tired_ray_march());
 
-			if (session.userId || !session.invite?.inviteeEmail)
-				throw error(401, m.kind_cuddly_bat_clasp());
+			if (session.userId || !session.invite?.inviteeEmail) error(401, m.kind_cuddly_bat_clasp());
 		}
 
 		const userEmail = currentInvite?.inviteeEmail ?? session?.invite?.inviteeEmail;
-		if (!userEmail) throw error(400, m.kind_cuddly_bat_clasp());
+		if (!userEmail) error(400, m.kind_cuddly_bat_clasp());
 
 		const user = await prisma.user.create({
 			data: {

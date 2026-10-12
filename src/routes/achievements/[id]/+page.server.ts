@@ -1,12 +1,21 @@
-import * as m from '$lib/i18n/messages';
-import { prisma } from '$lib/../prisma/client';
 import type { ClaimEndorsement, User } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import { canEditAchievements } from '$lib/server/permissions';
 
-export const load: PageServerLoad = async ({ url, params, locals }) => {
+import { prisma } from '$lib/../prisma/client';
+import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
+import { activeSuspensionFor } from '$lib/server/moderation/suspension';
+import {
+	canEditAchievements,
+	canInviteToAchievement,
+	isMember,
+	membershipAchievementId
+} from '$lib/server/permissions';
+
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const achievementId = params.id;
 
 	// Check if user has permission to edit achievements
@@ -31,32 +40,36 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 		include: {
 			_count: {
 				select: { achievementClaims: true }
-			},
-			achievementConfig: true
+			}
 		}
 	});
+
+	// P5 moderation: a suspended achievement is hidden from non-admins (treat as removed)
+	// and shown to admins with a `suspension` flag. Origin org for an org-owned
+	// achievement is its own org (== locals.org here).
+	const viewerIsAdmin = isAdmin(locals.session?.user);
+	const suspension = await activeSuspensionFor({
+		originOrgId: locals.org.id,
+		targetType: 'ACHIEVEMENT',
+		targetId: achievementId
+	});
+	if (suspension && !viewerIsAdmin) error(404, m.best_sharp_lamb_enchant());
 
 	const relatedAchievements = await prisma.achievement.findMany({
 		where: {
 			id: {
-				in: [
-					achievement?.achievementConfig?.claimRequiresId || 'N/A',
-					achievement?.achievementConfig?.reviewRequiresId || 'None'
-				]
+				in: [achievement.claimRequiresId || 'N/A', achievement.reviewRequiresId || 'None']
 			}
-		},
-		include: {
-			achievementConfig: true
 		}
 	});
 
 	// Get the existing claim(s) user has made for this badge,
 	// or for the badge that is required to be eligible to claim this badge
-	const relatedClaims = !!locals.session?.user?.id
+	const relatedClaims = locals.session?.user?.id
 		? await prisma.achievementClaim.findMany({
 				where: {
 					achievementId: {
-						in: [achievementId, achievement?.achievementConfig?.claimRequiresId || 'N/A']
+						in: [achievementId, achievement.claimRequiresId || 'N/A']
 					},
 					userId: locals.session?.user.id
 				},
@@ -68,6 +81,17 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 				}
 			})
 		: [];
+
+	let inviteCapability = false;
+	if (locals.session?.user?.id) {
+		inviteCapability = await canInviteToAchievement({
+			user: {
+				id: locals.session.user.id,
+				orgRole: locals.session.user.orgRole
+			},
+			achievement: achievement as unknown as App.AchievementWithJson
+		});
+	}
 
 	let outstandingInvites: (ClaimEndorsement & { creator: User | null })[] = [];
 	if (locals.session?.user?.id && relatedClaims.length == 0) {
@@ -89,9 +113,31 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 			})) ?? [];
 	}
 
+	// P4: gate the claims/earners list to members (+ admins) when a membership
+	// achievement is configured. When unset (`!gatingActive`) the list stays open
+	// to any logged-in user, preserving today's behavior.
+	const gatingActive = membershipAchievementId(locals.org) !== null;
+	const canViewClaimsList =
+		!gatingActive ||
+		(!!locals.session?.user &&
+			(await isMember({
+				user: {
+					id: locals.session.user.id,
+					orgRole: locals.session.user.orgRole
+				},
+				org: {
+					id: locals.org.id,
+					json: locals.org.json
+				}
+			})));
+
 	return {
 		editAchievementCapability,
+		inviteCapability,
+		canViewClaimsList,
 		achievement,
+		// P5: present only to admins (non-admins 404 above). Drives the suspended marker.
+		suspension: suspension ? { tier: suspension.tier } : null,
 		relatedAchievements,
 		relatedClaims,
 		outstandingInvites
@@ -100,21 +146,21 @@ export const load: PageServerLoad = async ({ url, params, locals }) => {
 
 export const actions: Actions = {
 	delete: async ({ locals, params }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.lower_home_cow_view());
+		if (!isAdmin(locals.session?.user)) error(403, m.lower_home_cow_view());
 
 		// TODO: require confirmation for delete
 		// TODO: ensure can't delete non-org achievement
-		const configDelete = prisma.achievementConfig.deleteMany({
-			where: {
-				achievementId: params.id
-			}
-		});
 
-		// Achievements that once required this achievement get their claimability reset
-		const requiredConfigDelete = prisma.achievementConfig.deleteMany({
+		// Achievements that once required this achievement get their claimability reset.
+		// Must run before the delete below: the self-relation FK is ON DELETE SET NULL,
+		// so after deletion `claimRequiresId` would already be null and no longer match.
+		const requiredAchievementReset = prisma.achievement.updateMany({
 			where: {
 				claimRequiresId: params.id
+			},
+			data: {
+				claimRequiresId: null,
+				claimable: false
 			}
 		});
 
@@ -159,8 +205,7 @@ export const actions: Actions = {
 		}
 
 		await prisma.$transaction([
-			configDelete,
-			requiredConfigDelete,
+			requiredAchievementReset,
 			credentialsDelete,
 			achievementClaimsDelete,
 			claimEndorsementDelete,
@@ -168,6 +213,6 @@ export const actions: Actions = {
 			...(orgPermissionCleanup ? [orgPermissionCleanup] : [])
 		]);
 
-		throw redirect(303, '/achievements');
+		redirect(303, '/achievements');
 	}
 };

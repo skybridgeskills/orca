@@ -1,18 +1,21 @@
-import * as m from '$lib/i18n/messages';
-import * as path from 'path';
 import * as fs from 'fs/promises';
-import mime from 'mime-types';
+import * as path from 'path';
+
 import { error, json } from '@sveltejs/kit';
-import type { RequestEvent } from './$types';
+import mime from 'mime-types';
+
+import * as m from '$lib/i18n/messages';
 import { isLocalDevFileMedia } from '$lib/server/media.js';
 
+import type { RequestEvent } from './$types';
+
 export const GET = async ({ params }: RequestEvent) => {
-	if (!isLocalDevFileMedia()) throw error(500, { message: m.clear_mellow_goat_lead() });
+	if (!isLocalDevFileMedia()) error(500, { message: m.clear_mellow_goat_lead() });
 	const filePath = path.join(process.cwd(), 'dev-uploads', params.id, params.filename);
 
 	try {
 		const mimeType = mime.lookup(filePath);
-		if (!mimeType) throw error(404);
+		if (!mimeType) error(404);
 
 		const data = await fs.readFile(filePath);
 		return new Response(new Uint8Array(data), {
@@ -21,14 +24,14 @@ export const GET = async ({ params }: RequestEvent) => {
 	} catch (err) {
 		if (err instanceof Error) {
 			console.error(err);
-			throw error(500, { message: err.message });
+			error(500, { message: err.message });
 		}
 		throw err;
 	}
 };
 
 export const PUT = async ({ params, request }: RequestEvent) => {
-	if (!isLocalDevFileMedia()) throw error(500, { message: m.clear_mellow_goat_lead() });
+	if (!isLocalDevFileMedia()) error(500, { message: m.clear_mellow_goat_lead() });
 	try {
 		const dirPath = path.join(process.cwd(), 'dev-uploads', params.id);
 		const filePath = path.join(dirPath, params.filename);
@@ -44,7 +47,7 @@ export const PUT = async ({ params, request }: RequestEvent) => {
 	} catch (err) {
 		if (err instanceof Error) {
 			console.error(err);
-			throw error(500, { message: err.message });
+			error(500, { message: err.message });
 		}
 		throw err;
 	}

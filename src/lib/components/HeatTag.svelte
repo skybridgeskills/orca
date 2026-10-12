@@ -1,12 +1,15 @@
 <script lang="ts">
-	export let heat = 0.0;
-	export let text = '';
-	export let href = '';
-	let elem = href ? 'a' : 'span';
+	interface Props {
+		heat?: number;
+		text?: string;
+		href?: string;
+	}
+
+	let { heat = 0.0, text = '', href = '' }: Props = $props();
 
 	type BarCount = 0 | 1 | 2 | 3 | 4;
 	// Clamp and round heat to min 0 and max 4
-	const filledBars = Math.min(4, Math.max(0, Math.round(heat))) as BarCount;
+	const filledBars = $derived(Math.min(4, Math.max(0, Math.round(heat))) as BarCount);
 
 	const strokes: { [K in BarCount]: string } = {
 		0: '#999',
@@ -23,15 +26,15 @@
 		4: 'url(#Gradient)'
 	};
 
-	let klass =
+	const baseClass =
 		'rounded-full py-0.5 px-2 text-xs font-semibold inline-flex items-center me-2 leading-6 bg-slate-500 dark:bg-slate-700 text-white dark:text-slate-100';
 	// Link hover color
-	if (href) {
-		klass += ' hover:bg-blue-500 dark:hover:bg-blue-500';
-	}
+	const klass = $derived(
+		href ? `${baseClass} hover:bg-blue-500 dark:hover:bg-blue-500` : baseClass
+	);
 </script>
 
-<svelte:element this={elem} class={klass} {...elem === 'a' ? { href } : {}} tabindex="0">
+<svelte:element this={href ? 'a' : 'span'} class={klass} {...href ? { href } : {}} tabindex="0">
 	<span class="truncate text-xs tagwidth">
 		{text}
 	</span>

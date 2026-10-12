@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
 import fs from 'fs';
+
 import {
 	BucketCannedACL,
 	CreateBucketCommand,
@@ -8,6 +8,7 @@ import {
 	S3Client,
 	type CORSRule
 } from '@aws-sdk/client-s3';
+import dotenv from 'dotenv';
 
 const main = async () => {
 	dotenv.config();
@@ -52,7 +53,7 @@ const main = async () => {
 
 		// Uploading files to the bucket
 		const command = new PutObjectCommand(params);
-		const results = await s3Client.send(command);
+		await s3Client.send(command);
 		console.log(
 			'Successfully created ' +
 				params.Key +
@@ -88,7 +89,7 @@ const main = async () => {
 				CORSRules: [corsRule]
 			}
 		});
-		const results = await s3Client.send(command);
+		await s3Client.send(command);
 		console.log('Successfully added CORS config.');
 	} catch (err) {
 		console.log('Error', err);

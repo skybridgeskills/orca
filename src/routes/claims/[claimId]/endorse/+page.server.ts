@@ -1,14 +1,19 @@
-import * as m from '$lib/i18n/messages';
-import { error, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
-import { prisma } from '$lib/../prisma/client';
 import type { AchievementClaim } from '@prisma/client';
-import stripTags from '$lib/utils/stripTags';
+import { error, redirect } from '@sveltejs/kit';
+
+import { prisma } from '$lib/../prisma/client';
 import { getValidUserClaim } from '$lib/data/achievementClaim';
+import { buildResults, getRubricForReview } from '$lib/data/resultDescription';
+import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
+import { isStewardUser } from '$lib/server/stewards';
+import stripTags from '$lib/utils/stripTags';
+
+import type { Actions } from './$types';
 
 export const load = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't hold org admin role
-	if (!locals.session?.user?.id) throw redirect(303, '/login');
+	if (!locals.session?.user?.id) redirect(303, '/login');
 
 	const claim = await prisma.achievementClaim.findUniqueOrThrow({
 		where: { id: params.claimId },
@@ -32,25 +37,17 @@ export const actions: Actions = {
 	default: async ({ locals, request, params }) => {
 		// Award a badge to a user by id (DID) or email identifier, but generate no user claim for it
 		if (!locals.session?.user) {
-			throw error(401, m.quick_happy_kite_zoom());
+			error(401, m.quick_happy_kite_zoom());
 		}
 
 		const requestData = await request.formData();
-		const data = {
-			organization: { connect: { id: locals.org.id } },
-
-			json: JSON.stringify({
-				id: stripTags(requestData.get('evidenceUrl')?.toString()),
-				narrative: stripTags(requestData.get('narrative')?.toString())
-			} as App.EvidenceItem)
-		};
+		const evidenceUrl = stripTags(requestData.get('evidenceUrl')?.toString());
+		const narrative = stripTags(requestData.get('narrative')?.toString());
 
 		const claim = await prisma.achievementClaim.findUniqueOrThrow({
 			where: { id: params.claimId },
 			include: {
-				achievement: {
-					include: { achievementConfig: true }
-				},
+				achievement: true,
 				endorsements: {
 					where: {
 						creatorId: locals.session.user.id
@@ -61,7 +58,22 @@ export const actions: Actions = {
 		});
 
 		const inviteeEmail = claim.user.identifiers.filter((i) => i.type == 'EMAIL')[0]?.identifier;
-		if (!inviteeEmail) throw error(400, m.curly_tired_guppy_link());
+		if (!inviteeEmail) error(400, m.curly_tired_guppy_link());
+
+		// Rubric: record the reviewer's per-criterion picks (self-describing Results).
+		// Pre-filter to allowed values so buildResults never throws on a tampered request.
+		const rubric = getRubricForReview(claim.achievement.json);
+		const picks: Record<string, string> = {};
+		for (const rd of rubric) {
+			const value = requestData.get(`result[${rd.id}]`)?.toString();
+			if (value && rd.allowedValue.includes(value)) picks[rd.id] = value;
+		}
+		const results = buildResults(picks, rubric);
+		const endorsementJson = JSON.stringify({
+			id: evidenceUrl,
+			narrative,
+			...(results.length ? { results } : {})
+		} as App.EvidenceItem);
 
 		const created = true;
 		// If there is a member, ensure that there is an AchievementClaim
@@ -79,34 +91,36 @@ export const actions: Actions = {
 				organization: { connect: { id: locals.org.id } },
 				achievement: { connect: { id: claim.achievementId } },
 				creator: { connect: { id: locals.session.user.id } },
-				json: data.json
+				json: endorsementJson
 			},
 			update: {
-				json: data.json,
+				json: endorsementJson,
 				claim: { connect: { id: claim.id } }
 			}
 		});
 
 		let updatedClaim: AchievementClaim | null = null;
 		let shouldMakeClaimValid = false;
+		// A steward (an assigned reviewer) validates a claim unilaterally, like an
+		// admin — regardless of the base review rule — but never their own claim.
+		const endorserIsSteward =
+			isStewardUser(claim.achievement, locals.session.user.id) &&
+			claim.userId !== locals.session.user.id;
 		// check the cases where we should make the claim valid
-		if (
-			!claim.validFrom &&
-			['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none')
-		) {
-			// If the current user is an admin, the claim becomes valid.
+		if (!claim.validFrom && (isAdmin(locals.session?.user) || endorserIsSteward)) {
+			// If the current user is an admin or an assigned steward, the claim becomes valid.
 			shouldMakeClaimValid = true;
-		} else if (!claim.validFrom && claim.achievement.achievementConfig?.reviewRequiresId) {
+		} else if (!claim.validFrom && claim.achievement.reviewRequiresId) {
 			// If the current user is not an admin but holds the required reviewer badge, the claim becomes valid.
 			const endorserReviewerBadge = await getValidUserClaim(
 				locals.session.user.id,
-				claim.achievement.achievementConfig.reviewRequiresId,
+				claim.achievement.reviewRequiresId,
 				locals.org.id
 			);
 			if (endorserReviewerBadge) {
 				shouldMakeClaimValid = true;
 			}
-		} else if (!claim.validFrom && !claim.achievement.achievementConfig?.reviewRequiresId) {
+		} else if (!claim.validFrom && !claim.achievement.reviewRequiresId) {
 			// If the validFrom date just isn't set already but should be.
 			shouldMakeClaimValid = true;
 		}

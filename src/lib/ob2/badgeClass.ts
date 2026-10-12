@@ -1,8 +1,11 @@
 import type { Achievement, Organization } from '@prisma/client';
+
 import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
+import { staticImageUrlForAchievement } from '$lib/utils/imageUrl';
+
 import { OB2_CONTEXT_URL, OB_VERSION_DESCRIPTORS, type OB_VERSION } from './constants';
 import { issuerFromOrganization, type OB2Issuer } from './issuer';
-import { staticImageUrlForAchievement } from '$lib/utils/imageUrl';
+
 import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 const OPEN_BADGES_ACHEIVEMENT_DEFINITION =

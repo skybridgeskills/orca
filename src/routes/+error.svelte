@@ -1,5 +1,6 @@
 <script>
 	import * as m from '$lib/i18n/messages';
+
 	import { page } from '$app/stores';
 </script>
 

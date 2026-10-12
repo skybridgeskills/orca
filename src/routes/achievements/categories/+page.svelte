@@ -1,9 +1,13 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
+	import type { AchievementCategory } from '@prisma/client';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
+
 	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import ButtonGroup from '$lib/components/ButtonGroup.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+	import * as m from '$lib/i18n/messages';
 	import {
 		achievementCategories,
 		upsertAchievementCategory,
@@ -11,14 +15,9 @@
 		fetchAchievementCategories,
 		acLoading
 	} from '$lib/stores/achievementCategoryStore';
-	import { enhance } from '$app/forms';
-	import type { PageData } from './$types';
-	import { stringify } from 'uuid';
-	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
-	import type { ActionResult } from '@sveltejs/kit';
-	import type { AchievementCategory } from '@prisma/client';
-	import { onMount } from 'svelte';
 	import { LoadingStatus } from '$lib/stores/common';
+
+	import { enhance } from '$app/forms';
 
 	interface CategoryForm {
 		id: string | null;
@@ -229,7 +228,7 @@
 						<button
 							form="createCategoryForm"
 							type="submit"
-							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 							>{m.fresh_bright_sparrow_create()}</button
 						>
 					</td>
@@ -239,8 +238,8 @@
 	{/if}
 </div>
 
-<form id="createCategoryForm" method="POST" action="?/create" use:enhance={enhanceUpsert} />
-<form id="updateCategoryForm" method="POST" action="?/update" use:enhance={enhanceUpsert} />
+<form id="createCategoryForm" method="POST" action="?/create" use:enhance={enhanceUpsert}></form>
+<form id="updateCategoryForm" method="POST" action="?/update" use:enhance={enhanceUpsert}></form>
 <form id="deleteCategoryForm" method="POST" action="?/delete" use:enhance={enhanceDelete}>
 	<input
 		form="deleteCategoryForm"

@@ -1,7 +1,7 @@
-import * as m from '$lib/i18n/messages';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClaimStatus } from '@prisma/client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import * as m from '$lib/i18n/messages';
 import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
 import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
 import { TransactionServiceUpstreamError } from '$lib/server/transactionService/client';
@@ -22,6 +22,10 @@ vi.mock('$lib/server/transactionService/config', () => ({
 vi.mock('$lib/../prisma/client', () => ({
 	prisma: { achievementClaim: { findUnique: mockFindUnique } }
 }));
+
+// P5: the exchange path now blocks suspended content; default to "not suspended".
+const mockIsSuspended = vi.hoisted(() => vi.fn().mockResolvedValue(false));
+vi.mock('$lib/server/moderation/suspension', () => ({ isSuspended: mockIsSuspended }));
 
 import { POST } from './+server';
 
@@ -78,6 +82,7 @@ function isKitError(e: unknown): e is { status: number; body: { message: string 
 describe('POST /claims/[claimId]/exchange', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		mockIsSuspended.mockResolvedValue(false);
 		mockIsExchangeEnabled.mockReturnValue(true);
 		mockFindUnique.mockResolvedValue(buildClaim());
 		mockCreateExchange.mockResolvedValue({

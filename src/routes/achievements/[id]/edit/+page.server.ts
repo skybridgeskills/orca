@@ -1,17 +1,30 @@
-import * as m from '$lib/i18n/messages';
-import type { Actions } from './$types';
-import { error, fail, json, redirect } from '@sveltejs/kit';
-import { prisma } from '../../../../prisma/client';
-import type { Achievement } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import stripTags from '../../../../lib/utils/stripTags';
-import { ValidationError } from 'yup';
-import { achievementFormSchema } from '$lib/data/achievementForm';
-import { getUploadUrl } from '$lib/server/media';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
+import { ValidationError } from 'yup';
+
 import { getAchievement } from '$lib/data/achievement';
-import { canEditAchievements } from '$lib/server/permissions';
+import {
+	achievementFormSchema,
+	resolveSelfRequirement,
+	SELF_REQUIREMENT
+} from '$lib/data/achievementForm';
 import type { Alignment } from '$lib/data/alignment';
+import {
+	diffAndApplyRubric,
+	getCurrentResultDescriptions,
+	parseRubricFromFormData
+} from '$lib/data/resultDescription';
+import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
+import { getUploadUrl } from '$lib/server/media';
+import { canEditAchievements } from '$lib/server/permissions';
+import { getUserSummaries } from '$lib/server/userDirectory';
+
+import stripTags from '../../../../lib/utils/stripTags';
+import { prisma } from '../../../../prisma/client';
+
+import type { Actions } from './$types';
 
 function parseAlignmentsFromFormData(formData: FormData): Alignment[] {
 	const alignments: Alignment[] = [];
@@ -49,25 +62,10 @@ function parseAlignmentsFromFormData(formData: FormData): Alignment[] {
 	return alignments;
 }
 
-interface AchievementConfigForm {
-	claimable: boolean;
-	claimRequires?: { connect: { id: string } } | undefined;
-	achievement: { connect: { id: string } };
-	organization: { connect: { id: string } };
-	reviewsRequired: number;
-	reviewRequires?: { connect: { id: string } } | undefined;
-	json?: {
-		capabilities: {
-			inviteRequires: string | null;
-		};
-		claimTemplate: string;
-	};
-}
-
 export const load = async ({ locals, params }) => {
 	// redirect user if logged out or doesn't have permission to edit achievements
 	if (!locals.session?.user?.id) {
-		throw redirect(302, `/achievements/${params.id}`);
+		redirect(302, `/achievements/${params.id}`);
 	}
 
 	const hasPermission = await canEditAchievements({
@@ -82,18 +80,15 @@ export const load = async ({ locals, params }) => {
 	});
 
 	if (!hasPermission) {
-		throw redirect(302, `/achievements/${params.id}`);
+		redirect(302, `/achievements/${params.id}`);
 	}
 
 	const achievement = (await prisma.achievement.findFirstOrThrow({
 		where: {
 			id: params.id,
 			organizationId: locals.org.id
-		},
-		include: {
-			achievementConfig: true
 		}
-	})) as Achievement & { achievementConfig?: App.AchievementConfig };
+	})) as unknown as App.AchievementWithJson;
 
 	const categories = await prisma.achievementCategory.findMany({
 		where: {
@@ -104,17 +99,26 @@ export const load = async ({ locals, params }) => {
 		}
 	});
 
+	// Every saved steward who is still a user of the org, whatever the directory
+	// rules, so a save by a non-admin editor never drops one an admin chose.
+	const selectedStewards = await getUserSummaries({
+		orgId: locals.org.id,
+		ids: achievement.json?.stewards ?? [],
+		includeEmail: isAdmin(locals.session.user)
+	});
+
 	return {
 		organization: locals.org,
 		achievement: achievement,
-		categories: categories
+		categories: categories,
+		selectedStewards
 	};
 };
 
 export const actions: Actions = {
 	default: async ({ locals, request, params }) => {
 		if (!locals.session?.user?.id) {
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 		}
 
 		const hasPermission = await canEditAchievements({
@@ -129,7 +133,7 @@ export const actions: Actions = {
 		});
 
 		if (!hasPermission) {
-			throw error(403, m.lower_home_cow_view());
+			error(403, m.lower_home_cow_view());
 		}
 
 		const requestData = await request.formData();
@@ -163,6 +167,10 @@ export const actions: Actions = {
 
 			category: stripTags(requestData.get('category')?.toString()),
 
+			// OB3 achievementType: strip/trim, empty -> undefined (which clears the column below).
+			achievementType:
+				stripTags(requestData.get('achievementType')?.toString())?.trim() || undefined,
+
 			// Properties for AchievmentConfig
 			capabilities_inviteRequires:
 				requestData.get('capabilities_inviteRequires')?.toString() || null,
@@ -180,72 +188,71 @@ export const actions: Actions = {
 			(requestData.get('claimTemplate_enabled')?.toString() || 'off') === 'on';
 		const rawClaimTemplate = stripTags(requestData.get('claimTemplate')?.toString() || '');
 		const claimTemplate = claimTemplate_enabled ? rawClaimTemplate : '';
-		const mergedAchievementJson = { ...achievementJsonBaseline } as Record<string, unknown>;
-		delete mergedAchievementJson.alignments;
-		if (formData.alignments.length > 0) {
-			mergedAchievementJson.alignment = formData.alignments;
-		} else {
-			delete mergedAchievementJson.alignment;
-		}
+		const claimable = formData.claimable == 'on';
 
-		const achievementData = {
-			name: formData.name,
-			description: formData.description,
-			criteriaId: formData.criteriaId,
-			criteriaNarrative: formData.criteriaNarrative,
-			...(imageUpdated ? { image: imageKey } : null), // Only include the image field value if image is changed.
-			category:
-				formData.category != 'uncategorized'
-					? { connect: { id: formData.category } }
-					: { disconnect: true },
-			json: mergedAchievementJson as unknown as Prisma.InputJsonObject
-		};
+		// claimRequires: only when claimable, the 'badge' option is selected, and a
+		// prerequisite badge was chosen.
+		let claimRequires: { connect: { id: string } } | undefined =
+			claimable && formData.claimableSelectedOption == 'badge' && !!formData.claimRequires
+				? { connect: { id: formData.claimRequires } }
+				: undefined;
 
-		let configData: AchievementConfigForm = {
-			claimable: formData.claimable == 'on',
-			organization: { connect: { id: locals.org.id } },
-			achievement: { connect: { id: params.id } },
-			reviewsRequired: formData.reviewsRequired
-		};
+		// reviewRequires: decided on the form's reviewsRequired (before the admin
+		// override below), matching the pre-merge ordering.
+		let reviewRequires: { connect: { id: string } } | undefined;
+		if (formData.reviewsRequired > 0 && !!formData.reviewRequires)
+			// "This badge": resolve the 'self' sentinel to this achievement's own id (the row
+			// already exists in edit, so a nested connect is fine).
+			reviewRequires = {
+				connect: { id: resolveSelfRequirement(formData.reviewRequires, params.id) || '' }
+			};
+		else if (formData.reviewsRequired == 0) reviewRequires = undefined;
 
 		if (
-			configData['claimable'] &&
-			formData.claimableSelectedOption == 'badge' &&
-			!!formData.claimRequires
-		)
-			configData['claimRequires'] = {
-				connect: { id: formData.claimRequires }
-			};
-		else configData['claimRequires'] = undefined;
-
-		if (configData['reviewsRequired'] > 0 && !!formData.reviewRequires)
-			configData['reviewRequires'] = {
-				connect: { id: formData.reviewRequires || '' }
-			};
-		else if (configData['reviewsRequired'] == 0) configData['reviewRequires'] = undefined;
-
-		if (formData.capabilities_inviteRequires) {
+			formData.capabilities_inviteRequires &&
+			formData.capabilities_inviteRequires !== SELF_REQUIREMENT
+		) {
 			try {
-				const relatedInviteRequiresAchievement = await getAchievement(
-					formData.capabilities_inviteRequires,
-					locals.org.id
-				);
-			} catch (e) {
+				await getAchievement(formData.capabilities_inviteRequires, locals.org.id);
+			} catch {
 				return fail(400, {
 					code: 'inviteRequires',
 					message: m.swift_steady_falcon_notfound()
 				});
 			}
 		}
-		configData['json'] = {
-			capabilities: {
-				inviteRequires: formData.capabilities_inviteRequires
-			},
-			claimTemplate
-		};
 
 		// "Reviewed by an admin requires only one review, no matter what."
-		if (formData.reviewableSelectedOption == 'admin') configData['reviewsRequired'] = 1;
+		const reviewsRequired =
+			formData.reviewableSelectedOption == 'admin' ? 1 : formData.reviewsRequired;
+
+		// Stewards (additive overlay): persisted only when review is required, filtered
+		// to current org members (non-member IDs from a tampered request are dropped).
+		const requestedStewards = [
+			...new Set(requestData.getAll('stewards').map(String).filter(Boolean))
+		];
+		const stewardMembers = requestedStewards.length
+			? await prisma.user.findMany({
+					where: { organizationId: locals.org.id, id: { in: requestedStewards } },
+					select: { id: true }
+				})
+			: [];
+		const stewards =
+			formData.reviewableSelectedOption !== 'none' && stewardMembers.length
+				? stewardMembers.map((u) => u.id)
+				: undefined;
+
+		// Rubric: diff the submitted result descriptions against the existing rubric
+		// (keep id when unchanged, re-mint on content change, drop removed rows).
+		const submittedRubric = parseRubricFromFormData(requestData).map((rd) => ({
+			...rd,
+			name: stripTags(rd.name),
+			allowedValue: rd.allowedValue.map((v) => stripTags(v))
+		}));
+		const resultDescriptions = diffAndApplyRubric(
+			submittedRubric,
+			getCurrentResultDescriptions(achievementJsonBaseline)
+		);
 
 		try {
 			await achievementFormSchema.validate(formData);
@@ -254,50 +261,87 @@ export const actions: Actions = {
 		}
 
 		// If achievement is not claimable, don't allow claimRequires to be set to anything.
-		if (!configData.claimable && !!configData.claimRequires?.connect.id)
-			configData.claimRequires = undefined;
+		if (!claimable && !!claimRequires?.connect.id) claimRequires = undefined;
 
-		const upsertData = {
-			where: {
-				achievementId: params.id
-			},
-			update: {
-				claimable: configData.claimable,
-				claimRequires: !!configData.claimRequires ? configData.claimRequires : { disconnect: true },
-				reviewRequires: !!configData.reviewRequires
-					? configData.reviewRequires
-					: { disconnect: true },
-				reviewsRequired: configData.reviewsRequired,
-				json: configData.json
-			},
-			create: configData
+		// Merge the flattened config json (capabilities, claimTemplate, reviewsRequired)
+		// into the achievement json alongside the pre-existing keys (e.g. alignment).
+		const mergedAchievementJson = { ...achievementJsonBaseline } as Record<string, unknown>;
+		delete mergedAchievementJson.alignments;
+		if (formData.alignments.length > 0) {
+			mergedAchievementJson.alignment = formData.alignments;
+		} else {
+			delete mergedAchievementJson.alignment;
+		}
+		mergedAchievementJson.capabilities = {
+			inviteRequires: resolveSelfRequirement(formData.capabilities_inviteRequires, params.id)
 		};
-		// TODO update records in a transaction
-		try {
-			const achievementConfig = await prisma.achievementConfig.upsert(upsertData);
-		} catch (e) {
-			if (e instanceof Prisma.PrismaClientKnownRequestError) {
-				if (e.code == 'P2025') {
-					return fail(400, {
-						code: 'claimRequires',
-						message: m.swift_steady_falcon_notfound()
-					});
-				}
-			}
-			throw error(500, m.fresh_bright_sparrow_saveerror());
+		mergedAchievementJson.claimTemplate = claimTemplate;
+		mergedAchievementJson.reviewsRequired = reviewsRequired;
+		if (stewards) {
+			mergedAchievementJson.stewards = stewards;
+		} else {
+			delete mergedAchievementJson.stewards;
+		}
+		if (resultDescriptions.length) {
+			mergedAchievementJson.resultDescriptions = resultDescriptions;
+		} else {
+			delete mergedAchievementJson.resultDescriptions;
 		}
 
-		const updated = await prisma.achievement.update({
-			where: {
-				id: params.id,
-				organizationId: locals.org.id
-			},
-			include: {
-				category: true,
-				achievementConfig: true
-			},
-			data: achievementData
-		});
+		// Preserve the stored achievementType on a plain edit. The edit form does not
+		// expose this field, so only overwrite it when the request actually carries it
+		// (e.g. a future type picker). Without this guard every edit would write null and
+		// wipe a type set elsewhere — e.g. the skills picker's 'Competency' — which would
+		// revert the competency icon to the no-image (Ribbon) fallback.
+		const achievementTypeUpdate = requestData.has('achievementType')
+			? { achievementType: formData.achievementType ?? null }
+			: {};
+
+		const achievementData = {
+			name: formData.name,
+			description: formData.description,
+			criteriaId: formData.criteriaId,
+			criteriaNarrative: formData.criteriaNarrative,
+			...achievementTypeUpdate,
+			...(imageUpdated ? { image: imageKey } : null), // Only include the image field value if image is changed.
+			category:
+				formData.category && formData.category != 'uncategorized'
+					? { connect: { id: formData.category } }
+					: { disconnect: true },
+			claimable,
+			claimRequires: claimRequires ? claimRequires : { disconnect: true },
+			reviewRequires: reviewRequires ? reviewRequires : { disconnect: true },
+			json: mergedAchievementJson as unknown as Prisma.InputJsonObject
+		};
+
+		// Single atomic write (replaces the former config-upsert + achievement-update).
+		// A bad claimRequires/reviewRequires connect surfaces as P2025 -> 400.
+		const updated = await prisma.achievement
+			.update({
+				where: {
+					id: params.id,
+					organizationId: locals.org.id
+				},
+				include: {
+					category: true,
+					claimRequires: true,
+					reviewRequires: true
+				},
+				data: achievementData
+			})
+			.catch((e) => {
+				if (e instanceof Prisma.PrismaClientKnownRequestError && e.code == 'P2025') {
+					return null;
+				}
+				error(500, m.fresh_bright_sparrow_saveerror());
+			});
+
+		if (!updated) {
+			return fail(400, {
+				code: 'claimRequires',
+				message: m.swift_steady_falcon_notfound()
+			});
+		}
 
 		const imageUploadUrl = imageUpdated && imageKey ? await getUploadUrl(imageKey) : null;
 

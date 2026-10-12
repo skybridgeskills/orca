@@ -1,37 +1,27 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { page } from '$app/stores';
+	import type { Achievement, AchievementClaim } from '@prisma/client';
+
 	import Alert from '$lib/components/Alert.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import type {
-		Achievement,
-		AchievementConfig,
-		AchievementCategory,
-		AchievementClaim,
-		ClaimStatus
-	} from '@prisma/client';
+	import * as m from '$lib/i18n/messages';
+	import { getSession } from '$lib/session/context';
 
-	export let achievement: Achievement & {
-		category: AchievementCategory | null;
-		achievementConfig: AchievementConfig | null;
-	};
-	export let relatedAchievements: Array<
-		Achievement & {
-			category: AchievementCategory | null;
-			achievementConfig: AchievementConfig | null;
-		}
-	>;
-	export let relatedClaims: AchievementClaim[];
-	export let showClaimLink = false;
+	import { resolve } from '$app/paths';
+
+	interface Props {
+		achievement: App.AchievementWithRelations;
+		relatedAchievements: Achievement[];
+		relatedClaims: AchievementClaim[];
+		showClaimLink?: boolean;
+	}
+
+	let { achievement, relatedAchievements, relatedClaims, showClaimLink = false }: Props = $props();
+	const session = getSession();
 
 	const userHoldsAchievement = () =>
 		relatedClaims.filter((c) => c.achievementId == achievement.id).length > 0;
 	const userHoldsRequiredAchievement = () =>
-		relatedClaims.filter((c) => c.achievementId == achievement.achievementConfig?.claimRequiresId)
-			.length > 0;
-
-	const reviewRequires = (): Achievement | undefined =>
-		relatedAchievements.filter((c) => c.achievementConfig?.reviewRequiresId == achievement.id)[0];
+		relatedClaims.filter((c) => c.achievementId == achievement.claimRequiresId).length > 0;
 </script>
 
 {#if userHoldsAchievement()}
@@ -45,20 +35,20 @@
 					{#if claim.claimStatus == 'UNACCEPTED'}
 						{m.kind_dry_panther_bask()}
 						<a
-							href={`/achievements/${achievement.id}/claim`}
+							href={resolve(`/achievements/${achievement.id}/claim`)}
 							class="text-bold underline hover:no-underline">{m.best_teary_shrimp_pause()}</a
 						>
 					{:else if claim.claimStatus == 'ACCEPTED'}
 						{m.weary_bold_myna_buy()}
 						<a
-							href={`/achievements/${achievement.id}/claim`}
+							href={resolve(`/achievements/${achievement.id}/claim`)}
 							class="text-bold underline hover:no-underline">{m.gray_plane_kite_deny()}</a
 						>
 					{:else}
 						{m.piquant_curly_mantis_tickle()}
 						{#if showClaimLink}
 							<a
-								href={`/achievements/${achievement.id}/claim`}
+								href={resolve(`/achievements/${achievement.id}/claim`)}
 								class="text-bold underline hover:no-underline">{m.gray_plane_kite_deny()}</a
 							>
 						{/if}
@@ -67,7 +57,7 @@
 			{/each}
 		</Alert>
 	</div>
-{:else if achievement.achievementConfig?.claimable && achievement.achievementConfig?.claimRequiresId}
+{:else if achievement.claimable && achievement.claimRequiresId}
 	<div class="max-w-2xl flex justify-between items-center mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
 			{#if userHoldsRequiredAchievement()}
@@ -78,18 +68,18 @@
 		</h2>
 		<div>
 			{#if showClaimLink && userHoldsRequiredAchievement()}
-				<a href={`/achievements/${achievement.id}/claim`}>
+				<a href={resolve(`/achievements/${achievement.id}/claim`)}>
 					<Button text={m.bold_swift_eagle_claim()} />
 				</a>
 			{/if}
 		</div>
 	</div>
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
-		{#each relatedAchievements.filter((rc) => achievement.achievementConfig?.claimRequiresId == rc.id) as claimRequires (claimRequires.id)}
+		{#each relatedAchievements.filter((rc) => achievement.claimRequiresId == rc.id) as claimRequires (claimRequires.id)}
 			<span>
 				{m.sharp_quiet_panther_requires()}
 				<a
-					href={`/achievements/${claimRequires.id}`}
+					href={resolve(`/achievements/${claimRequires.id}`)}
 					class="font-bold underline hover:no-underline"
 				>
 					{claimRequires.name}</a
@@ -100,10 +90,10 @@
 			</span>
 		{/each}
 	</p>
-{:else if achievement.achievementConfig?.claimable && !achievement.achievementConfig?.claimRequiresId}
+{:else if achievement.claimable && !achievement.claimRequiresId}
 	<div class="max-w-2xl flex justify-between items-center mt-4">
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">
-			{#if $page.data.session?.user.id}
+			{#if $session?.user?.id}
 				{m.fresh_bright_sparrow_openclaim()}
 			{:else}
 				{m.quick_safe_deer_enabled()}
@@ -111,7 +101,7 @@
 		</h2>
 		<div>
 			{#if showClaimLink}
-				<a href={`/achievements/${achievement.id}/claim`}>
+				<a href={resolve(`/achievements/${achievement.id}/claim`)}>
 					<Button text="Claim" />
 				</a>
 			{/if}
@@ -121,7 +111,7 @@
 	<p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
 		{m.sharp_fluffy_mantis_delight()}
 	</p>
-{:else if !achievement.achievementConfig?.claimable || false}
+{:else if !achievement.claimable || false}
 	<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.firm_clear_fox_disabled()}</h2>
 	<p class="max-w-2xl mt-4 text-sm text-gray-500 dark:text-gray-400">
 		{m.calm_steady_lynx_adminonly()}

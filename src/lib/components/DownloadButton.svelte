@@ -1,19 +1,40 @@
 <script lang="ts">
 	import Button from './Button.svelte';
 
-	export let text: string = '';
-	export let sourceUrl: string = '';
-	export let fileName: string | null = null;
+	interface Props {
+		class?: string;
+		text?: string;
+		sourceUrl?: string;
+		fileName?: string | null;
+		id?: string;
+		buttonType?: 'button' | 'submit';
+		moreProps?: object;
+		submodule?: App.ButtonRole;
+	}
 
-	let klass = '';
-	export { klass as class };
-	export let id: string = '';
-	export let buttonType: 'button' | 'submit' = 'button';
-	export let moreProps: Object = {};
-	export let submodule: App.ButtonRole = 'primary';
+	let {
+		class: klass = '',
+		text = '',
+		sourceUrl = '',
+		fileName = null,
+		id = '',
+		buttonType = 'button',
+		moreProps = {},
+		submodule = 'primary'
+	}: Props = $props();
+
+	let errorMessage = $state('');
 
 	const download = async () => {
+		errorMessage = '';
 		const response = await fetch(sourceUrl, { method: 'POST', body: '' });
+
+		// A refusal (e.g. 403 for suspended content) must not be saved as the file.
+		if (!response.ok) {
+			const body = await response.json().catch(() => null);
+			errorMessage = body?.message || response.statusText || String(response.status);
+			return;
+		}
 
 		const responseBlob = await response.blob();
 		const href = URL.createObjectURL(responseBlob);
@@ -27,6 +48,8 @@
 	};
 </script>
 
-<Button {id} {buttonType} {submodule} {...moreProps} on:click={download} class={klass}
-	>{text}</Button
+<Button {id} {buttonType} {submodule} {...moreProps} onclick={download} class={klass}>{text}</Button
 >
+{#if errorMessage}
+	<p class="mt-2 text-sm text-red-600 dark:text-red-500" role="alert">{errorMessage}</p>
+{/if}

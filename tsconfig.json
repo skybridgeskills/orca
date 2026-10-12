@@ -1,35 +1,35 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		"paths": { "$lib": ["./src/lib"], "$lib/*": ["./src/lib/*"] },
-		"rootDirs": ["..", ".", ".svelte-kit/types", "types"],
-		"typeRoots": ["./types", "./node_modules/@types"],
 		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,
-		"moduleResolution": "bundler",
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"outDir": "./.svelte-kit",
-		"verbatimModuleSyntax": true,
-		"ignoreDeprecations": "5.0"
+		"moduleResolution": "bundler",
+		"typeRoots": ["./types", "./node_modules/@types"]
 	},
+	// Path aliases ($lib, etc.), rootDirs and verbatimModuleSyntax are inherited
+	// from ./.svelte-kit/tsconfig.json. Do not redefine `paths`, `baseUrl` or
+	// `rootDirs` here — doing so triggers svelte-check's "baseUrl/paths
+	// interferes" notice. https://svelte.dev/docs/kit/configuration#typescript
+	//
+	// The generated include does not pick up the hand-written ambient module
+	// declarations under ./types, so include them explicitly here.
 	"include": [
-		"/**/*.ts",
 		".svelte-kit/ambient.d.ts",
 		".svelte-kit/types/**/$types.d.ts",
 		"types/**/*.d.ts",
 		"src/**/*.d.ts",
-		"vite.config.ts",
 		"src/**/*.js",
 		"src/**/*.ts",
 		"src/**/*.svelte",
 		"tests/**/*.js",
 		"tests/**/*.ts",
-		"tests/**/*.svelte"
-	],
-	"exclude": ["node_modules"]
+		"tests/**/*.svelte",
+		"vite.config.js"
+	]
 }

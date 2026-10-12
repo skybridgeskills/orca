@@ -1,19 +1,25 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
 	import Button from '$lib/components/Button.svelte';
+	import * as m from '$lib/i18n/messages';
+	import { isAdmin, isGeneralAdmin } from '$lib/permissions/isAdmin';
+	import { getSession } from '$lib/session/context';
 
-	export let data: PageData;
+	import type { PageProps } from './$types';
+
+	import { resolve } from '$app/paths';
+
+	let { data }: PageProps = $props();
+	const session = getSession();
 </script>
 
-{#if data.session?.user?.orgRole === 'GENERAL_ADMIN'}
+{#if isGeneralAdmin($session?.user)}
 	<div class="max-w-2xl flex justify-between items-center">
 		<h1 class="inline-flex mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white">
 			{m.mellow_elegant_parrot_ask()}
 			{data.org.name}
 		</h1>
 		<p class="">
-			<a class="text-gray-900 dark:text-gray-100" href="/about/edit"
+			<a class="text-gray-900 dark:text-gray-100" href={resolve('/about/edit')}
 				><Button text={m.sharp_clear_fox_edit()} /></a
 			>
 		</p>
@@ -25,9 +31,12 @@
 	</h1>
 {/if}
 
-{#if ['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(data.session?.user?.orgRole ?? '')}
+{#if isAdmin($session?.user)}
 	<p class="max-w-2xl mt-3 text-sm">
-		<a class="text-blue-600 dark:text-blue-400 hover:underline" href="/about/settings/issuer">
+		<a
+			class="text-blue-600 dark:text-blue-400 hover:underline"
+			href={resolve('/about/settings/issuer')}
+		>
 			Manage issuer settings
 		</a>
 	</p>
@@ -40,8 +49,10 @@
 {#if data.org.url}
 	<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 		{m.nice_aqua_scallop_climb()}
-		<a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href={data.org.url}
-			>{data.org.url}</a
+		<a
+			class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+			href={data.org.url}
+			rel="external">{data.org.url}</a
 		>
 	</p>
 {/if}

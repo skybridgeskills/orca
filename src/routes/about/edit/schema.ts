@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+
 import { locales } from '$lib/i18n/runtime';
 
 const availableLanguageTagsArray = [...locales];

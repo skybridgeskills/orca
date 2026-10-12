@@ -1,16 +1,14 @@
-import jsigs from 'jsonld-signatures';
-const {
-	purposes: { AssertionProofPurpose }
-} = jsigs;
-import { extendedDocumentLoader } from './documentLoader';
+import { DataIntegrityProof } from '@interop/data-integrity-proof';
+import { eddsaRdfc2022 } from '@interop/ed25519-signature/eddsa-rdfc-2022';
+import { Ed25519VerificationKey } from '@interop/ed25519-verification-key';
+import { issue, type VerifiableCredential } from '@interop/vc';
 import type { Achievement, AchievementClaim, Organization, User, Identifier } from '@prisma/client';
 
-// Required to set up a suite instance with private key
-import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020';
-import { Ed25519Signature2020 } from '@digitalbazaar/ed25519-signature-2020';
-import { KeyDID, OrganizationDID } from '$lib/credentials/did';
 import { buildAchievementCredentialTemplate } from '$lib/credentials/credentialTemplate';
+import { MultikeyDID, OrganizationDID } from '$lib/credentials/did';
 import { resolveActiveSigningKey } from '$lib/server/signingKey/resolver';
+
+import { extendedDocumentLoader } from './documentLoader';
 
 export const achievementClaimToCredential = async function (
 	claim: AchievementClaim & {
@@ -22,25 +20,37 @@ export const achievementClaimToCredential = async function (
 	const credentialTemplate = buildAchievementCredentialTemplate(claim, organization);
 	const signingKey = await resolveActiveSigningKey(organization as App.Organization);
 	const organizationDid = new OrganizationDID(organization);
-	const keyDid = new KeyDID(organization, signingKey);
+	// The Multikey verification-method id is the proof creator for new credentials
+	// (DataIntegrityProof / eddsa-rdfc-2022). The signer reports `id: keyData.id`, so
+	// `proof.verificationMethod` becomes the Multikey identifier.
+	const verificationMethodDid = new MultikeyDID(organization, signingKey);
 	const keyData = {
-		id: keyDid.didString(),
+		id: verificationMethodDid.didString(),
 		controller: organizationDid.didString(),
 		privateKeyMultibase: signingKey.privateKeyMultibase,
 		publicKeyMultibase: signingKey.publicKeyMultibase
 	};
 
-	const keyPair = await Ed25519VerificationKey2020.from(keyData);
+	const keyPair = await Ed25519VerificationKey.from(keyData);
+	const suite = new DataIntegrityProof({
+		signer: keyPair.signer(),
+		cryptosuite: eddsaRdfc2022,
+		date: new Date().toISOString()
+	});
 
-	const suite = new Ed25519Signature2020({ key: keyPair }); //might need to use signer param
-	// Set date as property (not in type definition but works at runtime)
-	(suite as any).date = new Date().toISOString();
+	// `issue()` mutates the credential in place, so sign a deep copy. With the VC 2.0
+	// context present, `DataIntegrityProof.ensureSuiteContext` adds nothing, so no
+	// suite context is appended to `@context`.
+	const credentialCopy = structuredClone(credentialTemplate);
 
-	const signedCredential = await jsigs.sign(credentialTemplate, {
+	// orca maintains its own OB3 credential types; cast at the @interop/vc
+	// boundary, where the structural VC type differs only in fields irrelevant
+	// to signing (e.g. `evidence`).
+	const signedCredential = await issue({
+		credential: credentialCopy as unknown as VerifiableCredential,
 		suite,
-		purpose: new AssertionProofPurpose(),
 		documentLoader: extendedDocumentLoader
-	} as any);
+	});
 
 	return signedCredential as App.OpenBadgeCredential;
 };

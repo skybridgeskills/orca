@@ -1,24 +1,4 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { page } from '$app/stores';
-	import dayjs from 'dayjs';
-	import relativeTime from 'dayjs/plugin/relativeTime.js';
-	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
-	import Modal from '$lib/components/Modal.svelte';
-	import type { PageData } from './$types';
-	import Icon from 'svelte-icons-pack/Icon.svelte';
-	import FaSolidEnvelopeOpenText from 'svelte-icons-pack/fa/FaSolidEnvelopeOpenText.js';
-	import FaSolidInfoCircle from 'svelte-icons-pack/fa/FaSolidInfoCircle.js';
-	import FaTrashAlt from 'svelte-icons-pack/fa/FaTrashAlt.js';
-	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
-	import { imageUrl } from '$lib/utils/imageUrl';
-	import { isAdmin } from '$lib/permissions/isAdmin';
-	import ClaimSummaryCard from '$lib/components/achievement/ClaimSummaryCard.svelte';
-	import Heading from '$lib/components/Heading.svelte';
-	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
-	import QRCode from '$lib/components/QRCode.svelte';
 	import type {
 		Achievement,
 		AchievementCategory,
@@ -26,85 +6,96 @@
 		ClaimEndorsement,
 		User
 	} from '@prisma/client';
+	import dayjs from 'dayjs';
+	import relativeTime from 'dayjs/plugin/relativeTime.js';
+	import { onMount, setContext } from 'svelte';
+	import { Icon } from 'svelte-icons-pack';
+	import { FaSolidEnvelopeOpenText } from 'svelte-icons-pack/fa';
+	import { FaSolidCircleInfo as FaSolidInfoCircle } from 'svelte-icons-pack/fa';
+	import { FaSolidTrash as FaTrashAlt } from 'svelte-icons-pack/fa';
+
+	import AchievementIcon from '$lib/components/achievement/AchievementIcon.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
+	import ClaimSummaryCard from '$lib/components/achievement/ClaimSummaryCard.svelte';
+	import Badge from '$lib/components/Badge.svelte';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import Heading from '$lib/components/Heading.svelte';
+	import KebabMenu from '$lib/components/KebabMenu.svelte';
+	import Modal from '$lib/components/Modal.svelte';
+	import ReportModal from '$lib/components/moderation/ReportModal.svelte';
+	import QRCode from '$lib/components/QRCode.svelte';
+	import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
+	import * as m from '$lib/i18n/messages';
+	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
+	import { isAdmin } from '$lib/permissions/isAdmin';
+	import { getSession } from '$lib/session/context';
 	import {
 		acLoading,
 		fetchAchievementCategories,
 		getCategoryById
 	} from '$lib/stores/achievementCategoryStore';
-	import ClaimList from '$lib/components/achievement/ClaimList.svelte';
-	import { onMount, setContext } from 'svelte';
-	import { calculatePageAndSize } from '$lib/utils/pagination';
-	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
-	import { ensureLoaded } from '$lib/stores/common';
 	import {
 		achievements,
 		achievementsLoading,
 		fetchAchievements
 	} from '$lib/stores/achievementStore';
-	import {
-		backpackClaims,
-		backpackClaimsLoading,
-		fetchBackpackClaims
-	} from '$lib/stores/backpackStore';
+	import { ensureLoaded } from '$lib/stores/common';
+	import { calculatePageAndSize } from '$lib/utils/pagination';
+
+	import type { PageProps } from './$types';
+
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
+	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
 	dayjs.extend(relativeTime);
 
-	export let data: PageData;
+	let { data }: PageProps = $props();
+	const session = getSession();
 
-	$: alignments = alignmentRowsFromAchievementJson(data.achievement.json);
-	$: hasAlignments = alignments.length > 0;
-	let showDeleteModal = false;
-	let showShareModal = false;
+	const alignments = $derived(alignmentRowsFromAchievementJson(data.achievement.json));
+	const hasAlignments = $derived(alignments.length > 0);
+	let showDeleteModal = $state(false);
+	let showShareModal = $state(false);
+	let showReportModal = $state(false);
 
-	const breadcrumbItems = [
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
 		{ text: data.achievement.name }
-	];
+	]);
 
-	let config: App.AchievementConfig | null = null;
-	let claim: AchievementClaim | undefined;
-	let category: AchievementCategory | undefined;
-	let userHoldsRequiredAchievement = false;
-	let inviteCapability = false;
-	let reviewRequires: Achievement | undefined;
-	let invite: (ClaimEndorsement & { creator: User | null }) | undefined;
-	$: {
-		config = data.achievement.achievementConfig as App.AchievementConfig | null;
-		claim = data.relatedClaims.find((c) => data.achievement.id == c.achievementId);
-		userHoldsRequiredAchievement =
-			data.relatedClaims.filter(
-				(c) =>
-					c.achievementId == config?.claimRequiresId &&
-					c.validFrom !== null &&
-					c.claimStatus === 'ACCEPTED' &&
-					(c.validUntil === null || new Date(c.validUntil) > new Date())
-			).length > 0;
-		inviteCapability =
-			isAdmin({ user: data.session?.user || undefined }) ||
-			(!!config?.json?.capabilities?.inviteRequires &&
-				!!$backpackClaims.find(
-					(c) =>
-						c.achievementId == config?.json?.capabilities?.inviteRequires &&
-						c.validFrom &&
-						c.claimStatus == 'ACCEPTED'
-				));
+	let category: AchievementCategory | undefined = $state();
 
-		reviewRequires = data.relatedAchievements
-			.filter((c) => data.achievement.achievementConfig?.reviewRequiresId == c.id)
-			.find(() => true);
+	const config = $derived(data.achievement as unknown as App.AchievementWithRelations);
+	const claim: AchievementClaim | undefined = $derived(
+		data.relatedClaims.find((c) => data.achievement.id == c.achievementId)
+	);
+	const userHoldsRequiredAchievement = $derived(
+		data.relatedClaims.filter(
+			(c) =>
+				c.achievementId == config?.claimRequiresId &&
+				c.validFrom !== null &&
+				c.claimStatus === 'ACCEPTED' &&
+				(c.validUntil === null || new Date(c.validUntil) > new Date())
+		).length > 0
+	);
+	const reviewRequires: Achievement | undefined = $derived(
+		data.relatedAchievements.filter((c) => config?.reviewRequiresId == c.id).find(() => true)
+	);
+	const invite: (ClaimEndorsement & { creator: User | null }) | undefined = $derived(
+		data.outstandingInvites.find(() => true)
+	);
 
-		invite = data.outstandingInvites.find((a) => true);
-	}
-
+	// setContext runs once during init; using the initial `data` is intentional.
+	// svelte-ignore state_referenced_locally
 	setContext('achievementId', data.achievement.id);
-	setContext('session', data.session);
 
 	onMount(async () => {
 		await ensureLoaded(achievementsLoading, fetchAchievements);
 		await ensureLoaded(acLoading, fetchAchievementCategories);
-		await ensureLoaded(backpackClaimsLoading, fetchBackpackClaims);
 		category = getCategoryById(data.achievement.categoryId ?? 'Uncategorized');
 	});
 </script>
@@ -112,11 +103,21 @@
 <Breadcrumbs items={breadcrumbItems} />
 
 <div class="max-w-2xl flex justify-between items-center mb-4">
-	<h1 class="inline-flex mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white">
+	<h1
+		class="inline-flex items-center gap-2 mt-1 mr-3 text-xl sm:text-2xl text-gray-800 dark:text-white"
+	>
 		{data.achievement.name}
+		{#if data.suspension}
+			<Badge
+				text={data.suspension.tier === 'SITE'
+					? m.flat_grey_moth_global()
+					: m.flat_grey_moth_local()}
+				variant="danger"
+			/>
+		{/if}
 	</h1>
 	<div class="inline-flex items-center">
-		{#if inviteCapability}
+		{#if data.inviteCapability}
 			<Button
 				href={`/achievements/${data.achievement.id}/award`}
 				text={m.bright_happy_sparrow_award()}
@@ -130,10 +131,10 @@
 				text={m.sharp_clear_fox_edit()}
 			/>
 		{/if}
-		{#if isAdmin({ user: data.session?.user || undefined })}
+		{#if isAdmin($session?.user)}
 			<Button
 				submodule="danger"
-				on:click={() => {
+				onclick={() => {
 					showDeleteModal = true;
 				}}
 			>
@@ -146,7 +147,7 @@
 		<Button
 			text={m.happy_sparse_lemur_clasp()}
 			submodule="secondary"
-			on:click={() => {
+			onclick={() => {
 				showShareModal = true;
 			}}
 		/>
@@ -161,27 +162,35 @@
 				submodule="primary"
 			/>
 		{/if}
+		<KebabMenu id="achievement-kebab" label={m.brisk_zesty_otter_flag()}>
+			<li>
+				<button
+					type="button"
+					class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+					onclick={() => {
+						showReportModal = true;
+					}}
+				>
+					{m.brisk_zesty_otter_flag()}
+				</button>
+			</li>
+		</KebabMenu>
 	</div>
 </div>
 
 {#if category !== undefined}
 	<span
-		class="bg-gray-100 text-gray-800 text-md font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
+		class="bg-gray-100 text-gray-800 text-md font-medium mr-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-gray-300"
 		>{m.serious_gentle_boar_nurture()}: {category.name}</span
 	>
 {/if}
 
 <div class="mb-4 max-w-xs dark:bg-gray-200 mt-4 p-2 rounded-md">
-	{#if data.achievement.image}
-		<img
-			src={imageUrl(data.achievement.image)}
-			alt={m.firm_steady_boar_imagealt({ name: data.achievement.name })}
-		/>
-	{:else}
-		<div class="text-gray-400 dark:text-gray-700">
-			<Ribbon />
-		</div>
-	{/if}
+	<AchievementIcon
+		image={data.achievement.image}
+		achievementType={data.achievement.achievementType}
+		name={data.achievement.name}
+	/>
 </div>
 
 <p class="max-w-2xl mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -197,7 +206,7 @@
 		<AchievementSummary
 			achievement={{ ...data.achievement, name: m.frail_weary_rabbit_nurture(), description: '' }}
 		>
-			<div slot="moredescription">
+			{#snippet moredescription()}
 				<p class="text-sm md:text-md font-light text-gray-500 dark:text-gray-400">
 					{m.kind_dry_panther_bask()}
 					{#if invite}
@@ -208,27 +217,29 @@
 						})}
 					{/if}
 				</p>
-			</div>
-			<div slot="image">
+			{/snippet}
+			{#snippet image()}
 				<div class="text-blue-600 dark:text-blue-700 w-10">
 					<Icon src={FaSolidEnvelopeOpenText} size="40" color="currentColor" />
 				</div>
-			</div>
-			<div slot="actions">
+			{/snippet}
+			{#snippet actions()}
 				<div class="p-2 flex flex-row space-x-3">
 					<a
 						class="text-gray-600 w-4 h-4 cursor-pointer"
 						href={invite
-							? `/achievements/${data.achievement.id}/claim?i=${invite?.id}&e=${encodeURIComponent(
-									invite?.inviteeEmail
-								)}`
-							: `/achievements/${data.achievement.id}/claim`}
+							? resolve(
+									`/achievements/${data.achievement.id}/claim?i=${invite?.id}&e=${encodeURIComponent(
+										invite?.inviteeEmail
+									)}`
+								)
+							: resolve(`/achievements/${data.achievement.id}/claim`)}
 					>
 						<span class="sr-only">{m.bold_swift_eagle_claim()}</span>
 						<Icon src={FaSolidInfoCircle} size="20" color="currentColor" />
 					</a>
 				</div>
-			</div>
+			{/snippet}
 		</AchievementSummary>
 	{/if}
 </div>
@@ -246,8 +257,9 @@
 			{@const claimRequires = $achievements.find((a) => config?.claimRequiresId == a.id)}
 			{#if claimRequires}
 				{m.sharp_quiet_panther_requires()}
-				<a href={`/achievements/${claimRequires.id}`} class="font-bold underline hover:no-underline"
-					>{claimRequires.name}</a
+				<a
+					href={resolve(`/achievements/${claimRequires.id}`)}
+					class="font-bold underline hover:no-underline">{claimRequires.name}</a
 				>. {#if userHoldsRequiredAchievement}
 					{m.swift_steady_falcon_meets()}
 				{:else}
@@ -266,30 +278,47 @@
 			: undefined}
 		{#if inviteRequires}
 			{m.bright_happy_sparrow_invitedesc()}
-			<a href={`/achievements/${inviteRequires?.id}`} class="font-bold underline hover:no-underline"
-				>{inviteRequires?.name}</a
+			<a
+				href={resolve(`/achievements/${inviteRequires?.id}`)}
+				class="font-bold underline hover:no-underline">{inviteRequires?.name}</a
 			>.
 		{:else if !config?.claimable}
 			{m.calm_steady_lynx_adminonly()}
 		{/if}
 
-		{#if reviewRequires && !!config?.reviewsRequired}
+		{#if reviewRequires && !!config?.json?.reviewsRequired}
 			{m.warm_tangy_deer_reviewsum({
-				reviewsRequired: config?.reviewsRequired ?? 0
+				reviewsRequired: config?.json?.reviewsRequired ?? 0
 			})}
 			<a
-				href={`/achievements/${reviewRequires?.id}`}
+				href={resolve(`/achievements/${reviewRequires?.id}`)}
 				class="font-bold underline hover:no-underline"
 			>
 				{reviewRequires.name}</a
 			>.
-		{:else if !config?.reviewRequiresId && config?.reviewsRequired}
+		{:else if !config?.reviewRequiresId && config?.json?.reviewsRequired}
 			{m.calm_steady_lynx_adminreview()}
 		{:else}
 			{m.gentle_brave_falcon_noreviews()}
 		{/if}
+		{#if config?.json?.stewards?.length}
+			&nbsp;{m.gentle_warm_heron_review()}
+		{/if}
 	</Heading>
 </div>
+
+{#if config?.json?.resultDescriptions?.length}
+	<div class="mt-4 max-w-2xl">
+		<h3 class="text-md font-semibold text-gray-900 dark:text-white mb-2">
+			{m.fancy_lush_owl_rubric()}
+		</h3>
+		<ul class="text-sm text-gray-700 dark:text-gray-400 space-y-1">
+			{#each config.json.resultDescriptions as rd (rd.id)}
+				<li><span class="font-medium">{rd.name}:</span> {rd.allowedValue.join(' · ')}</li>
+			{/each}
+		</ul>
+	</div>
+{/if}
 
 {#if data.org.json?.permissions?.editAchievementCapability?.requiresAchievement == data.achievement.id}
 	<div class="mt-4 max-w-2xl">
@@ -313,7 +342,7 @@
 			description={m.wide_quiet_beaver_build()}
 		/>
 		<div class="mt-4 space-y-4">
-			{#each alignments as alignment}
+			{#each alignments as alignment (alignment.targetUrl)}
 				<div
 					class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800"
 				>
@@ -321,7 +350,7 @@
 						<a
 							href={alignment.targetUrl}
 							target="_blank"
-							rel="noopener noreferrer"
+							rel="external noopener noreferrer"
 							class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
 						>
 							{alignment.targetName}
@@ -329,7 +358,7 @@
 						{#if alignment.targetCode}
 							<span class="text-sm text-gray-600 dark:text-gray-400">
 								{m.tiny_neat_hare_skip()}:
-								<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded"
+								<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded-sm"
 									>{alignment.targetCode}</code
 								>
 							</span>
@@ -352,19 +381,15 @@
 	level="h3"
 	description={`${m.vivid_best_bat_soar({
 		count: data.achievement._count.achievementClaims
-	})} ${
-		['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(data.session?.user?.orgRole || 'none')
-			? m.bad_mad_jackdaw_tap()
-			: m.great_merry_boar_ascend()
-	}`}
+	})} ${isAdmin($session?.user) ? m.bad_mad_jackdaw_tap() : m.great_merry_boar_ascend()}`}
 />
 
-{#if data.session?.user}
+{#if data.canViewClaimsList}
 	<div class="relative overflow-x-auto">
 		<ClaimList
-			{...calculatePageAndSize($page.url)}
+			{...calculatePageAndSize(page.url)}
 			totalCount={data.achievement._count.achievementClaims}
-			enableInvites={inviteCapability}
+			enableInvites={data.inviteCapability}
 		/>
 	</div>
 {:else}
@@ -373,12 +398,12 @@
 	</div>
 {/if}
 
-<form id="deleteForm" action="?/delete" method="POST" />
+<form id="deleteForm" action="?/delete" method="POST"></form>
 
 <Modal
 	visible={showDeleteModal}
 	title={m.stout_sad_bat_spur()}
-	on:close={() => {
+	onclose={() => {
 		showDeleteModal = false;
 	}}
 	actions={[
@@ -413,7 +438,7 @@
 <Modal
 	visible={showShareModal}
 	title={m.happy_sparse_lemur_clasp()}
-	on:close={() => {
+	onclose={() => {
 		showShareModal = false;
 	}}
 	actions={[
@@ -442,3 +467,5 @@
 		alt={m.plane_light_fish_view()}
 	/>
 </Modal>
+
+<ReportModal targetType="ACHIEVEMENT" targetId={data.achievement.id} bind:open={showReportModal} />

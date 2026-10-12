@@ -1,17 +1,18 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import type { PageData } from './$types';
+	import * as m from '$lib/i18n/messages';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
 
-	export let data: PageData;
-	let achievement = data.credential.achievement;
+	import type { PageProps } from './$types';
 
-	let breadcrumbItems = [
+	let { data }: PageProps = $props();
+	const achievement = $derived(data.credential.achievement);
+
+	const breadcrumbItems = $derived([
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: achievement.name, href: `/achievements/${achievement.id}` }
-	];
+	]);
 </script>
 
 <Breadcrumbs items={breadcrumbItems} />

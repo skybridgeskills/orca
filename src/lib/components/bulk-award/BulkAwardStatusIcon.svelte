@@ -1,12 +1,19 @@
 <script lang="ts">
-	import Icon from 'svelte-icons-pack/Icon.svelte';
-	import FaSolidCheckCircle from 'svelte-icons-pack/fa/FaSolidCheckCircle.js';
-	import FaSolidExclamationCircle from 'svelte-icons-pack/fa/FaSolidExclamationCircle.js';
-	import FaSolidTimesCircle from 'svelte-icons-pack/fa/FaSolidTimesCircle.js';
-	import FaSolidCircle from 'svelte-icons-pack/fa/FaSolidCircle.js';
+	import { Icon } from 'svelte-icons-pack';
+	import {
+		FaSolidCircle,
+		FaSolidCircleCheck,
+		FaSolidCircleExclamation,
+		FaSolidCircleXmark
+	} from 'svelte-icons-pack/fa';
+
 	import type { BulkAwardRowStatusValue } from './bulkAwardTypes';
 
-	export let status: BulkAwardRowStatusValue;
+	interface Props {
+		status: BulkAwardRowStatusValue;
+	}
+
+	let { status }: Props = $props();
 
 	const iconSize = '18';
 
@@ -45,10 +52,10 @@
 			/>
 		</svg>
 	{:else if status === 'success_new'}
-		<Icon src={FaSolidCheckCircle} size={iconSize} color="currentColor" />
+		<Icon src={FaSolidCircleCheck} size={iconSize} color="currentColor" />
 	{:else if status === 'success_existing'}
-		<Icon src={FaSolidExclamationCircle} size={iconSize} color="currentColor" />
+		<Icon src={FaSolidCircleExclamation} size={iconSize} color="currentColor" />
 	{:else if status === 'error'}
-		<Icon src={FaSolidTimesCircle} size={iconSize} color="currentColor" />
+		<Icon src={FaSolidCircleXmark} size={iconSize} color="currentColor" />
 	{/if}
 </span>

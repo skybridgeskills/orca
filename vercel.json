@@ -1,0 +1,11 @@
+{
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"buildCommand": "pnpm run build",
+	"installCommand": "corepack enable && pnpm install --frozen-lockfile",
+	"crons": [
+		{
+			"path": "/api/cron/purge-messages",
+			"schedule": "0 3 * * *"
+		}
+	]
+}

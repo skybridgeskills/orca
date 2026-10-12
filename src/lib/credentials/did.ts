@@ -67,3 +67,17 @@ export class KeyDID extends DID {
 		super(DID_METHODS.WEB, organization.domain, '', '', 'key-0');
 	}
 }
+
+export const MULTIKEY_VERIFICATION_METHOD_FRAGMENT = 'key-0-multikey';
+
+// Multikey verification-method id, parallel to `KeyDID`. Used as the proof creator for
+// DataIntegrityProof / eddsa-rdfc-2022 credentials. See ADR
+// 2026-06-12-data-integrity-proof-eddsa-rdfc-2022.
+export class MultikeyDID extends DID {
+	constructor(
+		public organization: Organization,
+		public key: SigningKey
+	) {
+		super(DID_METHODS.WEB, organization.domain, '', '', MULTIKEY_VERIFICATION_METHOD_FRAGMENT);
+	}
+}

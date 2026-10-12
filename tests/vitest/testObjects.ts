@@ -6,7 +6,22 @@ import type {
 	SigningKey,
 	User
 } from '@prisma/client';
-import { test } from 'vitest';
+import type { RequestEvent } from '@sveltejs/kit';
+
+/**
+ * Build a minimal stand-in for SvelteKit's `RequestEvent` suitable for unit
+ * tests that exercise hook/server helpers. The inner `as unknown as RequestEvent`
+ * cast is intentional and local: the mock is deliberately partial.
+ */
+export function makeFakeRequestEvent(
+	overrides: Partial<RequestEvent> & { host?: string } = {}
+): RequestEvent<Record<string, string>, string | null> {
+	const { host = 'example.com', ...rest } = overrides;
+	return {
+		url: new URL(`http://${host}`),
+		...rest
+	} as unknown as RequestEvent<Record<string, string>, string | null>;
+}
 
 export const testDate = new Date('2023-05-23');
 
@@ -29,7 +44,9 @@ export const testUser: User = {
 	familyName: 'User',
 	orgRole: null,
 	organizationId: testOrganization.id,
-	defaultVisibility: 'PRIVATE'
+	defaultVisibility: 'PRIVATE',
+	profileVisibility: 'COMMUNITY',
+	json: {}
 };
 
 export const testUserIdentifier: Identifier = {
@@ -39,7 +56,8 @@ export const testUserIdentifier: Identifier = {
 	verifiedAt: testDate,
 	userId: testUser.id,
 	organizationId: testOrganization.id,
-	visibility: 'PRIVATE'
+	visibility: 'PRIVATE',
+	json: {}
 };
 
 export const testAchievement: Achievement = {
@@ -55,7 +73,10 @@ export const testAchievement: Achievement = {
 	image: null,
 	creatorProfileId: null,
 	json: null,
-	categoryId: null
+	categoryId: null,
+	claimable: false,
+	claimRequiresId: null,
+	reviewRequiresId: null
 };
 
 export const testAchievementClaim: AchievementClaim = {

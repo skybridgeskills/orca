@@ -1,35 +1,56 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import Card from '$lib/components/Card.svelte';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
-	import StatusTag from '$lib/components/StatusTag.svelte';
 	import type { Achievement, AchievementClaim } from '@prisma/client';
+	import type { Snippet } from 'svelte';
+
+	import StatusTag from '$lib/components/StatusTag.svelte';
+	import * as m from '$lib/i18n/messages';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
 	import { imageUrl } from '$lib/utils/imageUrl';
-	import { createEventDispatcher } from 'svelte';
 
-	export let achievement: Achievement;
-	export let linkAchievement = true;
-	export let achievementHref = '';
-	export let claim: AchievementClaim | null = null;
-	export let href = '';
-	export let imageSize: '16' | '32' = '32'; // Tailwind width https://tailwindcss.com/docs/width
-	export let isClickable = false;
-	export let disabled = false;
+	import { resolve } from '$app/paths';
 
-	const dispatcher = createEventDispatcher();
+	interface Props {
+		achievement: Achievement;
+		linkAchievement?: boolean;
+		achievementHref?: string;
+		claim?: AchievementClaim | null;
+		href?: string;
+		imageSize?: '16' | '32'; // Tailwind width https://tailwindcss.com/docs/width
+		isClickable?: boolean;
+		disabled?: boolean;
+		onclick?: () => void;
+		image?: Snippet;
+		moredescription?: Snippet;
+		actions?: Snippet;
+	}
+
+	let {
+		achievement,
+		linkAchievement = true,
+		achievementHref = '',
+		claim = null,
+		href = '',
+		imageSize = '32',
+		isClickable = false,
+		disabled = false,
+		onclick,
+		image,
+		moredescription,
+		actions
+	}: Props = $props();
 </script>
 
 <svelte:element
-	this={!!href ? 'a' : 'section'}
-	href={href || undefined}
-	on:click={() => {
-		if (isClickable) dispatcher('click');
+	this={href ? 'a' : 'section'}
+	href={href ? resolve(href) : undefined}
+	onclick={() => {
+		if (isClickable) onclick?.();
 	}}
 	role={isClickable ? 'button' : 'listitem'}
 	tabindex="-1"
 	aria-roledescription={m.brave_light_lemur_scold()}
 	class="relative max-w-2xl bg-white p-6 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex flex-col {isClickable
-		? 'hover:shadow-lg hover:dark:shadow-gray-800 hover:border-gray-300 hover:dark:border-gray-500 cursor-pointer'
+		? 'hover:shadow-lg dark:hover:shadow-gray-800 hover:border-gray-300 dark:hover:border-gray-500 cursor-pointer'
 		: ''}"
 >
 	{#if claim?.claimStatus}
@@ -43,26 +64,24 @@
 
 	<div class="flex flex-col sm:flex-row gap-4">
 		<!-- Image -->
-		<slot name="image">
-			{#if achievement.image}
-				<img
-					src={imageUrl(achievement.image)}
-					class="object-scale-down"
-					class:w-32={imageSize === '32'}
-					class:w-16={imageSize === '16'}
-					class:opacity-50={disabled}
-					alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
-				/>
-			{:else}
-				<div
-					class={`text-gray-400 dark:text-gray-700`}
-					class:w-32={imageSize === '32'}
-					class:w-16={imageSize === '16'}
-				>
-					<Ribbon />
-				</div>
-			{/if}
-		</slot>
+		{#if image}{@render image()}{:else if achievement.image}
+			<img
+				src={imageUrl(achievement.image)}
+				class="object-scale-down"
+				class:w-32={imageSize === '32'}
+				class:w-16={imageSize === '16'}
+				class:opacity-50={disabled}
+				alt={m.firm_steady_boar_imagealt({ name: achievement.name })}
+			/>
+		{:else}
+			<div
+				class="text-gray-400 dark:text-gray-700"
+				class:w-32={imageSize === '32'}
+				class:w-16={imageSize === '16'}
+			>
+				<Ribbon />
+			</div>
+		{/if}
 		<div>
 			<!-- Name -->
 
@@ -72,9 +91,9 @@
 				}`}
 			>
 				{#if achievementHref}
-					<a href={achievementHref}>{achievement.name}</a>
+					<a href={resolve(achievementHref)}>{achievement.name}</a>
 				{:else if linkAchievement}
-					<a href="/achievements/{achievement.id}">{achievement.name}</a>
+					<a href={resolve(`/achievements/${achievement.id}`)}>{achievement.name}</a>
 				{:else}
 					{achievement.name}
 				{/if}
@@ -90,10 +109,10 @@
 					{achievement.description}
 				</p>
 			{/if}
-			<slot name="moredescription" />
+			{@render moredescription?.()}
 		</div>
 	</div>
 	<div class="absolute bottom-0 right-2">
-		<slot name="actions" />
+		{@render actions?.()}
 	</div>
 </svelte:element>

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { CredentialSubjectDID } from '$lib/credentials/did';
+
 import {
 	testAchievement,
 	testAchievementClaim,
@@ -7,7 +9,7 @@ import {
 	testUser,
 	testUserIdentifier
 } from '../../../tests/vitest/testObjects';
-import { CredentialSubjectDID } from '$lib/credentials/did';
+
 import { buildAchievementCredentialTemplate } from './credentialTemplate';
 
 describe('buildAchievementCredentialTemplate', () => {

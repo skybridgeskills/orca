@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { setIssuerSchema, setTransactionServiceSchema } from './schema';
 
 describe('setIssuerSchema', () => {

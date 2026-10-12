@@ -1,21 +1,25 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import { imageUrl } from '$lib/utils/imageUrl';
-	import { page } from '$app/stores';
 	import Button from '$lib/components/Button.svelte';
+	import Card from '$lib/components/Card.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Pagination from '$lib/components/Pagination.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import Tag from '$lib/components/Tag.svelte';
+	import * as m from '$lib/i18n/messages';
+	import Ribbon from '$lib/illustrations/Ribbon.svelte';
+	import { getSession } from '$lib/session/context';
+	import { imageUrl } from '$lib/utils/imageUrl';
 	import { calculatePageAndSize } from '$lib/utils/pagination';
-	import type { PageData } from './$types';
+
+	import type { PageProps } from './$types';
+
+	import { page } from '$app/state';
 	import { PUBLIC_HTTP_PROTOCOL } from '$env/static/public';
 
-	import Card from '$lib/components/Card.svelte';
-	import Ribbon from '$lib/illustrations/Ribbon.svelte';
-	export let data: PageData;
-	let member = data.member;
-	let showShareModal = false;
+	let { data }: PageProps = $props();
+	const session = getSession();
+	const member = $derived(data.member);
+	let showShareModal = $state(false);
 </script>
 
 <div class="max-w-2xl flex justify-between items-center mb-4">
@@ -27,20 +31,20 @@
 		{/if}
 	</h1>
 	<div class="inline-flex items-center">
-		{#if member.id == data.session?.user?.id}
+		{#if member.id == $session?.user?.id}
 			<Button
 				text={m.happy_sparse_lemur_clasp()}
 				submodule="secondary"
-				on:click={() => {
+				onclick={() => {
 					showShareModal = true;
 				}}
 			/>
-			<Button href={`/settings`} submodule="secondary" text={m.quiet_warm_dog_soar()} />
+			<Button href="/settings" submodule="secondary" text={m.quiet_warm_dog_soar()} />
 		{/if}
 	</div>
 </div>
 <p class="mt-1 mb-8 text-sm text-gray-500 dark:text-gray-400">
-	{#if member.id == data.session?.user?.id}
+	{#if member.id == $session?.user?.id}
 		{m.merry_bright_rabbit_bask()}
 	{:else}
 		{m.red_wide_jackdaw_drip()}
@@ -55,7 +59,7 @@
 			{member.identifiers.length} {m.bright_happy_sparrow_identifier()}
 		{/if}
 	</h3>
-	{#each member.identifiers as identifier}
+	{#each member.identifiers as identifier (identifier.id)}
 		<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
 			{identifier.type}: {identifier.identifier}
 			{#if identifier.verifiedAt}({m.sad_vivid_myna_visit()}){/if}
@@ -71,11 +75,11 @@
 			: m.soft_dense_boar_drip()}
 	</h3>
 	<Pagination
-		paging={{ ...calculatePageAndSize($page.url), count: member._count.receivedAchievementClaims }}
+		paging={{ ...calculatePageAndSize(page.url), count: member._count.receivedAchievementClaims }}
 	/>
 
 	<div class="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
-		{#each member.receivedAchievementClaims as claim}
+		{#each member.receivedAchievementClaims as claim (claim.id)}
 			<Card maxWidth="" hoverEffect={true} href="/claims/{claim.id}">
 				<div class="grid grid-cols-4 gap-2">
 					<div class="m-auto">
@@ -83,7 +87,6 @@
 							<img
 								src={imageUrl(claim.achievement.image)}
 								alt={m.dull_bright_ostrich_delight({ achievementName: claim.achievement.name })}
-								aria-hidden
 							/>
 						{:else}
 							<div class="text-gray-400 dark:text-gray-700">
@@ -107,11 +110,11 @@
 	</div>
 {/if}
 
-{#if member.id == data.session?.user?.id}
+{#if member.id == $session?.user?.id}
 	<Modal
 		visible={showShareModal}
 		title={m.happy_sparse_lemur_clasp()}
-		on:close={() => {
+		onclose={() => {
 			showShareModal = false;
 		}}
 		actions={[

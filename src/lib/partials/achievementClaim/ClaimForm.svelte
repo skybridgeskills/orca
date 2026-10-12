@@ -1,7 +1,13 @@
 <script lang="ts">
+	import type { AchievementClaim, Identifier } from '@prisma/client';
+	import { error } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
+
+	import Button from '$lib/components/Button.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
+	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
 	import * as m from '$lib/i18n/messages';
-	import type { Achievement, AchievementClaim, Identifier } from '@prisma/client';
-	import { session } from '$lib/stores/sessionStore';
+	import { getSession } from '$lib/session/context';
 	import {
 		claimEmail,
 		claimId,
@@ -10,61 +16,68 @@
 		claimUrl,
 		inviteId
 	} from '$lib/stores/activeClaimStore';
+
 	import { deserialize } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { error } from '@sveltejs/kit';
-	import { onMount } from 'svelte';
-	import Button from '$lib/components/Button.svelte';
-	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
-	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
-	export let existingBadgeClaim: AchievementClaim | null = null;
-	export let achievement: Achievement;
-	export let achievementConfig: App.AchievementConfig | null = null;
-	export let claimIntent: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED' = 'ACCEPTED';
-	const userIdentifiers: Identifier[] = $page.data.user?.identifiers || [];
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
+	interface Props {
+		existingBadgeClaim?: AchievementClaim | null;
+		achievement: App.AchievementWithRelations;
+		claimIntent?: 'ACCEPTED' | 'UNACCEPTED' | 'REJECTED';
+		handleSubmit?: (e: SubmitEvent) => Promise<void>;
+		handleCancel: () => void;
+	}
+
+	const session = getSession();
+	const userIdentifiers: Identifier[] = page.data.user?.identifiers || [];
 	const userEmails = userIdentifiers.filter((iden) => iden.type == 'EMAIL');
 
-	export let handleSubmit = async (e: SubmitEvent) => {
-		if (
-			!$session?.user &&
-			($inviteId || (achievementConfig?.claimable && !achievementConfig?.claimRequiresId))
-		) {
-			// User is unauthenticated, so needs to create an invite, then prove email address / create a session, but then can submit a claim
-			e.preventDefault();
-			$claimId = achievement.id;
-			$claimPending = true;
+	let {
+		existingBadgeClaim = null,
+		achievement,
+		claimIntent = 'ACCEPTED',
+		handleSubmit = async (e: SubmitEvent) => {
+			if (
+				!$session?.user &&
+				($inviteId || (achievement.claimable && !achievement.claimRequiresId))
+			) {
+				// User is unauthenticated, so needs to create an invite, then prove email address / create a session, but then can submit a claim
+				e.preventDefault();
+				$claimId = achievement.id;
+				$claimPending = true;
 
-			if (achievementConfig?.claimable && !achievementConfig?.claimRequiresId) {
-				const formData = new FormData();
-				formData.append('email', $claimEmail);
-				formData.append('narrative', 'Self-invitation of open claiming badge');
-				const response = await fetch(`/achievements/${achievement.id}/award`, {
-					method: 'POST',
-					body: formData
-				});
-				if (response.status != 200) {
-					throw error(400, m.factual_petty_marten_startle());
-				} else {
-					const responseData = deserialize(await response.text());
-					if (responseData && typeof responseData === 'object' && 'data' in responseData) {
-						const data = responseData.data as { endorsement?: { id?: string } };
-						$inviteId = data?.endorsement?.id ?? '';
+				if (achievement.claimable && !achievement.claimRequiresId) {
+					const formData = new FormData();
+					formData.append('email', $claimEmail);
+					formData.append('narrative', 'Self-invitation of open claiming badge');
+					const response = await fetch(`/achievements/${achievement.id}/award`, {
+						method: 'POST',
+						body: formData
+					});
+					if (response.status != 200) {
+						error(400, m.factual_petty_marten_startle());
+					} else {
+						const responseData = deserialize(await response.text());
+						if (responseData && typeof responseData === 'object' && 'data' in responseData) {
+							const data = responseData.data as { endorsement?: { id?: string } };
+							$inviteId = data?.endorsement?.id ?? '';
+						}
 					}
 				}
+				goto(resolve('/login'));
+			} else {
+				setTimeout(() => {
+					$claimEmail = userEmails[0]?.identifier || '';
+					$claimNarrative = '';
+					$claimUrl = '';
+					$claimPending = false;
+				}, 100);
+				// Bubble through to default form handling otherwise after setting up the form to be reset.
 			}
-			goto('/login');
-		} else {
-			setTimeout(() => {
-				$claimEmail = userEmails[0]?.identifier || '';
-				$claimNarrative = '';
-				$claimUrl = '';
-				$claimPending = false;
-			}, 100);
-			// Bubble through to default form handling otherwise after setting up the form to be reset.
-		}
-	};
-	export let handleCancel: () => void;
+		},
+		handleCancel
+	}: Props = $props();
 
 	const maybeSubmit = () => {
 		if ($claimPending && $session?.user) {
@@ -76,7 +89,7 @@
 
 	onMount(() => {
 		if (!$claimEmail) $claimEmail = userEmails[0]?.identifier || '';
-		if ($claimId && $claimId != $page.params.id) {
+		if ($claimId && $claimId != page.params.id) {
 			// Reset previous claim data
 			$claimEmail = userEmails[0]?.identifier || '';
 			$claimNarrative = '';
@@ -91,17 +104,21 @@
 			const claimJson = JSON.parse(existingBadgeClaim.json?.toString() || '{}') || {};
 
 			// Priority: Existing claim narrative, template narrative, or empty string
-			$claimNarrative = claimJson.narrative || achievementConfig?.json?.claimTemplate || '';
+			$claimNarrative = claimJson.narrative || achievement.json?.claimTemplate || '';
 			$claimUrl = claimJson.id ?? '';
 		} else if (!existingBadgeClaim && !$claimPending) {
-			$claimNarrative = achievementConfig?.json?.claimTemplate ?? '';
+			$claimNarrative = achievement.json?.claimTemplate ?? '';
 			$claimUrl = '';
 		}
 	});
 
-	$: {
+	// Side-effect: when the login flow completes and a user session appears (store
+	// change), re-trigger the deferred claim submission. This reacts to external
+	// store state and performs a DOM action (clicking submit), so it is a genuine
+	// $effect, not state mirroring.
+	$effect(() => {
 		if ($session?.user) maybeSubmit();
-	}
+	});
 </script>
 
 <form
@@ -110,7 +127,7 @@
 		? `/achievements/${achievement.id}/claim?/updateClaim`
 		: `/achievements/${achievement.id}/claim?/claim`}
 	class="max-w-2xl"
-	on:submit={handleSubmit}
+	onsubmit={handleSubmit}
 >
 	<input type="hidden" name="claimStatus" value={claimIntent} />
 	<input type="hidden" name="inviteId" value={$inviteId} />
@@ -129,7 +146,7 @@
 					bind:value={$claimEmail}
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 				>
-					{#each userEmails as identifier, i (identifier.id)}
+					{#each userEmails as identifier (identifier.id)}
 						<option value={identifier.identifier}>{identifier.identifier}</option>
 					{/each}
 				</select>
@@ -154,13 +171,13 @@
 			<label for="narrative" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 				>{m.patchy_crazy_marten_march()}</label
 			>
-			<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
+			<div class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 				{#if achievement.criteriaNarrative}
 					<MarkdownRender value={achievement.criteriaNarrative} />
 				{:else}
 					{m.bright_swift_eagle_narrinst()}
 				{/if}
-			</p>
+			</div>
 			<MarkdownEditor bind:value={$claimNarrative} inputName="narrative" />
 		</div>
 		<div class="mb-6">
@@ -197,7 +214,7 @@
 			submodule="secondary"
 			buttonType="button"
 			text={m.calm_steady_lynx_cancel()}
-			on:click={handleCancel}
+			onclick={handleCancel}
 		/>
 	</div>
 </form>

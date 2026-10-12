@@ -1,14 +1,18 @@
-import * as m from '$lib/i18n/messages';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from '@sveltejs/kit';
 import * as dotenv from 'dotenv';
-import { ValidationError } from 'yup';
-import { formSchema } from './schema';
-import { prisma } from '../../../prisma/client';
-import type { PageServerLoad } from './$types';
-import stripTags from '../../../lib/utils/stripTags';
-import { getUploadUrl } from '$lib/server/media';
 import { v4 as uuidv4 } from 'uuid';
+import { ValidationError } from 'yup';
+
+import * as m from '$lib/i18n/messages';
+import { isAdmin } from '$lib/permissions/isAdmin';
+import { getUploadUrl } from '$lib/server/media';
+
+import stripTags from '../../../lib/utils/stripTags';
+import { prisma } from '../../../prisma/client';
+
+import type { PageServerLoad } from './$types';
+import { formSchema } from './schema';
 
 dotenv.config();
 
@@ -18,21 +22,19 @@ const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
 
 export const load: PageServerLoad = ({ locals }) => {
 	// redirect user if logged out or doesn't hold org admin role
-	if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-		throw redirect(302, '/');
+	if (!isAdmin(locals.session?.user)) redirect(302, '/');
 };
 
 export const actions: Actions = {
-	default: async ({ locals, cookies, request }) => {
-		if (!['GENERAL_ADMIN', 'CONTENT_ADMIN'].includes(locals.session?.user?.orgRole || 'none'))
-			throw error(403, m.lower_home_cow_view());
+	default: async ({ locals, request }) => {
+		if (!isAdmin(locals.session?.user)) error(403, m.lower_home_cow_view());
 
 		const requestData = await request.formData();
 		const imageUpdated = requestData.get('imageEdited') === 'true';
 		const imageKey = requestData.get('imageExtension')
 			? `org-${locals.org.id}/${uuidv4().slice(-8)}-raw-image.${requestData.get('imageExtension')}`
 			: null;
-		let formData = {
+		const formData = {
 			name: stripTags(requestData.get('name')?.toString()),
 			description: stripTags(requestData.get('description')?.toString()),
 			url: requestData.get('url')?.toString(),
@@ -43,7 +45,7 @@ export const actions: Actions = {
 		try {
 			await formSchema.validate(formData);
 		} catch (err) {
-			if (err instanceof ValidationError) throw error(400, err.message);
+			if (err instanceof ValidationError) error(400, err.message);
 		}
 
 		// Get the tagline, defaultLanguage, and permissions from the form data
@@ -51,6 +53,10 @@ export const actions: Actions = {
 		const defaultLanguage = requestData.get('defaultLanguage')?.toString();
 		const editAchievementCapability = requestData.get('editAchievementCapability')?.toString();
 		const editAchievementRequires = requestData.get('editAchievementRequires')?.toString();
+		const membershipAchievement = requestData.get('membershipAchievement')?.toString();
+		const membershipAchievementRequires = requestData
+			.get('membershipAchievementRequires')
+			?.toString();
 
 		// Parse the current json object
 		const jsonData: App.OrganizationConfig =
@@ -63,7 +69,7 @@ export const actions: Actions = {
 		const updatedJson: App.OrganizationConfig = {
 			...jsonData,
 			tagline: tagline,
-			defaultLanguage: defaultLanguage || undefined,
+			defaultLanguage: (defaultLanguage || undefined) as App.OrganizationConfig['defaultLanguage'],
 			orgStatus: currentOrgStatus // Explicitly preserve orgStatus
 		};
 
@@ -78,7 +84,7 @@ export const actions: Actions = {
 			});
 
 			if (!achievement) {
-				throw error(400, 'Selected achievement does not exist in this organization');
+				error(400, 'Selected achievement does not exist in this organization');
 			}
 
 			updatedJson.permissions = {
@@ -91,6 +97,33 @@ export const actions: Actions = {
 			// Clear the permission setting (default to admins only)
 			if (updatedJson.permissions?.editAchievementCapability) {
 				delete updatedJson.permissions.editAchievementCapability;
+			}
+		}
+
+		// Handle membership achievement (who is a member of the community)
+		if (membershipAchievement === 'achievement' && membershipAchievementRequires) {
+			// Validate that the achievement exists in this organization
+			const achievement = await prisma.achievement.findFirst({
+				where: {
+					id: membershipAchievementRequires,
+					organizationId: locals.org.id
+				}
+			});
+
+			if (!achievement) {
+				error(400, 'Selected membership achievement does not exist in this organization');
+			}
+
+			updatedJson.permissions = {
+				...updatedJson.permissions,
+				membershipAchievement: {
+					requiresAchievement: membershipAchievementRequires
+				}
+			};
+		} else {
+			// Clear the membership setting. Unset means open: every signed-in user counts as a member.
+			if (updatedJson.permissions?.membershipAchievement) {
+				delete updatedJson.permissions.membershipAchievement;
 			}
 		}
 

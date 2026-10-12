@@ -1,13 +1,16 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import Alert from '$lib/components/Alert.svelte';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
+	import Alert from '$lib/components/Alert.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
-	import type { PageData } from './$types';
 	import Button from '$lib/components/Button.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import MarkdownEditor from '$lib/components/markdown-editor/MarkdownEditor.svelte';
 	import MarkdownRender from '$lib/components/MarkdownRender.svelte';
-	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+	import * as m from '$lib/i18n/messages';
+
+	import type { PageData } from './$types';
+
+	import { resolve } from '$app/paths';
 
 	export let data: PageData;
 	export let form;
@@ -16,10 +19,16 @@
 		id?: string;
 	};
 
+	type AwardedEndorsement = {
+		json?: string;
+		claim?: unknown;
+		createdAt?: Date;
+	};
+
 	$: {
 		if (form && form.endorsement) {
-			const endorsement = form.endorsement as any;
-			if ('json' in endorsement && typeof endorsement.json === 'string') {
+			const endorsement = form.endorsement as AwardedEndorsement | undefined;
+			if (endorsement && typeof endorsement.json === 'string') {
 				endorsementJson = JSON.parse(endorsement.json);
 			} else {
 				endorsementJson = {};
@@ -32,7 +41,10 @@
 	const breadcrumbItems = [
 		{ text: m.each_fluffy_fox_view(), href: '/' },
 		{ text: m.antsy_grand_rabbit_gaze(), href: '/achievements' },
-		{ text: data.achievement?.name, href: `/achievements/${data.achievement.id}` }
+		{
+			text: data.achievement?.name,
+			href: `/achievements/${data.achievement.id}`
+		}
 	];
 </script>
 
@@ -50,7 +62,7 @@
 			<p class="mt-4 mb-8 text-sm text-gray-500 dark:text-gray-400">
 				{m.patchy_silly_guppy_jump()}
 				<a
-					href={`/claims/${form.endorsement?.claim?.id}`}
+					href={resolve(`/claims/${form.endorsement?.claim?.id}`)}
 					class="text-blue-700 text-underline hover:no-underline"
 				>
 					{m.best_teary_shrimp_pause()}
@@ -85,14 +97,18 @@
 					<p class="font-bold max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 						{m.fancy_flat_kite_relish()}:
 					</p>
-					<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
+					<div class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 						<MarkdownRender value={endorsementJson.narrative} />
-					</p>
+					</div>
 				{/if}
 				{#if endorsementJson?.id}
 					<p class="max-w-2xl mt-3 text-sm text-gray-800 dark:text-gray-400">
 						<span class="font-bold">{m.calm_steady_lynx_evidence()}:</span>
-						<a href={endorsementJson.id} class="text-blue-700 text-underline hover:no-underline">
+						<a
+							href={endorsementJson.id}
+							rel="external"
+							class="text-blue-700 text-underline hover:no-underline"
+						>
 							{endorsementJson.id}
 						</a>
 					</p>
@@ -104,11 +120,11 @@
 			<Button
 				text={m.equal_petty_panther_file()}
 				submodule="secondary"
-				on:click={() => {
+				onclick={() => {
 					form = null;
 				}}
 			/>
-			<Button href="../{data.achievement.id}" submodule="primary" text="Done" />
+			<Button href={`/achievements/${data.achievement.id}`} submodule="primary" text="Done" />
 		</div>
 	{:else}
 		<!-- Submission form -->
@@ -119,7 +135,7 @@
 
 		<p class="mb-4 text-sm">
 			<a
-				href="/achievements/{data.achievement.id}/award/bulk"
+				href={resolve(`/achievements/${data.achievement.id}/award/bulk`)}
 				class="text-blue-700 hover:underline"
 			>
 				{m.warm_calm_otter_bulk()}
@@ -153,9 +169,9 @@
 					>{m.patchy_crazy_marten_march()}</label
 				>
 				{#if data.achievement.criteriaNarrative}
-					<p class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
+					<div class="max-w-2xl my-4 text-sm text-gray-500 dark:text-gray-400">
 						<MarkdownRender value={data.achievement.criteriaNarrative} />
-					</p>
+					</div>
 				{/if}
 				<textarea
 					id="narrative"
@@ -163,7 +179,7 @@
 					class="hidden"
 					placeholder={m.elegant_soft_oryx_read()}
 					bind:value={awardNarrative}
-				/>
+				></textarea>
 				<MarkdownEditor bind:value={awardNarrative} inputName="narrative" />
 			</div>
 			<div class="mb-6">
@@ -183,7 +199,7 @@
 
 			<button
 				type="submit"
-				class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+				class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 				>{m.bold_swift_eagle_submit()}</button
 			>
 		</form>

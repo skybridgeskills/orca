@@ -1,11 +1,12 @@
 <script lang="ts">
-	import * as m from '$lib/i18n/messages';
-	import type { PageData } from './$types';
-	import AchievementForm from '$lib/partials/AchievementForm.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import * as m from '$lib/i18n/messages';
+	import AchievementForm from '$lib/partials/AchievementForm.svelte';
 
-	export let data: PageData;
-	const categories = data.categories;
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+	const categories = $derived(data.categories);
 
 	let formData = {
 		name: '',

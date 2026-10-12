@@ -1,7 +1,8 @@
 import { prisma } from '../prisma/client';
+
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const highlightedAchievements = await prisma.achievement.findMany({
 		take: 4,
 		where: {

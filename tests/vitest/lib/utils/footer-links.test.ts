@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { getFooterUrl } from '$lib/utils/footer-links';
 
 describe('getFooterUrl', () => {

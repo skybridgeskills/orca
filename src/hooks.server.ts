@@ -1,11 +1,14 @@
-import * as m from '$lib/i18n/messages';
 import { error, type Handle, type RequestEvent } from '@sveltejs/kit';
 import cookie from 'cookie';
-import { prisma } from './prisma/client';
+
+import * as m from '$lib/i18n/messages';
 import { setLocale, locales } from '$lib/i18n/runtime';
 import { paraglideMiddleware } from '$lib/i18n/server';
-import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 import { getLanguageForRequest } from '$lib/utils/language-selection';
+
+import { prisma } from './prisma/client';
+
+import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
 
 export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
 	return orgJson.orgStatus ?? 'ENABLED';
@@ -20,7 +23,7 @@ export const getOrganizationFromRequest = async function (event: RequestEvent) {
 		}
 	});
 	if (orgs.length == 0) {
-		throw error(404, m.warm_top_parrot_drip());
+		error(404, m.warm_top_parrot_drip());
 	}
 
 	const org = orgs.find((org) => org.domain === domain) || orgs[0];
@@ -31,9 +34,9 @@ export const getOrganizationFromRequest = async function (event: RequestEvent) {
 	const orgStatus = getOrgStatus(orgJson);
 
 	if (orgStatus === 'SUSPENDED') {
-		throw error(503, m.sunny_watery_sparrow_jest());
+		error(503, m.sunny_watery_sparrow_jest());
 	} else if (orgStatus === 'PENDING') {
-		throw error(
+		error(
 			403,
 			'This community is not yet activated. Please try again later. If you are the administrator, please check your email for activation instructions.'
 		);
@@ -60,7 +63,9 @@ const getSession = async function (sessionId: string, orgId: string) {
 					organizationId: true,
 					orgRole: true,
 					identifiers: true,
-					defaultVisibility: true
+					defaultVisibility: true,
+					profileVisibility: true,
+					json: true
 				}
 			}
 		}
@@ -76,9 +81,12 @@ const getAuthHeaderTokenValue = function (authHeader: string | null) {
 	return parts[1];
 };
 
+// Org-less endpoints: health checks, and Vercel Cron (which calls the *.vercel.app host).
+const ORGLESS_PATH = /^\/(?:healthz$|api\/(?:v\d+\/)?cron\/)/;
+
 export const handle: Handle = ({ event, resolve }) => {
-	// Short-circuit for healthcheck - no org validation needed
-	if (event.url.pathname === '/healthz') {
+	// Short-circuit: no org lookup, session or paraglide for org-less endpoints.
+	if (ORGLESS_PATH.test(event.url.pathname)) {
 		return resolve(event);
 	}
 
