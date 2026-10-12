@@ -45,7 +45,7 @@ const fixTsconfigPlugin = () => ({
 	}
 });
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
 	let plugins = [
 		tailwindcss(),
 		sveltekit(),
@@ -114,6 +114,12 @@ export default defineConfig(({ mode }) => {
 			]
 		},
 		plugins,
+		// Bundle the @interop VC/crypto stack into the production server build.
+		// CJS @interop/jsonld require()s the ESM-only @interop/http-client, which
+		// plain Node 24 allows but the Vercel function runtime rejects with
+		// ERR_REQUIRE_ESM, so credential signing 500s there when left external.
+		// Build only: dev and Vitest keep loading these packages from node_modules.
+		ssr: command === 'build' ? { noExternal: [/^@interop\//] } : undefined,
 		server: {
 			port: parseInt(process.env.SERVER_PORT || process.env.PORT || '5173'),
 			host: '0.0.0.0',
