@@ -11,9 +11,27 @@ ALTER TABLE "Achievement" ADD COLUMN     "claimable" BOOLEAN NOT NULL DEFAULT fa
 ADD COLUMN     "claimRequiresId" TEXT,
 ADD COLUMN     "reviewRequiresId" TEXT;
 
+-- 2a. Achievements created by the earliest versions hold `""` instead of an object in
+--     `json`, and `"" || {...}` builds an array rather than merging keys. `""` and a
+--     JSON null carry nothing, so step 2 treats them as `{}`. Any other non-object
+--     value is unexpected: stop here (the whole migration rolls back) rather than
+--     discard it.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM "Achievement" a
+    JOIN "AchievementConfig" c ON c."achievementId" = a."id"
+    WHERE jsonb_typeof(a."json") <> 'object'
+      AND a."json" NOT IN ('""'::jsonb, 'null'::jsonb)
+  ) THEN
+    RAISE EXCEPTION 'Achievement.json holds a non-object value other than "" or null; fix it before migrating';
+  END IF;
+END $$;
+
 -- 2. Copy scalar config fields onto the achievement and merge the config json into
 --    `Achievement.json`. The `a."json" || ...` order preserves pre-existing json
---    keys (e.g. `alignment`) and only adds/overrides the merged config keys.
+--    keys (e.g. `alignment`) and only adds/overrides the merged config keys; a
+--    non-object `json` (`""`, null; see 2a) starts from `{}`.
 --    `reviewsRequired` moves into `json` (its single source of truth). `capabilities`
 --    / `claimTemplate` are copied verbatim from the config json *only when present*
 --    (the `?` key-existence guard avoids writing a null-valued top-level key when an
@@ -23,7 +41,7 @@ UPDATE "Achievement" a SET
   "claimable"        = c."claimable",
   "claimRequiresId"  = c."claimRequiresId",
   "reviewRequiresId" = c."reviewRequiresId",
-  "json" = COALESCE(a."json", '{}'::jsonb)
+  "json" = (CASE WHEN jsonb_typeof(a."json") = 'object' THEN a."json" ELSE '{}'::jsonb END)
            || jsonb_build_object('reviewsRequired', c."reviewsRequired")
            || (CASE WHEN c."json" ? 'capabilities'
                     THEN jsonb_build_object('capabilities', c."json"->'capabilities')
