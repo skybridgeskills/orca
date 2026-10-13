@@ -17,17 +17,15 @@ export type ViewerRole = 'owner' | 'admin' | 'community' | 'public';
  * - `editClaim`   – open the claim form with intent ACCEPTED (claim / edit / re-accept)
  * - `rejectClaim` – open the claim form with intent REJECTED
  * - `download`    – download the verifiable credential JSON
- * - `sendToWallet`– CHAPI send-to-wallet (non-exchange orgs)
- * - `exchange`    – transaction-service wallet handoff (exchange-enabled orgs)
+ * - `exchange`    – Send to wallet: the wallet exchange modal (CHAPI, QR, deep link)
  * - `copyLink`    – copy the public OB2 URL to the clipboard
- * - `shareQr`     – show the QR-code share modal (non-exchange orgs)
+ * - `shareQr`     – show the QR-code share modal (local-signing orgs)
  * - `shareLinkedin` – LinkedIn "add to profile" link
  */
 export type ClaimActionId =
 	| 'editClaim'
 	| 'rejectClaim'
 	| 'download'
-	| 'sendToWallet'
 	| 'exchange'
 	| 'copyLink'
 	| 'shareQr'
@@ -59,6 +57,12 @@ export interface ClaimActionDescriptor {
 	moreProps?: Record<string, unknown>;
 }
 
+/**
+ * How the org issues credentials: `local` signs in ORCA (and hosts the wallet exchange);
+ * `transactionService` delegates the exchange and signing to the DCC transaction service.
+ */
+export type IssuerMode = 'local' | 'transactionService';
+
 export interface ClaimActionsView {
 	/** Primary accept/reject/edit actions (rendered near the claim status). */
 	manage: ClaimActionId[];
@@ -68,7 +72,7 @@ export interface ClaimActionsView {
 
 /**
  * Pure view-model: derive the set of allowed actions from
- * (claimStatus, viewerRole, exchangeEnabled, visibility).
+ * (claimStatus, viewerRole, issuerMode, visibility).
  *
  * Sharing goes through the public `/ob2/a/<id>` link, which only serves `PUBLIC`
  * claims, so the share list is empty for any other visibility. The manage actions
@@ -86,7 +90,7 @@ export interface ClaimActionsView {
 export function claimActions(
 	claimStatus: ClaimStatus,
 	viewer: ViewerRole,
-	exchangeEnabled: boolean,
+	issuerMode: IssuerMode,
 	visibility: Visibility
 ): ClaimActionsView {
 	const empty: ClaimActionsView = { manage: [], share: [] };
@@ -98,17 +102,18 @@ export function claimActions(
 			return { manage: ['rejectClaim', 'editClaim'], share: [] };
 		}
 		case 'ACCEPTED': {
-			// AcceptedClaimDetail: download/sendToWallet (or exchange) + edit + reject,
-			// plus a share bar (copyLink, QR [non-exchange only], LinkedIn).
-			const manage: ClaimActionId[] = exchangeEnabled
-				? ['exchange', 'editClaim', 'rejectClaim']
-				: ['download', 'sendToWallet', 'editClaim', 'rejectClaim'];
+			// AcceptedClaimDetail: download (local signing only) + send to wallet + edit +
+			// reject, plus a share bar (copyLink, QR [local signing only], LinkedIn).
+			const local = issuerMode === 'local';
+			const manage: ClaimActionId[] = local
+				? ['download', 'exchange', 'editClaim', 'rejectClaim']
+				: ['exchange', 'editClaim', 'rejectClaim'];
 			const share: ClaimActionId[] =
 				visibility !== 'PUBLIC'
 					? []
-					: exchangeEnabled
-						? ['copyLink', 'shareLinkedin']
-						: ['copyLink', 'shareQr', 'shareLinkedin'];
+					: local
+						? ['copyLink', 'shareQr', 'shareLinkedin']
+						: ['copyLink', 'shareLinkedin'];
 			return { manage, share };
 		}
 		case 'REJECTED': {

@@ -11,10 +11,14 @@
 	}
 
 	let { actions, buttonClass = '' }: Props = $props();
+
+	// The shared button's `mr-3` would push a full-width button past the edge in the column.
+	const controlClass = $derived(`max-sm:mr-0 ${buttonClass}`);
 </script>
 
 {#if actions.length}
-	<div class="flex gap-1">
+	<!-- One column on phones (the buttons are already full width there); a row from `sm` up. -->
+	<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-1">
 		{#each actions as action (action.id)}
 			{#if action.id === 'shareLinkedin'}
 				<!-- Preserve the original LinkedIn "add to profile" image link markup. -->
@@ -33,7 +37,7 @@
 					submodule={action.submodule}
 					id={action.controlId}
 					fileName={action.downloadFileName}
-					class={buttonClass}
+					class={controlClass}
 				/>
 			{:else}
 				<Button
@@ -42,7 +46,7 @@
 					id={action.controlId}
 					disabled={action.disabled}
 					onclick={action.onclick}
-					class={buttonClass}
+					class={controlClass}
 				/>
 			{/if}
 		{/each}

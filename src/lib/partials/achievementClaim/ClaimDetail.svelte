@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { AchievementClaim, Organization } from '@prisma/client';
 	import type { Snippet } from 'svelte';
-	import { onMount } from 'svelte';
 
 	import {
 		claimActions,
 		type ClaimActionDescriptor,
 		type ClaimActionId,
+		type IssuerMode,
 		type ViewerRole
 	} from '$lib/claimViewModel';
 	import AchievementSummary from '$lib/components/achievement/AchievementSummary.svelte';
@@ -20,7 +20,6 @@
 	import QRCode from '$lib/components/QRCode.svelte';
 	import * as m from '$lib/i18n/messages';
 	import AchievementCriteria from '$lib/partials/achievement/AchievementCriteria.svelte';
-	import { notifications, Notification } from '$lib/stores/notificationStore';
 	import { evidenceItem } from '$lib/utils/evidenceItem';
 	import { linkedInShareUrl } from '$lib/utils/shareCredentials';
 
@@ -48,7 +47,7 @@
 			organization: Organization;
 		};
 		viewer: ViewerRole;
-		exchangeEnabled?: boolean;
+		issuerMode?: IssuerMode;
 		/**
 		 * Forwarded to `ClaimHeader`, beneath the title. The claim route supplies the
 		 * owner's `VisibilityControl` here; a non-owner "why is this visible" indicator
@@ -57,7 +56,7 @@
 		visibility?: Snippet;
 	}
 
-	let { claim, achievement, viewer, exchangeEnabled = false, visibility }: Props = $props();
+	let { claim, achievement, viewer, issuerMode = 'local', visibility }: Props = $props();
 
 	const isOwner = $derived(viewer === 'owner');
 	const isPublic = $derived(viewer === 'public');
@@ -68,19 +67,12 @@
 	// the value is owned by the form thereafter (matches the prior partials).
 	// svelte-ignore state_referenced_locally
 	let claimIntent: 'ACCEPTED' | 'REJECTED' | 'UNACCEPTED' = $state(claim.claimStatus || 'ACCEPTED');
-	let sendToWalletModalVisible = $state(false);
 	let showQRShareModal = $state(false);
 	let exchangeModalOpen = $state(false);
 	// Report-content affordance: available to ANY viewer of the claim (incl. the
 	// public / anonymous surface). The kebab + modal live here so both the authed
 	// and public branches share one state and one ReportModal instance.
 	let showReportModal = $state(false);
-
-	onMount(async () => {
-		// Owner-only: the credential-handler polyfill is only needed for the
-		// send-to-wallet affordance, which only the owner of an accepted claim sees.
-		if (isOwner) await window.credentialHandlerPolyfill.loadOnce();
-	});
 
 	const ob2Url = $derived(
 		`${PUBLIC_HTTP_PROTOCOL}://${achievement.organization.domain}/ob2/a/${claim.id}`
@@ -89,32 +81,6 @@
 	const openForm = (intent: 'ACCEPTED' | 'REJECTED') => {
 		claimIntent = intent;
 		showClaimForm = true;
-	};
-
-	const sendToWallet = async () => {
-		if (claim.claimStatus != 'ACCEPTED') return;
-		if (!navigator.credentials) {
-			notifications.add(new Notification(m.happy_antsy_kite_succeed()));
-			return;
-		}
-
-		const vc = await fetch(`/claims/${claim.id}/download`, { method: 'POST', body: '' }).then(
-			async (res) => await res.json()
-		);
-		if (!vc) return;
-
-		const presentation = {
-			'@context': [
-				'https://www.w3.org/2018/credentials/v1',
-				'https://www.w3.org/2018/credentials/examples/v1'
-			],
-			type: 'VerifiablePresentation',
-			verifiableCredential: [vc]
-			// A proof is not required on the Verifiable Presentation (only on the VCs themselves)
-		};
-		const webCredential = new window.WebCredential(presentation.type, presentation);
-		const chapiResult = await navigator.credentials.store(webCredential);
-		if (chapiResult === null) notifications.add(new Notification(m.tired_fancy_deer_lead()));
 	};
 
 	const copyLink = (e: MouseEvent | KeyboardEvent) => {
@@ -127,7 +93,7 @@
 
 	// --- Actions-as-data: map each derived ClaimActionId to a render descriptor ---
 	const actionView = $derived(
-		claimActions(claim.claimStatus, viewer, exchangeEnabled, claim.visibility)
+		claimActions(claim.claimStatus, viewer, issuerMode, claim.visibility)
 	);
 
 	const describe = (id: ClaimActionId): ClaimActionDescriptor => {
@@ -164,15 +130,6 @@
 					downloadUrl: `/claims/${claim.id}/download`,
 					downloadFileName: `${achievement.name.split(' ').join('-')}-credential.json`,
 					controlId: `download-${claim.id}`
-				};
-			case 'sendToWallet':
-				return {
-					id,
-					label: m.red_sleek_kite_relish(),
-					submodule: 'secondary',
-					onclick: () => {
-						sendToWalletModalVisible = true;
-					}
 				};
 			case 'exchange':
 				return {
@@ -330,7 +287,9 @@
 	{#if isOwner}
 		<!-- Owner manage row: heading + accept/reject/edit (+ accepted download). -->
 		{#if !showClaimForm || formInModal}
-			<div class="max-w-2xl flex justify-between items-center mt-6 border-t pt-5">
+			<div
+				class="max-w-2xl flex flex-col sm:flex-row sm:justify-between sm:items-center mt-6 border-t pt-5 pb-2 sm:pb-0"
+			>
 				<h2 class="text-l sm:text-xl my-4 dark:text-white">{manageHeading}</h2>
 				<ClaimActionBar actions={manageActions} />
 			</div>
@@ -427,38 +386,7 @@
 		</Modal>
 	{/if}
 
-	{#if claim.claimStatus === 'ACCEPTED' && !exchangeEnabled}
-		<Modal
-			visible={sendToWalletModalVisible}
-			title={m.red_sleek_kite_relish()}
-			onclose={() => {
-				sendToWalletModalVisible = false;
-			}}
-			actions={[
-				{
-					label: m.red_sleek_kite_relish(),
-					onClick: () => {
-						sendToWallet();
-						sendToWalletModalVisible = false;
-					},
-					submodule: 'primary',
-					buttonType: 'button'
-				}
-			]}
-		>
-			<p class="text-center text-gray-500 dark:text-gray-400">
-				{m.deft_bad_mouse_scold()}
-				<a href="https://chapi.io/" class="font-bold underline hover:no-underline" target="_blank"
-					>Credential Handler API (CHAPI)</a
-				>. {m.wide_smooth_mantis_intend()}
-				<a
-					href="https://learncard.app"
-					class="underline hover:no-underline font-bold"
-					target="_blank">LearnCard</a
-				>.
-			</p>
-		</Modal>
-
+	{#if claim.claimStatus === 'ACCEPTED' && issuerMode === 'local'}
 		<Modal
 			visible={showQRShareModal}
 			title={m.happy_bright_mole_spill()}
@@ -474,7 +402,7 @@
 		</Modal>
 	{/if}
 
-	{#if claim.claimStatus === 'ACCEPTED' && exchangeEnabled}
+	{#if claim.claimStatus === 'ACCEPTED'}
 		<SendToWalletExchangeModal
 			bind:open={exchangeModalOpen}
 			claimId={claim.id}

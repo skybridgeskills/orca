@@ -4,9 +4,10 @@ import { error, json } from '@sveltejs/kit';
 import { prisma } from '$lib/../prisma/client';
 import { buildAchievementCredentialTemplate } from '$lib/credentials/credentialTemplate';
 import * as m from '$lib/i18n/messages';
+import { createLocalExchange } from '$lib/server/exchange/localExchange';
 import { isSuspended } from '$lib/server/moderation/suspension';
 import { BadOrgConfigBlobError } from '$lib/server/secrets/orgConfigCrypto';
-import { IssuerMisconfiguredError } from '$lib/server/signingKey/resolver';
+import { IssuerMisconfiguredError, resolveActiveSigningKey } from '$lib/server/signingKey/resolver';
 import {
 	createExchange,
 	TransactionServiceUpstreamError
@@ -18,7 +19,9 @@ import type { RequestEvent } from './$types';
 export const POST = async ({ locals, params }: RequestEvent) => {
 	if (!locals.session?.user?.id) error(404, m.best_sharp_lamb_enchant());
 
-	if (!isExchangeEnabled(locals.org)) {
+	// Transaction-service orgs delegate the exchange; every other org hosts it locally.
+	const usesTransactionService = locals.org.json?.issuer?.type === 'transactionService';
+	if (usesTransactionService && !isExchangeEnabled(locals.org)) {
 		error(409, 'This organization is not configured for wallet exchange.');
 	}
 
@@ -52,6 +55,8 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 		error(403, m.glum_stout_seal_block());
 	}
 
+	if (!usesTransactionService) return createLocal(locals.org, claim.id);
+
 	const template = buildAchievementCredentialTemplate(claim, locals.org as Organization, {
 		includeSubjectId: false
 	});
@@ -74,3 +79,15 @@ export const POST = async ({ locals, params }: RequestEvent) => {
 		error(500, 'Unexpected error.');
 	}
 };
+
+/** ORCA-hosted exchange (local signing). Checks the org can sign before handing out URLs. */
+async function createLocal(org: App.Organization, claimId: string) {
+	try {
+		await resolveActiveSigningKey(org);
+	} catch (err) {
+		// A missing or unavailable key is a configuration problem, not a server fault.
+		console.error('Local exchange requested but the org cannot sign', err);
+		error(503, 'Issuer is misconfigured.');
+	}
+	return json(await createLocalExchange(org, claimId));
+}

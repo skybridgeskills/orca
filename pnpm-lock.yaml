@@ -20,6 +20,9 @@ importers:
       '@interop/data-integrity-proof':
         specifier: ^3.2.1
         version: 3.2.1
+      '@interop/did-method-key':
+        specifier: ^7.4.4
+        version: 7.4.4
       '@interop/ed25519-signature':
         specifier: ^7.0.0
         version: 7.0.1(@interop/jsonld-signatures@11.6.7)
@@ -54,8 +57,8 @@ importers:
         specifier: ^4.11.2
         version: 4.11.2(svelte@5.56.0(@typescript-eslint/types@8.60.0))
       credential-handler-polyfill:
-        specifier: ^3.2.0
-        version: 3.2.1
+        specifier: ^4.1.0
+        version: 4.1.0
       dayjs:
         specifier: ^1.11.9
         version: 1.11.19
@@ -931,8 +934,20 @@ packages:
     resolution: {integrity: sha512-koNgRHhQ26JUVdCnjJPloJA18cSUpWwqa3CFuwekoKztOUl6/ZgubFvi9FSGNEuAWq2RJuSVUXgvlRl7XrSHhQ==}
     engines: {node: '>=24.0'}
 
+  '@interop/data-integrity-core@8.8.0':
+    resolution: {integrity: sha512-c5zWCHMfMXmEBbJs8AZXvrvbNKVMnTXBcp5poojUtRhpEi9qHi81jF/F1NmLiVQApIQITpIDyBG7/79WxIjCzA==}
+    engines: {node: '>=24.0'}
+
   '@interop/data-integrity-proof@3.2.1':
     resolution: {integrity: sha512-hGrJSprOElcjPURXZYQnderBg0u8tEBlFpl6tPx20kScWBqPvs6EtGLy4DTTx6/XU1m5i6wZAAPtx8PyqK3xCw==}
+    engines: {node: '>=24.0'}
+
+  '@interop/did-io@4.2.0':
+    resolution: {integrity: sha512-irPL6CDwnYVhlii/8eJUG7fKXSmozCvV1bA9mzdtb/j8WwI89GAAwZtbT/ZB+aQy9rVR9Ghoe8fJypHZx8clKg==}
+    engines: {node: '>=24.0'}
+
+  '@interop/did-method-key@7.4.4':
+    resolution: {integrity: sha512-35ucLPgEWnH/erp9fpBxgRJiocJD48mcT35OPF9aokREThERSmwLmVn2y5/VUowPkWpck2QJg7yw2//0mwpKdQ==}
     engines: {node: '>=24.0'}
 
   '@interop/ed25519-signature@7.0.1':
@@ -948,6 +963,15 @@ packages:
     resolution: {integrity: sha512-CqCJlNaBMmj3sPqo1291aAObKQlJINjUnTur2aGS6rFBLWtsUQCqPxAiSLn1HythmwuB7x+al6bRnmt7ZCAAEg==}
     engines: {node: '>=20'}
 
+  '@interop/ed25519-verification-key@8.2.1':
+    resolution: {integrity: sha512-ft1j14xt6uu6T27begDXn15Cb7Mab1OZZOpbQxMhKyRrhKey56i+HMx2Ia53XPimhdXuVAGj7nCEFlcR4yOj1w==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react-native-get-random-values: '>=1.8.0'
+    peerDependenciesMeta:
+      react-native-get-random-values:
+        optional: true
+
   '@interop/http-client@1.0.3':
     resolution: {integrity: sha512-KxWiQ87iRreDfrhzrrcEJL/sDrnonhnOSyQKDlnxJywfJnB211rWOtcLlEz3kwrqw3Tt0L3H+5zVvgfG6V/xhw==}
     engines: {node: '>=22.12'}
@@ -960,8 +984,16 @@ packages:
     resolution: {integrity: sha512-gH9Jlwexv4QBdw5mPPrHtrC6ojP/FIfazsy55ScNhnwPbmhWl592erBGmQoo8WGT8wRSOwiGRG30b96lEPTT/w==}
     engines: {node: '>=18'}
 
+  '@interop/lru-memoize@4.0.3':
+    resolution: {integrity: sha512-6c8dnoQNIiL25Q4YovC1a44mREO1lzW3F/lmvdwbAMMbhtGGRoQeqo1H4diwNhBzaxRrUMXrAIwbM26POmI/Yg==}
+    engines: {node: '>=24.0'}
+
   '@interop/vc@11.0.1':
     resolution: {integrity: sha512-jbu3xuXMA1+Nqt6QwJ2Q2pbdtKvfhUmcHwF6YGILD8tVWwiJwvp1ch2CqGyH1zmL2bvEkTa6BEjZNvuWn2ldaQ==}
+    engines: {node: '>=24.0'}
+
+  '@interop/x25519-key-agreement-key@5.4.1':
+    resolution: {integrity: sha512-4/sL9vP6cwpE/oicx+JvfNrS4PoX10kbJGJRG2eYBkPAKUKqOxvb4z3SODR6334b1Htr5WtOxudPNTxVgutpIg==}
     engines: {node: '>=24.0'}
 
   '@isaacs/fs-minipass@4.0.1':
@@ -1014,11 +1046,19 @@ packages:
   '@neondatabase/serverless@0.6.1':
     resolution: {integrity: sha512-rZIyWf27WxH4eW0ZRDQT2PxUJH3AphNVEnO4x1AGjBW6XrguH3ChLokup0gNGrX8cxDbP0UyduI7qdy4OLos+A==}
 
+  '@noble/curves@2.4.0':
+    resolution: {integrity: sha512-P4/62zrgfH33CneE3Dn4WhJVA22YUU0eR51wKIan4NVRvwsA0YnPTwWGpNbpuacSujmSFLvyzpyuR30+fbq2Ew==}
+    engines: {node: '>= 20.19.0'}
+
   '@noble/ed25519@3.1.0':
     resolution: {integrity: sha512-pfcObRY3CtvwfaG9Mt5XqZdKmAQppl37tHUeuBhDUbiwJBCVY4/A4lbMvb1xKhMDx96AqAqZpMWuBX1HulhX4g==}
 
   '@noble/hashes@2.2.0':
     resolution: {integrity: sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg==}
+    engines: {node: '>= 20.19.0'}
+
+  '@noble/hashes@2.4.0':
+    resolution: {integrity: sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==}
     engines: {node: '>= 20.19.0'}
 
   '@package-json/types@0.0.12':
@@ -1289,6 +1329,9 @@ packages:
 
   '@scure/base@2.2.0':
     resolution: {integrity: sha512-b8XEupJibegiXV+tDUseI8oLQc8ei3d/4Jkb2RpbHh3MfE054ov3uIz2dhFkB3FI8iwYkEh0gGCApkrYggkPNg==}
+
+  '@scure/base@2.4.0':
+    resolution: {integrity: sha512-thZ1TuJwFwBblOhgsjDKvvGirBxNp+wSvY/DR6tJBJOTDhdAAcHJ8Vbr2eFnqaxeca4+t0i9KBf+uHYGWwZORg==}
 
   '@shikijs/core@3.23.0':
     resolution: {integrity: sha512-NSWQz0riNb67xthdm5br6lAkvpDJRTgB36fxlo37ZzM2yq0PQFFzbd8psqC2XMPgCzo1fW6cVi18+ArJ44wqgA==}
@@ -2665,8 +2708,8 @@ packages:
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
-  credential-handler-polyfill@3.2.1:
-    resolution: {integrity: sha512-3atcMQ8urA/M5d9bGc9NkTcCP6XEXS9uPMBltjp3itaiSDmdmbGXfBRWtAhJ37+NxmCsDNxmjjL9Y3E2SiRzJw==}
+  credential-handler-polyfill@4.1.0:
+    resolution: {integrity: sha512-MOhdGKI/8KQDPnuDibtWlv0AbxjELFyNUk6AT9/1q5KpnCtYSqbvkmWlPpdrHQwxdETu39Pe97ASdbT/LlIZWg==}
 
   credentials-context@2.0.0:
     resolution: {integrity: sha512-/mFKax6FK26KjgV2KW2D4YqKgoJ5DVJpNt87X2Jc9IxT2HBMy7nEIlc+n7pEi+YFFe721XqrvZPd+jbyyBjsvQ==}
@@ -4554,8 +4597,8 @@ packages:
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
 
-  web-request-rpc@2.0.3:
-    resolution: {integrity: sha512-lKuY88iMVomXrgej6EK98fvvhgbk02uWAqFHynIvIDnURvA+kEO6rjLDbyZ7Odv4BpCo/+q44BNhgf7F76eIuA==}
+  web-request-rpc@3.0.1:
+    resolution: {integrity: sha512-dnVaNe3b89vnICKz440TCdxhDvww+pbL0iupUldiVrCXcb15eaXF8lcAwySw8u9vHNpeqEWfswAZv+LO24/Vsw==}
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -5482,12 +5525,30 @@ snapshots:
 
   '@interop/data-integrity-core@6.1.2': {}
 
+  '@interop/data-integrity-core@8.8.0':
+    dependencies:
+      '@scure/base': 2.4.0
+
   '@interop/data-integrity-proof@3.2.1':
     dependencies:
       '@interop/data-integrity-core': 6.1.2
       '@interop/jsonld-signatures': 11.6.7
       '@noble/hashes': 2.2.0
       '@scure/base': 2.2.0
+
+  '@interop/did-io@4.2.0':
+    dependencies:
+      '@interop/data-integrity-core': 8.8.0
+      '@interop/lru-memoize': 4.0.3
+
+  '@interop/did-method-key@7.4.4':
+    dependencies:
+      '@interop/data-integrity-core': 8.8.0
+      '@interop/did-io': 4.2.0
+      '@interop/ed25519-verification-key': 8.2.1
+      '@interop/x25519-key-agreement-key': 5.4.1
+    transitivePeerDependencies:
+      - react-native-get-random-values
 
   '@interop/ed25519-signature@7.0.1(@interop/jsonld-signatures@11.6.7)':
     dependencies:
@@ -5504,6 +5565,13 @@ snapshots:
   '@interop/ed25519-verification-key@7.0.1':
     dependencies:
       '@interop/data-integrity-core': 6.1.2
+      '@noble/ed25519': 3.1.0
+      '@noble/hashes': 2.2.0
+      '@scure/base': 2.2.0
+
+  '@interop/ed25519-verification-key@8.2.1':
+    dependencies:
+      '@interop/data-integrity-core': 8.8.0
       '@noble/ed25519': 3.1.0
       '@noble/hashes': 2.2.0
       '@scure/base': 2.2.0
@@ -5529,6 +5597,10 @@ snapshots:
       lru-cache: 6.0.0
       rdf-canonize: 5.0.0
 
+  '@interop/lru-memoize@4.0.3':
+    dependencies:
+      lru-cache: 11.5.1
+
   '@interop/vc@11.0.1':
     dependencies:
       '@digitalcredentials/credentials-v2-context': 1.0.0
@@ -5536,6 +5608,12 @@ snapshots:
       '@interop/jsonld': 9.0.2
       '@interop/jsonld-signatures': 11.6.7
       credentials-context: 2.0.0
+
+  '@interop/x25519-key-agreement-key@5.4.1':
+    dependencies:
+      '@interop/data-integrity-core': 8.8.0
+      '@noble/curves': 2.4.0
+      '@scure/base': 2.2.0
 
   '@isaacs/fs-minipass@4.0.1':
     dependencies:
@@ -5606,9 +5684,15 @@ snapshots:
     dependencies:
       '@types/pg': 8.6.6
 
+  '@noble/curves@2.4.0':
+    dependencies:
+      '@noble/hashes': 2.4.0
+
   '@noble/ed25519@3.1.0': {}
 
   '@noble/hashes@2.2.0': {}
+
+  '@noble/hashes@2.4.0': {}
 
   '@package-json/types@0.0.12': {}
 
@@ -5871,6 +5955,8 @@ snapshots:
     optional: true
 
   '@scure/base@2.2.0': {}
+
+  '@scure/base@2.4.0': {}
 
   '@shikijs/core@3.23.0':
     dependencies:
@@ -7279,9 +7365,9 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  credential-handler-polyfill@3.2.1:
+  credential-handler-polyfill@4.1.0:
     dependencies:
-      web-request-rpc: 2.0.3
+      web-request-rpc: 3.0.1
 
   credentials-context@2.0.0: {}
 
@@ -9348,7 +9434,7 @@ snapshots:
     dependencies:
       defaults: 1.0.4
 
-  web-request-rpc@2.0.3: {}
+  web-request-rpc@3.0.1: {}
 
   webidl-conversions@3.0.1: {}
 

@@ -2,13 +2,13 @@ import type { Visibility } from '@prisma/client';
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import { prisma } from '$lib/../prisma/client';
+import type { IssuerMode } from '$lib/claimViewModel';
 import { getAchievement } from '$lib/data/achievement';
 import { getValidUserClaim } from '$lib/data/achievementClaim';
 import * as m from '$lib/i18n/messages';
 import { canViewClaim, viewerRole } from '$lib/server/claimVisibility';
 import { activeSuspensionFor } from '$lib/server/moderation/suspension';
 import { isMemberOrOpen } from '$lib/server/permissions';
-import { isExchangeEnabled } from '$lib/server/transactionService/config';
 import { isVisibility } from '$lib/server/visibility';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -87,7 +87,9 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		endorsementCount,
 		user: locals.session?.user,
 		prerequisiteClaim,
-		exchangeEnabled: isExchangeEnabled(locals.org)
+		issuerMode: (locals.org.json?.issuer?.type === 'transactionService'
+			? 'transactionService'
+			: 'local') as IssuerMode
 	};
 };
 
