@@ -7,6 +7,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { CredentialSubjectDID, OrganizationDID } from '$lib/credentials/did';
 import { alignmentRowsFromAchievementJson } from '$lib/data/alignment';
 
+export interface CredentialTemplateOptions {
+	/** Omit `credentialSubject.id` (the transaction service inserts the holder DID itself). */
+	includeSubjectId?: boolean;
+	/** Subject DID override, e.g. a wallet's DID-authenticated holder DID. Defaults to the
+	 * org-generated did:web for the user. */
+	subjectId?: string;
+	/** Credential `id` override. Defaults to `urn:uuid:<claim id>` (the claim's cached credential). */
+	credentialId?: string;
+}
+
 /**
  * Builds an unsigned Open Badge credential payload. No `proof` field is set; signing adds it.
  */
@@ -16,10 +26,11 @@ export function buildAchievementCredentialTemplate(
 		user: User & { identifiers: Identifier[] };
 	},
 	organization: Organization,
-	options: { includeSubjectId?: boolean } = {}
+	options: CredentialTemplateOptions = {}
 ): App.OpenBadgeCredential {
 	const { includeSubjectId = true } = options;
-	const generatedSubjectDid = new CredentialSubjectDID(organization, claim.user);
+	const subjectId =
+		options.subjectId ?? new CredentialSubjectDID(organization, claim.user).didString();
 	const organizationDid = new OrganizationDID(organization);
 
 	// OB2/OB3 Alignment uses `targetUrl`; internal storage maps `targetUrl` (see legacy readers in alignment.ts).
@@ -48,7 +59,7 @@ export function buildAchievementCredentialTemplate(
 
 	const credentialSubject = includeSubjectId
 		? {
-				id: generatedSubjectDid.didString(),
+				id: subjectId,
 				...achievementSubject
 			}
 		: { ...achievementSubject };
@@ -58,7 +69,7 @@ export function buildAchievementCredentialTemplate(
 			'https://www.w3.org/ns/credentials/v2',
 			'https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json'
 		],
-		id: `urn:uuid:${claim.id}`,
+		id: options.credentialId ?? `urn:uuid:${claim.id}`,
 		type: ['VerifiableCredential', 'OpenBadgeCredential'],
 		issuer: {
 			id: organizationDid.didString(),

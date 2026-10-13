@@ -4,7 +4,10 @@ import { Ed25519VerificationKey } from '@interop/ed25519-verification-key';
 import { issue, type VerifiableCredential } from '@interop/vc';
 import type { Achievement, AchievementClaim, Organization, User, Identifier } from '@prisma/client';
 
-import { buildAchievementCredentialTemplate } from '$lib/credentials/credentialTemplate';
+import {
+	buildAchievementCredentialTemplate,
+	type CredentialTemplateOptions
+} from '$lib/credentials/credentialTemplate';
 import { MultikeyDID, OrganizationDID } from '$lib/credentials/did';
 import { resolveActiveSigningKey } from '$lib/server/signingKey/resolver';
 
@@ -15,9 +18,14 @@ export const achievementClaimToCredential = async function (
 		achievement: Achievement;
 		user: User & { identifiers: Identifier[] };
 	},
-	organization: Organization
+	organization: Organization,
+	templateOptions: Pick<CredentialTemplateOptions, 'subjectId' | 'credentialId'> = {}
 ) {
-	const credentialTemplate = buildAchievementCredentialTemplate(claim, organization);
+	const credentialTemplate = buildAchievementCredentialTemplate(
+		claim,
+		organization,
+		templateOptions
+	);
 	const signingKey = await resolveActiveSigningKey(organization as App.Organization);
 	const organizationDid = new OrganizationDID(organization);
 	// The Multikey verification-method id is the proof creator for new credentials

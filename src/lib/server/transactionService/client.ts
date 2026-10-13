@@ -100,6 +100,59 @@ export async function createExchange(
 	};
 }
 
+const UPSTREAM_STATES = ['pending', 'active', 'complete', 'invalid'] as const;
+type UpstreamExchangeState = (typeof UPSTREAM_STATES)[number];
+
+/**
+ * Reads a claim exchange's state from the transaction service. Only `state` and `expires`
+ * are taken from the record: the rest holds the credential template and variables.
+ * Returns null when the service has no such exchange.
+ */
+export async function getExchangeState(
+	org: App.Organization,
+	exchangeId: string
+): Promise<{ state: UpstreamExchangeState; expiresAt: string | null } | null> {
+	if (!isExchangeAvailable(org)) {
+		throw new IssuerMisconfiguredError(
+			`Transaction service is not configured for organization ${org.id}.`
+		);
+	}
+	const transactionService = readTransactionServiceConfig(org);
+	const apiKey = decrypt(transactionService.encryptedApiKey);
+	const baseUrl = transactionService.url.replace(/\/$/, '');
+	const url = `${baseUrl}/workflows/claim/exchanges/${encodeURIComponent(exchangeId)}`;
+
+	let response: Response;
+	try {
+		response = await redactedFetch(url, {
+			method: 'GET',
+			headers: {
+				Authorization: `Basic ${Buffer.from(`${transactionService.tenantName}:${apiKey}`).toString('base64')}`,
+				Accept: 'application/json'
+			}
+		});
+	} catch (err) {
+		if (err instanceof BadOrgConfigBlobError || err instanceof IssuerMisconfiguredError) {
+			throw err;
+		}
+		throw new TransactionServiceUpstreamError('Failed to reach transaction service', {
+			cause: err
+		});
+	}
+
+	if (response.status === 404) return null;
+	if (!response.ok) {
+		throw new TransactionServiceUpstreamError(`Transaction service returned ${response.status}`, {
+			status: response.status
+		});
+	}
+
+	const data = (await response.json()) as Record<string, unknown> | null;
+	const state = UPSTREAM_STATES.find((s) => s === data?.state) ?? 'pending';
+	const expiresAt = typeof data?.expires === 'string' ? data.expires : null;
+	return { state, expiresAt };
+}
+
 function readOrgJson(org: App.Organization): App.OrganizationConfig | null {
 	const j = org.json as unknown;
 	if (j === null || typeof j !== 'object' || Array.isArray(j)) {

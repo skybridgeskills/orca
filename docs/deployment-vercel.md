@@ -50,8 +50,9 @@ imperative steps and copy-paste commands as-is.
     page fails with a 500.
   - Optional: `CRON_SECRET`. Vercel Cron sends it as
     `Authorization: Bearer <CRON_SECRET>` to `/api/cron/purge-messages`, daily at
-    03:00 UTC (the `crons` entry in `vercel.json`). Without it, the cleanup job
-    gets a 401 and old messages are not purged.
+    03:00 UTC (the `crons` entry in `vercel.json`). The job purges old messages and
+    Send to wallet exchanges that expired more than 24 hours ago. Without it, the
+    cleanup job gets a 401 and nothing is purged.
 - [ ] Vercel project settings: **Node.js Version 24.x**; `ENABLE_EXPERIMENTAL_COREPACK=1`
       in Production and Preview (needed for pnpm 11); no build or install command
       overrides in the dashboard (`vercel.json` is the source of truth).

@@ -56,6 +56,7 @@ export async function ensureClaimCredential(
 			data: {
 				identifier: signedCredential.id,
 				subjectId: signedCredential.credentialSubject.id,
+				claimId: claim.id, // self-heals rows that predate the claimId backfill
 				json: JSON.parse(JSON.stringify(signedCredential)) as Prisma.InputJsonValue
 			}
 		});
@@ -66,6 +67,7 @@ export async function ensureClaimCredential(
 			achievement: { connect: { id: claim.achievementId } },
 			creatorUser: { connect: { id: opts.creatorUserId } },
 			claim: { connect: { id: claim.id } },
+			issuedFor: { connect: { id: claim.id } },
 			identifier: signedCredential.id,
 			subjectId: signedCredential.credentialSubject.id,
 			json: JSON.parse(JSON.stringify(signedCredential)) as Prisma.InputJsonValue

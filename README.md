@@ -9,12 +9,12 @@ Features:
 - Prerequisite requirements
 - Peer endorsements, and qualified reviews by users who hold configurable reviewer badge
 - Internationalization (i18n) with supported locales `en-US`, `en-AU`, and `fr`.
-- Digital credentials wallet integration with CHAPI.
-- Optional wallet handoff via the [DCC Transaction Service](https://github.com/digitalcredentials/transaction-service) (per-organization opt-in). See `docs/plans/2026-04-21-transaction-service-exchanges/00-overview.md` for the design.
+- Send to wallet over [CHAPI](https://chapi.io/), a QR code, or a deep link, through a [VC-API](https://w3c-ccg.github.io/vc-api/) claim exchange with DID authentication. The issued credential's subject is the wallet's own DID. ORCA hosts the exchange for orgs that sign locally; see `docs/adr/2026-10-12-orca-hosted-vc-api-claim-exchange.md`.
+- Optional wallet handoff via the [DCC Transaction Service](https://github.com/digitalcredentials/transaction-service) (per-organization opt-in), which then hosts the exchange and signs. See `docs/plans/2026-04-21-transaction-service-exchanges/00-overview.md` for the design.
 
 Roadmap:
 
-- API (based on [VC-API](https://w3c-ccg.github.io/vc-api/)) that can be used by connected services that cause badges to be awarded or make use of those badges on behalf of the community.
+- API (based on [VC-API](https://w3c-ccg.github.io/vc-api/), beyond the hosted claim exchange) that can be used by connected services that cause badges to be awarded or make use of those badges on behalf of the community.
 - Federation of communities for non-PII aggregate usage data using ActivityPub
 - Visualizations: word clouds, and maps
 - Enhanced granular privacy controls

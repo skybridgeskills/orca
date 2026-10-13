@@ -67,7 +67,7 @@
 	claim={data.claim}
 	achievement={achievementForDetail}
 	viewer={data.viewer}
-	exchangeEnabled={data.exchangeEnabled}
+	issuerMode={data.issuerMode}
 	visibility={data.viewer === 'owner' ? visibilityControl : undefined}
 />
 

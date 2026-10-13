@@ -13,7 +13,9 @@
 </script>
 
 {#if actions.length}
-	<div class="max-w-2xl flex justify-between items-center mt-6 border-t border-b pt-5">
+	<div
+		class="max-w-2xl flex flex-col sm:flex-row sm:justify-between sm:items-center mt-6 border-t border-b pt-5 pb-4 sm:pb-0"
+	>
 		<h2 class="text-l sm:text-xl my-4 dark:text-white">{m.early_fancy_boar_file()}</h2>
 		<ClaimActionBar {actions} buttonClass="text-xs" />
 	</div>
