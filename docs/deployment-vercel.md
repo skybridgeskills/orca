@@ -76,6 +76,22 @@ ORCA pins the runtime in the repo, but confirm the dashboard agrees:
 **After deploy, verify:** the Vercel build logs report Node `24.x`, and the deployed
 functions show the `nodejs24.x` runtime.
 
+### Node.js security releases
+
+- Vercel manages the patch version for `nodejs24.x`. Do **not** change the project's
+  Node.js Version setting or `svelte.config.js` for a patch release.
+- Watch Vercel's Node.js security bulletin until it reports the patched runtimes as
+  fully rolled out. Then redeploy **both** production projects (US and EU) through the
+  normal release flow (sections 4–6; skip the migration step if the schema is
+  unchanged).
+- Verify: load a page in each project, then find the `orca server start` line in its
+  function logs. Confirm `node` is at or above the patched version (for example
+  `v24.22.1` for the October 2026 release). The line is logged on cold start.
+- Docker is separate: the `Dockerfile` uses the floating `node:24-alpine` tag and CI
+  pulls it fresh, so any new image built on `main` gets the latest Node 24 patch.
+  The published image only changes when `main` is rebuilt; re-run the latest `main`
+  CI workflow if nothing has merged since the release.
+
 ## 4. Deploying a release with migrations
 
 For a release that adds files under `src/prisma/migrations/`:
@@ -147,14 +163,15 @@ Expect `.vercel/output/` with function `.vc-config.json` files reporting
 
 ## 9. Troubleshooting
 
-| Symptom                                   | Likely cause                               | Fix                                                                                        |
-| ----------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `Unsupported Node.js version`             | Build/runtime on old Node                  | Set project Node.js Version to 24.x; confirm `runtime: 'nodejs24.x'` in `svelte.config.js` |
-| Install fails on the pnpm version         | Corepack not enabled                       | Set `ENABLE_EXPERIMENTAL_COREPACK=1` in the environment; redeploy                          |
-| Runtime Prisma/Neon errors                | `DATABASE_SERVERLESS` not `true`           | Set `DATABASE_SERVERLESS=true`; redeploy                                                   |
-| New deployment 500s on new columns/tables | Migrations not applied                     | Run section 4 step 3                                                                       |
-| App returns 500 after migrating           | `DATABASE_URL` pooled string misconfigured | Verify the Neon **pooled** connection string                                               |
-| Message cleanup cron returns 401          | `CRON_SECRET` missing from Production env  | Set `CRON_SECRET`; redeploy so the build picks it up                                       |
+| Symptom                                                                     | Likely cause                                           | Fix                                                                                        |
+| --------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `Unsupported Node.js version`                                               | Build/runtime on old Node                              | Set project Node.js Version to 24.x; confirm `runtime: 'nodejs24.x'` in `svelte.config.js` |
+| Install fails on the pnpm version                                           | Corepack not enabled                                   | Set `ENABLE_EXPERIMENTAL_COREPACK=1` in the environment; redeploy                          |
+| Runtime Prisma/Neon errors                                                  | `DATABASE_SERVERLESS` not `true`                       | Set `DATABASE_SERVERLESS=true`; redeploy                                                   |
+| New deployment 500s on new columns/tables                                   | Migrations not applied                                 | Run section 4 step 3                                                                       |
+| App returns 500 after migrating                                             | `DATABASE_URL` pooled string misconfigured             | Verify the Neon **pooled** connection string                                               |
+| Message cleanup cron returns 401                                            | `CRON_SECRET` missing from Production env              | Set `CRON_SECRET`; redeploy so the build picks it up                                       |
+| `orca server start` logs an unpatched Node version after a security release | Vercel rollout not complete, or deployment predates it | Wait for Vercel's bulletin to report completion; redeploy                                  |
 
 ## Review gate (before production deploy)
 

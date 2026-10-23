@@ -139,10 +139,16 @@ For production deployment to Vercel on Node 24 (runtime setup, env vars, Prisma 
 
 ## Docker
 
-The image is based on `node:24-alpine` and uses `pnpm@10.29.2` (activated via Corepack inside the build) for dependency installation and the build. Build it locally from the repository root:
+The image is based on the floating `node:24-alpine` tag, so each build picks up the latest Node 24 patch release; CI pulls the base image fresh on every build. pnpm comes from `package.json`'s `packageManager` field via Corepack. Build it locally from the repository root, with `--pull` so a stale cached base image is not reused:
 
 ```sh
-docker build -t orca:dev .
+docker build --pull -t orca:dev .
+```
+
+Confirm the Node version inside a built image:
+
+```sh
+docker run --rm --entrypoint node orca:dev -v
 ```
 
 The container needs a reachable PostgreSQL instance and a minimal set of environment variables. The entrypoint runs Prisma migrations using `DATABASE_URL_DIRECT`, then starts the SvelteKit Node server on port 3000. Example against Postgres on the host (macOS/Windows; use `host.docker.internal` in the URL):

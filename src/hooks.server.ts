@@ -1,4 +1,4 @@
-import { error, type Handle, type RequestEvent } from '@sveltejs/kit';
+import { error, type Handle, type RequestEvent, type ServerInit } from '@sveltejs/kit';
 import cookie from 'cookie';
 
 import * as m from '$lib/i18n/messages';
@@ -9,6 +9,12 @@ import { getLanguageForRequest } from '$lib/utils/language-selection';
 import { prisma } from './prisma/client';
 
 import { DEFAULT_ORG_ENABLED, DEFAULT_ORG_DOMAIN } from '$env/static/private';
+
+// Logged once per server instance so the running Node patch level can be
+// confirmed from Vercel function logs or `docker logs` after a security release.
+export const init: ServerInit = () => {
+	console.info('orca server start', { node: process.version });
+};
 
 export const getOrgStatus = (orgJson: App.OrganizationConfig): App.OrgStatus => {
 	return orgJson.orgStatus ?? 'ENABLED';
