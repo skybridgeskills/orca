@@ -1,0 +1,100 @@
+name: Migrate database
+
+# Started by hand. Applies Prisma migrations to the database of the chosen GitHub
+# environment, read from that environment's DATABASE_URL_DIRECT secret. The
+# environment list comes from the repo's settings, so forks define their own.
+# See docs/deployment-vercel.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment whose DATABASE_URL_DIRECT secret points at the database to migrate
+        type: environment
+        required: true
+      sha:
+        description: Optional commit on the default branch to take migrations from (default is the commit this run is on)
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migrate-${{ inputs.environment }}
+  # Never cancel a migration part-way through.
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ inputs.environment }}
+    env:
+      # The schema reads both; migrations must use the direct (non-pooled) connection.
+      DATABASE_URL: ${{ secrets.DATABASE_URL_DIRECT }}
+      DATABASE_URL_DIRECT: ${{ secrets.DATABASE_URL_DIRECT }}
+      TARGET_ENVIRONMENT: ${{ inputs.environment }}
+      REQUESTED_SHA: ${{ inputs.sha }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+    steps:
+      - name: Check the environment's database secret
+        run: |
+          if [ -z "$DATABASE_URL_DIRECT" ]; then
+            echo "::error::Environment '$TARGET_ENVIRONMENT' has no DATABASE_URL_DIRECT secret. Add it under Settings → Environments → $TARGET_ENVIRONMENT."
+            exit 1
+          fi
+          # Logs on a public repo are public, and Prisma prints the database host.
+          host=$(printf '%s' "$DATABASE_URL_DIRECT" | sed -E 's#^[a-z]+://([^@/]*@)?([^:/?]+).*#\2#')
+          echo "::add-mask::$host"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Full history, so a requested sha can be checked against the default branch.
+          fetch-depth: 0
+
+      - name: Check out the requested commit
+        if: inputs.sha != ''
+        run: |
+          if ! [[ "$REQUESTED_SHA" =~ ^[0-9a-f]{7,40}$ ]]; then
+            echo "::error::sha must be 7–40 lowercase hex characters."
+            exit 1
+          fi
+          if ! commit=$(git rev-parse --quiet --verify "$REQUESTED_SHA^{commit}"); then
+            echo "::error::$REQUESTED_SHA is not a commit in this repository."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$commit" "origin/$DEFAULT_BRANCH"; then
+            echo "::error::$REQUESTED_SHA is not on $DEFAULT_BRANCH."
+            exit 1
+          fi
+          git checkout --detach "$commit"
+
+      - name: Record the run
+        run: |
+          {
+            echo "### Migrating \`$TARGET_ENVIRONMENT\`"
+            echo "- Commit: \`$(git rev-parse HEAD)\`"
+            echo "- Started (UTC, point-in-time restore target): $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Migration status
+        # Informational. It exits 1 whenever migrations are pending, which is the
+        # normal case here; connection and history errors fail the next step.
+        run: pnpm exec prisma migrate status --schema src/prisma/schema.prisma || true
+
+      - name: Apply migrations
+        run: pnpm exec prisma migrate deploy --schema src/prisma/schema.prisma

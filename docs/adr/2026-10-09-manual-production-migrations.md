@@ -1,6 +1,6 @@
 # Production migrations run by hand, not in the Vercel build
 
-- Status: Accepted
+- Status: Accepted; decision 2 amended by [2026-10-23-production-migrations-workflow](2026-10-23-production-migrations-workflow.md)
 - Date: 2026-10-09
 - Deciders: ORCA maintainers
 
