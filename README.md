@@ -137,6 +137,10 @@ To reproduce the Vercel bundle locally: `rm -rf build .svelte-kit .vercel && VER
 
 For production deployment to Vercel on Node 24 (runtime setup, env vars, Prisma migrations, rollback), follow the runbook in [`docs/deployment-vercel.md`](docs/deployment-vercel.md).
 
+### Running production migrations
+
+The Vercel build never migrates the database. Production migrations are applied when you choose, by starting the **Migrate database** workflow (`.github/workflows/migrate.yml`) by hand from the Actions tab. It runs `prisma migrate status` and then `prisma migrate deploy` against the database of the GitHub environment you pick. To use it on your own deployment (including from a fork), create a GitHub environment for each database you run, add a `DATABASE_URL_DIRECT` environment secret with that database's direct connection string, and restrict the environment's deployment branches to your default branch. The environment names are yours to choose; the workflow lists whatever environments the repository has. See [`docs/deployment-vercel.md`](docs/deployment-vercel.md) for the full steps.
+
 ## Docker
 
 The image is based on the floating `node:24-alpine` tag, so each build picks up the latest Node 24 patch release; CI pulls the base image fresh on every build. pnpm comes from `package.json`'s `packageManager` field via Corepack. Build it locally from the repository root, with `--pull` so a stale cached base image is not reused:
