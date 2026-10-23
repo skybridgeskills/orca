@@ -1,3 +1,7 @@
+# Floating major tag: every build picks up the latest Node 24 patch
+# (including security releases) as long as the base image is pulled fresh.
+# CI always pulls (`pull: true` in .github/workflows/test.yml); locally, use
+# `docker build --pull`.
 FROM node:24-alpine
 
 # Install OpenSSL for Prisma compatibility
@@ -10,14 +14,16 @@ WORKDIR /app
 # entrypoint runs (see PoC Phase 3 for the volume wiring).
 RUN mkdir -p /app/dev-uploads
 
-# Activate the pnpm version pinned in package.json's `packageManager` field
-# via Corepack. `--activate` makes the shim available on PATH.
-RUN corepack enable && corepack prepare pnpm@10.29.2 --activate
+# Enable the Corepack shims. Corepack activates the pnpm version pinned in
+# package.json's `packageManager` field the first time pnpm runs in /app.
+RUN corepack enable
 
 # Install dependencies first to maximise Docker layer cache reuse on
 # source-only changes. `pnpm install --frozen-lockfile` requires the
-# lockfile and manifest to match exactly.
-COPY package.json pnpm-lock.yaml ./
+# lockfile and manifest to match exactly. pnpm-workspace.yaml carries
+# `allowBuilds` (pnpm 11 refuses to install without it) and .npmrc carries
+# `engine-strict`; both must be present before install.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile
 
 # Bring in the rest of the application source.

@@ -90,6 +90,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          # Always pull the floating node:24-alpine base so each image ships the
+          # latest Node 24 patch release.
+          pull: true
           platforms: linux/amd64,linux/arm64
           push: true
           tags: skybridgeskills/orca:${{ github.sha }},skybridgeskills/orca:latest
