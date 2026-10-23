@@ -76,6 +76,11 @@ A user's request to earn a badge for an achievement.
 - `validFrom`, `validUntil`: Optional validity period
 - `visibility`: Who can see this claim (default `PUBLIC`; see
   [Claim visibility](#claim-visibility))
+- `credentialId`: Unique foreign key to the claim's **cached** `AchievementCredential`
+  (relation `CachedCredential`), used by the JSON download and the OB3 API
+- `issuedCredentials`: Every `AchievementCredential` issued for this claim (relation
+  `IssuedCredentials`), cached and holder-bound
+- `exchanges`: Open `CredentialExchange` rows for Send to wallet
 
 **Unique constraint**: `(userId, achievementId)` - a user can only have one claim per achievement.
 
@@ -90,6 +95,32 @@ A credential (badge) that has been issued to a user.
 - `creatorUserId`: Foreign key to User who created/issued the credential
 - `identifier`: Unique identifier for the credential
 - `json`: JSON field containing the full credential data (OpenBadges format)
+- `claimId`: Foreign key to the claim it was issued for (relation `IssuedCredentials`,
+  `ON DELETE CASCADE`; indexed)
+
+A claim has one **cached** credential, which the claim's `credentialId` points at. Its
+subject is an org-generated `did:web:<org>:u:<user>`. A claim can also have any number of
+**holder-bound** credentials, one per completed Send to wallet exchange: the subject is the
+wallet's DID-authenticated holder DID, and each has a fresh `urn:uuid` id. Every row has
+`claimId` set. See ADR 2026-10-12-orca-hosted-vc-api-claim-exchange.
+
+### CredentialExchange
+
+Ephemeral VC-API claim exchange state for orgs that sign locally (transaction-service orgs
+keep this state in the service). Nothing permanent lives here; the issued credential is an
+`AchievementCredential` with `claimId`.
+
+- `id`: UUID primary key; it appears in the wallet-facing URLs, so it is the capability
+- `organizationId`, `claimId`: foreign keys (the claim FK is `ON DELETE CASCADE`)
+- `challenge`: DID-auth challenge
+- `expiresAt`: creation + 15 minutes (indexed for the purge)
+- `startedAt`: set when a wallet fetches the DID-auth request
+- `completedAt`: single-use marker, set when a credential is issued
+- `errors`: JSON array of `{ code, message, at }` (sanitized, no presentation content)
+
+State is derived, not stored: `complete` if `completedAt` is set, otherwise `invalid` if
+`errors` has entries, otherwise `active` if `startedAt` is set, otherwise `pending`. The
+daily `/api/cron/purge-messages` job deletes rows that expired more than 24 hours ago.
 
 ### ClaimEndorsement
 

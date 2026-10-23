@@ -36,6 +36,7 @@ model Organization {
   messages                Message[]
   reports                 Report[]
   moderationActions       ModerationAction[]
+  credentialExchanges     CredentialExchange[]
 }
 
 model User {
@@ -189,37 +190,60 @@ model AchievementCredential {
   subjectId      String
   creatorUserId  String
   profileId      String?
-  claim          AchievementClaim?
+  claimId        String? // claim this credential was issued for (cached or holder-bound)
+  claim          AchievementClaim? @relation("CachedCredential")
+  issuedFor      AchievementClaim? @relation("IssuedCredentials", fields: [claimId], references: [id], onDelete: Cascade)
   achievement    Achievement       @relation(fields: [achievementId], references: [id])
   creatorUser    User              @relation(fields: [creatorUserId], references: [id])
   organization   Organization      @relation(fields: [organizationId], references: [id])
   Profile        Profile?          @relation(fields: [profileId], references: [id])
 
   @@index([subjectId])
+  @@index([claimId])
 }
 
 model AchievementClaim {
-  id             String                 @id @default(uuid())
-  organizationId String
-  credentialId   String?                @unique
-  userId         String
-  achievementId  String
-  json           Json                   @default("{}")
-  claimStatus    ClaimStatus            @default(UNACCEPTED)
-  createdOn      DateTime               @default(now())
-  creatorId      String?
-  validFrom      DateTime?
-  validUntil     DateTime?
-  visibility     Visibility             @default(PUBLIC)
-  achievement    Achievement            @relation(fields: [achievementId], references: [id])
-  creator        User?                  @relation("CreatedAchievementClaims", fields: [creatorId], references: [id])
-  credential     AchievementCredential? @relation(fields: [credentialId], references: [id])
-  organization   Organization           @relation(fields: [organizationId], references: [id])
-  user           User                   @relation("AchievementClaims", fields: [userId], references: [id])
-  endorsements   ClaimEndorsement[]     @relation("Endorsements")
-  reviewsGiven   ClaimEndorsement[]     @relation("Prerequisite")
+  id                String                  @id @default(uuid())
+  organizationId    String
+  credentialId      String?                 @unique
+  userId            String
+  achievementId     String
+  json              Json                    @default("{}")
+  claimStatus       ClaimStatus             @default(UNACCEPTED)
+  createdOn         DateTime                @default(now())
+  creatorId         String?
+  validFrom         DateTime?
+  validUntil        DateTime?
+  visibility        Visibility              @default(PUBLIC)
+  achievement       Achievement             @relation(fields: [achievementId], references: [id])
+  creator           User?                   @relation("CreatedAchievementClaims", fields: [creatorId], references: [id])
+  credential        AchievementCredential?  @relation("CachedCredential", fields: [credentialId], references: [id])
+  organization      Organization            @relation(fields: [organizationId], references: [id])
+  user              User                    @relation("AchievementClaims", fields: [userId], references: [id])
+  endorsements      ClaimEndorsement[]      @relation("Endorsements")
+  reviewsGiven      ClaimEndorsement[]      @relation("Prerequisite")
+  issuedCredentials AchievementCredential[] @relation("IssuedCredentials")
+  exchanges         CredentialExchange[]
 
   @@unique([userId, achievementId])
+}
+
+/// Ephemeral VC-API exchange state for Orca-hosted (local-signing) exchanges. Rows are
+/// purged after expiry; nothing permanent lives here.
+model CredentialExchange {
+  id             String           @id @default(uuid()) // capability: appears in wallet-facing URLs
+  organizationId String
+  claimId        String
+  challenge      String
+  expiresAt      DateTime
+  startedAt      DateTime? // wallet fetched the DID-auth request
+  completedAt    DateTime? // single-use marker; credential issued
+  errors         Json? // [{ code, message, at }] — sanitized, no presentation content
+  createdAt      DateTime         @default(now())
+  claim          AchievementClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+
+  @@index([expiresAt])
 }
 
 model ClaimEndorsement {

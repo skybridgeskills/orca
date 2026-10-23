@@ -221,19 +221,6 @@ declare namespace App {
 	}
 }
 
-// app.d.ts is an ambient (non-module) declaration file, so the Window
-// augmentation is declared at top level rather than inside `declare global`
-// (which only takes effect inside modules). This makes the CHAPI globals
-// visible to .svelte/.ts consumers under whole-app type-checking.
-interface Window {
-	credentialHandlerPolyfill: {
-		loadOnce: () => Promise<void>;
-	};
-	WebCredential: {
-		new (type: string, data: unknown): Credential;
-	};
-}
-
 declare module '$app/paths' {
 	/**
 	 * Fallback for resolve() when the argument is a string variable or TS

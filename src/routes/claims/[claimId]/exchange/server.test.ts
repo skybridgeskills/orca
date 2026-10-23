@@ -27,6 +27,18 @@ vi.mock('$lib/../prisma/client', () => ({
 const mockIsSuspended = vi.hoisted(() => vi.fn().mockResolvedValue(false));
 vi.mock('$lib/server/moderation/suspension', () => ({ isSuspended: mockIsSuspended }));
 
+// Local-signing orgs host the exchange themselves (P4 of chapi-exchange-delivery).
+const mockResolveActiveSigningKey = vi.hoisted(() => vi.fn());
+vi.mock('$lib/server/signingKey/resolver', async (importOriginal) => {
+	const mod = await importOriginal<typeof import('$lib/server/signingKey/resolver')>();
+	return { ...mod, resolveActiveSigningKey: mockResolveActiveSigningKey };
+});
+
+const mockCreateLocalExchange = vi.hoisted(() => vi.fn());
+vi.mock('$lib/server/exchange/localExchange', () => ({
+	createLocalExchange: mockCreateLocalExchange
+}));
+
 import { POST } from './+server';
 
 const ORG: App.Organization = {
@@ -265,5 +277,109 @@ describe('POST /claims/[claimId]/exchange', () => {
 			}
 		}
 		spy.mockRestore();
+	});
+});
+
+describe('POST /claims/[claimId]/exchange (local-signing org)', () => {
+	const LOCAL_ORG = {
+		...ORG,
+		json: { issuer: { type: 'signingKey', signingKeyId: 'key-1' } }
+	} as App.Organization;
+
+	const LOCAL_RESPONSE = {
+		exchangeId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+		protocols: {
+			iu: 'https://example.com/interactions/b2c3d4e5-f6a7-8901-bcde-f12345678901?iuv=1',
+			vcapi: 'https://example.com/workflows/claim/exchanges/b2c3d4e5-f6a7-8901-bcde-f12345678901',
+			lcw: 'https://lcw.app/request.html?issuer=example.com&auth_type=bearer&challenge=c&vc_request_url=x',
+			verifiablePresentationRequest: { query: { type: 'DIDAuthentication' } }
+		},
+		expiresAt: '2099-01-01T00:00:00.000Z'
+	};
+
+	function localEvent(
+		over: { session?: App.SessionData | null; org?: App.Organization } = {}
+	): Parameters<typeof POST>[0] {
+		return makeEvent({
+			locals: {
+				org: over.org ?? LOCAL_ORG,
+				session:
+					over.session === undefined
+						? ({ user: { id: 'user-1' } } as App.SessionData)
+						: over.session
+			}
+		});
+	}
+
+	async function expectKitError(promise: Promise<unknown>, status: number, message?: string) {
+		try {
+			await promise;
+			expect.fail('expected throw');
+		} catch (e) {
+			expect(isKitError(e)).toBe(true);
+			if (isKitError(e)) {
+				expect(e.status).toBe(status);
+				if (message !== undefined) expect(e.body.message).toBe(message);
+			}
+		}
+	}
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mockIsSuspended.mockResolvedValue(false);
+		// isExchangeEnabled means "transaction service configured"; a local org has none.
+		mockIsExchangeEnabled.mockReturnValue(false);
+		mockFindUnique.mockResolvedValue(buildClaim());
+		mockResolveActiveSigningKey.mockResolvedValue({ id: 'key-1' });
+		mockCreateLocalExchange.mockResolvedValue(LOCAL_RESPONSE);
+	});
+
+	it.each([
+		['a signingKey issuer', LOCAL_ORG],
+		['no issuer config', { ...ORG, json: {} } as App.Organization]
+	])('returns createLocalExchange’s shape for an org with %s', async (_label, org) => {
+		const res = (await POST(localEvent({ org }))) as Response;
+		expect(res.status).toBe(200);
+		expect(await res.json()).toEqual(LOCAL_RESPONSE);
+		expect(mockResolveActiveSigningKey).toHaveBeenCalledWith(org);
+		expect(mockCreateLocalExchange).toHaveBeenCalledWith(org, 'claim-1');
+		expect(mockResolveActiveSigningKey.mock.invocationCallOrder[0]).toBeLessThan(
+			mockCreateLocalExchange.mock.invocationCallOrder[0]
+		);
+		expect(mockCreateExchange).not.toHaveBeenCalled();
+	});
+
+	it.each([
+		['IssuerMisconfiguredError', new IssuerMisconfiguredError('key revoked')],
+		['a missing key (Prisma not-found)', new Error('No SigningKey found')]
+	])('returns 503 and creates no exchange when the signing key throws %s', async (_l, err) => {
+		const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+		mockResolveActiveSigningKey.mockRejectedValue(err);
+		await expectKitError(POST(localEvent()), 503, 'Issuer is misconfigured.');
+		expect(mockCreateLocalExchange).not.toHaveBeenCalled();
+		spy.mockRestore();
+	});
+
+	it('returns 404 with no session', async () => {
+		await expectKitError(POST(localEvent({ session: null })), 404, m.best_sharp_lamb_enchant());
+		expect(mockCreateLocalExchange).not.toHaveBeenCalled();
+	});
+
+	it.each([
+		['missing', null],
+		['in another org', buildClaim({ organizationId: 'other-org' })],
+		['owned by another user', buildClaim({ userId: 'other-user' })],
+		['not ACCEPTED', buildClaim({ claimStatus: ClaimStatus.UNACCEPTED })]
+	])('returns 404 when the claim is %s', async (_label, claim) => {
+		mockFindUnique.mockResolvedValue(claim);
+		await expectKitError(POST(localEvent()), 404, m.best_sharp_lamb_enchant());
+		expect(mockResolveActiveSigningKey).not.toHaveBeenCalled();
+		expect(mockCreateLocalExchange).not.toHaveBeenCalled();
+	});
+
+	it.each([['CLAIM'], ['ACHIEVEMENT']])('returns 403 when the %s is suspended', async (type) => {
+		mockIsSuspended.mockImplementation(async ({ targetType }) => targetType === type);
+		await expectKitError(POST(localEvent()), 403, m.glum_stout_seal_block());
+		expect(mockCreateLocalExchange).not.toHaveBeenCalled();
 	});
 });
